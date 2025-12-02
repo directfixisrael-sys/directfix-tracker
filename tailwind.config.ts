@@ -14,7 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        rubik: ["Rubik", "sans-serif"],
+        rubik: ["'Rubik'", "sans-serif"],
+        sans: ["'Rubik'", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
