@@ -116,8 +116,8 @@ const AdminPanel = () => {
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-xl font-bold text-foreground mb-2">פאנל ניהול</h1>
-          <p className="text-muted-foreground text-sm mb-6">הכנס קוד גישה להמשך</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">פאנל ניהול</h1>
+          <p className="text-muted-foreground mb-6">הכנס קוד גישה להמשך</p>
           
           <form onSubmit={handleCodeSubmit} className="space-y-4">
             <Input
@@ -267,16 +267,16 @@ const AdminPanel = () => {
         return (
           <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
-              <h2 className="text-lg md:text-xl font-bold">כל ההודעות</h2>
+              <h2 className="text-xl md:text-2xl font-bold">כל ההודעות</h2>
               {unreadCount > 0 && (
-                <span className="bg-warning text-warning-foreground text-xs md:text-sm px-3 py-1 rounded-full">
+                <span className="bg-warning text-warning-foreground text-sm px-3 py-1.5 rounded-full">
                   {unreadCount} הודעות חדשות מלקוחות
                 </span>
               )}
             </div>
             <div className="space-y-3 md:space-y-4">
               {sortedMessages.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">אין הודעות עדיין</p>
+                <p className="text-muted-foreground text-center py-8 text-lg">אין הודעות עדיין</p>
               ) : (
                 sortedMessages.map((msg) => {
                   const order = orders.find(o => o.id === msg.orderId);
@@ -294,9 +294,9 @@ const AdminPanel = () => {
                           {isUnreadCustomer && (
                             <span className="w-2 h-2 bg-warning rounded-full animate-pulse" />
                           )}
-                          <span className="font-medium">{msg.senderName}</span>
+                          <span className="font-medium text-base">{msg.senderName}</span>
                           <span className={cn(
-                            "text-xs px-2 py-0.5 rounded-full",
+                            "text-sm px-2 py-0.5 rounded-full",
                             msg.sender === 'customer' 
                               ? "bg-primary/10 text-primary" 
                               : "bg-muted text-muted-foreground"
@@ -304,11 +304,11 @@ const AdminPanel = () => {
                             {msg.sender === 'customer' ? 'לקוח' : 'תמיכה'}
                           </span>
                         </div>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-sm text-muted-foreground">
                           {msg.timestamp.toLocaleString('he-IL')}
                         </span>
                       </div>
-                      <p className="text-foreground">{msg.message}</p>
+                      <p className="text-foreground text-base">{msg.message}</p>
                       {order && (
                         <p className="text-xs text-muted-foreground mt-2">
                           הזמנה: {order.customerName} - {order.deviceType}
@@ -337,18 +337,18 @@ const AdminPanel = () => {
 
         return (
           <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
-            <h2 className="text-lg md:text-xl font-bold mb-4">לקוחות ({uniqueCustomers.length})</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-4">לקוחות ({uniqueCustomers.length})</h2>
             <div className="space-y-3">
               {uniqueCustomers.map((customer) => (
                 <div key={customer.phone} className="glass-card p-4 rounded-xl">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">{customer.name}</p>
-                      <p className="text-sm text-muted-foreground">{customer.phone}</p>
-                      <p className="text-sm text-muted-foreground">{customer.address}</p>
+                      <p className="font-medium text-base">{customer.name}</p>
+                      <p className="text-muted-foreground">{customer.phone}</p>
+                      <p className="text-muted-foreground">{customer.address}</p>
                     </div>
                     <div className="text-left">
-                      <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-sm">
+                      <span className="bg-primary/10 text-primary px-3 py-1.5 rounded-full text-base">
                         {customer.ordersCount} הזמנות
                       </span>
                     </div>
@@ -362,15 +362,15 @@ const AdminPanel = () => {
       case 'settings':
         return (
           <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 space-y-4 md:space-y-6 overflow-y-auto">
-            <h2 className="text-lg md:text-xl font-bold">הגדרות</h2>
+            <h2 className="text-xl md:text-2xl font-bold">הגדרות</h2>
             
             {/* Push Notifications */}
             <PushNotificationToggle />
             
             {/* Other settings */}
             <div className="glass-card p-6 rounded-xl">
-              <h3 className="font-bold text-foreground mb-3">הגדרות נוספות</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <h3 className="font-bold text-foreground mb-3 text-lg">הגדרות נוספות</h3>
+              <ul className="space-y-2 text-muted-foreground">
                 <li>• ניהול טכנאים</li>
                 <li>• הגדרות הודעות SMS</li>
                 <li>• עריכת מחירון</li>
@@ -402,14 +402,14 @@ const AdminPanel = () => {
         return (
           <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 md:mb-6">
-              <h2 className="text-lg md:text-xl font-bold">משוב לקוחות</h2>
+              <h2 className="text-xl md:text-2xl font-bold">משוב לקוחות</h2>
               <div className="flex items-center gap-3 md:gap-4">
-                <div className="bg-warning/10 text-warning px-3 md:px-4 py-1.5 md:py-2 rounded-xl flex items-center gap-2">
-                  <Star className="w-4 h-4 md:w-5 md:h-5 fill-warning" />
-                  <span className="font-bold text-base md:text-lg">{avgRating}</span>
-                  <span className="text-xs md:text-sm">ממוצע</span>
+                <div className="bg-warning/10 text-warning px-4 py-2 rounded-xl flex items-center gap-2">
+                  <Star className="w-5 h-5 md:w-6 md:h-6 fill-warning" />
+                  <span className="font-bold text-lg md:text-xl">{avgRating}</span>
+                  <span className="text-sm">ממוצע</span>
                 </div>
-                <span className="text-muted-foreground text-xs md:text-sm">
+                <span className="text-muted-foreground">
                   {ordersWithFeedback.length} דירוגים
                 </span>
               </div>
@@ -428,8 +428,8 @@ const AdminPanel = () => {
                     <div key={order.id} className="glass-card p-5 rounded-xl">
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <p className="font-bold text-foreground">{order.customerName}</p>
-                          <p className="text-sm text-muted-foreground">{order.customerPhone}</p>
+                          <p className="font-bold text-foreground text-lg">{order.customerName}</p>
+                          <p className="text-muted-foreground">{order.customerPhone}</p>
                         </div>
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
@@ -448,11 +448,11 @@ const AdminPanel = () => {
                       
                       {order.feedback && (
                         <div className="bg-muted/50 rounded-lg p-3 mb-3">
-                          <p className="text-foreground text-sm">"{order.feedback}"</p>
+                          <p className="text-foreground">"{order.feedback}"</p>
                         </div>
                       )}
                       
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <span>{order.deviceType} - {order.issueDescription}</span>
                         <span>{new Date(order.updatedAt).toLocaleDateString('he-IL')}</span>
                       </div>
@@ -470,38 +470,38 @@ const AdminPanel = () => {
         
         return (
           <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
-            <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6">אנליטיקס</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">אנליטיקס</h2>
             
             {/* Stats cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
               <div className="glass-card p-5 rounded-xl">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Smartphone className="w-5 h-5 text-primary" />
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <Smartphone className="w-6 h-6 text-primary" />
                   </div>
-                  <span className="text-muted-foreground">סה"כ הזמנות</span>
+                  <span className="text-muted-foreground text-base">סה"כ הזמנות</span>
                 </div>
-                <p className="text-3xl font-bold text-foreground">{orders.length}</p>
+                <p className="text-4xl font-bold text-foreground">{orders.length}</p>
               </div>
               
               <div className="glass-card p-5 rounded-xl">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 bg-success/10 rounded-lg flex items-center justify-center">
-                    <Activity className="w-5 h-5 text-success" />
+                  <div className="w-12 h-12 bg-success/10 rounded-lg flex items-center justify-center">
+                    <Activity className="w-6 h-6 text-success" />
                   </div>
-                  <span className="text-muted-foreground">הושלמו</span>
+                  <span className="text-muted-foreground text-base">הושלמו</span>
                 </div>
-                <p className="text-3xl font-bold text-success">{completedOrders.length}</p>
+                <p className="text-4xl font-bold text-success">{completedOrders.length}</p>
               </div>
               
               <div className="glass-card p-5 rounded-xl">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 bg-warning/10 rounded-lg flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-warning" />
+                  <div className="w-12 h-12 bg-warning/10 rounded-lg flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-warning" />
                   </div>
-                  <span className="text-muted-foreground">ממתינות</span>
+                  <span className="text-muted-foreground text-base">ממתינות</span>
                 </div>
-                <p className="text-3xl font-bold text-warning">{pendingOrders.length}</p>
+                <p className="text-4xl font-bold text-warning">{pendingOrders.length}</p>
               </div>
             </div>
 
@@ -509,23 +509,23 @@ const AdminPanel = () => {
             <div className="glass-card p-5 rounded-xl">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-3 h-3 bg-success rounded-full animate-pulse" />
-                <h3 className="font-bold text-foreground">צופים כרגע בעמוד המעקב</h3>
-                <span className="bg-success/10 text-success text-sm px-2 py-0.5 rounded-full">
+                <h3 className="font-bold text-foreground text-lg">צופים כרגע בעמוד המעקב</h3>
+                <span className="bg-success/10 text-success px-3 py-1 rounded-full">
                   {viewingOrders.length} לקוחות
                 </span>
               </div>
               
               {viewingOrders.length === 0 ? (
-                <p className="text-muted-foreground text-sm">אין לקוחות שצופים כרגע</p>
+                <p className="text-muted-foreground">אין לקוחות שצופים כרגע</p>
               ) : (
                 <div className="space-y-3">
                   {viewingOrders.map((order) => (
-                    <div key={order.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div key={order.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <Eye className="w-4 h-4 text-success" />
+                        <Eye className="w-5 h-5 text-success" />
                         <div>
-                          <p className="font-medium text-foreground">{order.customerName}</p>
-                          <p className="text-xs text-muted-foreground">{order.deviceType}</p>
+                          <p className="font-medium text-foreground text-base">{order.customerName}</p>
+                          <p className="text-sm text-muted-foreground">{order.deviceType}</p>
                         </div>
                       </div>
                       <div className="text-left">
@@ -568,13 +568,13 @@ const AdminPanel = () => {
                     )}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <span className={cn("status-badge text-xs", getStatusColor(order.status))}>
+                      <span className={cn("status-badge text-sm", getStatusColor(order.status))}>
                         {statusLabels[order.status]}
                       </span>
-                      <span className="font-medium text-foreground">{order.customerName}</span>
+                      <span className="font-medium text-foreground text-base">{order.customerName}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-1">{order.deviceType}</p>
-                    <p className="text-xs text-muted-foreground">{order.customerPhone}</p>
+                    <p className="text-muted-foreground mb-1">{order.deviceType}</p>
+                    <p className="text-sm text-muted-foreground">{order.customerPhone}</p>
                   </button>
                 ))
               )}
@@ -610,27 +610,27 @@ const AdminPanel = () => {
                         </Button>
                       </div>
                       <div className="text-right order-1 md:order-2 md:text-left">
-                        <h2 className="text-lg md:text-xl font-bold text-foreground">{selectedOrder.customerName}</h2>
-                        <p className="text-muted-foreground text-sm">{selectedOrder.customerPhone}</p>
+                        <h2 className="text-xl md:text-2xl font-bold text-foreground">{selectedOrder.customerName}</h2>
+                        <p className="text-muted-foreground">{selectedOrder.customerPhone}</p>
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-3 md:gap-4 text-sm">
+                    <div className="grid grid-cols-2 gap-3 md:gap-4">
                       <div>
-                        <p className="text-muted-foreground text-xs md:text-sm">מכשיר</p>
-                        <p className="font-medium text-foreground">{selectedOrder.deviceType}</p>
+                        <p className="text-muted-foreground text-sm">מכשיר</p>
+                        <p className="font-medium text-foreground text-base">{selectedOrder.deviceType}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-xs md:text-sm">תקלה</p>
-                        <p className="font-medium text-foreground">{selectedOrder.issueDescription}</p>
+                        <p className="text-muted-foreground text-sm">תקלה</p>
+                        <p className="font-medium text-foreground text-base">{selectedOrder.issueDescription}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-xs md:text-sm">כתובת</p>
-                        <p className="font-medium text-foreground">{selectedOrder.customerAddress}</p>
+                        <p className="text-muted-foreground text-sm">כתובת</p>
+                        <p className="font-medium text-foreground text-base">{selectedOrder.customerAddress}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-xs md:text-sm">מחיר</p>
-                        <p className="font-medium text-foreground">₪{selectedOrder.repairPrice}</p>
+                        <p className="text-muted-foreground text-sm">מחיר</p>
+                        <p className="font-medium text-foreground text-base">₪{selectedOrder.repairPrice}</p>
                       </div>
                     </div>
 
@@ -658,7 +658,7 @@ const AdminPanel = () => {
 
                   {/* Status update */}
                   <div className="glass-card rounded-xl p-6">
-                    <h3 className="font-semibold text-foreground mb-4">עדכון סטטוס</h3>
+                    <h3 className="font-semibold text-foreground mb-4 text-lg">עדכון סטטוס</h3>
                     <div className="space-y-3">
                       <Select 
                         value={selectedOrder.status}
@@ -683,7 +683,7 @@ const AdminPanel = () => {
 
                   {/* ETA update */}
                   <div className="glass-card rounded-xl p-6">
-                    <h3 className="font-semibold text-foreground mb-4">זמן הגעה משוער</h3>
+                    <h3 className="font-semibold text-foreground mb-4 text-lg">זמן הגעה משוער</h3>
                     <div className="flex gap-2">
                       <Input
                         type="time"
@@ -704,7 +704,7 @@ const AdminPanel = () => {
 
                   {/* Add note */}
                   <div className="glass-card rounded-xl p-6">
-                    <h3 className="font-semibold text-foreground mb-4">הוספת הערה</h3>
+                    <h3 className="font-semibold text-foreground mb-4 text-lg">הוספת הערה</h3>
                     <div className="flex gap-2">
                       <Input
                         placeholder="הערה חדשה..."
@@ -717,7 +717,7 @@ const AdminPanel = () => {
                     {selectedOrder.notes.length > 0 && (
                       <div className="mt-4 space-y-2">
                         {selectedOrder.notes.map((note, i) => (
-                          <p key={i} className="text-sm text-muted-foreground bg-muted/50 p-2 rounded">
+                          <p key={i} className="text-muted-foreground bg-muted/50 p-3 rounded">
                             {note}
                           </p>
                         ))}
@@ -727,11 +727,11 @@ const AdminPanel = () => {
 
                   {/* Chat */}
                   <div className="glass-card rounded-xl p-6">
-                    <h3 className="font-semibold text-foreground mb-4">צ'אט עם הלקוח</h3>
+                    <h3 className="font-semibold text-foreground mb-4 text-lg">צ'אט עם הלקוח</h3>
                     
                     <div className="h-64 overflow-y-auto space-y-3 mb-4 p-3 bg-muted/30 rounded-lg">
                       {orderMessages.length === 0 && (
-                        <p className="text-center text-muted-foreground text-sm">אין הודעות עדיין</p>
+                        <p className="text-center text-muted-foreground">אין הודעות עדיין</p>
                       )}
                       {orderMessages.map((msg) => (
                         <div
@@ -749,9 +749,9 @@ const AdminPanel = () => {
                                 : "bg-muted text-foreground rounded-bl-md"
                             )}
                           >
-                            <p className="text-sm">{msg.message}</p>
+                          <p>{msg.message}</p>
                             <p className={cn(
-                              "text-xs mt-1",
+                              "text-sm mt-1",
                               msg.sender === 'support' ? "text-primary-foreground/60" : "text-muted-foreground"
                             )}>
                               {msg.timestamp.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}

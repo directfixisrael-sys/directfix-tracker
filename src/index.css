@@ -93,10 +93,11 @@
 
   html {
     direction: rtl;
+    font-size: 16px;
   }
 
   body {
-    @apply bg-background text-foreground font-rubik antialiased;
+    @apply bg-background text-foreground font-rubik antialiased text-base;
   }
 }
 
