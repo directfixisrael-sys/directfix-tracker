@@ -1,10 +1,15 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { RepairOrder, ChatMessage, RepairStatus, Accessory } from '@/types/repair';
 
 interface RepairStore {
   orders: RepairOrder[];
   messages: ChatMessage[];
   currentOrder: RepairOrder | null;
+  activeTab: 'orders' | 'customers' | 'messages' | 'settings';
+  
+  // Tab actions
+  setActiveTab: (tab: 'orders' | 'customers' | 'messages' | 'settings') => void;
   
   // Customer actions
   setCurrentOrder: (order: RepairOrder | null) => void;
@@ -21,6 +26,7 @@ interface RepairStore {
   addNote: (orderId: string, note: string) => void;
   addSupportMessage: (orderId: string, message: string) => void;
   markMessageAsRead: (messageId: string) => void;
+  deleteOrder: (orderId: string) => void;
 }
 
 const defaultAccessories: Accessory[] = [
@@ -79,147 +85,210 @@ const demoMessages: ChatMessage[] = [
   },
 ];
 
-export const useRepairStore = create<RepairStore>((set, get) => ({
-  orders: demoOrders,
-  messages: demoMessages,
-  currentOrder: null,
+export const useRepairStore = create<RepairStore>()(
+  persist(
+    (set, get) => ({
+      orders: demoOrders,
+      messages: demoMessages,
+      currentOrder: null,
+      activeTab: 'orders',
 
-  setCurrentOrder: (order) => set({ currentOrder: order }),
-  
-  findOrderByPhone: (phone) => {
-    return get().orders.find(o => o.customerPhone === phone);
-  },
+      setActiveTab: (tab) => set({ activeTab: tab }),
 
-  toggleAccessory: (orderId, accessoryId) => set((state) => ({
-    orders: state.orders.map(order => 
-      order.id === orderId 
-        ? {
-            ...order,
-            accessories: order.accessories.map(acc =>
-              acc.id === accessoryId ? { ...acc, selected: !acc.selected } : acc
-            ),
-            updatedAt: new Date(),
+      setCurrentOrder: (order) => set({ currentOrder: order }),
+      
+      findOrderByPhone: (phone) => {
+        const normalizedPhone = phone.replace(/\D/g, '');
+        return get().orders.find(o => o.customerPhone.replace(/\D/g, '') === normalizedPhone);
+      },
+
+      toggleAccessory: (orderId, accessoryId) => set((state) => {
+        const updatedOrders = state.orders.map(order => 
+          order.id === orderId 
+            ? {
+                ...order,
+                accessories: order.accessories.map(acc =>
+                  acc.id === accessoryId ? { ...acc, selected: !acc.selected } : acc
+                ),
+                updatedAt: new Date(),
+              }
+            : order
+        );
+        
+        const updatedCurrentOrder = state.currentOrder?.id === orderId
+          ? {
+              ...state.currentOrder,
+              accessories: state.currentOrder.accessories.map(acc =>
+                acc.id === accessoryId ? { ...acc, selected: !acc.selected } : acc
+              ),
+              updatedAt: new Date(),
+            }
+          : state.currentOrder;
+
+        return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
+      }),
+
+      setWantsPromotions: (orderId, wants) => set((state) => {
+        const updatedOrders = state.orders.map(order =>
+          order.id === orderId ? { ...order, wantsPromotions: wants, updatedAt: new Date() } : order
+        );
+        
+        const updatedCurrentOrder = state.currentOrder?.id === orderId
+          ? { ...state.currentOrder, wantsPromotions: wants, updatedAt: new Date() }
+          : state.currentOrder;
+
+        return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
+      }),
+
+      setRating: (orderId, rating) => set((state) => {
+        const updatedOrders = state.orders.map(order =>
+          order.id === orderId ? { ...order, rating, updatedAt: new Date() } : order
+        );
+        
+        const updatedCurrentOrder = state.currentOrder?.id === orderId
+          ? { ...state.currentOrder, rating, updatedAt: new Date() }
+          : state.currentOrder;
+
+        return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
+      }),
+
+      addCustomerMessage: (orderId, message) => set((state) => ({
+        messages: [
+          ...state.messages,
+          {
+            id: Date.now().toString(),
+            orderId,
+            sender: 'customer',
+            senderName: state.orders.find(o => o.id === orderId)?.customerName || 'לקוח',
+            message,
+            timestamp: new Date(),
+            read: false,
+          },
+        ],
+      })),
+
+      addOrder: (orderData) => set((state) => {
+        const newOrder: RepairOrder = {
+          ...orderData,
+          id: Date.now().toString(),
+          accessories: [...defaultAccessories],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        return { orders: [...state.orders, newOrder] };
+      }),
+
+      updateOrderStatus: (orderId, status, note) => set((state) => {
+        const updatedOrders = state.orders.map(order =>
+          order.id === orderId 
+            ? { 
+                ...order, 
+                status, 
+                updatedAt: new Date(),
+                completedAt: status === 'completed' ? new Date() : order.completedAt,
+                notes: note ? [...order.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`] : order.notes,
+              } 
+            : order
+        );
+        
+        const updatedCurrentOrder = state.currentOrder?.id === orderId
+          ? { 
+              ...state.currentOrder, 
+              status, 
+              updatedAt: new Date(),
+              completedAt: status === 'completed' ? new Date() : state.currentOrder.completedAt,
+              notes: note ? [...state.currentOrder.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`] : state.currentOrder.notes,
+            }
+          : state.currentOrder;
+
+        return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
+      }),
+
+      updateEstimatedArrival: (orderId, eta) => set((state) => {
+        const updatedOrders = state.orders.map(order =>
+          order.id === orderId ? { ...order, estimatedArrival: eta, updatedAt: new Date() } : order
+        );
+        
+        const updatedCurrentOrder = state.currentOrder?.id === orderId
+          ? { ...state.currentOrder, estimatedArrival: eta, updatedAt: new Date() }
+          : state.currentOrder;
+
+        return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
+      }),
+
+      addNote: (orderId, note) => set((state) => {
+        const updatedOrders = state.orders.map(order =>
+          order.id === orderId 
+            ? { ...order, notes: [...order.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`], updatedAt: new Date() } 
+            : order
+        );
+        
+        const updatedCurrentOrder = state.currentOrder?.id === orderId
+          ? { ...state.currentOrder, notes: [...state.currentOrder.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`], updatedAt: new Date() }
+          : state.currentOrder;
+
+        return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
+      }),
+
+      addSupportMessage: (orderId, message) => set((state) => ({
+        messages: [
+          ...state.messages,
+          {
+            id: Date.now().toString(),
+            orderId,
+            sender: 'support',
+            senderName: 'שירה',
+            message,
+            timestamp: new Date(),
+            read: false,
+          },
+        ],
+      })),
+
+      markMessageAsRead: (messageId) => set((state) => ({
+        messages: state.messages.map(msg =>
+          msg.id === messageId ? { ...msg, read: true } : msg
+        ),
+      })),
+
+      deleteOrder: (orderId) => set((state) => ({
+        orders: state.orders.filter(order => order.id !== orderId),
+        currentOrder: state.currentOrder?.id === orderId ? null : state.currentOrder,
+        messages: state.messages.filter(msg => msg.orderId !== orderId),
+      })),
+    }),
+    {
+      name: 'directfix-repairs',
+      // Custom serializer to handle Date objects
+      storage: {
+        getItem: (name) => {
+          const str = localStorage.getItem(name);
+          if (!str) return null;
+          const data = JSON.parse(str);
+          // Convert date strings back to Date objects
+          if (data.state?.orders) {
+            data.state.orders = data.state.orders.map((order: any) => ({
+              ...order,
+              createdAt: new Date(order.createdAt),
+              updatedAt: new Date(order.updatedAt),
+              completedAt: order.completedAt ? new Date(order.completedAt) : undefined,
+            }));
           }
-        : order
-    ),
-    currentOrder: state.currentOrder?.id === orderId
-      ? {
-          ...state.currentOrder,
-          accessories: state.currentOrder.accessories.map(acc =>
-            acc.id === accessoryId ? { ...acc, selected: !acc.selected } : acc
-          ),
-          updatedAt: new Date(),
-        }
-      : state.currentOrder,
-  })),
-
-  setWantsPromotions: (orderId, wants) => set((state) => ({
-    orders: state.orders.map(order =>
-      order.id === orderId ? { ...order, wantsPromotions: wants, updatedAt: new Date() } : order
-    ),
-    currentOrder: state.currentOrder?.id === orderId
-      ? { ...state.currentOrder, wantsPromotions: wants, updatedAt: new Date() }
-      : state.currentOrder,
-  })),
-
-  setRating: (orderId, rating) => set((state) => ({
-    orders: state.orders.map(order =>
-      order.id === orderId ? { ...order, rating, updatedAt: new Date() } : order
-    ),
-    currentOrder: state.currentOrder?.id === orderId
-      ? { ...state.currentOrder, rating, updatedAt: new Date() }
-      : state.currentOrder,
-  })),
-
-  addCustomerMessage: (orderId, message) => set((state) => ({
-    messages: [
-      ...state.messages,
-      {
-        id: Date.now().toString(),
-        orderId,
-        sender: 'customer',
-        senderName: state.orders.find(o => o.id === orderId)?.customerName || 'לקוח',
-        message,
-        timestamp: new Date(),
-        read: false,
+          if (data.state?.messages) {
+            data.state.messages = data.state.messages.map((msg: any) => ({
+              ...msg,
+              timestamp: new Date(msg.timestamp),
+            }));
+          }
+          return data;
+        },
+        setItem: (name, value) => {
+          localStorage.setItem(name, JSON.stringify(value));
+        },
+        removeItem: (name) => {
+          localStorage.removeItem(name);
+        },
       },
-    ],
-  })),
-
-  addOrder: (orderData) => set((state) => ({
-    orders: [
-      ...state.orders,
-      {
-        ...orderData,
-        id: Date.now().toString(),
-        accessories: [...defaultAccessories],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ],
-  })),
-
-  updateOrderStatus: (orderId, status, note) => set((state) => ({
-    orders: state.orders.map(order =>
-      order.id === orderId 
-        ? { 
-            ...order, 
-            status, 
-            updatedAt: new Date(),
-            completedAt: status === 'completed' ? new Date() : order.completedAt,
-            notes: note ? [...order.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`] : order.notes,
-          } 
-        : order
-    ),
-    currentOrder: state.currentOrder?.id === orderId
-      ? { 
-          ...state.currentOrder, 
-          status, 
-          updatedAt: new Date(),
-          completedAt: status === 'completed' ? new Date() : state.currentOrder.completedAt,
-          notes: note ? [...state.currentOrder.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`] : state.currentOrder.notes,
-        }
-      : state.currentOrder,
-  })),
-
-  updateEstimatedArrival: (orderId, eta) => set((state) => ({
-    orders: state.orders.map(order =>
-      order.id === orderId ? { ...order, estimatedArrival: eta, updatedAt: new Date() } : order
-    ),
-    currentOrder: state.currentOrder?.id === orderId
-      ? { ...state.currentOrder, estimatedArrival: eta, updatedAt: new Date() }
-      : state.currentOrder,
-  })),
-
-  addNote: (orderId, note) => set((state) => ({
-    orders: state.orders.map(order =>
-      order.id === orderId 
-        ? { ...order, notes: [...order.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`], updatedAt: new Date() } 
-        : order
-    ),
-    currentOrder: state.currentOrder?.id === orderId
-      ? { ...state.currentOrder, notes: [...state.currentOrder.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`], updatedAt: new Date() }
-      : state.currentOrder,
-  })),
-
-  addSupportMessage: (orderId, message) => set((state) => ({
-    messages: [
-      ...state.messages,
-      {
-        id: Date.now().toString(),
-        orderId,
-        sender: 'support',
-        senderName: 'שירה',
-        message,
-        timestamp: new Date(),
-        read: false,
-      },
-    ],
-  })),
-
-  markMessageAsRead: (messageId) => set((state) => ({
-    messages: state.messages.map(msg =>
-      msg.id === messageId ? { ...msg, read: true } : msg
-    ),
-  })),
-}));
+    }
+  )
+);
