@@ -1,22 +1,34 @@
 import { useState } from 'react';
-import { Star, ExternalLink, PartyPopper } from 'lucide-react';
+import { Star, ExternalLink, PartyPopper, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
 interface RatingPromptProps {
-  onRate: (rating: number) => void;
+  onRate: (rating: number, feedback?: string) => void;
   currentRating?: number;
+  currentFeedback?: string;
 }
 
-const RatingPrompt = ({ onRate, currentRating }: RatingPromptProps) => {
+const RatingPrompt = ({ onRate, currentRating, currentFeedback }: RatingPromptProps) => {
   const [hoveredRating, setHoveredRating] = useState(0);
   const [selectedRating, setSelectedRating] = useState(currentRating || 0);
-  const [submitted, setSubmitted] = useState(!!currentRating);
+  const [feedback, setFeedback] = useState(currentFeedback || '');
+  const [step, setStep] = useState<'rating' | 'feedback' | 'done'>(currentRating ? 'done' : 'rating');
 
   const handleRate = (rating: number) => {
     setSelectedRating(rating);
-    onRate(rating);
-    setSubmitted(true);
+    setStep('feedback');
+  };
+
+  const handleSubmitFeedback = () => {
+    onRate(selectedRating, feedback.trim() || undefined);
+    setStep('done');
+  };
+
+  const handleSkipFeedback = () => {
+    onRate(selectedRating);
+    setStep('done');
   };
 
   const googleReviewUrl = "https://g.page/r/directfix/review";
@@ -32,7 +44,7 @@ const RatingPrompt = ({ onRate, currentRating }: RatingPromptProps) => {
         תודה שבחרתם בדיירקט פיקס
       </p>
 
-      {!submitted ? (
+      {step === 'rating' && (
         <>
           <p className="text-sm text-foreground mb-4">איך הייתה החוויה?</p>
           <div className="flex justify-center gap-2 mb-4">
@@ -56,7 +68,51 @@ const RatingPrompt = ({ onRate, currentRating }: RatingPromptProps) => {
             ))}
           </div>
         </>
-      ) : (
+      )}
+
+      {step === 'feedback' && (
+        <div className="animate-scale-in space-y-4">
+          <div className="flex justify-center gap-1 mb-2">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star
+                key={star}
+                className={cn(
+                  "w-6 h-6",
+                  selectedRating >= star
+                    ? "fill-warning text-warning"
+                    : "text-muted-foreground/30"
+                )}
+              />
+            ))}
+          </div>
+          
+          <p className="text-sm text-foreground">
+            {selectedRating >= 4 ? 'שמחים לשמוע! רוצים לשתף אותנו?' : 'נשמח לשמוע מה יכולנו לעשות טוב יותר'}
+          </p>
+          
+          <Textarea
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            placeholder={selectedRating >= 4 
+              ? "מילה טובה תמיד משמחת... 💚" 
+              : "ספרו לנו מה קרה, נשתדל להשתפר..."
+            }
+            className="min-h-[100px] text-right"
+          />
+          
+          <div className="flex gap-2 justify-center">
+            <Button variant="outline" onClick={handleSkipFeedback}>
+              דלג
+            </Button>
+            <Button onClick={handleSubmitFeedback} className="gap-2">
+              <Send className="w-4 h-4" />
+              שלח
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {step === 'done' && (
         <div className="animate-scale-in">
           <div className="flex justify-center gap-1 mb-5">
             {[1, 2, 3, 4, 5].map((star) => (
@@ -71,6 +127,12 @@ const RatingPrompt = ({ onRate, currentRating }: RatingPromptProps) => {
               />
             ))}
           </div>
+          
+          {feedback && (
+            <div className="bg-muted/50 rounded-xl p-3 mb-4 text-sm text-muted-foreground">
+              "{feedback}"
+            </div>
+          )}
           
           {selectedRating >= 4 ? (
             <div className="space-y-4">
@@ -90,7 +152,7 @@ const RatingPrompt = ({ onRate, currentRating }: RatingPromptProps) => {
             <div className="space-y-3">
               <p className="font-semibold text-foreground">תודה על המשוב</p>
               <p className="text-sm text-muted-foreground">
-                נשתדל להשתפר. שלחו לנו הודעה בצ'אט אם יש משהו ספציפי.
+                נשתדל להשתפר בפעמים הבאות
               </p>
             </div>
           )}

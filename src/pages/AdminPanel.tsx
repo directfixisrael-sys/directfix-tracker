@@ -17,7 +17,10 @@ import {
   Trash2,
   Copy,
   ExternalLink,
-  RefreshCw
+  RefreshCw,
+  Star,
+  Activity,
+  Eye
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -313,6 +316,154 @@ const AdminPanel = () => {
                 <li>• עריכת מחירון</li>
                 <li>• התאמה אישית של סטטוסים</li>
               </ul>
+            </div>
+          </div>
+        );
+
+      case 'feedback':
+        const ordersWithFeedback = orders.filter(o => o.rating);
+        const avgRating = ordersWithFeedback.length > 0 
+          ? (ordersWithFeedback.reduce((sum, o) => sum + (o.rating || 0), 0) / ordersWithFeedback.length).toFixed(1)
+          : '0';
+        
+        return (
+          <div className="flex-1 p-6 overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold">משוב לקוחות</h2>
+              <div className="flex items-center gap-4">
+                <div className="bg-warning/10 text-warning px-4 py-2 rounded-xl flex items-center gap-2">
+                  <Star className="w-5 h-5 fill-warning" />
+                  <span className="font-bold text-lg">{avgRating}</span>
+                  <span className="text-sm">ממוצע</span>
+                </div>
+                <span className="text-muted-foreground text-sm">
+                  {ordersWithFeedback.length} דירוגים
+                </span>
+              </div>
+            </div>
+
+            {ordersWithFeedback.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <Star className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>אין דירוגים עדיין</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {ordersWithFeedback
+                  .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+                  .map((order) => (
+                    <div key={order.id} className="glass-card p-5 rounded-xl">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <p className="font-bold text-foreground">{order.customerName}</p>
+                          <p className="text-sm text-muted-foreground">{order.customerPhone}</p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={cn(
+                                "w-5 h-5",
+                                (order.rating || 0) >= star
+                                  ? "fill-warning text-warning"
+                                  : "text-muted-foreground/30"
+                              )}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {order.feedback && (
+                        <div className="bg-muted/50 rounded-lg p-3 mb-3">
+                          <p className="text-foreground text-sm">"{order.feedback}"</p>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{order.deviceType} - {order.issueDescription}</span>
+                        <span>{new Date(order.updatedAt).toLocaleDateString('he-IL')}</span>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        );
+
+      case 'analytics':
+        const viewingOrders = orders.filter(o => o.isViewing);
+        const completedOrders = orders.filter(o => o.status === 'completed');
+        const pendingOrders = orders.filter(o => o.status === 'pending');
+        
+        return (
+          <div className="flex-1 p-6 overflow-y-auto">
+            <h2 className="text-xl font-bold mb-6">אנליטיקס</h2>
+            
+            {/* Stats cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <div className="glass-card p-5 rounded-xl">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <Smartphone className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="text-muted-foreground">סה"כ הזמנות</span>
+                </div>
+                <p className="text-3xl font-bold text-foreground">{orders.length}</p>
+              </div>
+              
+              <div className="glass-card p-5 rounded-xl">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 bg-success/10 rounded-lg flex items-center justify-center">
+                    <Activity className="w-5 h-5 text-success" />
+                  </div>
+                  <span className="text-muted-foreground">הושלמו</span>
+                </div>
+                <p className="text-3xl font-bold text-success">{completedOrders.length}</p>
+              </div>
+              
+              <div className="glass-card p-5 rounded-xl">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 bg-warning/10 rounded-lg flex items-center justify-center">
+                    <Clock className="w-5 h-5 text-warning" />
+                  </div>
+                  <span className="text-muted-foreground">ממתינות</span>
+                </div>
+                <p className="text-3xl font-bold text-warning">{pendingOrders.length}</p>
+              </div>
+            </div>
+
+            {/* Live viewing */}
+            <div className="glass-card p-5 rounded-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-3 h-3 bg-success rounded-full animate-pulse" />
+                <h3 className="font-bold text-foreground">צופים כרגע בעמוד המעקב</h3>
+                <span className="bg-success/10 text-success text-sm px-2 py-0.5 rounded-full">
+                  {viewingOrders.length} לקוחות
+                </span>
+              </div>
+              
+              {viewingOrders.length === 0 ? (
+                <p className="text-muted-foreground text-sm">אין לקוחות שצופים כרגע</p>
+              ) : (
+                <div className="space-y-3">
+                  {viewingOrders.map((order) => (
+                    <div key={order.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Eye className="w-4 h-4 text-success" />
+                        <div>
+                          <p className="font-medium text-foreground">{order.customerName}</p>
+                          <p className="text-xs text-muted-foreground">{order.deviceType}</p>
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <span className={cn("status-badge text-xs", getStatusColor(order.status))}>
+                          {statusLabels[order.status]}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -632,6 +783,40 @@ const AdminPanel = () => {
           >
             <Settings className="w-5 h-5" />
             <span>הגדרות</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('feedback')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'feedback' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <Star className="w-5 h-5" />
+            <span>משוב לקוחות</span>
+            {orders.filter(o => o.rating).length > 0 && (
+              <span className="mr-auto bg-warning/20 text-warning text-xs px-2 py-0.5 rounded-full">
+                {orders.filter(o => o.rating).length}
+              </span>
+            )}
+          </button>
+          <button 
+            onClick={() => setActiveTab('analytics')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'analytics' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <Activity className="w-5 h-5" />
+            <span>אנליטיקס</span>
+            {orders.filter(o => o.isViewing).length > 0 && (
+              <span className="mr-auto bg-success/20 text-success text-xs px-2 py-0.5 rounded-full animate-pulse">
+                {orders.filter(o => o.isViewing).length} צופים
+              </span>
+            )}
           </button>
         </nav>
 

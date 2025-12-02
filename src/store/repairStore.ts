@@ -6,18 +6,19 @@ interface RepairStore {
   orders: RepairOrder[];
   messages: ChatMessage[];
   currentOrder: RepairOrder | null;
-  activeTab: 'orders' | 'customers' | 'messages' | 'settings';
+  activeTab: 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics';
   
   // Tab actions
-  setActiveTab: (tab: 'orders' | 'customers' | 'messages' | 'settings') => void;
+  setActiveTab: (tab: 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics') => void;
   
   // Customer actions
   setCurrentOrder: (order: RepairOrder | null) => void;
   findOrderByPhone: (phone: string) => RepairOrder | undefined;
   toggleAccessory: (orderId: string, accessoryId: string) => void;
   setWantsPromotions: (orderId: string, wants: boolean) => void;
-  setRating: (orderId: string, rating: number) => void;
+  setRating: (orderId: string, rating: number, feedback?: string) => void;
   addCustomerMessage: (orderId: string, message: string) => void;
+  setViewingStatus: (orderId: string, isViewing: boolean) => void;
   
   // Admin actions
   addOrder: (order: Omit<RepairOrder, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -140,17 +141,25 @@ export const useRepairStore = create<RepairStore>()(
         return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
       }),
 
-      setRating: (orderId, rating) => set((state) => {
+      setRating: (orderId, rating, feedback) => set((state) => {
         const updatedOrders = state.orders.map(order =>
-          order.id === orderId ? { ...order, rating, updatedAt: new Date() } : order
+          order.id === orderId ? { ...order, rating, feedback, updatedAt: new Date() } : order
         );
         
         const updatedCurrentOrder = state.currentOrder?.id === orderId
-          ? { ...state.currentOrder, rating, updatedAt: new Date() }
+          ? { ...state.currentOrder, rating, feedback, updatedAt: new Date() }
           : state.currentOrder;
 
         return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
       }),
+
+      setViewingStatus: (orderId, isViewing) => set((state) => ({
+        orders: state.orders.map(order =>
+          order.id === orderId 
+            ? { ...order, isViewing, lastViewedAt: isViewing ? new Date() : order.lastViewedAt } 
+            : order
+        ),
+      })),
 
       addCustomerMessage: (orderId, message) => set((state) => ({
         messages: [

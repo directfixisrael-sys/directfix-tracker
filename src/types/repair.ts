@@ -25,6 +25,9 @@ export interface RepairOrder {
   completedAt?: Date;
   wantsPromotions: boolean;
   rating?: number;
+  feedback?: string;
+  lastViewedAt?: Date;
+  isViewing?: boolean;
 }
 
 export interface Accessory {
