@@ -30,10 +30,10 @@ interface RepairStore {
 }
 
 const defaultAccessories: Accessory[] = [
-  { id: '1', name: 'מגן מסך רגיל', price: 50, selected: false },
-  { id: '2', name: 'מגן מסך איכותי', price: 100, selected: false },
-  { id: '3', name: 'מטען איכותי', price: 70, selected: false },
-  { id: '4', name: 'כיסוי שקוף איכותי', price: 50, selected: false },
+  { id: '1', name: 'מגן מסך רגיל', price: 50, originalPrice: 79, selected: false },
+  { id: '2', name: 'מגן מסך פרימיום', price: 100, originalPrice: 149, selected: false },
+  { id: '3', name: 'מטען מהיר + כבל', price: 70, originalPrice: 119, selected: false },
+  { id: '4', name: 'כיסוי שקוף פרימיום', price: 50, originalPrice: 89, selected: false },
 ];
 
 // Demo data

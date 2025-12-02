@@ -31,7 +31,9 @@ export interface Accessory {
   id: string;
   name: string;
   price: number;
+  originalPrice: number;
   selected: boolean;
+  description?: string;
 }
 
 export interface ChatMessage {
