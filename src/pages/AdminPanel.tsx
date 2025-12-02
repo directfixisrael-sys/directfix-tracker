@@ -20,14 +20,71 @@ import {
   RefreshCw,
   Star,
   Activity,
-  Eye
+  Eye,
+  Lock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import logo from '@/assets/logo.png';
 
+const ADMIN_CODE = 'pp1p1xke';
+
 const AdminPanel = () => {
   const { toast } = useToast();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [accessCode, setAccessCode] = useState('');
+  const [codeError, setCodeError] = useState('');
+
+  // Check if already authenticated from session
+  useEffect(() => {
+    const savedAuth = sessionStorage.getItem('admin-authenticated');
+    if (savedAuth === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleCodeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (accessCode === ADMIN_CODE) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('admin-authenticated', 'true');
+      setCodeError('');
+    } else {
+      setCodeError('קוד שגוי, נסה שוב');
+    }
+  };
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="glass-card p-8 rounded-2xl max-w-sm w-full text-center">
+          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-8 h-8 text-primary" />
+          </div>
+          <h1 className="text-xl font-bold text-foreground mb-2">פאנל ניהול</h1>
+          <p className="text-muted-foreground text-sm mb-6">הכנס קוד גישה להמשך</p>
+          
+          <form onSubmit={handleCodeSubmit} className="space-y-4">
+            <Input
+              type="password"
+              value={accessCode}
+              onChange={(e) => setAccessCode(e.target.value)}
+              placeholder="קוד גישה"
+              className="text-center text-lg tracking-widest"
+              autoFocus
+            />
+            {codeError && (
+              <p className="text-destructive text-sm">{codeError}</p>
+            )}
+            <Button type="submit" className="w-full">
+              כניסה
+            </Button>
+          </form>
+        </div>
+      </div>
+    );
+  }
   
   const { 
     orders, 
