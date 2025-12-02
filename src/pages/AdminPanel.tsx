@@ -40,6 +40,7 @@ const AdminPanel = () => {
   const [newMessage, setNewMessage] = useState('');
   const [newNote, setNewNote] = useState('');
   const [eta, setEta] = useState('');
+  const [wazeLink, setWazeLink] = useState('');
   const [statusNote, setStatusNote] = useState('');
   const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
   const [newOrder, setNewOrder] = useState({
@@ -59,7 +60,8 @@ const AdminPanel = () => {
     setActiveTab,
     addOrder, 
     updateOrderStatus, 
-    updateEstimatedArrival, 
+    updateEstimatedArrival,
+    updateWazeLink,
     addNote, 
     addSupportMessage,
     deleteOrder,
@@ -702,6 +704,37 @@ const AdminPanel = () => {
                     {selectedOrder.estimatedArrival && (
                       <p className="text-sm text-muted-foreground mt-2">
                         נוכחי: {selectedOrder.estimatedArrival}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Waze link */}
+                  <div className="glass-card rounded-xl p-6">
+                    <h3 className="font-semibold text-foreground mb-4 text-lg">קישור וויז</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      הדבק את קישור השיתוף מוויז כדי שהלקוח יוכל לעקוב אחריך
+                    </p>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="https://waze.com/ul/..."
+                        value={wazeLink}
+                        onChange={(e) => setWazeLink(e.target.value)}
+                        className="flex-1"
+                        dir="ltr"
+                      />
+                      <Button onClick={() => {
+                        if (selectedOrder && wazeLink) {
+                          updateWazeLink(selectedOrder.id, wazeLink);
+                          toast({ title: "קישור וויז עודכן" });
+                          setWazeLink('');
+                        }
+                      }}>
+                        שמור
+                      </Button>
+                    </div>
+                    {selectedOrder.wazeLink && (
+                      <p className="text-sm text-muted-foreground mt-2" dir="ltr">
+                        נוכחי: {selectedOrder.wazeLink}
                       </p>
                     )}
                   </div>

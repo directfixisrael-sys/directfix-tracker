@@ -1,9 +1,11 @@
-import { MapPin } from 'lucide-react';
+import { MapPin, Navigation } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface TechnicianTrackerProps {
   technicianName: string;
   estimatedArrival?: string;
   customerAddress: string;
+  wazeLink?: string;
 }
 
 // Custom scooter SVG component
@@ -41,7 +43,13 @@ const TechnicianScooter = () => (
   </svg>
 );
 
-const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress }: TechnicianTrackerProps) => {
+const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, wazeLink }: TechnicianTrackerProps) => {
+  const handleWazeClick = () => {
+    if (wazeLink) {
+      window.open(wazeLink, '_blank');
+    }
+  };
+
   return (
     <div className="wolt-card-elevated overflow-hidden animate-slide-up">
       {/* City illustration map */}
@@ -138,6 +146,17 @@ const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress }
             <p className="font-medium text-foreground text-sm">{customerAddress}</p>
           </div>
         </div>
+
+        {/* Waze tracking button */}
+        {wazeLink && (
+          <Button
+            onClick={handleWazeClick}
+            className="w-full mt-4 gap-3 bg-[#33ccff] hover:bg-[#2bb8e6] text-white font-bold py-4 text-lg"
+          >
+            <Navigation className="w-6 h-6" />
+            עקוב בוויז
+          </Button>
+        )}
       </div>
     </div>
   );

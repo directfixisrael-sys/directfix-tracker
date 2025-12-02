@@ -164,6 +164,7 @@ const CustomerTracker = () => {
             technicianName={currentOrder.technicianName!}
             estimatedArrival={currentOrder.estimatedArrival}
             customerAddress={currentOrder.customerAddress}
+            wazeLink={currentOrder.wazeLink}
           />
         )}
 

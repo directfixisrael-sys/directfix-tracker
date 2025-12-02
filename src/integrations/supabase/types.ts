@@ -74,6 +74,7 @@ export type Database = {
           technician_name: string | null
           updated_at: string
           wants_promotions: boolean
+          waze_link: string | null
         }
         Insert: {
           accessories?: Json
@@ -96,6 +97,7 @@ export type Database = {
           technician_name?: string | null
           updated_at?: string
           wants_promotions?: boolean
+          waze_link?: string | null
         }
         Update: {
           accessories?: Json
@@ -118,6 +120,7 @@ export type Database = {
           technician_name?: string | null
           updated_at?: string
           wants_promotions?: boolean
+          waze_link?: string | null
         }
         Relationships: []
       }
