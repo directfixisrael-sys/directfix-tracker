@@ -16,8 +16,8 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button className="fixed left-4 top-1/2 -translate-y-1/2 z-40 w-12 h-12 bg-card rounded-full shadow-lg border border-border/50 flex items-center justify-center hover:scale-105 transition-transform">
-          <Receipt className="w-5 h-5 text-foreground" />
+        <button className="fixed left-4 top-1/2 -translate-y-1/2 z-40 w-12 h-12 bg-card rounded-full shadow-lg border-2 border-primary/30 dark:border-primary/50 flex items-center justify-center hover:scale-105 hover:border-primary/50 dark:hover:border-primary/70 transition-all">
+          <Receipt className="w-5 h-5 text-primary" />
         </button>
       </SheetTrigger>
       <SheetContent side="left" className="w-[320px] sm:w-[380px]">
