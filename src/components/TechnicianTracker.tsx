@@ -1,10 +1,45 @@
-import { Bike, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
 interface TechnicianTrackerProps {
   technicianName: string;
   estimatedArrival?: string;
   customerAddress: string;
 }
+
+// Custom scooter SVG component
+const TechnicianScooter = () => (
+  <svg viewBox="0 0 80 50" className="w-20 h-12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Delivery box */}
+    <rect x="20" y="5" width="30" height="22" rx="3" fill="hsl(var(--primary))" />
+    <rect x="22" y="7" width="26" height="10" rx="1" fill="hsl(var(--primary-foreground))" fillOpacity="0.9" />
+    <text x="35" y="14" textAnchor="middle" fontSize="4" fontWeight="bold" fill="hsl(var(--primary))">DIRECT</text>
+    <text x="35" y="18" textAnchor="middle" fontSize="3" fontWeight="bold" fill="hsl(var(--primary))">FIX</text>
+    
+    {/* Scooter body */}
+    <ellipse cx="45" cy="35" rx="18" ry="8" fill="hsl(var(--primary))" />
+    <rect x="30" y="28" width="25" height="10" rx="5" fill="hsl(var(--primary))" />
+    
+    {/* Handle */}
+    <rect x="55" y="20" width="3" height="15" rx="1" fill="hsl(var(--foreground))" fillOpacity="0.7" />
+    <rect x="52" y="18" width="9" height="4" rx="2" fill="hsl(var(--foreground))" fillOpacity="0.5" />
+    
+    {/* Seat */}
+    <ellipse cx="38" cy="26" rx="8" ry="3" fill="hsl(var(--foreground))" fillOpacity="0.8" />
+    
+    {/* Front wheel */}
+    <circle cx="60" cy="40" r="8" fill="hsl(var(--foreground))" fillOpacity="0.8" />
+    <circle cx="60" cy="40" r="5" fill="hsl(var(--background))" />
+    <circle cx="60" cy="40" r="2" fill="hsl(var(--foreground))" fillOpacity="0.5" />
+    
+    {/* Back wheel */}
+    <circle cx="25" cy="40" r="8" fill="hsl(var(--foreground))" fillOpacity="0.8" />
+    <circle cx="25" cy="40" r="5" fill="hsl(var(--background))" />
+    <circle cx="25" cy="40" r="2" fill="hsl(var(--foreground))" fillOpacity="0.5" />
+    
+    {/* Headlight */}
+    <ellipse cx="63" cy="32" rx="2" ry="3" fill="#FBBF24" />
+  </svg>
+);
 
 const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress }: TechnicianTrackerProps) => {
   return (
@@ -69,17 +104,15 @@ const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress }
           </div>
         </div>
 
-        {/* Motorcycle with technician */}
-        <div className="absolute right-1/4 bottom-4 z-20 animate-drive">
+        {/* Scooter with technician */}
+        <div className="absolute right-1/4 bottom-2 z-20 animate-drive">
           <div className="relative">
             {/* Name bubble */}
-            <div className="absolute -top-10 right-1/2 translate-x-1/2 bg-card px-3 py-1.5 rounded-full shadow-lg whitespace-nowrap border border-border/50">
-              <span className="text-xs font-semibold text-foreground">{technicianName} 🏍️</span>
+            <div className="absolute -top-6 right-1/2 translate-x-1/2 bg-card px-3 py-1.5 rounded-full shadow-lg whitespace-nowrap border border-border/50">
+              <span className="text-xs font-semibold text-foreground">{technicianName}</span>
             </div>
-            {/* Bike icon */}
-            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
-              <Bike className="w-6 h-6 text-primary-foreground" />
-            </div>
+            {/* Custom scooter */}
+            <TechnicianScooter />
           </div>
         </div>
       </div>
