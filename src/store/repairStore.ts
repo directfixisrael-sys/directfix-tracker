@@ -274,28 +274,38 @@ export const useRepairStore = create<RepairStore>()(
       // Custom serializer to handle Date objects
       storage: {
         getItem: (name) => {
-          const str = localStorage.getItem(name);
-          if (!str) return null;
-          const data = JSON.parse(str);
-          // Convert date strings back to Date objects
-          if (data.state?.orders) {
-            data.state.orders = data.state.orders.map((order: any) => ({
-              ...order,
-              createdAt: new Date(order.createdAt),
-              updatedAt: new Date(order.updatedAt),
-              completedAt: order.completedAt ? new Date(order.completedAt) : undefined,
-            }));
+          try {
+            const str = localStorage.getItem(name);
+            if (!str) return null;
+            const data = JSON.parse(str);
+            // Convert date strings back to Date objects
+            if (data.state?.orders) {
+              data.state.orders = data.state.orders.map((order: any) => ({
+                ...order,
+                createdAt: order.createdAt ? new Date(order.createdAt) : new Date(),
+                updatedAt: order.updatedAt ? new Date(order.updatedAt) : new Date(),
+                completedAt: order.completedAt ? new Date(order.completedAt) : undefined,
+                lastViewedAt: order.lastViewedAt ? new Date(order.lastViewedAt) : undefined,
+              }));
+            }
+            if (data.state?.messages) {
+              data.state.messages = data.state.messages.map((msg: any) => ({
+                ...msg,
+                timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+              }));
+            }
+            return data;
+          } catch (error) {
+            console.error('Error loading from localStorage:', error);
+            return null;
           }
-          if (data.state?.messages) {
-            data.state.messages = data.state.messages.map((msg: any) => ({
-              ...msg,
-              timestamp: new Date(msg.timestamp),
-            }));
-          }
-          return data;
         },
         setItem: (name, value) => {
-          localStorage.setItem(name, JSON.stringify(value));
+          try {
+            localStorage.setItem(name, JSON.stringify(value));
+          } catch (error) {
+            console.error('Error saving to localStorage:', error);
+          }
         },
         removeItem: (name) => {
           localStorage.removeItem(name);
