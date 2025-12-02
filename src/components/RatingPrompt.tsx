@@ -31,7 +31,7 @@ const RatingPrompt = ({ onRate, currentRating, currentFeedback }: RatingPromptPr
     setStep('done');
   };
 
-  const googleReviewUrl = "https://g.page/r/directfix/review";
+  const googleReviewUrl = "https://share.google/8DfDFe9PoBcW62VRB";
 
   return (
     <div className="wolt-card-elevated p-6 text-center animate-slide-up">
