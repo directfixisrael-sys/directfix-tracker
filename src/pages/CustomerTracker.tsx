@@ -30,8 +30,21 @@ const CustomerTracker = () => {
     setWantsPromotions,
     setRating,
     addCustomerMessage,
+    setViewingStatus,
     messages,
   } = useRepairStore();
+
+  // Track viewing status
+  useEffect(() => {
+    if (currentOrder) {
+      setViewingStatus(currentOrder.id, true);
+      
+      // Set to not viewing when leaving page
+      return () => {
+        setViewingStatus(currentOrder.id, false);
+      };
+    }
+  }, [currentOrder?.id, setViewingStatus]);
 
   // Keep currentOrder in sync with orders from store
   useEffect(() => {
@@ -183,8 +196,9 @@ const CustomerTracker = () => {
         {/* Rating prompt */}
         {showRating && (
           <RatingPrompt 
-            onRate={(rating) => setRating(currentOrder.id, rating)}
+            onRate={(rating, feedback) => setRating(currentOrder.id, rating, feedback)}
             currentRating={currentOrder.rating}
+            currentFeedback={currentOrder.feedback}
           />
         )}
 
