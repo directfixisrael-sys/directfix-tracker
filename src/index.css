@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap');
-
 @layer base {
   :root {
     --background: 210 20% 98%;
@@ -93,11 +91,16 @@
 
   html {
     direction: rtl;
-    font-size: 16px;
+    font-size: 18px;
   }
 
   body {
-    @apply bg-background text-foreground font-rubik antialiased text-base;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Rubik', sans-serif;
+  }
+  
+  * {
+    font-family: 'Rubik', sans-serif;
   }
 }
 
