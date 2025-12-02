@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Phone, Search } from 'lucide-react';
+import { Search, Smartphone } from 'lucide-react';
 
 interface PhoneInputProps {
   onSubmit: (phone: string) => void;
@@ -20,55 +20,59 @@ const PhoneInput = ({ onSubmit, isLoading, error }: PhoneInputProps) => {
   };
 
   const formatPhone = (value: string) => {
-    // Remove non-digits
     const digits = value.replace(/\D/g, '');
     return digits.slice(0, 10);
   };
 
   return (
-    <div className="w-full max-w-md mx-auto animate-slide-up">
-      <div className="glass-card rounded-2xl p-8 shadow-card">
+    <div className="w-full max-w-sm mx-auto animate-slide-up">
+      <div className="wolt-card-elevated p-8">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Phone className="w-8 h-8 text-primary" />
+          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-5">
+            <Smartphone className="w-10 h-10 text-primary" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">מעקב אחר התיקון</h2>
-          <p className="text-muted-foreground">הזן את מספר הטלפון שלך כדי לעקוב אחר סטטוס התיקון</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">עקוב אחר התיקון</h2>
+          <p className="text-muted-foreground text-sm">הכניסו את מספר הטלפון שלכם</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="relative">
             <Input
               type="tel"
-              placeholder="050-1234567"
+              placeholder="05X-XXXXXXX"
               value={phone}
               onChange={(e) => setPhone(formatPhone(e.target.value))}
-              className="h-14 text-lg text-center pr-12 font-medium tracking-wider"
+              className="h-14 text-lg text-center font-medium tracking-widest rounded-xl border-2 border-border focus:border-primary transition-colors"
               dir="ltr"
             />
-            <Phone className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           </div>
 
           {error && (
-            <p className="text-destructive text-sm text-center animate-fade-in">{error}</p>
+            <div className="bg-destructive/10 text-destructive text-sm text-center py-3 px-4 rounded-xl animate-fade-in">
+              {error}
+            </div>
           )}
 
           <Button 
             type="submit" 
-            size="xl" 
-            className="w-full"
+            size="lg" 
+            className="w-full h-14 text-base font-semibold rounded-xl"
             disabled={phone.length < 9 || isLoading}
           >
             {isLoading ? (
               <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
             ) : (
               <>
-                <Search className="w-5 h-5" />
-                חפש הזמנה
+                <Search className="w-5 h-5 ml-2" />
+                מצא את ההזמנה שלי
               </>
             )}
           </Button>
         </form>
+
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          הזינו את המספר שהזנתם בעת ההזמנה
+        </p>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Phone, Settings } from 'lucide-react';
+import { Smartphone, Settings } from 'lucide-react';
 import logo from '@/assets/logo.png';
 
 const Index = () => {
@@ -10,29 +10,29 @@ const Index = () => {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Hero section */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-        <div className="text-center animate-slide-up">
+        <div className="text-center animate-slide-up max-w-sm">
           <img 
             src={logo} 
             alt="Direct Fix Logo" 
-            className="h-24 w-auto mx-auto mb-6"
+            className="h-20 w-auto mx-auto mb-8"
           />
-          <h1 className="text-4xl font-bold text-foreground mb-2">דיירקט פיקס</h1>
-          <p className="text-lg text-muted-foreground mb-8">מערכת מעקב תיקונים</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">דיירקט פיקס</h1>
+          <p className="text-muted-foreground mb-10">מערכת מעקב תיקונים בזמן אמת</p>
 
-          <div className="space-y-4 max-w-xs mx-auto">
+          <div className="space-y-4">
             <Button 
-              size="xl" 
-              className="w-full gap-3"
+              size="lg" 
+              className="w-full h-14 text-base font-semibold rounded-xl gap-3"
               onClick={() => navigate('/track')}
             >
-              <Phone className="w-5 h-5" />
-              מעקב אחר תיקון
+              <Smartphone className="w-5 h-5" />
+              עקוב אחר התיקון שלך
             </Button>
 
             <Button 
               variant="secondary" 
               size="lg" 
-              className="w-full gap-3"
+              className="w-full h-12 rounded-xl gap-3"
               onClick={() => navigate('/admin')}
             >
               <Settings className="w-5 h-5" />
@@ -43,8 +43,8 @@ const Index = () => {
       </div>
 
       {/* Footer */}
-      <footer className="text-center py-6 text-sm text-muted-foreground border-t border-border">
-        <p>© {new Date().getFullYear()} דיירקט פיקס - כל הזכויות שמורות</p>
+      <footer className="text-center py-6 text-xs text-muted-foreground border-t border-border">
+        <p>© {new Date().getFullYear()} דיירקט פיקס</p>
       </footer>
     </div>
   );

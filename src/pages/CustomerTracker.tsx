@@ -10,6 +10,7 @@ import RatingPrompt from '@/components/RatingPrompt';
 import PromotionsOptIn from '@/components/PromotionsOptIn';
 import OrderSummary from '@/components/OrderSummary';
 import { useRepairStore } from '@/store/repairStore';
+import logo from '@/assets/logo.png';
 
 const CustomerTracker = () => {
   const [searchParams] = useSearchParams();
@@ -28,7 +29,6 @@ const CustomerTracker = () => {
     messages,
   } = useRepairStore();
 
-  // Check for phone in URL params
   useEffect(() => {
     const phone = searchParams.get('phone');
     if (phone) {
@@ -40,15 +40,14 @@ const CustomerTracker = () => {
     setIsSearching(true);
     setError('');
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 600));
 
     const order = findOrderByPhone(phone);
     if (order) {
       setCurrentOrder(order);
       setError('');
     } else {
-      setError('לא נמצאה הזמנה עם מספר הטלפון הזה');
+      setError('לא נמצאה הזמנה עם מספר הטלפון הזה. וודאו שהמספר נכון או צרו קשר עם התמיכה.');
       setCurrentOrder(null);
     }
     
@@ -57,22 +56,22 @@ const CustomerTracker = () => {
 
   const handleBack = () => {
     setCurrentOrder(null);
-    navigate('/');
+    navigate('/track');
   };
 
   const orderMessages = currentOrder 
     ? messages.filter(m => m.orderId === currentOrder.id)
     : [];
 
-  // Show phone input if no order is found
+  // Phone input screen
   if (!currentOrder) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="container py-12 px-4">
-          <div className="max-w-md mx-auto text-center mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">דיירקט פיקס</h1>
-            <p className="text-muted-foreground">שירות תיקון מכשירים סלולריים עד הבית</p>
+        <main className="container py-8 px-4">
+          <div className="max-w-sm mx-auto text-center mb-8 animate-slide-down">
+            <img src={logo} alt="Direct Fix" className="h-14 mx-auto mb-4" />
+            <p className="text-muted-foreground text-sm">מעקב אחר התיקון שלכם בזמן אמת</p>
           </div>
           <PhoneInput 
             onSubmit={handleSearch}
@@ -89,17 +88,17 @@ const CustomerTracker = () => {
   const showRating = currentOrder.status === 'completed';
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-28">
       <Header showBackButton onBack={handleBack} />
       
-      <main className="container py-6 px-4 space-y-6">
-        {/* Welcome message */}
-        <div className="animate-slide-down">
-          <p className="text-muted-foreground">שלום,</p>
-          <h1 className="text-2xl font-bold text-foreground">{currentOrder.customerName}</h1>
+      <main className="container py-5 px-4 space-y-5 max-w-lg mx-auto">
+        {/* Welcome */}
+        <div className="animate-slide-down text-center pt-2 pb-3">
+          <p className="text-muted-foreground text-sm">שלום,</p>
+          <h1 className="text-2xl font-bold text-foreground">{currentOrder.customerName} 👋</h1>
         </div>
 
-        {/* Technician tracker (when on the way) */}
+        {/* Technician tracker */}
         {showTechnicianTracker && (
           <TechnicianTracker
             technicianName={currentOrder.technicianName!}
@@ -114,7 +113,7 @@ const CustomerTracker = () => {
           estimatedArrival={currentOrder.estimatedArrival}
         />
 
-        {/* Rating prompt (when completed) */}
+        {/* Rating prompt */}
         {showRating && (
           <RatingPrompt 
             onRate={(rating) => setRating(currentOrder.id, rating)}
@@ -134,7 +133,7 @@ const CustomerTracker = () => {
         {/* Order summary */}
         <OrderSummary order={currentOrder} />
 
-        {/* Promotions opt-in */}
+        {/* Promotions */}
         <PromotionsOptIn
           checked={currentOrder.wantsPromotions}
           onCheckedChange={(checked) => setWantsPromotions(currentOrder.id, checked)}

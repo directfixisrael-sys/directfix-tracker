@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Star, ExternalLink } from 'lucide-react';
+import { Star, ExternalLink, PartyPopper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -22,78 +22,75 @@ const RatingPrompt = ({ onRate, currentRating }: RatingPromptProps) => {
   const googleReviewUrl = "https://g.page/r/directfix/review";
 
   return (
-    <div className="glass-card rounded-2xl p-6 animate-slide-up text-center">
+    <div className="wolt-card-elevated p-6 text-center animate-slide-up">
       <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
-        <span className="text-3xl">🎉</span>
+        <PartyPopper className="w-8 h-8 text-success" />
       </div>
       
-      <h3 className="text-xl font-bold text-foreground mb-2">התיקון הושלם בהצלחה!</h3>
-      <p className="text-muted-foreground mb-6">
-        תודה שבחרתם בדיירקט פיקס. נשמח לשמוע את דעתכם!
+      <h3 className="text-xl font-bold text-foreground mb-2">התיקון הושלם! 🎉</h3>
+      <p className="text-muted-foreground text-sm mb-6">
+        תודה שבחרתם בדיירקט פיקס
       </p>
 
       {!submitted ? (
         <>
-          <div className="flex justify-center gap-2 mb-6">
+          <p className="text-sm text-foreground mb-4">איך הייתה החוויה?</p>
+          <div className="flex justify-center gap-2 mb-4">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 onMouseEnter={() => setHoveredRating(star)}
                 onMouseLeave={() => setHoveredRating(0)}
                 onClick={() => handleRate(star)}
-                className="p-1 transition-transform hover:scale-110"
+                className="p-1.5 transition-transform hover:scale-125"
               >
                 <Star
                   className={cn(
-                    "w-10 h-10 transition-colors",
+                    "w-9 h-9 transition-colors",
                     (hoveredRating || selectedRating) >= star
                       ? "fill-warning text-warning"
-                      : "text-muted-foreground"
+                      : "text-muted-foreground/30"
                   )}
                 />
               </button>
             ))}
           </div>
-          <p className="text-sm text-muted-foreground">לחצו על הכוכבים לדירוג</p>
         </>
       ) : (
         <div className="animate-scale-in">
-          <div className="flex justify-center gap-1 mb-4">
+          <div className="flex justify-center gap-1 mb-5">
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}
                 className={cn(
-                  "w-8 h-8",
+                  "w-7 h-7",
                   selectedRating >= star
                     ? "fill-warning text-warning"
-                    : "text-muted-foreground"
+                    : "text-muted-foreground/30"
                 )}
               />
             ))}
           </div>
           
-          {selectedRating >= 4 && (
-            <div className="space-y-3">
-              <p className="text-success font-medium">תודה רבה! 💚</p>
+          {selectedRating >= 4 ? (
+            <div className="space-y-4">
+              <p className="text-success font-semibold">תודה רבה! 💚</p>
               <p className="text-sm text-muted-foreground">
-                נשמח אם תשתפו את החוויה שלכם גם בגוגל
+                נשמח אם תשתפו את החוויה גם בגוגל
               </p>
               <Button 
-                variant="accent" 
-                className="gap-2"
+                className="gap-2 rounded-full"
                 onClick={() => window.open(googleReviewUrl, '_blank')}
               >
                 <ExternalLink className="w-4 h-4" />
                 דרגו אותנו בגוגל
               </Button>
             </div>
-          )}
-          
-          {selectedRating < 4 && (
+          ) : (
             <div className="space-y-3">
-              <p className="text-foreground font-medium">תודה על המשוב!</p>
+              <p className="font-semibold text-foreground">תודה על המשוב</p>
               <p className="text-sm text-muted-foreground">
-                נשתדל להשתפר. אפשר לשלוח לנו הודעה בצ'אט אם יש משהו ספציפי.
+                נשתדל להשתפר. שלחו לנו הודעה בצ'אט אם יש משהו ספציפי.
               </p>
             </div>
           )}

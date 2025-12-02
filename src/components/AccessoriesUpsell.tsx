@@ -1,6 +1,6 @@
 import { Accessory } from '@/types/repair';
 import { cn } from '@/lib/utils';
-import { Check, Shield, Battery, Smartphone } from 'lucide-react';
+import { Check, ShieldCheck, Zap, Smartphone } from 'lucide-react';
 
 interface AccessoriesUpsellProps {
   accessories: Accessory[];
@@ -9,9 +9,9 @@ interface AccessoriesUpsellProps {
 }
 
 const accessoryIcons: Record<string, React.ReactNode> = {
-  '1': <Shield className="w-5 h-5" />,
-  '2': <Shield className="w-5 h-5" />,
-  '3': <Battery className="w-5 h-5" />,
+  '1': <ShieldCheck className="w-5 h-5" />,
+  '2': <ShieldCheck className="w-5 h-5" />,
+  '3': <Zap className="w-5 h-5" />,
   '4': <Smartphone className="w-5 h-5" />,
 };
 
@@ -21,53 +21,60 @@ const AccessoriesUpsell = ({ accessories, onToggle, disabled }: AccessoriesUpsel
     .reduce((sum, a) => sum + a.price, 0);
 
   return (
-    <div className="glass-card rounded-2xl p-6 animate-slide-up">
-      <div className="flex items-center justify-between mb-4">
+    <div className="wolt-card p-5 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-lg font-semibold text-foreground">להוסיף אביזרים?</h3>
+          <h3 className="text-lg font-bold text-foreground">הוסיפו אביזרים</h3>
           <p className="text-sm text-muted-foreground">הטכנאי יביא איתו</p>
         </div>
         {selectedTotal > 0 && (
-          <div className="bg-accent/10 text-accent px-3 py-1.5 rounded-full animate-scale-in">
+          <div className="bg-primary text-primary-foreground px-4 py-2 rounded-full animate-scale-in">
             <span className="font-bold">+₪{selectedTotal}</span>
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-3">
         {accessories.map((accessory) => (
           <button
             key={accessory.id}
             onClick={() => !disabled && onToggle(accessory.id)}
             disabled={disabled}
             className={cn(
-              "relative p-4 rounded-xl border-2 transition-all duration-200 text-right",
+              "w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200",
               accessory.selected 
                 ? "border-primary bg-primary/5" 
-                : "border-border hover:border-primary/50 bg-card",
+                : "border-transparent bg-muted/50 hover:bg-muted",
               disabled && "opacity-50 cursor-not-allowed"
             )}
           >
-            {accessory.selected && (
-              <div className="absolute top-2 left-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-scale-in">
-                <Check className="w-3 h-3 text-primary-foreground" />
-              </div>
-            )}
-            
             <div className={cn(
-              "w-10 h-10 rounded-lg flex items-center justify-center mb-2 transition-colors",
-              accessory.selected ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+              "w-12 h-12 rounded-xl flex items-center justify-center transition-colors",
+              accessory.selected ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground"
             )}>
               {accessoryIcons[accessory.id]}
             </div>
             
-            <p className="font-medium text-foreground text-sm mb-1">{accessory.name}</p>
-            <p className={cn(
-              "font-bold",
-              accessory.selected ? "text-primary" : "text-muted-foreground"
+            <div className="flex-1 text-right">
+              <p className="font-semibold text-foreground">{accessory.name}</p>
+              <p className={cn(
+                "text-lg font-bold",
+                accessory.selected ? "text-primary" : "text-muted-foreground"
+              )}>
+                ₪{accessory.price}
+              </p>
+            </div>
+
+            <div className={cn(
+              "w-7 h-7 rounded-full flex items-center justify-center transition-all",
+              accessory.selected 
+                ? "bg-primary" 
+                : "border-2 border-border"
             )}>
-              ₪{accessory.price}
-            </p>
+              {accessory.selected && (
+                <Check className="w-4 h-4 text-primary-foreground" />
+              )}
+            </div>
           </button>
         ))}
       </div>

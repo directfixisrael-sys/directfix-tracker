@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        heebo: ["Heebo", "sans-serif"],
+        rubik: ["Rubik", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -83,21 +83,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "pulse-ring": {
-          "0%": { transform: "scale(0.8)", opacity: "1" },
-          "100%": { transform: "scale(1.4)", opacity: "0" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "pulse-ring": "pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       boxShadow: {
-        "glow": "0 0 20px hsl(var(--primary) / 0.3)",
-        "glow-accent": "0 0 20px hsl(var(--accent) / 0.3)",
-        "card": "0 4px 24px -4px hsl(var(--foreground) / 0.08)",
-        "card-hover": "0 8px 32px -8px hsl(var(--foreground) / 0.12)",
+        "wolt": "0 2px 8px rgba(0,0,0,0.08)",
+        "wolt-lg": "0 4px 20px rgba(0,0,0,0.12)",
+        "wolt-xl": "0 8px 30px rgba(0,0,0,0.16)",
       },
     },
   },
