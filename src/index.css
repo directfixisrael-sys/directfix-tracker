@@ -2,32 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap');
 
 @layer base {
   :root {
     --background: 210 20% 98%;
-    --foreground: 220 25% 10%;
+    --foreground: 210 25% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 25% 10%;
+    --card-foreground: 210 25% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 10%;
+    --popover-foreground: 210 25% 12%;
 
-    --primary: 217 91% 50%;
+    --primary: 193 100% 44%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 220 25% 20%;
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 210 25% 20%;
 
-    --muted: 210 30% 94%;
-    --muted-foreground: 220 15% 45%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 210 15% 50%;
 
-    --accent: 30 95% 55%;
+    --accent: 193 100% 44%;
     --accent-foreground: 0 0% 100%;
 
-    --success: 142 76% 36%;
+    --success: 152 70% 45%;
     --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
@@ -36,61 +36,53 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 217 91% 50%;
+    --border: 210 20% 90%;
+    --input: 210 20% 90%;
+    --ring: 193 100% 44%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    --chat-bubble-user: 217 91% 50%;
-    --chat-bubble-support: 210 30% 94%;
-
-    --sidebar-background: 220 25% 10%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-background: 210 25% 12%;
+    --sidebar-foreground: 210 20% 96%;
+    --sidebar-primary: 193 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 18%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 220 20% 20%;
-    --sidebar-ring: 217 91% 60%;
-
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 50%) 0%, hsl(217 91% 40%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(30 95% 55%) 0%, hsl(25 95% 50%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(142 76% 30%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 30% 98%) 100%);
+    --sidebar-accent: 210 20% 20%;
+    --sidebar-accent-foreground: 210 20% 96%;
+    --sidebar-border: 210 20% 20%;
+    --sidebar-ring: 193 100% 50%;
   }
 
   .dark {
-    --background: 220 25% 8%;
-    --foreground: 210 40% 98%;
+    --background: 210 25% 8%;
+    --foreground: 210 20% 98%;
 
-    --card: 220 25% 12%;
-    --card-foreground: 210 40% 98%;
+    --card: 210 25% 12%;
+    --card-foreground: 210 20% 98%;
 
-    --popover: 220 25% 12%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 210 25% 12%;
+    --popover-foreground: 210 20% 98%;
 
-    --primary: 217 91% 60%;
+    --primary: 193 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 20% 18%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 210 20% 18%;
+    --secondary-foreground: 210 20% 98%;
 
-    --muted: 220 20% 18%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 210 20% 18%;
+    --muted-foreground: 210 15% 60%;
 
-    --accent: 30 95% 55%;
+    --accent: 193 100% 50%;
     --accent-foreground: 0 0% 100%;
 
-    --success: 142 76% 45%;
+    --success: 152 70% 50%;
     --success-foreground: 0 0% 100%;
 
     --destructive: 0 62% 50%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 210 20% 98%;
 
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 217 91% 60%;
+    --border: 210 20% 20%;
+    --input: 210 20% 20%;
+    --ring: 193 100% 50%;
   }
 }
 
@@ -104,91 +96,75 @@
   }
 
   body {
-    @apply bg-background text-foreground font-heebo;
+    @apply bg-background text-foreground font-rubik antialiased;
   }
 }
 
 @layer components {
-  .glass-card {
-    @apply bg-card/80 backdrop-blur-xl border border-border/50 shadow-lg;
+  .wolt-card {
+    @apply bg-card rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-border/50;
   }
 
-  .status-badge {
-    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium;
+  .wolt-card-elevated {
+    @apply bg-card rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.12)];
   }
 
-  .status-pending {
-    @apply bg-warning/10 text-warning;
+  .status-dot {
+    @apply w-3 h-3 rounded-full relative;
   }
 
-  .status-confirmed {
-    @apply bg-primary/10 text-primary;
-  }
-
-  .status-in-progress {
-    @apply bg-accent/10 text-accent;
-  }
-
-  .status-completed {
-    @apply bg-success/10 text-success;
+  .status-dot.active::after {
+    content: '';
+    @apply absolute inset-0 rounded-full bg-current animate-ping opacity-40;
   }
 
   .chat-bubble {
-    @apply rounded-2xl px-4 py-2.5 max-w-[85%] shadow-sm;
+    @apply rounded-2xl px-4 py-3 max-w-[85%];
   }
 
   .chat-bubble-user {
-    @apply bg-primary text-primary-foreground rounded-br-md;
+    @apply bg-primary text-primary-foreground rounded-bl-md;
   }
 
   .chat-bubble-support {
-    @apply bg-muted text-foreground rounded-bl-md;
-  }
-
-  .pulse-dot {
-    @apply relative;
-  }
-
-  .pulse-dot::before {
-    content: '';
-    @apply absolute inset-0 rounded-full bg-current animate-ping opacity-75;
-  }
-
-  .gradient-text {
-    @apply bg-gradient-to-l from-primary to-accent bg-clip-text text-transparent;
+    @apply bg-muted text-foreground rounded-br-md;
   }
 }
 
 @layer utilities {
   .animate-slide-up {
-    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .animate-slide-down {
-    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
+    animation: fadeIn 0.4s ease-out;
   }
 
   .animate-scale-in {
     animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .animate-bounce-soft {
-    animation: bounceSoft 2s ease-in-out infinite;
+  .animate-pulse-slow {
+    animation: pulseSlow 2s ease-in-out infinite;
   }
 
   .animate-drive {
-    animation: drive 3s ease-in-out infinite;
+    animation: driveMotorcycle 4s ease-in-out infinite;
+  }
+
+  .animate-road {
+    animation: roadMove 1s linear infinite;
   }
 }
 
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
@@ -199,7 +175,7 @@
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-24px);
   }
   to {
     opacity: 1;
@@ -208,12 +184,8 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes scaleIn {
@@ -227,29 +199,27 @@
   }
 }
 
-@keyframes bounceSoft {
+@keyframes pulseSlow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes driveMotorcycle {
   0%, 100% {
-    transform: translateY(0);
+    transform: translateX(0) translateY(0);
+  }
+  25% {
+    transform: translateX(-8px) translateY(-2px);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translateX(0) translateY(0);
+  }
+  75% {
+    transform: translateX(8px) translateY(-2px);
   }
 }
 
-@keyframes drive {
-  0% {
-    transform: translateX(0) rotate(0deg);
-  }
-  25% {
-    transform: translateX(-5px) rotate(-2deg);
-  }
-  50% {
-    transform: translateX(0) rotate(0deg);
-  }
-  75% {
-    transform: translateX(5px) rotate(2deg);
-  }
-  100% {
-    transform: translateX(0) rotate(0deg);
-  }
+@keyframes roadMove {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-24px); }
 }

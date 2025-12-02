@@ -9,16 +9,16 @@ interface PromotionsOptInProps {
 
 const PromotionsOptIn = ({ checked, onCheckedChange }: PromotionsOptInProps) => {
   return (
-    <div className="glass-card rounded-2xl p-4 animate-slide-up">
+    <div className="wolt-card p-4 animate-slide-up" style={{ animationDelay: '0.4s' }}>
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-          <Gift className="w-5 h-5 text-accent" />
+        <div className="w-11 h-11 bg-warning/10 rounded-xl flex items-center justify-center flex-shrink-0">
+          <Gift className="w-5 h-5 text-warning" />
         </div>
         <div className="flex-1">
-          <Label htmlFor="promotions" className="font-medium text-foreground cursor-pointer">
+          <Label htmlFor="promotions" className="font-semibold text-foreground cursor-pointer">
             קבלו מבצעים והנחות
           </Label>
-          <p className="text-sm text-muted-foreground">נשלח לכם הצעות מיוחדות ב-SMS</p>
+          <p className="text-xs text-muted-foreground">הצעות מיוחדות ישירות לנייד</p>
         </div>
         <Switch
           id="promotions"
