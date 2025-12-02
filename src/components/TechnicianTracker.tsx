@@ -185,7 +185,7 @@ const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, 
             className="w-full mt-4 gap-3 bg-[#33ccff] hover:bg-[#2bb8e6] text-white font-bold py-4 text-lg"
           >
             <Navigation className="w-6 h-6" />
-            נווט בוויז
+            עקוב בוויז
           </Button>
         )}
       </div>
