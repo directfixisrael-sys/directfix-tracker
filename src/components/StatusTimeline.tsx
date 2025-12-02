@@ -7,18 +7,24 @@ interface StatusTimelineProps {
   estimatedArrival?: string;
 }
 
+// Simplified status order - removed technician_assigned, arrived, in_progress
 const statusOrder: RepairStatus[] = [
   'pending',
   'confirmed',
-  'technician_assigned',
   'on_the_way',
-  'arrived',
-  'in_progress',
   'completed',
 ];
 
+// Map original statuses to display statuses
+const getDisplayStatus = (status: RepairStatus): RepairStatus => {
+  if (status === 'technician_assigned') return 'confirmed';
+  if (status === 'arrived' || status === 'in_progress') return 'on_the_way';
+  return status;
+};
+
 const StatusTimeline = ({ currentStatus, estimatedArrival }: StatusTimelineProps) => {
-  const currentIndex = statusOrder.indexOf(currentStatus);
+  const displayStatus = getDisplayStatus(currentStatus);
+  const currentIndex = statusOrder.indexOf(displayStatus);
 
   return (
     <div className="wolt-card p-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>

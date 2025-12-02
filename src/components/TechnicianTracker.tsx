@@ -1,4 +1,4 @@
-import { Bike, MapPin, Navigation } from 'lucide-react';
+import { Bike, MapPin } from 'lucide-react';
 
 interface TechnicianTrackerProps {
   technicianName: string;
@@ -9,51 +9,76 @@ interface TechnicianTrackerProps {
 const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress }: TechnicianTrackerProps) => {
   return (
     <div className="wolt-card-elevated overflow-hidden animate-slide-up">
-      {/* Map visualization */}
-      <div className="relative h-48 bg-gradient-to-bl from-primary/5 via-background to-primary/10 overflow-hidden">
-        {/* Animated background pattern */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, hsl(var(--primary)/0.2) 1px, transparent 0)`,
-            backgroundSize: '24px 24px'
-          }} />
+      {/* City illustration map */}
+      <div className="relative h-52 bg-gradient-to-b from-sky-100 via-sky-50 to-emerald-50 dark:from-sky-900/30 dark:via-sky-800/20 dark:to-emerald-900/20 overflow-hidden">
+        {/* Sky with clouds */}
+        <div className="absolute top-4 left-8 w-16 h-6 bg-white/60 dark:bg-white/20 rounded-full blur-sm" />
+        <div className="absolute top-8 left-20 w-12 h-4 bg-white/40 dark:bg-white/10 rounded-full blur-sm" />
+        <div className="absolute top-6 right-12 w-20 h-5 bg-white/50 dark:bg-white/15 rounded-full blur-sm" />
+        
+        {/* Sun */}
+        <div className="absolute top-4 right-8 w-10 h-10 bg-yellow-300/60 dark:bg-yellow-400/30 rounded-full blur-md" />
+
+        {/* Buildings - back row */}
+        <div className="absolute bottom-16 inset-x-0 flex justify-around items-end px-4">
+          <div className="w-10 h-20 bg-slate-300/80 dark:bg-slate-600/60 rounded-t-lg" />
+          <div className="w-8 h-28 bg-slate-400/70 dark:bg-slate-500/60 rounded-t-sm" />
+          <div className="w-12 h-24 bg-blue-200/80 dark:bg-blue-800/50 rounded-t-lg" />
+          <div className="w-6 h-16 bg-slate-300/70 dark:bg-slate-600/50 rounded-t-md" />
+          <div className="w-10 h-32 bg-slate-400/60 dark:bg-slate-500/50 rounded-t-sm" />
+          <div className="w-8 h-20 bg-blue-300/70 dark:bg-blue-700/50 rounded-t-lg" />
+          <div className="w-14 h-26 bg-slate-300/80 dark:bg-slate-600/60 rounded-t-md" />
+        </div>
+
+        {/* Trees */}
+        <div className="absolute bottom-14 left-6">
+          <div className="w-8 h-10 bg-emerald-500/70 dark:bg-emerald-600/50 rounded-full" />
+          <div className="w-2 h-4 bg-amber-700/60 dark:bg-amber-800/50 mx-auto -mt-1" />
+        </div>
+        <div className="absolute bottom-14 right-10">
+          <div className="w-10 h-12 bg-emerald-600/60 dark:bg-emerald-700/40 rounded-full" />
+          <div className="w-2 h-4 bg-amber-700/60 dark:bg-amber-800/50 mx-auto -mt-1" />
+        </div>
+        <div className="absolute bottom-14 left-1/3">
+          <div className="w-6 h-8 bg-emerald-400/70 dark:bg-emerald-500/50 rounded-full" />
+          <div className="w-1.5 h-3 bg-amber-700/60 dark:bg-amber-800/50 mx-auto -mt-1" />
         </div>
 
         {/* Road */}
-        <div className="absolute inset-x-8 top-1/2 -translate-y-1/2">
-          {/* Road background */}
-          <div className="h-4 bg-foreground/10 rounded-full relative overflow-hidden">
-            {/* Animated dashes */}
-            <div className="absolute inset-y-0 inset-x-0 flex items-center overflow-hidden">
-              <div className="flex items-center gap-3 animate-road">
-                {[...Array(20)].map((_, i) => (
-                  <div key={i} className="w-4 h-0.5 bg-background/50 rounded-full flex-shrink-0" />
-                ))}
-              </div>
+        <div className="absolute bottom-0 inset-x-0 h-14 bg-slate-600/90 dark:bg-slate-700/90">
+          {/* Road markings */}
+          <div className="absolute top-1/2 -translate-y-1/2 inset-x-4 flex items-center overflow-hidden">
+            <div className="flex items-center gap-4 animate-road">
+              {[...Array(20)].map((_, i) => (
+                <div key={i} className="w-8 h-1 bg-yellow-400/80 rounded-full flex-shrink-0" />
+              ))}
             </div>
           </div>
+          
+          {/* Sidewalk */}
+          <div className="absolute top-0 inset-x-0 h-2 bg-slate-400/50 dark:bg-slate-500/40" />
         </div>
 
         {/* Destination marker */}
-        <div className="absolute left-12 top-1/2 -translate-y-1/2 z-10">
+        <div className="absolute left-10 bottom-12 z-10">
           <div className="relative">
-            <div className="w-12 h-12 bg-success rounded-full flex items-center justify-center shadow-wolt-lg">
-              <MapPin className="w-6 h-6 text-success-foreground" />
+            <div className="w-10 h-10 bg-success rounded-full flex items-center justify-center shadow-lg animate-bounce-slow">
+              <MapPin className="w-5 h-5 text-success-foreground" />
             </div>
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-success rotate-45 -z-10" />
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-success rotate-45 -z-10" />
           </div>
         </div>
 
         {/* Motorcycle with technician */}
-        <div className="absolute right-1/3 top-1/2 -translate-y-1/2 z-20 animate-drive">
+        <div className="absolute right-1/4 bottom-4 z-20 animate-drive">
           <div className="relative">
             {/* Name bubble */}
-            <div className="absolute -top-10 right-1/2 translate-x-1/2 bg-card px-3 py-1.5 rounded-full shadow-wolt whitespace-nowrap">
+            <div className="absolute -top-10 right-1/2 translate-x-1/2 bg-card px-3 py-1.5 rounded-full shadow-lg whitespace-nowrap border border-border/50">
               <span className="text-xs font-semibold text-foreground">{technicianName} 🏍️</span>
             </div>
             {/* Bike icon */}
-            <div className="w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-wolt-lg">
-              <Bike className="w-7 h-7 text-primary-foreground" />
+            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
+              <Bike className="w-6 h-6 text-primary-foreground" />
             </div>
           </div>
         </div>
@@ -74,9 +99,9 @@ const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress }
         </div>
 
         <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-xl">
-          <Navigation className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+          <MapPin className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
           <div>
-            <p className="text-xs text-muted-foreground mb-1">כתובת למשלוח</p>
+            <p className="text-xs text-muted-foreground mb-1">כתובת הלקוח</p>
             <p className="font-medium text-foreground text-sm">{customerAddress}</p>
           </div>
         </div>
