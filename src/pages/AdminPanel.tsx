@@ -635,10 +635,31 @@ const AdminPanel = () => {
                         <p className="font-medium text-foreground text-base">{selectedOrder.customerAddress}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-sm">מחיר</p>
+                        <p className="text-muted-foreground text-sm">מחיר תיקון</p>
                         <p className="font-medium text-foreground text-base">₪{selectedOrder.repairPrice}</p>
                       </div>
                     </div>
+
+                    {/* Selected accessories */}
+                    {selectedOrder.accessories.some(acc => acc.selected) && (
+                      <div className="mt-4 pt-4 border-t border-border">
+                        <p className="text-muted-foreground text-sm mb-2">אביזרים שנבחרו:</p>
+                        <div className="space-y-2">
+                          {selectedOrder.accessories.filter(acc => acc.selected).map((acc) => (
+                            <div key={acc.id} className="flex items-center justify-between bg-success/10 text-success px-3 py-2 rounded-lg">
+                              <span className="font-medium">{acc.name}</span>
+                              <span className="font-bold">₪{acc.price}</span>
+                            </div>
+                          ))}
+                          <div className="flex items-center justify-between pt-2 border-t border-border">
+                            <span className="font-bold text-foreground">סה"כ לתשלום:</span>
+                            <span className="font-bold text-lg text-primary">
+                              ₪{selectedOrder.repairPrice + selectedOrder.accessories.filter(acc => acc.selected).reduce((sum, acc) => sum + acc.price, 0)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="mt-4 pt-4 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-3">
                       <Button
