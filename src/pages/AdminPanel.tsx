@@ -733,11 +733,11 @@ const AdminPanel = () => {
                   <div className="glass-card rounded-xl p-6">
                     <h3 className="font-semibold text-foreground mb-4 text-lg">קישור וויז</h3>
                     <p className="text-sm text-muted-foreground mb-3">
-                      הדבק את קישור השיתוף מוויז כדי שהלקוח יוכל לעקוב אחריך
+                      הדבק את הטקסט המלא מהשיתוף של וויז - המערכת תחלץ את הקישור
                     </p>
                     <div className="flex gap-2">
                       <Input
-                        placeholder="https://waze.com/ul/..."
+                        placeholder="הדבק כאן את השיתוף מוויז..."
                         value={wazeLink}
                         onChange={(e) => setWazeLink(e.target.value)}
                         className="flex-1"
@@ -745,18 +745,29 @@ const AdminPanel = () => {
                       />
                       <Button onClick={() => {
                         if (selectedOrder && wazeLink) {
-                          updateWazeLink(selectedOrder.id, wazeLink);
-                          toast({ title: "קישור וויז עודכן" });
-                          setWazeLink('');
+                          // Extract just the URL from the pasted text
+                          const urlMatch = wazeLink.match(/https:\/\/waze\.com\/ul[^\s]*/);
+                          const extractedUrl = urlMatch ? urlMatch[0] : wazeLink;
+                          
+                          if (extractedUrl.includes('waze.com')) {
+                            updateWazeLink(selectedOrder.id, extractedUrl);
+                            toast({ title: "קישור וויז עודכן" });
+                            setWazeLink('');
+                          } else {
+                            toast({ title: "שגיאה", description: "לא נמצא קישור וויז תקין", variant: "destructive" });
+                          }
                         }
                       }}>
                         שמור
                       </Button>
                     </div>
                     {selectedOrder.wazeLink && (
-                      <p className="text-sm text-muted-foreground mt-2" dir="ltr">
-                        נוכחי: {selectedOrder.wazeLink}
-                      </p>
+                      <div className="mt-3 p-2 bg-success/10 rounded-lg">
+                        <p className="text-sm text-success font-medium">✓ קישור וויז פעיל</p>
+                        <p className="text-xs text-muted-foreground mt-1 truncate" dir="ltr">
+                          {selectedOrder.wazeLink}
+                        </p>
+                      </div>
                     )}
                   </div>
 
