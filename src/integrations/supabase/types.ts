@@ -14,7 +14,113 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      messages: {
+        Row: {
+          id: string
+          message: string
+          order_id: string
+          read: boolean
+          sender: string
+          sender_name: string
+          timestamp: string
+        }
+        Insert: {
+          id?: string
+          message: string
+          order_id: string
+          read?: boolean
+          sender: string
+          sender_name: string
+          timestamp?: string
+        }
+        Update: {
+          id?: string
+          message?: string
+          order_id?: string
+          read?: boolean
+          sender?: string
+          sender_name?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          accessories: Json
+          completed_at: string | null
+          created_at: string
+          customer_address: string
+          customer_name: string
+          customer_phone: string
+          device_type: string
+          estimated_arrival: string | null
+          feedback: string | null
+          id: string
+          is_viewing: boolean | null
+          issue_description: string
+          last_viewed_at: string | null
+          notes: string[]
+          rating: number | null
+          repair_price: number
+          status: string
+          technician_name: string | null
+          updated_at: string
+          wants_promotions: boolean
+        }
+        Insert: {
+          accessories?: Json
+          completed_at?: string | null
+          created_at?: string
+          customer_address?: string
+          customer_name: string
+          customer_phone: string
+          device_type?: string
+          estimated_arrival?: string | null
+          feedback?: string | null
+          id?: string
+          is_viewing?: boolean | null
+          issue_description?: string
+          last_viewed_at?: string | null
+          notes?: string[]
+          rating?: number | null
+          repair_price?: number
+          status?: string
+          technician_name?: string | null
+          updated_at?: string
+          wants_promotions?: boolean
+        }
+        Update: {
+          accessories?: Json
+          completed_at?: string | null
+          created_at?: string
+          customer_address?: string
+          customer_name?: string
+          customer_phone?: string
+          device_type?: string
+          estimated_arrival?: string | null
+          feedback?: string | null
+          id?: string
+          is_viewing?: boolean | null
+          issue_description?: string
+          last_viewed_at?: string | null
+          notes?: string[]
+          rating?: number | null
+          repair_price?: number
+          status?: string
+          technician_name?: string | null
+          updated_at?: string
+          wants_promotions?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
