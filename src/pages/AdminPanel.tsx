@@ -34,6 +34,21 @@ const AdminPanel = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [accessCode, setAccessCode] = useState('');
   const [codeError, setCodeError] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
+  const [newMessage, setNewMessage] = useState('');
+  const [newNote, setNewNote] = useState('');
+  const [eta, setEta] = useState('');
+  const [statusNote, setStatusNote] = useState('');
+  const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
+  const [newOrder, setNewOrder] = useState({
+    customerPhone: '',
+    customerName: '',
+    customerAddress: '',
+    deviceType: '',
+    issueDescription: '',
+    repairPrice: 0,
+    technicianName: '',
+  });
 
   const { 
     orders, 
@@ -54,6 +69,32 @@ const AdminPanel = () => {
     if (savedAuth === 'true') {
       setIsAuthenticated(true);
     }
+  }, []);
+
+  // Listen for localStorage changes from other tabs (without reload)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'directfix-repairs') {
+        console.log('Storage changed from another tab');
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Update selectedOrder when orders change
+  useEffect(() => {
+    if (selectedOrder) {
+      const updated = orders.find(o => o.id === selectedOrder.id);
+      if (updated) {
+        setSelectedOrder(updated);
+      }
+    }
+  }, [orders, selectedOrder?.id]);
+
+  const handleManualRefresh = useCallback(() => {
+    window.location.reload();
   }, []);
 
   const handleCodeSubmit = (e: React.FormEvent) => {
@@ -98,49 +139,6 @@ const AdminPanel = () => {
       </div>
     );
   }
-
-  // Listen for localStorage changes from other tabs (without reload)
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'directfix-repairs') {
-        console.log('Storage changed from another tab');
-        // The zustand persist middleware will handle rehydration automatically
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  const handleManualRefresh = useCallback(() => {
-    window.location.reload();
-  }, []);
-  
-  const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
-  const [newMessage, setNewMessage] = useState('');
-  const [newNote, setNewNote] = useState('');
-  const [eta, setEta] = useState('');
-  const [statusNote, setStatusNote] = useState('');
-  const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
-  const [newOrder, setNewOrder] = useState({
-    customerPhone: '',
-    customerName: '',
-    customerAddress: '',
-    deviceType: '',
-    issueDescription: '',
-    repairPrice: 0,
-    technicianName: '',
-  });
-
-  // Update selectedOrder when orders change
-  useEffect(() => {
-    if (selectedOrder) {
-      const updated = orders.find(o => o.id === selectedOrder.id);
-      if (updated) {
-        setSelectedOrder(updated);
-      }
-    }
-  }, [orders, selectedOrder?.id]);
 
   const handleCreateOrder = () => {
     console.log('Creating order:', newOrder);
