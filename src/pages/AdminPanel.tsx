@@ -265,16 +265,16 @@ const AdminPanel = () => {
     switch (activeTab) {
       case 'messages':
         return (
-          <div className="flex-1 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">כל ההודעות</h2>
+          <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
+              <h2 className="text-lg md:text-xl font-bold">כל ההודעות</h2>
               {unreadCount > 0 && (
-                <span className="bg-warning text-warning-foreground text-sm px-3 py-1 rounded-full">
+                <span className="bg-warning text-warning-foreground text-xs md:text-sm px-3 py-1 rounded-full">
                   {unreadCount} הודעות חדשות מלקוחות
                 </span>
               )}
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {sortedMessages.length === 0 ? (
                 <p className="text-muted-foreground text-center py-8">אין הודעות עדיין</p>
               ) : (
@@ -336,8 +336,8 @@ const AdminPanel = () => {
         }, [] as { phone: string; name: string; address: string; ordersCount: number }[]);
 
         return (
-          <div className="flex-1 p-6">
-            <h2 className="text-xl font-bold mb-4">לקוחות ({uniqueCustomers.length})</h2>
+          <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
+            <h2 className="text-lg md:text-xl font-bold mb-4">לקוחות ({uniqueCustomers.length})</h2>
             <div className="space-y-3">
               {uniqueCustomers.map((customer) => (
                 <div key={customer.phone} className="glass-card p-4 rounded-xl">
@@ -361,8 +361,8 @@ const AdminPanel = () => {
 
       case 'settings':
         return (
-          <div className="flex-1 p-6 space-y-6">
-            <h2 className="text-xl font-bold">הגדרות</h2>
+          <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 space-y-4 md:space-y-6 overflow-y-auto">
+            <h2 className="text-lg md:text-xl font-bold">הגדרות</h2>
             
             {/* Push Notifications */}
             <PushNotificationToggle />
@@ -400,16 +400,16 @@ const AdminPanel = () => {
           : '0';
         
         return (
-          <div className="flex-1 p-6 overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold">משוב לקוחות</h2>
-              <div className="flex items-center gap-4">
-                <div className="bg-warning/10 text-warning px-4 py-2 rounded-xl flex items-center gap-2">
-                  <Star className="w-5 h-5 fill-warning" />
-                  <span className="font-bold text-lg">{avgRating}</span>
-                  <span className="text-sm">ממוצע</span>
+          <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 md:mb-6">
+              <h2 className="text-lg md:text-xl font-bold">משוב לקוחות</h2>
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="bg-warning/10 text-warning px-3 md:px-4 py-1.5 md:py-2 rounded-xl flex items-center gap-2">
+                  <Star className="w-4 h-4 md:w-5 md:h-5 fill-warning" />
+                  <span className="font-bold text-base md:text-lg">{avgRating}</span>
+                  <span className="text-xs md:text-sm">ממוצע</span>
                 </div>
-                <span className="text-muted-foreground text-sm">
+                <span className="text-muted-foreground text-xs md:text-sm">
                   {ordersWithFeedback.length} דירוגים
                 </span>
               </div>
@@ -469,11 +469,11 @@ const AdminPanel = () => {
         const pendingOrders = orders.filter(o => o.status === 'pending');
         
         return (
-          <div className="flex-1 p-6 overflow-y-auto">
-            <h2 className="text-xl font-bold mb-6">אנליטיקס</h2>
+          <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
+            <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6">אנליטיקס</h2>
             
             {/* Stats cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
               <div className="glass-card p-5 rounded-xl">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -543,9 +543,12 @@ const AdminPanel = () => {
 
       default: // orders
         return (
-          <>
-            {/* Orders list */}
-            <div className="w-80 border-l border-border overflow-y-auto">
+          <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
+            {/* Orders list - show on mobile when no order selected, always show on desktop */}
+            <div className={cn(
+              "md:w-80 border-l border-border overflow-y-auto",
+              selectedOrder ? "hidden md:block" : "flex-1 md:flex-none"
+            )}>
               {orders.length === 0 ? (
                 <div className="p-8 text-center text-muted-foreground">
                   <Smartphone className="w-12 h-12 mx-auto mb-3 opacity-30" />
@@ -579,13 +582,21 @@ const AdminPanel = () => {
 
             {/* Order details */}
             {selectedOrder ? (
-              <div className="flex-1 overflow-y-auto p-6">
-                <div className="max-w-2xl mx-auto space-y-6">
+              <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6">
+                {/* Mobile back button */}
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="md:hidden flex items-center gap-2 text-muted-foreground mb-4 hover:text-foreground"
+                >
+                  ← חזרה לרשימה
+                </button>
+                
+                <div className="max-w-2xl mx-auto space-y-4 md:space-y-6">
                   {/* Order header */}
-                  <div className="glass-card rounded-xl p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <span className={cn("status-badge", getStatusColor(selectedOrder.status))}>
+                  <div className="glass-card rounded-xl p-4 md:p-6">
+                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
+                      <div className="flex items-center gap-2 order-2 md:order-1">
+                        <span className={cn("status-badge text-sm", getStatusColor(selectedOrder.status))}>
                           {statusLabels[selectedOrder.status]}
                         </span>
                         <Button
@@ -595,40 +606,40 @@ const AdminPanel = () => {
                           className="gap-1"
                         >
                           <Copy className="w-4 h-4" />
-                          העתק קישור
+                          <span className="hidden sm:inline">העתק קישור</span>
                         </Button>
                       </div>
-                      <div className="text-left">
-                        <h2 className="text-xl font-bold text-foreground">{selectedOrder.customerName}</h2>
-                        <p className="text-muted-foreground">{selectedOrder.customerPhone}</p>
+                      <div className="text-right order-1 md:order-2 md:text-left">
+                        <h2 className="text-lg md:text-xl font-bold text-foreground">{selectedOrder.customerName}</h2>
+                        <p className="text-muted-foreground text-sm">{selectedOrder.customerPhone}</p>
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-2 gap-3 md:gap-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground">מכשיר</p>
+                        <p className="text-muted-foreground text-xs md:text-sm">מכשיר</p>
                         <p className="font-medium text-foreground">{selectedOrder.deviceType}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">תקלה</p>
+                        <p className="text-muted-foreground text-xs md:text-sm">תקלה</p>
                         <p className="font-medium text-foreground">{selectedOrder.issueDescription}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">כתובת</p>
+                        <p className="text-muted-foreground text-xs md:text-sm">כתובת</p>
                         <p className="font-medium text-foreground">{selectedOrder.customerAddress}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">מחיר</p>
+                        <p className="text-muted-foreground text-xs md:text-sm">מחיר</p>
                         <p className="font-medium text-foreground">₪{selectedOrder.repairPrice}</p>
                       </div>
                     </div>
 
-                    <div className="mt-4 pt-4 border-t border-border flex justify-between items-center">
+                    <div className="mt-4 pt-4 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-3">
                       <Button
                         variant="destructive"
                         size="sm"
                         onClick={() => handleDeleteOrder(selectedOrder.id)}
-                        className="gap-1"
+                        className="gap-1 w-full sm:w-auto"
                       >
                         <Trash2 className="w-4 h-4" />
                         מחק הזמנה
@@ -766,22 +777,98 @@ const AdminPanel = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex items-center justify-center text-muted-foreground">
+              <div className="hidden md:flex flex-1 items-center justify-center text-muted-foreground">
                 <div className="text-center">
                   <Smartphone className="w-16 h-16 mx-auto mb-4 opacity-20" />
                   <p>בחרו הזמנה מהרשימה</p>
                 </div>
               </div>
             )}
-          </>
+          </div>
         );
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-sidebar border-l border-sidebar-border flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col md:flex-row">
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-sidebar border-t border-sidebar-border z-50 px-2 py-2 safe-area-pb">
+        <div className="flex justify-around items-center">
+          <button 
+            onClick={() => { setActiveTab('orders'); setSelectedOrder(null); }}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
+              activeTab === 'orders' 
+                ? "bg-primary/10 text-primary" 
+                : "text-muted-foreground"
+            )}
+          >
+            <Smartphone className="w-5 h-5" />
+            <span className="text-[10px]">הזמנות</span>
+            {orders.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
+                {orders.length}
+              </span>
+            )}
+          </button>
+          <button 
+            onClick={() => setActiveTab('messages')}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors relative min-w-[60px]",
+              activeTab === 'messages' 
+                ? "bg-primary/10 text-primary" 
+                : "text-muted-foreground"
+            )}
+          >
+            <MessageSquare className="w-5 h-5" />
+            <span className="text-[10px]">הודעות</span>
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-2 bg-warning text-warning-foreground text-[9px] w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+          <button 
+            onClick={() => setActiveTab('analytics')}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
+              activeTab === 'analytics' 
+                ? "bg-primary/10 text-primary" 
+                : "text-muted-foreground"
+            )}
+          >
+            <Activity className="w-5 h-5" />
+            <span className="text-[10px]">אנליטיקס</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('feedback')}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
+              activeTab === 'feedback' 
+                ? "bg-primary/10 text-primary" 
+                : "text-muted-foreground"
+            )}
+          >
+            <Star className="w-5 h-5" />
+            <span className="text-[10px]">משוב</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('settings')}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
+              activeTab === 'settings' 
+                ? "bg-primary/10 text-primary" 
+                : "text-muted-foreground"
+            )}
+          >
+            <Settings className="w-5 h-5" />
+            <span className="text-[10px]">הגדרות</span>
+          </button>
+        </div>
+      </nav>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex w-64 bg-sidebar border-l border-sidebar-border flex-col">
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -907,15 +994,17 @@ const AdminPanel = () => {
       {/* Main content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-card border-b border-border px-6 py-4 flex items-center justify-between">
+        <header className="bg-card border-b border-border px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-foreground">
+            <h1 className="text-lg md:text-xl font-bold text-foreground">
               {activeTab === 'orders' && 'ניהול הזמנות'}
               {activeTab === 'customers' && 'לקוחות'}
               {activeTab === 'messages' && 'הודעות'}
               {activeTab === 'settings' && 'הגדרות'}
+              {activeTab === 'feedback' && 'משוב לקוחות'}
+              {activeTab === 'analytics' && 'אנליטיקס'}
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs md:text-sm text-muted-foreground">
               {activeTab === 'orders' && `${orders.length} הזמנות`}
               {activeTab === 'messages' && `${messages.length} הודעות`}
             </p>
@@ -924,12 +1013,13 @@ const AdminPanel = () => {
           {activeTab === 'orders' && (
             <Dialog open={isNewOrderOpen} onOpenChange={setIsNewOrderOpen}>
               <DialogTrigger asChild>
-                <Button className="gap-2">
+                <Button className="gap-2" size="sm">
                   <Plus className="w-4 h-4" />
-                  הזמנה חדשה
+                  <span className="hidden sm:inline">הזמנה חדשה</span>
+                  <span className="sm:hidden">חדש</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>יצירת הזמנה חדשה</DialogTitle>
                   <DialogDescription>מלאו את פרטי ההזמנה</DialogDescription>
