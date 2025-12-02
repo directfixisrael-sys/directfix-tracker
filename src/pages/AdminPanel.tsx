@@ -25,7 +25,6 @@ import logo from '@/assets/logo.png';
 
 const AdminPanel = () => {
   const { toast } = useToast();
-  const [refreshKey, setRefreshKey] = useState(0);
   
   const { 
     orders, 
@@ -40,14 +39,12 @@ const AdminPanel = () => {
     deleteOrder,
   } = useRepairStore();
 
-  // Listen for localStorage changes from other tabs
+  // Listen for localStorage changes from other tabs (without reload)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'directfix-repairs') {
-        // Force re-render when localStorage changes
-        setRefreshKey(prev => prev + 1);
-        // Reload store state
-        window.location.reload();
+        console.log('Storage changed from another tab');
+        // The zustand persist middleware will handle rehydration automatically
       }
     };
 
@@ -55,20 +52,9 @@ const AdminPanel = () => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Auto-refresh every 5 seconds to check for new messages
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRefreshKey(prev => prev + 1);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   const handleManualRefresh = useCallback(() => {
     window.location.reload();
-    toast({
-      title: "הנתונים עודכנו",
-    });
-  }, [toast]);
+  }, []);
   
   const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
   const [newMessage, setNewMessage] = useState('');
@@ -97,6 +83,7 @@ const AdminPanel = () => {
   }, [orders, selectedOrder?.id]);
 
   const handleCreateOrder = () => {
+    console.log('Creating order:', newOrder);
     if (newOrder.customerPhone && newOrder.customerName) {
       addOrder({
         ...newOrder,
@@ -105,6 +92,7 @@ const AdminPanel = () => {
         notes: [],
         wantsPromotions: false,
       });
+      console.log('Order added, current orders:', orders.length + 1);
       setNewOrder({
         customerPhone: '',
         customerName: '',
@@ -118,6 +106,13 @@ const AdminPanel = () => {
       toast({
         title: "הזמנה נוצרה בהצלחה!",
         description: `הזמנה עבור ${newOrder.customerName} נוצרה`,
+      });
+    } else {
+      console.log('Missing required fields:', { phone: newOrder.customerPhone, name: newOrder.customerName });
+      toast({
+        title: "שגיאה",
+        description: "יש למלא שם לקוח ומספר טלפון",
+        variant: "destructive",
       });
     }
   };
