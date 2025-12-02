@@ -57,18 +57,22 @@ const CustomerTracker = () => {
     }
   }, [orders, currentOrder, setCurrentOrder]);
 
-  // Listen for localStorage changes from other tabs
+  // Listen for localStorage changes from other tabs - sync without reload
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'directfix-repairs') {
-        console.log('Storage changed, reloading...');
-        window.location.reload();
+      if (e.key === 'directfix-repairs' && currentOrder) {
+        console.log('Storage changed, syncing order...');
+        // Re-fetch the order from updated storage
+        const order = findOrderByPhone(currentOrder.customerPhone);
+        if (order) {
+          setCurrentOrder(order);
+        }
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, [currentOrder, findOrderByPhone, setCurrentOrder]);
 
   // Auto-refresh every 10 seconds to check for updates
   useEffect(() => {
