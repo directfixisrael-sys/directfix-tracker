@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MapPin, Navigation, ExternalLink, Map } from 'lucide-react';
+import { MapPin, Navigation, ExternalLink, Map, MapPinned } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface TechnicianTrackerProps {
@@ -8,6 +8,20 @@ interface TechnicianTrackerProps {
   customerAddress: string;
   wazeLink?: string;
 }
+
+// Extract city from address
+const extractCity = (address: string): string => {
+  // Try to extract city from common Israeli address formats
+  const parts = address.split(/[,\s]+/);
+  // Usually city is the last significant word (not a number)
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const part = parts[i].trim();
+    if (part && !/^\d+$/.test(part) && part.length > 2) {
+      return part;
+    }
+  }
+  return address.split(' ').pop() || '';
+};
 
 // Custom scooter SVG component
 const TechnicianScooter = () => (
@@ -45,8 +59,7 @@ const TechnicianScooter = () => (
 );
 
 const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, wazeLink }: TechnicianTrackerProps) => {
-  const [showEmbed, setShowEmbed] = useState(true);
-  const [embedError, setEmbedError] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   // Extract Waze URL from shared text
   const extractWazeUrl = (text: string): string | null => {
@@ -64,8 +77,13 @@ const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, 
   };
 
   const wazeUrl = wazeLink ? extractWazeUrl(wazeLink) : null;
+  const city = extractCity(customerAddress);
+  
+  // Google Maps embed URL
+  const googleMapsEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(customerAddress)}&zoom=15&language=he`;
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(customerAddress)}`;
 
-  // City illustration component (fallback when no Waze link)
+  // City illustration component
   const CityIllustration = () => (
     <div className="relative h-52 bg-gradient-to-b from-sky-100 via-sky-50 to-emerald-50 dark:from-sky-900/30 dark:via-sky-800/20 dark:to-emerald-900/20 overflow-hidden">
       {/* Sky with clouds */}
@@ -116,9 +134,13 @@ const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, 
         <div className="absolute top-0 inset-x-0 h-2 bg-slate-400/50 dark:bg-slate-500/40" />
       </div>
 
-      {/* Destination marker */}
+      {/* Destination marker with city name */}
       <div className="absolute left-10 bottom-12 z-10">
         <div className="relative">
+          {/* City name label */}
+          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-success text-success-foreground px-2 py-0.5 rounded-full shadow-lg whitespace-nowrap">
+            <span className="text-xs font-bold">{city}</span>
+          </div>
           <div className="w-10 h-10 bg-success rounded-full flex items-center justify-center shadow-lg animate-bounce-slow">
             <MapPin className="w-5 h-5 text-success-foreground" />
           </div>
@@ -143,28 +165,29 @@ const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, 
   return (
     <div className="wolt-card-elevated overflow-hidden animate-slide-up">
       {/* Map section */}
-      {wazeUrl && showEmbed && !embedError ? (
+      {showMap ? (
         <div className="relative">
-          {/* Waze embed iframe */}
+          {/* Google Maps embed */}
           <div className="relative h-64 bg-muted">
             <iframe
-              src={wazeUrl}
+              src={googleMapsEmbedUrl}
               className="w-full h-full border-0"
-              allow="geolocation"
-              onError={() => setEmbedError(true)}
-              title="מעקב וויז"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="מפת מיקום"
             />
             {/* Overlay header */}
             <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-background/90 to-transparent p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Navigation className="w-5 h-5 text-[#33ccff]" />
-                  <span className="font-bold text-foreground">{technicianName} בדרך אליך</span>
+                  <MapPinned className="w-5 h-5 text-primary" />
+                  <span className="font-bold text-foreground">{city}</span>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setShowEmbed(false)}
+                  onClick={() => setShowMap(false)}
                   className="text-xs"
                 >
                   <Map className="w-4 h-4 mr-1" />
@@ -174,35 +197,42 @@ const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, 
             </div>
           </div>
           
-          {/* Open in Waze button */}
-          <div className="p-3 bg-muted/50 border-t border-border">
+          {/* Open in Google Maps button */}
+          <div className="p-3 bg-muted/50 border-t border-border flex gap-2">
             <Button
-              onClick={handleWazeClick}
+              onClick={() => window.open(googleMapsUrl, '_blank')}
               variant="outline"
-              className="w-full gap-2"
+              className="flex-1 gap-2"
             >
               <ExternalLink className="w-4 h-4" />
-              פתח באפליקציית וויז
+              פתח ב-Google Maps
             </Button>
+            {wazeUrl && (
+              <Button
+                onClick={handleWazeClick}
+                className="flex-1 gap-2 bg-[#33ccff] hover:bg-[#2bb8e6] text-white"
+              >
+                <Navigation className="w-4 h-4" />
+                נווט בוויז
+              </Button>
+            )}
           </div>
         </div>
       ) : (
         <>
           <CityIllustration />
           
-          {/* Show embed button if embed is hidden */}
-          {wazeUrl && !showEmbed && (
-            <div className="p-3 bg-[#33ccff]/10 border-b border-border">
-              <Button
-                onClick={() => setShowEmbed(true)}
-                variant="ghost"
-                className="w-full gap-2 text-[#33ccff]"
-              >
-                <Map className="w-4 h-4" />
-                הצג מפת וויז
-              </Button>
-            </div>
-          )}
+          {/* Show map button */}
+          <div className="p-3 bg-primary/5 border-b border-border">
+            <Button
+              onClick={() => setShowMap(true)}
+              variant="ghost"
+              className="w-full gap-2 text-primary"
+            >
+              <Map className="w-4 h-4" />
+              הצג מפה
+            </Button>
+          </div>
         </>
       )}
 
@@ -228,14 +258,14 @@ const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, 
           </div>
         </div>
 
-        {/* Waze tracking button - only show if no embed or embed hidden */}
-        {wazeUrl && (!showEmbed || embedError) && (
+        {/* Navigation buttons - only show if map is not visible */}
+        {!showMap && wazeUrl && (
           <Button
             onClick={handleWazeClick}
             className="w-full mt-4 gap-3 bg-[#33ccff] hover:bg-[#2bb8e6] text-white font-bold py-4 text-lg"
           >
             <Navigation className="w-6 h-6" />
-            עקוב בוויז
+            נווט בוויז
           </Button>
         )}
       </div>
