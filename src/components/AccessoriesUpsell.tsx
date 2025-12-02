@@ -29,7 +29,7 @@ const AccessoriesUpsell = ({ accessories, onToggle, disabled }: AccessoriesUpsel
   
   const selectedOriginalTotal = accessories
     .filter(a => a.selected)
-    .reduce((sum, a) => sum + a.originalPrice, 0);
+    .reduce((sum, a) => sum + (a.originalPrice || Math.round(a.price * 1.5)), 0);
 
   const totalSaved = selectedOriginalTotal - selectedTotal;
 
@@ -72,7 +72,8 @@ const AccessoriesUpsell = ({ accessories, onToggle, disabled }: AccessoriesUpsel
 
         <div className="space-y-3">
           {accessories.map((accessory) => {
-            const discount = Math.round((1 - accessory.price / accessory.originalPrice) * 100);
+            const originalPrice = accessory.originalPrice || Math.round(accessory.price * 1.5);
+            const discount = Math.round((1 - accessory.price / originalPrice) * 100);
             
             return (
               <button
@@ -107,7 +108,7 @@ const AccessoriesUpsell = ({ accessories, onToggle, disabled }: AccessoriesUpsel
                     {accessoryDescriptions[accessory.id] || accessory.description}
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground line-through">₪{accessory.originalPrice}</span>
+                    <span className="text-sm text-muted-foreground line-through">₪{originalPrice}</span>
                     <span className={cn(
                       "text-lg font-bold",
                       accessory.selected ? "text-primary" : "text-foreground"
