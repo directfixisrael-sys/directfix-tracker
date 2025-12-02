@@ -57,40 +57,31 @@ const CustomerTracker = () => {
     }
   }, [orders, currentOrder, setCurrentOrder]);
 
-  // Listen for localStorage changes from other tabs - sync without reload
+  // Listen for localStorage changes from other tabs - rehydrate store
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'directfix-repairs' && currentOrder) {
-        console.log('Storage changed, syncing order...');
-        // Re-fetch the order from updated storage
-        const order = findOrderByPhone(currentOrder.customerPhone);
-        if (order) {
-          setCurrentOrder(order);
-        }
+      if (e.key === 'directfix-repairs') {
+        console.log('Storage changed, rehydrating store...');
+        // Rehydrate the zustand store from localStorage
+        useRepairStore.persist.rehydrate();
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [currentOrder, findOrderByPhone, setCurrentOrder]);
+  }, []);
 
-  // Auto-refresh every 10 seconds to check for updates
+  // Auto-refresh every 3 seconds - rehydrate from localStorage
   useEffect(() => {
     if (!currentOrder) return;
 
     const interval = setInterval(() => {
-      const phone = searchParams.get('phone');
-      if (phone) {
-        const order = findOrderByPhone(phone);
-        if (order && order.status !== currentOrder.status) {
-          console.log('Status changed:', currentOrder.status, '->', order.status);
-          setCurrentOrder(order);
-        }
-      }
-    }, 10000);
+      // Rehydrate the store from localStorage to get latest updates
+      useRepairStore.persist.rehydrate();
+    }, 3000);
 
     return () => clearInterval(interval);
-  }, [currentOrder, searchParams, findOrderByPhone, setCurrentOrder]);
+  }, [currentOrder]);
 
   useEffect(() => {
     const phone = searchParams.get('phone');
