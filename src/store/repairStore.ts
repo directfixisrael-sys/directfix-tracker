@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { supabase } from '@/integrations/supabase/client';
 import { RepairOrder, ChatMessage, RepairStatus, Accessory } from '@/types/repair';
 
 interface RepairStore {
@@ -7,27 +7,33 @@ interface RepairStore {
   messages: ChatMessage[];
   currentOrder: RepairOrder | null;
   activeTab: 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics';
+  isLoading: boolean;
   
   // Tab actions
   setActiveTab: (tab: 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics') => void;
   
+  // Data loading
+  loadOrders: () => Promise<void>;
+  loadMessages: () => Promise<void>;
+  subscribeToRealtime: () => () => void;
+  
   // Customer actions
   setCurrentOrder: (order: RepairOrder | null) => void;
   findOrderByPhone: (phone: string) => RepairOrder | undefined;
-  toggleAccessory: (orderId: string, accessoryId: string) => void;
-  setWantsPromotions: (orderId: string, wants: boolean) => void;
-  setRating: (orderId: string, rating: number, feedback?: string) => void;
-  addCustomerMessage: (orderId: string, message: string) => void;
-  setViewingStatus: (orderId: string, isViewing: boolean) => void;
+  toggleAccessory: (orderId: string, accessoryId: string) => Promise<void>;
+  setWantsPromotions: (orderId: string, wants: boolean) => Promise<void>;
+  setRating: (orderId: string, rating: number, feedback?: string) => Promise<void>;
+  addCustomerMessage: (orderId: string, message: string) => Promise<void>;
+  setViewingStatus: (orderId: string, isViewing: boolean) => Promise<void>;
   
   // Admin actions
-  addOrder: (order: Omit<RepairOrder, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateOrderStatus: (orderId: string, status: RepairStatus, note?: string) => void;
-  updateEstimatedArrival: (orderId: string, eta: string) => void;
-  addNote: (orderId: string, note: string) => void;
-  addSupportMessage: (orderId: string, message: string) => void;
-  markMessageAsRead: (messageId: string) => void;
-  deleteOrder: (orderId: string) => void;
+  addOrder: (order: Omit<RepairOrder, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateOrderStatus: (orderId: string, status: RepairStatus, note?: string) => Promise<void>;
+  updateEstimatedArrival: (orderId: string, eta: string) => Promise<void>;
+  addNote: (orderId: string, note: string) => Promise<void>;
+  addSupportMessage: (orderId: string, message: string) => Promise<void>;
+  markMessageAsRead: (messageId: string) => Promise<void>;
+  deleteOrder: (orderId: string) => Promise<void>;
 }
 
 const defaultAccessories: Accessory[] = [
@@ -37,280 +43,312 @@ const defaultAccessories: Accessory[] = [
   { id: '4', name: 'כיסוי שקוף פרימיום', price: 50, originalPrice: 89, selected: false },
 ];
 
-// Demo data
-const demoOrders: RepairOrder[] = [
-  {
-    id: '1',
-    customerPhone: '0501234567',
-    customerName: 'ישראל ישראלי',
-    customerAddress: 'רחוב הרצל 15, תל אביב',
-    deviceType: 'iPhone 14 Pro',
-    issueDescription: 'מסך שבור',
-    status: 'on_the_way',
-    estimatedArrival: '14:30',
-    technicianName: 'דני',
-    repairPrice: 450,
-    accessories: [...defaultAccessories],
-    notes: ['הלקוח ביקש להתקשר לפני ההגעה'],
-    createdAt: new Date(Date.now() - 3600000),
-    updatedAt: new Date(),
-    wantsPromotions: false,
-  },
-  {
-    id: '2',
-    customerPhone: '0529876543',
-    customerName: 'שרה כהן',
-    customerAddress: 'שדרות רוטשילד 50, תל אביב',
-    deviceType: 'Samsung Galaxy S23',
-    issueDescription: 'בעיית סוללה',
-    status: 'confirmed',
-    technicianName: 'משה',
-    repairPrice: 280,
-    accessories: [...defaultAccessories],
-    notes: [],
-    createdAt: new Date(Date.now() - 7200000),
-    updatedAt: new Date(),
-    wantsPromotions: true,
-  },
-];
+// Convert database row to RepairOrder
+const dbToOrder = (row: any): RepairOrder => ({
+  id: row.id,
+  customerPhone: row.customer_phone,
+  customerName: row.customer_name,
+  customerAddress: row.customer_address || '',
+  deviceType: row.device_type || '',
+  issueDescription: row.issue_description || '',
+  status: row.status as RepairStatus,
+  estimatedArrival: row.estimated_arrival,
+  technicianName: row.technician_name,
+  repairPrice: Number(row.repair_price) || 0,
+  accessories: row.accessories || defaultAccessories,
+  notes: row.notes || [],
+  createdAt: new Date(row.created_at),
+  updatedAt: new Date(row.updated_at),
+  completedAt: row.completed_at ? new Date(row.completed_at) : undefined,
+  wantsPromotions: row.wants_promotions || false,
+  rating: row.rating,
+  feedback: row.feedback,
+  lastViewedAt: row.last_viewed_at ? new Date(row.last_viewed_at) : undefined,
+  isViewing: row.is_viewing || false,
+});
 
-const demoMessages: ChatMessage[] = [
-  {
-    id: '1',
-    orderId: '1',
-    sender: 'support',
-    senderName: 'שירה',
-    message: 'שלום! ברוכים הבאים לדיירקט פיקס 👋 איך אפשר לעזור?',
-    timestamp: new Date(Date.now() - 1800000),
-    read: true,
-  },
-];
+// Convert database row to ChatMessage
+const dbToMessage = (row: any): ChatMessage => ({
+  id: row.id,
+  orderId: row.order_id,
+  sender: row.sender as 'customer' | 'support',
+  senderName: row.sender_name,
+  message: row.message,
+  timestamp: new Date(row.timestamp),
+  read: row.read,
+});
 
-export const useRepairStore = create<RepairStore>()(
-  persist(
-    (set, get) => ({
-      orders: demoOrders,
-      messages: demoMessages,
-      currentOrder: null,
-      activeTab: 'orders',
+export const useRepairStore = create<RepairStore>((set, get) => ({
+  orders: [],
+  messages: [],
+  currentOrder: null,
+  activeTab: 'orders',
+  isLoading: false,
 
-      setActiveTab: (tab) => set({ activeTab: tab }),
+  setActiveTab: (tab) => set({ activeTab: tab }),
 
-      setCurrentOrder: (order) => set({ currentOrder: order }),
+  loadOrders: async () => {
+    set({ isLoading: true });
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error loading orders:', error);
+    } else {
+      const orders = (data || []).map(dbToOrder);
+      set({ orders, isLoading: false });
       
-      findOrderByPhone: (phone) => {
-        const normalizedPhone = phone.replace(/\D/g, '');
-        return get().orders.find(o => o.customerPhone.replace(/\D/g, '') === normalizedPhone);
-      },
-
-      toggleAccessory: (orderId, accessoryId) => set((state) => {
-        const updatedOrders = state.orders.map(order => 
-          order.id === orderId 
-            ? {
-                ...order,
-                accessories: order.accessories.map(acc =>
-                  acc.id === accessoryId ? { ...acc, selected: !acc.selected } : acc
-                ),
-                updatedAt: new Date(),
-              }
-            : order
-        );
-        
-        const updatedCurrentOrder = state.currentOrder?.id === orderId
-          ? {
-              ...state.currentOrder,
-              accessories: state.currentOrder.accessories.map(acc =>
-                acc.id === accessoryId ? { ...acc, selected: !acc.selected } : acc
-              ),
-              updatedAt: new Date(),
-            }
-          : state.currentOrder;
-
-        return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
-      }),
-
-      setWantsPromotions: (orderId, wants) => set((state) => {
-        const updatedOrders = state.orders.map(order =>
-          order.id === orderId ? { ...order, wantsPromotions: wants, updatedAt: new Date() } : order
-        );
-        
-        const updatedCurrentOrder = state.currentOrder?.id === orderId
-          ? { ...state.currentOrder, wantsPromotions: wants, updatedAt: new Date() }
-          : state.currentOrder;
-
-        return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
-      }),
-
-      setRating: (orderId, rating, feedback) => set((state) => {
-        const updatedOrders = state.orders.map(order =>
-          order.id === orderId ? { ...order, rating, feedback, updatedAt: new Date() } : order
-        );
-        
-        const updatedCurrentOrder = state.currentOrder?.id === orderId
-          ? { ...state.currentOrder, rating, feedback, updatedAt: new Date() }
-          : state.currentOrder;
-
-        return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
-      }),
-
-      setViewingStatus: (orderId, isViewing) => set((state) => ({
-        orders: state.orders.map(order =>
-          order.id === orderId 
-            ? { ...order, isViewing, lastViewedAt: isViewing ? new Date() : order.lastViewedAt } 
-            : order
-        ),
-      })),
-
-      addCustomerMessage: (orderId, message) => set((state) => ({
-        messages: [
-          ...state.messages,
-          {
-            id: Date.now().toString(),
-            orderId,
-            sender: 'customer',
-            senderName: state.orders.find(o => o.id === orderId)?.customerName || 'לקוח',
-            message,
-            timestamp: new Date(),
-            read: false,
-          },
-        ],
-      })),
-
-      addOrder: (orderData) => set((state) => {
-        console.log('Store addOrder called with:', orderData);
-        const newOrder: RepairOrder = {
-          ...orderData,
-          id: Date.now().toString(),
-          accessories: [...defaultAccessories],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        console.log('New order created:', newOrder);
-        console.log('Total orders will be:', state.orders.length + 1);
-        return { orders: [...state.orders, newOrder] };
-      }),
-
-      updateOrderStatus: (orderId, status, note) => set((state) => {
-        const updatedOrders = state.orders.map(order =>
-          order.id === orderId 
-            ? { 
-                ...order, 
-                status, 
-                updatedAt: new Date(),
-                completedAt: status === 'completed' ? new Date() : order.completedAt,
-                notes: note ? [...order.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`] : order.notes,
-              } 
-            : order
-        );
-        
-        const updatedCurrentOrder = state.currentOrder?.id === orderId
-          ? { 
-              ...state.currentOrder, 
-              status, 
-              updatedAt: new Date(),
-              completedAt: status === 'completed' ? new Date() : state.currentOrder.completedAt,
-              notes: note ? [...state.currentOrder.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`] : state.currentOrder.notes,
-            }
-          : state.currentOrder;
-
-        return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
-      }),
-
-      updateEstimatedArrival: (orderId, eta) => set((state) => {
-        const updatedOrders = state.orders.map(order =>
-          order.id === orderId ? { ...order, estimatedArrival: eta, updatedAt: new Date() } : order
-        );
-        
-        const updatedCurrentOrder = state.currentOrder?.id === orderId
-          ? { ...state.currentOrder, estimatedArrival: eta, updatedAt: new Date() }
-          : state.currentOrder;
-
-        return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
-      }),
-
-      addNote: (orderId, note) => set((state) => {
-        const updatedOrders = state.orders.map(order =>
-          order.id === orderId 
-            ? { ...order, notes: [...order.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`], updatedAt: new Date() } 
-            : order
-        );
-        
-        const updatedCurrentOrder = state.currentOrder?.id === orderId
-          ? { ...state.currentOrder, notes: [...state.currentOrder.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`], updatedAt: new Date() }
-          : state.currentOrder;
-
-        return { orders: updatedOrders, currentOrder: updatedCurrentOrder };
-      }),
-
-      addSupportMessage: (orderId, message) => set((state) => ({
-        messages: [
-          ...state.messages,
-          {
-            id: Date.now().toString(),
-            orderId,
-            sender: 'support',
-            senderName: 'שירה',
-            message,
-            timestamp: new Date(),
-            read: false,
-          },
-        ],
-      })),
-
-      markMessageAsRead: (messageId) => set((state) => ({
-        messages: state.messages.map(msg =>
-          msg.id === messageId ? { ...msg, read: true } : msg
-        ),
-      })),
-
-      deleteOrder: (orderId) => set((state) => ({
-        orders: state.orders.filter(order => order.id !== orderId),
-        currentOrder: state.currentOrder?.id === orderId ? null : state.currentOrder,
-        messages: state.messages.filter(msg => msg.orderId !== orderId),
-      })),
-    }),
-    {
-      name: 'directfix-repairs',
-      // Custom serializer to handle Date objects
-      storage: {
-        getItem: (name) => {
-          try {
-            const str = localStorage.getItem(name);
-            if (!str) return null;
-            const data = JSON.parse(str);
-            // Convert date strings back to Date objects
-            if (data.state?.orders) {
-              data.state.orders = data.state.orders.map((order: any) => ({
-                ...order,
-                createdAt: order.createdAt ? new Date(order.createdAt) : new Date(),
-                updatedAt: order.updatedAt ? new Date(order.updatedAt) : new Date(),
-                completedAt: order.completedAt ? new Date(order.completedAt) : undefined,
-                lastViewedAt: order.lastViewedAt ? new Date(order.lastViewedAt) : undefined,
-              }));
-            }
-            if (data.state?.messages) {
-              data.state.messages = data.state.messages.map((msg: any) => ({
-                ...msg,
-                timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
-              }));
-            }
-            return data;
-          } catch (error) {
-            console.error('Error loading from localStorage:', error);
-            return null;
-          }
-        },
-        setItem: (name, value) => {
-          try {
-            localStorage.setItem(name, JSON.stringify(value));
-          } catch (error) {
-            console.error('Error saving to localStorage:', error);
-          }
-        },
-        removeItem: (name) => {
-          localStorage.removeItem(name);
-        },
-      },
+      // Update currentOrder if it exists
+      const currentOrder = get().currentOrder;
+      if (currentOrder) {
+        const updated = orders.find(o => o.id === currentOrder.id);
+        if (updated) {
+          set({ currentOrder: updated });
+        }
+      }
     }
-  )
-);
+  },
+
+  loadMessages: async () => {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .order('timestamp', { ascending: true });
+    
+    if (error) {
+      console.error('Error loading messages:', error);
+    } else {
+      set({ messages: (data || []).map(dbToMessage) });
+    }
+  },
+
+  subscribeToRealtime: () => {
+    const ordersChannel = supabase
+      .channel('orders-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => {
+          console.log('Orders changed, reloading...');
+          get().loadOrders();
+        }
+      )
+      .subscribe();
+
+    const messagesChannel = supabase
+      .channel('messages-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'messages' },
+        () => {
+          console.log('Messages changed, reloading...');
+          get().loadMessages();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(ordersChannel);
+      supabase.removeChannel(messagesChannel);
+    };
+  },
+
+  setCurrentOrder: (order) => set({ currentOrder: order }),
+  
+  findOrderByPhone: (phone) => {
+    const normalizedPhone = phone.replace(/\D/g, '');
+    return get().orders.find(o => o.customerPhone.replace(/\D/g, '') === normalizedPhone);
+  },
+
+  toggleAccessory: async (orderId, accessoryId) => {
+    const order = get().orders.find(o => o.id === orderId);
+    if (!order) return;
+
+    const newAccessories = order.accessories.map(acc =>
+      acc.id === accessoryId ? { ...acc, selected: !acc.selected } : acc
+    );
+
+    const { error } = await supabase
+      .from('orders')
+      .update({ accessories: newAccessories as unknown as any })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error updating accessories:', error);
+    }
+  },
+
+  setWantsPromotions: async (orderId, wants) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ wants_promotions: wants })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error updating promotions:', error);
+    }
+  },
+
+  setRating: async (orderId, rating, feedback) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ rating, feedback })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error updating rating:', error);
+    }
+  },
+
+  setViewingStatus: async (orderId, isViewing) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ 
+        is_viewing: isViewing, 
+        last_viewed_at: isViewing ? new Date().toISOString() : undefined 
+      })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error updating viewing status:', error);
+    }
+  },
+
+  addCustomerMessage: async (orderId, message) => {
+    const order = get().orders.find(o => o.id === orderId);
+    const { error } = await supabase
+      .from('messages')
+      .insert({
+        order_id: orderId,
+        sender: 'customer',
+        sender_name: order?.customerName || 'לקוח',
+        message,
+        read: false,
+      });
+
+    if (error) {
+      console.error('Error adding message:', error);
+    }
+  },
+
+  addOrder: async (orderData) => {
+    console.log('Adding order:', orderData);
+    const { error } = await supabase
+      .from('orders')
+      .insert({
+        customer_phone: orderData.customerPhone,
+        customer_name: orderData.customerName,
+        customer_address: orderData.customerAddress,
+        device_type: orderData.deviceType,
+        issue_description: orderData.issueDescription,
+        status: orderData.status,
+        estimated_arrival: orderData.estimatedArrival,
+        technician_name: orderData.technicianName,
+        repair_price: orderData.repairPrice,
+        accessories: defaultAccessories as unknown as any,
+        notes: orderData.notes || [],
+        wants_promotions: orderData.wantsPromotions,
+      });
+
+    if (error) {
+      console.error('Error adding order:', error);
+    } else {
+      console.log('Order added successfully');
+    }
+  },
+
+  updateOrderStatus: async (orderId, status, note) => {
+    const order = get().orders.find(o => o.id === orderId);
+    if (!order) return;
+
+    const updates: any = { 
+      status,
+      completed_at: status === 'completed' ? new Date().toISOString() : order.completedAt?.toISOString(),
+    };
+
+    if (note) {
+      updates.notes = [...order.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`];
+    }
+
+    const { error } = await supabase
+      .from('orders')
+      .update(updates)
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error updating status:', error);
+    }
+  },
+
+  updateEstimatedArrival: async (orderId, eta) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ estimated_arrival: eta })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error updating ETA:', error);
+    }
+  },
+
+  addNote: async (orderId, note) => {
+    const order = get().orders.find(o => o.id === orderId);
+    if (!order) return;
+
+    const { error } = await supabase
+      .from('orders')
+      .update({ 
+        notes: [...order.notes, `[${new Date().toLocaleTimeString('he-IL')}] ${note}`] 
+      })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error adding note:', error);
+    }
+  },
+
+  addSupportMessage: async (orderId, message) => {
+    const { error } = await supabase
+      .from('messages')
+      .insert({
+        order_id: orderId,
+        sender: 'support',
+        sender_name: 'שירה',
+        message,
+        read: false,
+      });
+
+    if (error) {
+      console.error('Error adding support message:', error);
+    }
+  },
+
+  markMessageAsRead: async (messageId) => {
+    const { error } = await supabase
+      .from('messages')
+      .update({ read: true })
+      .eq('id', messageId);
+
+    if (error) {
+      console.error('Error marking message as read:', error);
+    }
+  },
+
+  deleteOrder: async (orderId) => {
+    const { error } = await supabase
+      .from('orders')
+      .delete()
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error deleting order:', error);
+    } else {
+      const currentOrder = get().currentOrder;
+      if (currentOrder?.id === orderId) {
+        set({ currentOrder: null });
+      }
+    }
+  },
+}));

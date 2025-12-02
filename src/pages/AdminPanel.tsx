@@ -61,6 +61,9 @@ const AdminPanel = () => {
     addNote, 
     addSupportMessage,
     deleteOrder,
+    loadOrders,
+    loadMessages,
+    subscribeToRealtime,
   } = useRepairStore();
 
   // Check if already authenticated from session
@@ -71,16 +74,12 @@ const AdminPanel = () => {
     }
   }, []);
 
-  // Listen for localStorage changes from other tabs (without reload)
+  // Load data and subscribe to realtime on mount
   useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'directfix-repairs') {
-        console.log('Storage changed from another tab');
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    loadOrders();
+    loadMessages();
+    const unsubscribe = subscribeToRealtime();
+    return () => unsubscribe();
   }, []);
 
   // Update selectedOrder when orders change
