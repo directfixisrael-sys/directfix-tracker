@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import logo from '@/assets/logo.png';
 import PushNotificationToggle from '@/components/PushNotificationToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const ADMIN_CODE = 'pp1p1xke';
 
@@ -363,6 +364,9 @@ const AdminPanel = () => {
         return (
           <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 space-y-4 md:space-y-6 overflow-y-auto">
             <h2 className="text-xl md:text-2xl font-bold">הגדרות</h2>
+            
+            {/* Theme Toggle */}
+            <ThemeToggle />
             
             {/* Push Notifications */}
             <PushNotificationToggle />
