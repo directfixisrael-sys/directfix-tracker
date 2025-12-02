@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRepairStore } from '@/store/repairStore';
 import { RepairOrder, RepairStatus, statusLabels } from '@/types/repair';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,8 @@ import {
   Settings,
   Trash2,
   Copy,
-  ExternalLink
+  ExternalLink,
+  RefreshCw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -24,6 +25,8 @@ import logo from '@/assets/logo.png';
 
 const AdminPanel = () => {
   const { toast } = useToast();
+  const [refreshKey, setRefreshKey] = useState(0);
+  
   const { 
     orders, 
     messages, 
@@ -36,6 +39,36 @@ const AdminPanel = () => {
     addSupportMessage,
     deleteOrder,
   } = useRepairStore();
+
+  // Listen for localStorage changes from other tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'directfix-repairs') {
+        // Force re-render when localStorage changes
+        setRefreshKey(prev => prev + 1);
+        // Reload store state
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Auto-refresh every 5 seconds to check for new messages
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRefreshKey(prev => prev + 1);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleManualRefresh = useCallback(() => {
+    window.location.reload();
+    toast({
+      title: "הנתונים עודכנו",
+    });
+  }, [toast]);
   
   const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
   const [newMessage, setNewMessage] = useState('');
@@ -152,6 +185,15 @@ const AdminPanel = () => {
 
   const unreadCount = messages.filter(m => !m.read && m.sender === 'customer').length;
 
+  // Sort messages: newest first, unread customer messages on top
+  const sortedMessages = [...messages].sort((a, b) => {
+    // Unread customer messages first
+    if (a.sender === 'customer' && !a.read && (b.sender !== 'customer' || b.read)) return -1;
+    if (b.sender === 'customer' && !b.read && (a.sender !== 'customer' || a.read)) return 1;
+    // Then by date (newest first)
+    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+  });
+
   const getStatusColor = (status: RepairStatus) => {
     switch (status) {
       case 'pending': return 'bg-warning/10 text-warning';
@@ -171,20 +213,42 @@ const AdminPanel = () => {
       case 'messages':
         return (
           <div className="flex-1 p-6">
-            <h2 className="text-xl font-bold mb-4">כל ההודעות</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">כל ההודעות</h2>
+              {unreadCount > 0 && (
+                <span className="bg-warning text-warning-foreground text-sm px-3 py-1 rounded-full">
+                  {unreadCount} הודעות חדשות מלקוחות
+                </span>
+              )}
+            </div>
             <div className="space-y-4">
-              {messages.length === 0 ? (
+              {sortedMessages.length === 0 ? (
                 <p className="text-muted-foreground text-center py-8">אין הודעות עדיין</p>
               ) : (
-                messages.map((msg) => {
+                sortedMessages.map((msg) => {
                   const order = orders.find(o => o.id === msg.orderId);
+                  const isUnreadCustomer = msg.sender === 'customer' && !msg.read;
                   return (
-                    <div key={msg.id} className="glass-card p-4 rounded-xl">
+                    <div 
+                      key={msg.id} 
+                      className={cn(
+                        "glass-card p-4 rounded-xl transition-all",
+                        isUnreadCustomer && "border-2 border-warning bg-warning/5"
+                      )}
+                    >
                       <div className="flex items-start justify-between mb-2">
-                        <div>
+                        <div className="flex items-center gap-2">
+                          {isUnreadCustomer && (
+                            <span className="w-2 h-2 bg-warning rounded-full animate-pulse" />
+                          )}
                           <span className="font-medium">{msg.senderName}</span>
-                          <span className="text-muted-foreground text-sm mr-2">
-                            ({msg.sender === 'customer' ? 'לקוח' : 'תמיכה'})
+                          <span className={cn(
+                            "text-xs px-2 py-0.5 rounded-full",
+                            msg.sender === 'customer' 
+                              ? "bg-primary/10 text-primary" 
+                              : "bg-muted text-muted-foreground"
+                          )}>
+                            {msg.sender === 'customer' ? 'לקוח' : 'תמיכה'}
                           </span>
                         </div>
                         <span className="text-xs text-muted-foreground">
@@ -500,9 +564,18 @@ const AdminPanel = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-sidebar border-l border-sidebar-border flex flex-col">
         <div className="p-4 border-b border-sidebar-border">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Logo" className="h-8 w-auto" />
-            <span className="font-bold text-sidebar-foreground">דיירקט פיקס</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img src={logo} alt="Logo" className="h-8 w-auto" />
+              <span className="font-bold text-sidebar-foreground">דיירקט פיקס</span>
+            </div>
+            <button
+              onClick={handleManualRefresh}
+              className="w-8 h-8 flex items-center justify-center text-sidebar-foreground hover:bg-sidebar-accent rounded-lg transition-colors"
+              title="רענן נתונים"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
@@ -548,8 +621,8 @@ const AdminPanel = () => {
             <MessageSquare className="w-5 h-5" />
             <span>הודעות</span>
             {unreadCount > 0 && (
-              <span className="mr-auto bg-accent text-accent-foreground text-xs px-2 py-0.5 rounded-full">
-                {unreadCount}
+              <span className="mr-auto bg-warning text-warning-foreground text-xs px-2 py-0.5 rounded-full animate-pulse">
+                {unreadCount} חדשות
               </span>
             )}
           </button>
