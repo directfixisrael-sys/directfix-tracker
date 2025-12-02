@@ -44,11 +44,23 @@ const TechnicianScooter = () => (
 );
 
 const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, wazeLink }: TechnicianTrackerProps) => {
+  // Extract Waze URL from shared text
+  const extractWazeUrl = (text: string): string | null => {
+    const urlMatch = text.match(/https:\/\/waze\.com\/ul[^\s]*/);
+    return urlMatch ? urlMatch[0] : null;
+  };
+
   const handleWazeClick = () => {
     if (wazeLink) {
-      window.open(wazeLink, '_blank');
+      const url = extractWazeUrl(wazeLink) || wazeLink;
+      // Ensure URL starts with http
+      if (url.startsWith('http')) {
+        window.open(url, '_blank');
+      }
     }
   };
+
+  const wazeUrl = wazeLink ? extractWazeUrl(wazeLink) : null;
 
   return (
     <div className="wolt-card-elevated overflow-hidden animate-slide-up">
@@ -148,7 +160,7 @@ const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, 
         </div>
 
         {/* Waze tracking button */}
-        {wazeLink && (
+        {wazeUrl && (
           <Button
             onClick={handleWazeClick}
             className="w-full mt-4 gap-3 bg-[#33ccff] hover:bg-[#2bb8e6] text-white font-bold py-4 text-lg"
