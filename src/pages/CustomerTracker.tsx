@@ -22,6 +22,7 @@ const CustomerTracker = () => {
   const [showStickyHeader, setShowStickyHeader] = useState(false);
 
   const {
+    orders,
     currentOrder,
     setCurrentOrder,
     findOrderByPhone,
@@ -31,6 +32,48 @@ const CustomerTracker = () => {
     addCustomerMessage,
     messages,
   } = useRepairStore();
+
+  // Keep currentOrder in sync with orders from store
+  useEffect(() => {
+    if (currentOrder) {
+      const updatedOrder = orders.find(o => o.id === currentOrder.id);
+      if (updatedOrder && JSON.stringify(updatedOrder) !== JSON.stringify(currentOrder)) {
+        console.log('Order updated, syncing...', updatedOrder.status);
+        setCurrentOrder(updatedOrder);
+      }
+    }
+  }, [orders, currentOrder, setCurrentOrder]);
+
+  // Listen for localStorage changes from other tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'directfix-repairs') {
+        console.log('Storage changed, reloading...');
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Auto-refresh every 10 seconds to check for updates
+  useEffect(() => {
+    if (!currentOrder) return;
+
+    const interval = setInterval(() => {
+      const phone = searchParams.get('phone');
+      if (phone) {
+        const order = findOrderByPhone(phone);
+        if (order && order.status !== currentOrder.status) {
+          console.log('Status changed:', currentOrder.status, '->', order.status);
+          setCurrentOrder(order);
+        }
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [currentOrder, searchParams, findOrderByPhone, setCurrentOrder]);
 
   useEffect(() => {
     const phone = searchParams.get('phone');
