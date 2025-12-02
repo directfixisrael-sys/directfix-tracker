@@ -159,6 +159,10 @@
   .animate-road {
     animation: roadMove 1s linear infinite;
   }
+
+  .animate-bounce-slow {
+    animation: bounceSlow 2s ease-in-out infinite;
+  }
 }
 
 @keyframes slideUp {
@@ -221,5 +225,10 @@
 
 @keyframes roadMove {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-24px); }
+  100% { transform: translateX(-48px); }
+}
+
+@keyframes bounceSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }

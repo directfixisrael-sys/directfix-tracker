@@ -9,6 +9,8 @@ import LiveChat from '@/components/LiveChat';
 import RatingPrompt from '@/components/RatingPrompt';
 import PromotionsOptIn from '@/components/PromotionsOptIn';
 import OrderSummary from '@/components/OrderSummary';
+import OrderSummarySheet from '@/components/OrderSummarySheet';
+import StickyHeader from '@/components/StickyHeader';
 import { useRepairStore } from '@/store/repairStore';
 import logo from '@/assets/logo.png';
 
@@ -17,6 +19,7 @@ const CustomerTracker = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [showStickyHeader, setShowStickyHeader] = useState(false);
 
   const {
     currentOrder,
@@ -35,6 +38,15 @@ const CustomerTracker = () => {
       handleSearch(phone);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowStickyHeader(window.scrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSearch = async (phone: string) => {
     setIsSearching(true);
@@ -90,6 +102,18 @@ const CustomerTracker = () => {
   return (
     <div className="min-h-screen bg-background pb-28">
       <Header showBackButton onBack={handleBack} />
+      
+      {/* Sticky header when scrolling */}
+      {showTechnicianTracker && (
+        <StickyHeader
+          technicianName={currentOrder.technicianName!}
+          estimatedArrival={currentOrder.estimatedArrival}
+          isVisible={showStickyHeader}
+        />
+      )}
+
+      {/* Receipt icon sheet */}
+      <OrderSummarySheet order={currentOrder} />
       
       <main className="container py-5 px-4 space-y-5 max-w-lg mx-auto">
         {/* Welcome */}
