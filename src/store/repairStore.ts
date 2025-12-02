@@ -168,6 +168,7 @@ export const useRepairStore = create<RepairStore>()(
       })),
 
       addOrder: (orderData) => set((state) => {
+        console.log('Store addOrder called with:', orderData);
         const newOrder: RepairOrder = {
           ...orderData,
           id: Date.now().toString(),
@@ -175,6 +176,8 @@ export const useRepairStore = create<RepairStore>()(
           createdAt: new Date(),
           updatedAt: new Date(),
         };
+        console.log('New order created:', newOrder);
+        console.log('Total orders will be:', state.orders.length + 1);
         return { orders: [...state.orders, newOrder] };
       }),
 
