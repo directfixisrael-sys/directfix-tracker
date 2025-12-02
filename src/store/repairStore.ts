@@ -230,6 +230,19 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
 
     if (error) {
       console.error('Error adding message:', error);
+    } else {
+      // Send push notification to admin
+      try {
+        await supabase.functions.invoke('send-push-notification', {
+          body: {
+            title: `הודעה חדשה מ-${order?.customerName || 'לקוח'}`,
+            body: message.substring(0, 100),
+            url: '/admin',
+          },
+        });
+      } catch (e) {
+        console.error('Error sending push notification:', e);
+      }
     }
   },
 

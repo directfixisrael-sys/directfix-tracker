@@ -26,6 +26,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import logo from '@/assets/logo.png';
+import PushNotificationToggle from '@/components/PushNotificationToggle';
 
 const ADMIN_CODE = 'pp1p1xke';
 
@@ -360,17 +361,35 @@ const AdminPanel = () => {
 
       case 'settings':
         return (
-          <div className="flex-1 p-6">
-            <h2 className="text-xl font-bold mb-4">הגדרות</h2>
+          <div className="flex-1 p-6 space-y-6">
+            <h2 className="text-xl font-bold">הגדרות</h2>
+            
+            {/* Push Notifications */}
+            <PushNotificationToggle />
+            
+            {/* Other settings */}
             <div className="glass-card p-6 rounded-xl">
-              <p className="text-muted-foreground">הגדרות המערכת יתווספו בקרוב...</p>
-              <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+              <h3 className="font-bold text-foreground mb-3">הגדרות נוספות</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>• ניהול טכנאים</li>
                 <li>• הגדרות הודעות SMS</li>
                 <li>• עריכת מחירון</li>
                 <li>• התאמה אישית של סטטוסים</li>
               </ul>
             </div>
+            
+            {/* Logout */}
+            <Button 
+              variant="outline" 
+              className="w-full gap-2"
+              onClick={() => {
+                sessionStorage.removeItem('admin-authenticated');
+                setIsAuthenticated(false);
+              }}
+            >
+              <Lock className="w-4 h-4" />
+              התנתק
+            </Button>
           </div>
         );
 
