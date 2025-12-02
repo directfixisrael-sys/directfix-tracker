@@ -32,6 +32,9 @@ const CustomerTracker = () => {
     addCustomerMessage,
     setViewingStatus,
     messages,
+    loadOrders,
+    loadMessages,
+    subscribeToRealtime,
   } = useRepairStore();
 
   // Track viewing status
@@ -57,31 +60,13 @@ const CustomerTracker = () => {
     }
   }, [orders, currentOrder, setCurrentOrder]);
 
-  // Listen for localStorage changes from other tabs - rehydrate store
+  // Load data and subscribe to realtime on mount
   useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'directfix-repairs') {
-        console.log('Storage changed, rehydrating store...');
-        // Rehydrate the zustand store from localStorage
-        useRepairStore.persist.rehydrate();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    loadOrders();
+    loadMessages();
+    const unsubscribe = subscribeToRealtime();
+    return () => unsubscribe();
   }, []);
-
-  // Auto-refresh every 3 seconds - rehydrate from localStorage
-  useEffect(() => {
-    if (!currentOrder) return;
-
-    const interval = setInterval(() => {
-      // Rehydrate the store from localStorage to get latest updates
-      useRepairStore.persist.rehydrate();
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [currentOrder]);
 
   useEffect(() => {
     const phone = searchParams.get('phone');
