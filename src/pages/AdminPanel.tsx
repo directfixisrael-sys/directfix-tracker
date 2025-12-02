@@ -35,6 +35,19 @@ const AdminPanel = () => {
   const [accessCode, setAccessCode] = useState('');
   const [codeError, setCodeError] = useState('');
 
+  const { 
+    orders, 
+    messages, 
+    activeTab,
+    setActiveTab,
+    addOrder, 
+    updateOrderStatus, 
+    updateEstimatedArrival, 
+    addNote, 
+    addSupportMessage,
+    deleteOrder,
+  } = useRepairStore();
+
   // Check if already authenticated from session
   useEffect(() => {
     const savedAuth = sessionStorage.getItem('admin-authenticated');
@@ -85,19 +98,6 @@ const AdminPanel = () => {
       </div>
     );
   }
-  
-  const { 
-    orders, 
-    messages, 
-    activeTab,
-    setActiveTab,
-    addOrder, 
-    updateOrderStatus, 
-    updateEstimatedArrival, 
-    addNote, 
-    addSupportMessage,
-    deleteOrder,
-  } = useRepairStore();
 
   // Listen for localStorage changes from other tabs (without reload)
   useEffect(() => {
