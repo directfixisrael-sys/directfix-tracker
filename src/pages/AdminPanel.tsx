@@ -26,7 +26,8 @@ import {
   FileText,
   Edit,
   PlusCircle,
-  ChevronDown
+  ChevronDown,
+  MessageCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -251,6 +252,50 @@ const AdminPanel = () => {
       title: "הקישור הועתק!",
       description: "ניתן לשלוח ללקוח",
     });
+  };
+
+  const sendWhatsAppManually = async (order: RepairOrder) => {
+    toast({
+      title: "שולח הודעת וואטסאפ...",
+      description: "אנא המתן",
+    });
+    
+    try {
+      const trackingUrl = `${window.location.origin}/track?phone=${encodeURIComponent(order.customerPhone)}`;
+      
+      const { data, error } = await import('@/integrations/supabase/client').then(m => 
+        m.supabase.functions.invoke('send-whatsapp', {
+          body: {
+            to: order.customerPhone,
+            customerName: order.customerName,
+            orderId: order.id,
+            trackingUrl,
+          },
+        })
+      );
+      
+      if (error) {
+        console.error('Error sending WhatsApp:', error);
+        toast({
+          title: "שגיאה בשליחת וואטסאפ",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        console.log('WhatsApp sent:', data);
+        toast({
+          title: "הודעת וואטסאפ נשלחה!",
+          description: `נשלחה ל-${order.customerName}`,
+        });
+      }
+    } catch (e: any) {
+      console.error('Error:', e);
+      toast({
+        title: "שגיאה",
+        description: e.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const orderMessages = selectedOrder 
@@ -738,7 +783,7 @@ const AdminPanel = () => {
                   {/* Order header */}
                   <div className="glass-card rounded-xl p-4 md:p-6">
                     <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
-                      <div className="flex items-center gap-2 order-2 md:order-1">
+                      <div className="flex items-center gap-2 order-2 md:order-1 flex-wrap">
                         <span className={cn("status-badge text-sm", getStatusColor(selectedOrder.status))}>
                           {statusLabels[selectedOrder.status]}
                         </span>
@@ -750,6 +795,15 @@ const AdminPanel = () => {
                         >
                           <Copy className="w-4 h-4" />
                           <span className="hidden sm:inline">העתק קישור</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => sendWhatsAppManually(selectedOrder)}
+                          className="gap-1 text-green-600 border-green-600 hover:bg-green-50 dark:hover:bg-green-950"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                          <span className="hidden sm:inline">שלח וואטסאפ</span>
                         </Button>
                       </div>
                       <div className="text-right order-1 md:order-2 md:text-left">
