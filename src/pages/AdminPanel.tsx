@@ -21,7 +21,8 @@ import {
   Star,
   Activity,
   Eye,
-  Lock
+  Lock,
+  FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -46,6 +47,7 @@ const AdminPanel = () => {
   const [newNote, setNewNote] = useState('');
   const [eta, setEta] = useState('');
   const [wazeLink, setWazeLink] = useState('');
+  const [invoiceLink, setInvoiceLink] = useState('');
   const [statusNote, setStatusNote] = useState('');
   const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
   const [newOrder, setNewOrder] = useState({
@@ -67,6 +69,7 @@ const AdminPanel = () => {
     updateOrderStatus, 
     updateEstimatedArrival,
     updateWazeLink,
+    updateInvoiceLink,
     addNote, 
     addSupportMessage,
     deleteOrder,
@@ -150,37 +153,31 @@ const AdminPanel = () => {
 
   const handleCreateOrder = () => {
     console.log('Creating order:', newOrder);
-    if (newOrder.customerPhone && newOrder.customerName) {
-      addOrder({
-        ...newOrder,
-        status: 'pending',
-        accessories: [],
-        notes: [],
-        wantsPromotions: false,
-      });
-      console.log('Order added, current orders:', orders.length + 1);
-      setNewOrder({
-        customerPhone: '',
-        customerName: '',
-        customerAddress: '',
-        deviceType: '',
-        issueDescription: '',
-        repairPrice: 0,
-        technicianName: '',
-      });
-      setIsNewOrderOpen(false);
-      toast({
-        title: "הזמנה נוצרה בהצלחה!",
-        description: `הזמנה עבור ${newOrder.customerName} נוצרה`,
-      });
-    } else {
-      console.log('Missing required fields:', { phone: newOrder.customerPhone, name: newOrder.customerName });
-      toast({
-        title: "שגיאה",
-        description: "יש למלא שם לקוח ומספר טלפון",
-        variant: "destructive",
-      });
-    }
+    // No mandatory fields - create order with whatever data is provided
+    addOrder({
+      ...newOrder,
+      customerPhone: newOrder.customerPhone || 'לא צוין',
+      customerName: newOrder.customerName || 'לקוח חדש',
+      status: 'pending',
+      accessories: [],
+      notes: [],
+      wantsPromotions: false,
+    });
+    console.log('Order added, current orders:', orders.length + 1);
+    setNewOrder({
+      customerPhone: '',
+      customerName: '',
+      customerAddress: '',
+      deviceType: '',
+      issueDescription: '',
+      repairPrice: 0,
+      technicianName: '',
+    });
+    setIsNewOrderOpen(false);
+    toast({
+      title: "הזמנה נוצרה בהצלחה!",
+      description: newOrder.customerName ? `הזמנה עבור ${newOrder.customerName} נוצרה` : 'הזמנה חדשה נוצרה',
+    });
   };
 
   const handleSendMessage = () => {
@@ -792,6 +789,40 @@ const AdminPanel = () => {
                         <p className="text-sm text-success font-medium">✓ קישור וויז פעיל</p>
                         <p className="text-xs text-muted-foreground mt-1 truncate" dir="ltr">
                           {selectedOrder.wazeLink}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Invoice link */}
+                  <div className="glass-card rounded-xl p-6">
+                    <h3 className="font-semibold text-foreground mb-4 text-lg flex items-center gap-2">
+                      <FileText className="w-5 h-5" />
+                      קישור לחשבונית
+                    </h3>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="הכנס קישור לחשבונית..."
+                        value={invoiceLink}
+                        onChange={(e) => setInvoiceLink(e.target.value)}
+                        className="flex-1"
+                        dir="ltr"
+                      />
+                      <Button onClick={() => {
+                        if (selectedOrder && invoiceLink) {
+                          updateInvoiceLink(selectedOrder.id, invoiceLink);
+                          toast({ title: "קישור חשבונית עודכן" });
+                          setInvoiceLink('');
+                        }
+                      }}>
+                        שמור
+                      </Button>
+                    </div>
+                    {selectedOrder.invoiceLink && (
+                      <div className="mt-3 p-2 bg-success/10 rounded-lg">
+                        <p className="text-sm text-success font-medium">✓ חשבונית זמינה ללקוח</p>
+                        <p className="text-xs text-muted-foreground mt-1 truncate" dir="ltr">
+                          {selectedOrder.invoiceLink}
                         </p>
                       </div>
                     )}

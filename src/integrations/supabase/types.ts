@@ -64,6 +64,7 @@ export type Database = {
           estimated_arrival: string | null
           feedback: string | null
           id: string
+          invoice_link: string | null
           is_viewing: boolean | null
           issue_description: string
           last_viewed_at: string | null
@@ -87,6 +88,7 @@ export type Database = {
           estimated_arrival?: string | null
           feedback?: string | null
           id?: string
+          invoice_link?: string | null
           is_viewing?: boolean | null
           issue_description?: string
           last_viewed_at?: string | null
@@ -110,6 +112,7 @@ export type Database = {
           estimated_arrival?: string | null
           feedback?: string | null
           id?: string
+          invoice_link?: string | null
           is_viewing?: boolean | null
           issue_description?: string
           last_viewed_at?: string | null
