@@ -160,6 +160,41 @@ const CustomerTracker = () => {
           <h1 className="text-2xl font-bold text-foreground">{currentOrder.customerName} 👋</h1>
         </div>
 
+        {/* Rating prompt - show at top when completed */}
+        {showRating && (
+          <RatingPrompt 
+            onRate={(rating, feedback) => setRating(currentOrder.id, rating, feedback)}
+            currentRating={currentOrder.rating}
+            currentFeedback={currentOrder.feedback}
+          />
+        )}
+
+        {/* Invoice download - show below rating when completed */}
+        {showRating && currentOrder.invoiceLink && (
+          <div className="glass-card rounded-xl p-5 animate-fade-in">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                <FileText className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">חשבונית זמינה</h3>
+                <p className="text-sm text-muted-foreground">לחצו להורדת החשבונית</p>
+              </div>
+            </div>
+            <a 
+              href={currentOrder.invoiceLink} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-full"
+            >
+              <Button className="w-full gap-2">
+                <Download className="w-4 h-4" />
+                הורד חשבונית
+              </Button>
+            </a>
+          </div>
+        )}
+
         {/* Technician tracker */}
         {showTechnicianTracker && (
           <TechnicianTracker
@@ -189,17 +224,8 @@ const CustomerTracker = () => {
         {/* Order summary */}
         <OrderSummary order={currentOrder} />
 
-        {/* Rating prompt - show when completed */}
-        {showRating && (
-          <RatingPrompt 
-            onRate={(rating, feedback) => setRating(currentOrder.id, rating, feedback)}
-            currentRating={currentOrder.rating}
-            currentFeedback={currentOrder.feedback}
-          />
-        )}
-
-        {/* Invoice download - show below rating when completed */}
-        {currentOrder.invoiceLink && (
+        {/* Invoice download - also show when not completed but link exists */}
+        {!showRating && currentOrder.invoiceLink && (
           <div className="glass-card rounded-xl p-5 animate-fade-in">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
