@@ -13,6 +13,8 @@ import OrderSummarySheet from '@/components/OrderSummarySheet';
 import StickyHeader from '@/components/StickyHeader';
 import { useRepairStore } from '@/store/repairStore';
 import logo from '@/assets/logo.png';
+import { FileText, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const CustomerTracker = () => {
   const [searchParams] = useSearchParams();
@@ -194,6 +196,32 @@ const CustomerTracker = () => {
 
         {/* Order summary */}
         <OrderSummary order={currentOrder} />
+
+        {/* Invoice download */}
+        {currentOrder.invoiceLink && (
+          <div className="glass-card rounded-xl p-5 animate-fade-in">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                <FileText className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">חשבונית זמינה</h3>
+                <p className="text-sm text-muted-foreground">לחצו להורדת החשבונית</p>
+              </div>
+            </div>
+            <a 
+              href={currentOrder.invoiceLink} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-full"
+            >
+              <Button className="w-full gap-2">
+                <Download className="w-4 h-4" />
+                הורד חשבונית
+              </Button>
+            </a>
+          </div>
+        )}
 
         {/* Promotions */}
         <PromotionsOptIn

@@ -31,6 +31,7 @@ interface RepairStore {
   updateOrderStatus: (orderId: string, status: RepairStatus, note?: string) => Promise<void>;
   updateEstimatedArrival: (orderId: string, eta: string) => Promise<void>;
   updateWazeLink: (orderId: string, wazeLink: string) => Promise<void>;
+  updateInvoiceLink: (orderId: string, invoiceLink: string) => Promise<void>;
   addNote: (orderId: string, note: string) => Promise<void>;
   addSupportMessage: (orderId: string, message: string) => Promise<void>;
   markMessageAsRead: (messageId: string) => Promise<void>;
@@ -67,6 +68,7 @@ const dbToOrder = (row: any): RepairOrder => ({
   lastViewedAt: row.last_viewed_at ? new Date(row.last_viewed_at) : undefined,
   isViewing: row.is_viewing || false,
   wazeLink: row.waze_link,
+  invoiceLink: row.invoice_link,
 });
 
 // Convert database row to ChatMessage
@@ -316,6 +318,17 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
 
     if (error) {
       console.error('Error updating Waze link:', error);
+    }
+  },
+
+  updateInvoiceLink: async (orderId, invoiceLink) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ invoice_link: invoiceLink })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error updating invoice link:', error);
     }
   },
 

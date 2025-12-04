@@ -29,6 +29,7 @@ export interface RepairOrder {
   lastViewedAt?: Date;
   isViewing?: boolean;
   wazeLink?: string;
+  invoiceLink?: string;
 }
 
 export interface Accessory {
