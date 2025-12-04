@@ -28,11 +28,16 @@ import { useToast } from '@/hooks/use-toast';
 import logo from '@/assets/logo.png';
 import PushNotificationToggle from '@/components/PushNotificationToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import SwipeableOrderCard from '@/components/SwipeableOrderCard';
+import AdminLiveChat from '@/components/AdminLiveChat';
+import PullToRefresh from '@/components/PullToRefresh';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
 
 const AdminPanel = () => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [accessCode, setAccessCode] = useState('');
   const [codeError, setCodeError] = useState('');
@@ -267,6 +272,15 @@ const AdminPanel = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'messages':
+        // Group messages by order for reply functionality
+        const messagesByOrder = sortedMessages.reduce((acc, msg) => {
+          if (!acc[msg.orderId]) {
+            acc[msg.orderId] = [];
+          }
+          acc[msg.orderId].push(msg);
+          return acc;
+        }, {} as Record<string, typeof sortedMessages>);
+
         return (
           <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
@@ -288,9 +302,15 @@ const AdminPanel = () => {
                     <div 
                       key={msg.id} 
                       className={cn(
-                        "glass-card p-4 rounded-xl transition-all",
+                        "glass-card p-4 rounded-xl transition-all cursor-pointer hover:scale-[1.01]",
                         isUnreadCustomer && "border-2 border-warning bg-warning/5"
                       )}
+                      onClick={() => {
+                        if (order) {
+                          setSelectedOrder(order);
+                          setActiveTab('orders');
+                        }
+                      }}
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
@@ -313,9 +333,12 @@ const AdminPanel = () => {
                       </div>
                       <p className="text-foreground text-base">{msg.message}</p>
                       {order && (
-                        <p className="text-xs text-muted-foreground mt-2">
-                          הזמנה: {order.customerName} - {order.deviceType}
-                        </p>
+                        <div className="flex items-center justify-between mt-2">
+                          <p className="text-xs text-muted-foreground">
+                            הזמנה: {order.customerName} - {order.deviceType}
+                          </p>
+                          <span className="text-xs text-primary">לחץ לתשובה →</span>
+                        </div>
                       )}
                     </div>
                   );
@@ -548,41 +571,44 @@ const AdminPanel = () => {
         );
 
       default: // orders
+        const ordersList = (
+          <>
+            {orders.length === 0 ? (
+              <div className="p-8 text-center text-muted-foreground">
+                <Smartphone className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>אין הזמנות עדיין</p>
+                <p className="text-sm">לחצו על "הזמנה חדשה" להתחיל</p>
+              </div>
+            ) : (
+              orders.map((order) => (
+                <SwipeableOrderCard
+                  key={order.id}
+                  order={order}
+                  isSelected={selectedOrder?.id === order.id}
+                  onClick={() => setSelectedOrder(order)}
+                  onDelete={() => handleDeleteOrder(order.id)}
+                  getStatusColor={getStatusColor}
+                />
+              ))
+            )}
+          </>
+        );
+
         return (
           <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
             {/* Orders list - show on mobile when no order selected, always show on desktop */}
             <div className={cn(
-              "md:w-80 border-l border-border overflow-y-auto",
-              selectedOrder ? "hidden md:block" : "flex-1 md:flex-none"
+              "md:w-80 border-l border-border",
+              selectedOrder ? "hidden md:block md:overflow-y-auto" : "flex-1 md:flex-none"
             )}>
-              {orders.length === 0 ? (
-                <div className="p-8 text-center text-muted-foreground">
-                  <Smartphone className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p>אין הזמנות עדיין</p>
-                  <p className="text-sm">לחצו על "הזמנה חדשה" להתחיל</p>
-                </div>
+              {isMobile && !selectedOrder ? (
+                <PullToRefresh onRefresh={handleManualRefresh}>
+                  {ordersList}
+                </PullToRefresh>
               ) : (
-                orders.map((order) => (
-                  <button
-                    key={order.id}
-                    onClick={() => setSelectedOrder(order)}
-                    className={cn(
-                      "w-full p-4 border-b border-border text-right transition-colors",
-                      selectedOrder?.id === order.id 
-                        ? "bg-primary/5 border-r-2 border-r-primary" 
-                        : "hover:bg-muted/50"
-                    )}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <span className={cn("status-badge text-sm", getStatusColor(order.status))}>
-                        {statusLabels[order.status]}
-                      </span>
-                      <span className="font-medium text-foreground text-base">{order.customerName}</span>
-                    </div>
-                    <p className="text-muted-foreground mb-1">{order.deviceType}</p>
-                    <p className="text-sm text-muted-foreground">{order.customerPhone}</p>
-                  </button>
-                ))
+                <div className="overflow-y-auto h-full">
+                  {ordersList}
+                </div>
               )}
             </div>
 
@@ -794,55 +820,6 @@ const AdminPanel = () => {
                     )}
                   </div>
 
-                  {/* Chat */}
-                  <div className="glass-card rounded-xl p-6">
-                    <h3 className="font-semibold text-foreground mb-4 text-lg">צ'אט עם הלקוח</h3>
-                    
-                    <div className="h-64 overflow-y-auto space-y-3 mb-4 p-3 bg-muted/30 rounded-lg">
-                      {orderMessages.length === 0 && (
-                        <p className="text-center text-muted-foreground">אין הודעות עדיין</p>
-                      )}
-                      {orderMessages.map((msg) => (
-                        <div
-                          key={msg.id}
-                          className={cn(
-                            "flex",
-                            msg.sender === 'support' ? "justify-start" : "justify-end"
-                          )}
-                        >
-                          <div
-                            className={cn(
-                              "max-w-[80%] px-4 py-2 rounded-2xl",
-                              msg.sender === 'support' 
-                                ? "bg-primary text-primary-foreground rounded-br-md" 
-                                : "bg-muted text-foreground rounded-bl-md"
-                            )}
-                          >
-                          <p>{msg.message}</p>
-                            <p className={cn(
-                              "text-sm mt-1",
-                              msg.sender === 'support' ? "text-primary-foreground/60" : "text-muted-foreground"
-                            )}>
-                              {msg.timestamp.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="כתבו הודעה ללקוח..."
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                        className="flex-1"
-                      />
-                      <Button onClick={handleSendMessage}>
-                        <Send className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
                 </div>
               </div>
             ) : (
@@ -852,6 +829,15 @@ const AdminPanel = () => {
                   <p>בחרו הזמנה מהרשימה</p>
                 </div>
               </div>
+            )}
+
+            {/* Floating chat for selected order */}
+            {selectedOrder && (
+              <AdminLiveChat
+                messages={orderMessages}
+                onSendMessage={handleSendMessage}
+                customerName={selectedOrder.customerName}
+              />
             )}
           </div>
         );
