@@ -170,19 +170,11 @@ const CustomerTracker = () => {
           />
         )}
 
-        {/* Rating prompt - show at top when completed */}
-        {showRating && (
-          <RatingPrompt 
-            onRate={(rating, feedback) => setRating(currentOrder.id, rating, feedback)}
-            currentRating={currentOrder.rating}
-            currentFeedback={currentOrder.feedback}
-          />
-        )}
-
         {/* Status timeline */}
         <StatusTimeline 
           currentStatus={currentOrder.status}
           estimatedArrival={currentOrder.estimatedArrival}
+          updatedAt={currentOrder.updatedAt}
         />
 
         {/* Accessories upsell */}
@@ -197,7 +189,16 @@ const CustomerTracker = () => {
         {/* Order summary */}
         <OrderSummary order={currentOrder} />
 
-        {/* Invoice download */}
+        {/* Rating prompt - show when completed */}
+        {showRating && (
+          <RatingPrompt 
+            onRate={(rating, feedback) => setRating(currentOrder.id, rating, feedback)}
+            currentRating={currentOrder.rating}
+            currentFeedback={currentOrder.feedback}
+          />
+        )}
+
+        {/* Invoice download - show below rating when completed */}
         {currentOrder.invoiceLink && (
           <div className="glass-card rounded-xl p-5 animate-fade-in">
             <div className="flex items-center gap-3 mb-3">

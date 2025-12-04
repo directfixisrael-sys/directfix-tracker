@@ -58,10 +58,10 @@ export interface StatusUpdate {
 }
 
 export const statusLabels: Record<RepairStatus, string> = {
-  pending: 'ממתין לאישור',
+  pending: 'הזמנה התקבלה',
   confirmed: 'הזמנה אושרה',
   technician_assigned: 'טכנאי שובץ',
-  on_the_way: 'טכנאי בדרך אליך',
+  on_the_way: 'השליח בדרך אליך',
   arrived: 'טכנאי הגיע',
   in_progress: 'התיקון בתהליך',
   completed: 'התיקון הושלם',

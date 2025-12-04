@@ -59,6 +59,8 @@ const AdminPanel = () => {
     repairPrice: 0,
     technicianName: '',
   });
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [conversationInput, setConversationInput] = useState('');
 
   const { 
     orders, 
@@ -180,13 +182,21 @@ const AdminPanel = () => {
     });
   };
 
-  const handleSendMessage = () => {
-    if (selectedOrder && newMessage.trim()) {
-      addSupportMessage(selectedOrder.id, newMessage.trim());
-      setNewMessage('');
+  const handleSendMessage = (message?: string) => {
+    const msgToSend = message || newMessage.trim();
+    if (selectedOrder && msgToSend) {
+      addSupportMessage(selectedOrder.id, msgToSend);
+      if (!message) setNewMessage('');
       toast({
         title: "הודעה נשלחה",
       });
+    }
+  };
+
+  const handleExitAdmin = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (window.confirm('האם אתה בטוח שברצונך לצאת מפאנל הניהול?')) {
+      window.location.href = '/';
     }
   };
 
@@ -269,7 +279,7 @@ const AdminPanel = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'messages':
-        // Group messages by order for reply functionality
+        // Group messages by order for WhatsApp-style conversations
         const messagesByOrder = sortedMessages.reduce((acc, msg) => {
           if (!acc[msg.orderId]) {
             acc[msg.orderId] = [];
@@ -278,68 +288,166 @@ const AdminPanel = () => {
           return acc;
         }, {} as Record<string, typeof sortedMessages>);
 
+        // Get unique conversations with last message
+        const conversations = Object.entries(messagesByOrder).map(([orderId, msgs]) => {
+          const order = orders.find(o => o.id === orderId);
+          const lastMsg = msgs[msgs.length - 1];
+          const unreadCount = msgs.filter(m => !m.read && m.sender === 'customer').length;
+          return { orderId, order, msgs, lastMsg, unreadCount };
+        }).sort((a, b) => {
+          // Unread first, then by last message time
+          if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
+          if (b.unreadCount > 0 && a.unreadCount === 0) return 1;
+          return new Date(b.lastMsg.timestamp).getTime() - new Date(a.lastMsg.timestamp).getTime();
+        });
+
+        // If a conversation is selected, show chat view
+        if (selectedConversation) {
+          const conv = conversations.find(c => c.orderId === selectedConversation);
+          if (conv) {
+            return (
+              <div className="flex-1 flex flex-col h-full">
+                {/* Chat header */}
+                <div className="bg-primary p-4 flex items-center gap-3">
+                  <button 
+                    onClick={() => setSelectedConversation(null)}
+                    className="w-9 h-9 flex items-center justify-center hover:bg-primary-foreground/10 rounded-full transition-colors"
+                  >
+                    <span className="text-primary-foreground text-lg">→</span>
+                  </button>
+                  <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                    <span className="text-primary-foreground font-bold">
+                      {conv.order?.customerName?.charAt(0) || '?'}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-primary-foreground">{conv.order?.customerName || 'לקוח'}</h4>
+                    <p className="text-xs text-primary-foreground/70">{conv.order?.deviceType}</p>
+                  </div>
+                </div>
+
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-background">
+                  {conv.msgs.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={cn(
+                        "flex gap-2",
+                        msg.sender === 'support' ? "flex-row-reverse" : "flex-row"
+                      )}
+                    >
+                      {msg.sender === 'customer' && (
+                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                          <span className="text-muted-foreground font-bold text-sm">
+                            {conv.order?.customerName?.charAt(0) || '?'}
+                          </span>
+                        </div>
+                      )}
+                      <div
+                        className={cn(
+                          "max-w-[75%] px-4 py-2 rounded-2xl",
+                          msg.sender === 'support' 
+                            ? "bg-primary text-primary-foreground rounded-br-md" 
+                            : "bg-muted text-foreground rounded-bl-md"
+                        )}
+                      >
+                        <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
+                        <p className={cn(
+                          "text-[10px] mt-1",
+                          msg.sender === 'support' ? "text-primary-foreground/60" : "text-muted-foreground"
+                        )}>
+                          {new Date(msg.timestamp).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Input */}
+                <div className="p-4 border-t border-border bg-card">
+                  <div className="flex gap-2">
+                    <Input
+                      value={conversationInput}
+                      onChange={(e) => setConversationInput(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && conversationInput.trim()) {
+                          addSupportMessage(selectedConversation, conversationInput.trim());
+                          setConversationInput('');
+                        }
+                      }}
+                      placeholder="כתבו הודעה..."
+                      className="flex-1 rounded-full"
+                    />
+                    <Button 
+                      onClick={() => {
+                        if (conversationInput.trim()) {
+                          addSupportMessage(selectedConversation, conversationInput.trim());
+                          setConversationInput('');
+                        }
+                      }}
+                      size="icon"
+                      className="rounded-full w-10 h-10"
+                      disabled={!conversationInput.trim()}
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+        }
+
         return (
-          <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
-              <h2 className="text-xl md:text-2xl font-bold">כל ההודעות</h2>
+          <div className="flex-1 pb-24 md:pb-6 overflow-y-auto">
+            <div className="p-4 border-b border-border flex items-center justify-between">
+              <h2 className="text-xl font-bold">שיחות</h2>
               {unreadCount > 0 && (
                 <span className="bg-warning text-warning-foreground text-sm px-3 py-1.5 rounded-full">
-                  {unreadCount} הודעות חדשות מלקוחות
+                  {unreadCount} חדשות
                 </span>
               )}
             </div>
-            <div className="space-y-3 md:space-y-4">
-              {sortedMessages.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8 text-lg">אין הודעות עדיין</p>
+            <div className="divide-y divide-border">
+              {conversations.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8 text-lg">אין שיחות עדיין</p>
               ) : (
-                sortedMessages.map((msg) => {
-                  const order = orders.find(o => o.id === msg.orderId);
-                  const isUnreadCustomer = msg.sender === 'customer' && !msg.read;
-                  return (
-                    <div 
-                      key={msg.id} 
-                      className={cn(
-                        "glass-card p-4 rounded-xl transition-all cursor-pointer hover:scale-[1.01]",
-                        isUnreadCustomer && "border-2 border-warning bg-warning/5"
-                      )}
-                      onClick={() => {
-                        if (order) {
-                          setSelectedOrder(order);
-                          setActiveTab('orders');
-                        }
-                      }}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          {isUnreadCustomer && (
-                            <span className="w-2 h-2 bg-warning rounded-full animate-pulse" />
-                          )}
-                          <span className="font-medium text-base">{msg.senderName}</span>
-                          <span className={cn(
-                            "text-sm px-2 py-0.5 rounded-full",
-                            msg.sender === 'customer' 
-                              ? "bg-primary/10 text-primary" 
-                              : "bg-muted text-muted-foreground"
-                          )}>
-                            {msg.sender === 'customer' ? 'לקוח' : 'תמיכה'}
-                          </span>
-                        </div>
-                        <span className="text-sm text-muted-foreground">
-                          {msg.timestamp.toLocaleString('he-IL')}
+                conversations.map((conv) => (
+                  <div 
+                    key={conv.orderId} 
+                    className={cn(
+                      "p-4 cursor-pointer hover:bg-muted/50 transition-colors flex items-center gap-3",
+                      conv.unreadCount > 0 && "bg-warning/5"
+                    )}
+                    onClick={() => setSelectedConversation(conv.orderId)}
+                  >
+                    <div className="relative">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="text-primary font-bold text-lg">
+                          {conv.order?.customerName?.charAt(0) || '?'}
                         </span>
                       </div>
-                      <p className="text-foreground text-base">{msg.message}</p>
-                      {order && (
-                        <div className="flex items-center justify-between mt-2">
-                          <p className="text-xs text-muted-foreground">
-                            הזמנה: {order.customerName} - {order.deviceType}
-                          </p>
-                          <span className="text-xs text-primary">לחץ לתשובה →</span>
+                      {conv.unreadCount > 0 && (
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-warning rounded-full flex items-center justify-center">
+                          <span className="text-[10px] text-warning-foreground font-bold">{conv.unreadCount}</span>
                         </div>
                       )}
                     </div>
-                  );
-                })
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-foreground">{conv.order?.customerName || 'לקוח'}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(conv.lastMsg.timestamp).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {conv.lastMsg.sender === 'support' && <span className="text-primary">את/ה: </span>}
+                        {conv.lastMsg.message}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{conv.order?.deviceType}</p>
+                    </div>
+                  </div>
+                ))
               )}
             </div>
           </div>
@@ -1068,12 +1176,12 @@ const AdminPanel = () => {
 
         {/* Back to home link */}
         <div className="p-4 border-t border-sidebar-border">
-          <a 
-            href="/"
-            className="text-sidebar-foreground/60 hover:text-sidebar-foreground text-sm flex items-center gap-2"
+          <button 
+            onClick={handleExitAdmin}
+            className="text-sidebar-foreground/60 hover:text-sidebar-foreground text-sm flex items-center gap-2 w-full"
           >
             ← חזרה לדף הבית
-          </a>
+          </button>
         </div>
       </aside>
 
