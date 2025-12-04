@@ -252,7 +252,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
 
   addOrder: async (orderData) => {
     console.log('Adding order:', orderData);
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('orders')
       .insert({
         customer_phone: orderData.customerPhone,
@@ -267,12 +267,36 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
         accessories: defaultAccessories as unknown as any,
         notes: orderData.notes || [],
         wants_promotions: orderData.wantsPromotions,
-      });
+      })
+      .select()
+      .single();
 
     if (error) {
       console.error('Error adding order:', error);
     } else {
-      console.log('Order added successfully');
+      console.log('Order added successfully:', data);
+      
+      // Send WhatsApp notification with tracking link
+      try {
+        const trackingUrl = `${window.location.origin}/track?phone=${encodeURIComponent(orderData.customerPhone)}`;
+        
+        const response = await supabase.functions.invoke('send-whatsapp', {
+          body: {
+            to: orderData.customerPhone,
+            customerName: orderData.customerName,
+            orderId: data.id,
+            trackingUrl,
+          },
+        });
+        
+        if (response.error) {
+          console.error('Error sending WhatsApp:', response.error);
+        } else {
+          console.log('WhatsApp sent successfully:', response.data);
+        }
+      } catch (e) {
+        console.error('Error sending WhatsApp notification:', e);
+      }
     }
   },
 
