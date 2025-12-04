@@ -168,13 +168,7 @@ const CustomerTracker = () => {
           />
         )}
 
-        {/* Status timeline */}
-        <StatusTimeline 
-          currentStatus={currentOrder.status}
-          estimatedArrival={currentOrder.estimatedArrival}
-        />
-
-        {/* Rating prompt */}
+        {/* Rating prompt - show at top when completed */}
         {showRating && (
           <RatingPrompt 
             onRate={(rating, feedback) => setRating(currentOrder.id, rating, feedback)}
@@ -182,6 +176,12 @@ const CustomerTracker = () => {
             currentFeedback={currentOrder.feedback}
           />
         )}
+
+        {/* Status timeline */}
+        <StatusTimeline 
+          currentStatus={currentOrder.status}
+          estimatedArrival={currentOrder.estimatedArrival}
+        />
 
         {/* Accessories upsell */}
         {showAccessories && (
