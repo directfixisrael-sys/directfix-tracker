@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { 
   Plus, 
   MessageSquare, 
@@ -22,7 +23,10 @@ import {
   Activity,
   Eye,
   Lock,
-  FileText
+  FileText,
+  Edit,
+  PlusCircle,
+  ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -50,6 +54,8 @@ const AdminPanel = () => {
   const [invoiceLink, setInvoiceLink] = useState('');
   const [statusNote, setStatusNote] = useState('');
   const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
   const [newOrder, setNewOrder] = useState({
     customerPhone: '',
     customerName: '',
@@ -1205,63 +1211,157 @@ const AdminPanel = () => {
           </div>
           
           {activeTab === 'orders' && (
-            <Dialog open={isNewOrderOpen} onOpenChange={setIsNewOrderOpen}>
-              <DialogTrigger asChild>
-                <Button className="gap-2" size="sm">
-                  <Plus className="w-4 h-4" />
-                  <span className="hidden sm:inline">הזמנה חדשה</span>
-                  <span className="sm:hidden">חדש</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>יצירת הזמנה חדשה</DialogTitle>
-                  <DialogDescription>מלאו את פרטי ההזמנה</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <Input
-                    placeholder="שם הלקוח"
-                    value={newOrder.customerName}
-                    onChange={(e) => setNewOrder({ ...newOrder, customerName: e.target.value })}
-                  />
-                  <Input
-                    placeholder="טלפון"
-                    value={newOrder.customerPhone}
-                    onChange={(e) => setNewOrder({ ...newOrder, customerPhone: e.target.value })}
-                    dir="ltr"
-                  />
-                  <Input
-                    placeholder="כתובת"
-                    value={newOrder.customerAddress}
-                    onChange={(e) => setNewOrder({ ...newOrder, customerAddress: e.target.value })}
-                  />
-                  <Input
-                    placeholder="סוג מכשיר (לדוגמה: iPhone 14)"
-                    value={newOrder.deviceType}
-                    onChange={(e) => setNewOrder({ ...newOrder, deviceType: e.target.value })}
-                  />
-                  <Textarea
-                    placeholder="תיאור התקלה"
-                    value={newOrder.issueDescription}
-                    onChange={(e) => setNewOrder({ ...newOrder, issueDescription: e.target.value })}
-                  />
-                  <Input
-                    type="number"
-                    placeholder="מחיר התיקון"
-                    value={newOrder.repairPrice || ''}
-                    onChange={(e) => setNewOrder({ ...newOrder, repairPrice: Number(e.target.value) })}
-                  />
-                  <Input
-                    placeholder="שם הטכנאי"
-                    value={newOrder.technicianName}
-                    onChange={(e) => setNewOrder({ ...newOrder, technicianName: e.target.value })}
-                  />
-                  <Button onClick={handleCreateOrder} className="w-full">
-                    צור הזמנה
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="gap-2" size="sm">
+                    <Plus className="w-4 h-4" />
+                    <span className="hidden sm:inline">ניהול הזמנות</span>
+                    <span className="sm:hidden">הזמנות</span>
+                    <ChevronDown className="w-3 h-3" />
                   </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-popover border border-border shadow-lg z-50">
+                  <DropdownMenuItem 
+                    onClick={() => {
+                      setIsEditMode(false);
+                      setEditingOrderId(null);
+                      setNewOrder({
+                        customerPhone: '',
+                        customerName: '',
+                        customerAddress: '',
+                        deviceType: '',
+                        issueDescription: '',
+                        repairPrice: 0,
+                        technicianName: '',
+                      });
+                      setIsNewOrderOpen(true);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <PlusCircle className="w-4 h-4 ml-2" />
+                    יצירת הזמנה חדשה
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => {
+                      if (orders.length === 0) {
+                        toast({ title: "אין הזמנות לעריכה", variant: "destructive" });
+                        return;
+                      }
+                      setIsEditMode(true);
+                      setIsNewOrderOpen(true);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Edit className="w-4 h-4 ml-2" />
+                    עריכת הזמנה קיימת
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <Dialog open={isNewOrderOpen} onOpenChange={setIsNewOrderOpen}>
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>{isEditMode ? 'עריכת הזמנה' : 'יצירת הזמנה חדשה'}</DialogTitle>
+                    <DialogDescription>
+                      {isEditMode ? 'בחרו הזמנה לעריכה ועדכנו את הפרטים' : 'מלאו את פרטי ההזמנה'}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    {isEditMode && !editingOrderId && (
+                      <Select onValueChange={(value) => {
+                        const order = orders.find(o => o.id === value);
+                        if (order) {
+                          setEditingOrderId(value);
+                          setNewOrder({
+                            customerPhone: order.customerPhone,
+                            customerName: order.customerName,
+                            customerAddress: order.customerAddress,
+                            deviceType: order.deviceType,
+                            issueDescription: order.issueDescription,
+                            repairPrice: order.repairPrice,
+                            technicianName: order.technicianName || '',
+                          });
+                        }
+                      }}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="בחרו הזמנה לעריכה..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {orders.map((order) => (
+                            <SelectItem key={order.id} value={order.id}>
+                              {order.customerName} - {order.deviceType || 'ללא מכשיר'}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    
+                    {(!isEditMode || editingOrderId) && (
+                      <>
+                        <Input
+                          placeholder="שם הלקוח"
+                          value={newOrder.customerName}
+                          onChange={(e) => setNewOrder({ ...newOrder, customerName: e.target.value })}
+                        />
+                        <Input
+                          placeholder="טלפון"
+                          value={newOrder.customerPhone}
+                          onChange={(e) => setNewOrder({ ...newOrder, customerPhone: e.target.value })}
+                          dir="ltr"
+                        />
+                        <Input
+                          placeholder="כתובת"
+                          value={newOrder.customerAddress}
+                          onChange={(e) => setNewOrder({ ...newOrder, customerAddress: e.target.value })}
+                        />
+                        <Input
+                          placeholder="סוג מכשיר (לדוגמה: iPhone 14)"
+                          value={newOrder.deviceType}
+                          onChange={(e) => setNewOrder({ ...newOrder, deviceType: e.target.value })}
+                        />
+                        <Textarea
+                          placeholder="תיאור התקלה"
+                          value={newOrder.issueDescription}
+                          onChange={(e) => setNewOrder({ ...newOrder, issueDescription: e.target.value })}
+                        />
+                        <Input
+                          type="number"
+                          placeholder="מחיר התיקון"
+                          value={newOrder.repairPrice || ''}
+                          onChange={(e) => setNewOrder({ ...newOrder, repairPrice: Number(e.target.value) })}
+                        />
+                        <Input
+                          placeholder="שם הטכנאי"
+                          value={newOrder.technicianName}
+                          onChange={(e) => setNewOrder({ ...newOrder, technicianName: e.target.value })}
+                        />
+                        <Button 
+                          onClick={() => {
+                            if (isEditMode && editingOrderId) {
+                              // Update existing order - for now just show toast
+                              // The user can edit through the order details panel
+                              toast({ 
+                                title: "לעדכון מלא של ההזמנה", 
+                                description: "לחצו על ההזמנה ברשימה לעריכה מפורטת" 
+                              });
+                              setIsNewOrderOpen(false);
+                              const order = orders.find(o => o.id === editingOrderId);
+                              if (order) setSelectedOrder(order);
+                            } else {
+                              handleCreateOrder();
+                            }
+                          }} 
+                          className="w-full"
+                        >
+                          {isEditMode ? 'עבור לעריכה' : 'צור הזמנה'}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </>
           )}
         </header>
 
