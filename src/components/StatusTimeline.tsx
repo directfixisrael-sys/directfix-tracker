@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 interface StatusTimelineProps {
   currentStatus: RepairStatus;
   estimatedArrival?: string;
+  updatedAt?: Date;
 }
 
 // Simplified status order - removed technician_assigned, arrived, in_progress
@@ -22,9 +23,18 @@ const getDisplayStatus = (status: RepairStatus): RepairStatus => {
   return status;
 };
 
-const StatusTimeline = ({ currentStatus, estimatedArrival }: StatusTimelineProps) => {
+const StatusTimeline = ({ currentStatus, estimatedArrival, updatedAt }: StatusTimelineProps) => {
   const displayStatus = getDisplayStatus(currentStatus);
   const currentIndex = statusOrder.indexOf(displayStatus);
+
+  // Generate mock timestamps based on updatedAt for demo purposes
+  const getStatusTime = (index: number) => {
+    if (!updatedAt || index > currentIndex) return null;
+    const time = new Date(updatedAt);
+    // Subtract time for earlier statuses (roughly 30 min per status)
+    time.setMinutes(time.getMinutes() - (currentIndex - index) * 30);
+    return time.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+  };
 
   return (
     <div className="wolt-card p-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
@@ -35,6 +45,7 @@ const StatusTimeline = ({ currentStatus, estimatedArrival }: StatusTimelineProps
           const isCompleted = index < currentIndex;
           const isCurrent = index === currentIndex;
           const isPending = index > currentIndex;
+          const statusTime = getStatusTime(index);
 
           return (
             <div 
@@ -74,12 +85,19 @@ const StatusTimeline = ({ currentStatus, estimatedArrival }: StatusTimelineProps
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <p className={cn(
-                  "font-medium text-sm transition-colors",
-                  isCurrent ? "text-primary" : isCompleted ? "text-foreground" : "text-muted-foreground"
-                )}>
-                  {statusLabels[status]}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className={cn(
+                    "font-medium text-sm transition-colors",
+                    isCurrent ? "text-primary" : isCompleted ? "text-foreground" : "text-muted-foreground"
+                  )}>
+                    {statusLabels[status]}
+                  </p>
+                  {statusTime && (
+                    <span className="text-xs text-muted-foreground">
+                      {statusTime}
+                    </span>
+                  )}
+                </div>
                 
                 {status === 'on_the_way' && isCurrent && estimatedArrival && (
                   <p className="text-xs text-primary font-medium mt-0.5 animate-fade-in">
