@@ -254,48 +254,33 @@ const AdminPanel = () => {
     });
   };
 
-  const sendWhatsAppManually = async (order: RepairOrder) => {
-    toast({
-      title: "שולח הודעת וואטסאפ...",
-      description: "אנא המתן",
-    });
+  const sendWhatsAppManually = (order: RepairOrder) => {
+    const trackingUrl = `${window.location.origin}/track?phone=${encodeURIComponent(order.customerPhone)}`;
     
-    try {
-      const trackingUrl = `${window.location.origin}/track?phone=${encodeURIComponent(order.customerPhone)}`;
-      
-      const { data, error } = await import('@/integrations/supabase/client').then(m => 
-        m.supabase.functions.invoke('send-whatsapp', {
-          body: {
-            to: order.customerPhone,
-            customerName: order.customerName,
-            orderId: order.id,
-            trackingUrl,
-          },
-        })
-      );
-      
-      if (error) {
-        console.error('Error sending WhatsApp:', error);
-        toast({
-          title: "שגיאה בשליחת וואטסאפ",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        console.log('WhatsApp sent:', data);
-        toast({
-          title: "הודעת וואטסאפ נשלחה!",
-          description: `נשלחה ל-${order.customerName}`,
-        });
-      }
-    } catch (e: any) {
-      console.error('Error:', e);
-      toast({
-        title: "שגיאה",
-        description: e.message,
-        variant: "destructive",
-      });
+    // Format phone number for WhatsApp (remove leading 0, add 972)
+    let phone = order.customerPhone.replace(/\D/g, '');
+    if (phone.startsWith('0')) {
+      phone = '972' + phone.substring(1);
+    } else if (!phone.startsWith('972')) {
+      phone = '972' + phone;
     }
+    
+    const message = `שלום ${order.customerName}! 👋
+
+הזמנתך התקבלה בהצלחה ✅
+
+🔗 עקבו בזמן אמת אחרי הטכנאי:
+${trackingUrl}
+
+תודה שבחרתם בנו! 🙏`;
+
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    
+    toast({
+      title: "וואטסאפ נפתח",
+      description: "שלח את ההודעה ללקוח",
+    });
   };
 
   const orderMessages = selectedOrder 
