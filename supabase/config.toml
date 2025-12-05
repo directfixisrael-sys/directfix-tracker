@@ -2,3 +2,6 @@ project_id = "sggvzsewumgdhigdhcqp"
 
 [functions.send-push-notification]
 verify_jwt = false
+
+[functions.woocommerce-webhook]
+verify_jwt = false
