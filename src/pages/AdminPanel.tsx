@@ -6,6 +6,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { 
   Plus, 
@@ -68,6 +78,8 @@ const AdminPanel = () => {
   });
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [conversationInput, setConversationInput] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
 
   const { 
     orders, 
@@ -237,12 +249,21 @@ const AdminPanel = () => {
   };
 
   const handleDeleteOrder = (orderId: string) => {
-    deleteOrder(orderId);
-    setSelectedOrder(null);
-    toast({
-      title: "הזמנה נמחקה",
-      variant: "destructive",
-    });
+    setOrderToDelete(orderId);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteOrder = () => {
+    if (orderToDelete) {
+      deleteOrder(orderToDelete);
+      setSelectedOrder(null);
+      setDeleteDialogOpen(false);
+      setOrderToDelete(null);
+      toast({
+        title: "הזמנה נמחקה",
+        variant: "destructive",
+      });
+    }
   };
 
   const copyTrackingLink = (phone: string) => {
@@ -1409,6 +1430,27 @@ ${trackingUrl}
           {renderContent()}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>האם אתה בטוח שברצונך למחוק הזמנה זו?</AlertDialogTitle>
+            <AlertDialogDescription>
+              פעולה זו היא בלתי הפיכה. ההזמנה וכל המידע הקשור אליה יימחקו לצמיתות מהמערכת.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row-reverse gap-2">
+            <AlertDialogCancel>ביטול</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeleteOrder}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              מחק הזמנה
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
