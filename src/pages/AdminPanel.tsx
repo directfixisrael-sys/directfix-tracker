@@ -830,7 +830,15 @@ ${trackingUrl}
         );
 
       case 'analytics':
-        const viewingOrders = orders.filter(o => o.isViewing);
+        // Check if viewer is active - must have isViewing=true AND lastViewedAt within last 2 minutes
+        const now = new Date();
+        const viewingOrders = orders.filter(o => {
+          if (!o.isViewing || !o.lastViewedAt) return false;
+          const lastViewed = new Date(o.lastViewedAt);
+          const diffMs = now.getTime() - lastViewed.getTime();
+          const diffMinutes = diffMs / (1000 * 60);
+          return diffMinutes < 2; // Active if viewed within last 2 minutes
+        });
         const completedOrders = orders.filter(o => o.status === 'completed');
         const pendingOrders = orders.filter(o => o.status === 'pending');
         
@@ -1407,11 +1415,19 @@ ${trackingUrl}
           >
             <Activity className="w-5 h-5" />
             <span>אנליטיקס</span>
-            {orders.filter(o => o.isViewing).length > 0 && (
-              <span className="mr-auto bg-success/20 text-success text-xs px-2 py-0.5 rounded-full animate-pulse">
-                {orders.filter(o => o.isViewing).length} צופים
-              </span>
-            )}
+            {(() => {
+              const activeViewers = orders.filter(o => {
+                if (!o.isViewing || !o.lastViewedAt) return false;
+                const lastViewed = new Date(o.lastViewedAt);
+                const diffMs = new Date().getTime() - lastViewed.getTime();
+                return diffMs < 2 * 60 * 1000; // Within 2 minutes
+              });
+              return activeViewers.length > 0 && (
+                <span className="mr-auto bg-success/20 text-success text-xs px-2 py-0.5 rounded-full animate-pulse">
+                  {activeViewers.length} צופים
+                </span>
+              );
+            })()}
           </button>
         </nav>
 
