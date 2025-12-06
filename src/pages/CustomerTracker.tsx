@@ -39,13 +39,39 @@ const CustomerTracker = () => {
     subscribeToRealtime,
   } = useRepairStore();
 
-  // Track viewing status
+  // Track viewing status with heartbeat
   useEffect(() => {
     if (currentOrder) {
+      // Set viewing status immediately
       setViewingStatus(currentOrder.id, true);
       
-      // Set to not viewing when leaving page
+      // Send heartbeat every 30 seconds to keep "viewing" status accurate
+      const heartbeatInterval = setInterval(() => {
+        setViewingStatus(currentOrder.id, true);
+      }, 30000);
+      
+      // Handle page visibility changes
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          setViewingStatus(currentOrder.id, false);
+        } else {
+          setViewingStatus(currentOrder.id, true);
+        }
+      };
+      
+      // Handle before unload (when closing tab/browser)
+      const handleBeforeUnload = () => {
+        setViewingStatus(currentOrder.id, false);
+      };
+      
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      
+      // Cleanup when leaving page
       return () => {
+        clearInterval(heartbeatInterval);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('beforeunload', handleBeforeUnload);
         setViewingStatus(currentOrder.id, false);
       };
     }
