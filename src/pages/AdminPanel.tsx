@@ -37,7 +37,12 @@ import {
   Edit,
   PlusCircle,
   ChevronDown,
-  MessageCircle
+  MessageCircle,
+  Download,
+  Search,
+  Phone,
+  MapPin,
+  ArrowUpDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -80,6 +85,8 @@ const AdminPanel = () => {
   const [conversationInput, setConversationInput] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [customerSortBy, setCustomerSortBy] = useState<'name' | 'orders' | 'recent'>('recent');
 
   const { 
     orders, 
@@ -511,39 +518,207 @@ ${trackingUrl}
         );
 
       case 'customers':
+        // Build unique customers with more data
         const uniqueCustomers = orders.reduce((acc, order) => {
-          if (!acc.find(c => c.phone === order.customerPhone)) {
+          const existing = acc.find(c => c.phone === order.customerPhone);
+          if (existing) {
+            existing.ordersCount++;
+            if (new Date(order.createdAt) > new Date(existing.lastOrderDate)) {
+              existing.lastOrderDate = order.createdAt;
+            }
+            existing.totalSpent += order.repairPrice;
+          } else {
             acc.push({
               phone: order.customerPhone,
               name: order.customerName,
               address: order.customerAddress,
-              ordersCount: orders.filter(o => o.customerPhone === order.customerPhone).length,
+              ordersCount: 1,
+              lastOrderDate: order.createdAt,
+              totalSpent: order.repairPrice,
             });
           }
           return acc;
-        }, [] as { phone: string; name: string; address: string; ordersCount: number }[]);
+        }, [] as { phone: string; name: string; address: string; ordersCount: number; lastOrderDate: Date; totalSpent: number }[]);
+
+        // Filter customers
+        const filteredCustomers = uniqueCustomers.filter(customer => 
+          customer.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
+          customer.phone.includes(customerSearch) ||
+          customer.address.toLowerCase().includes(customerSearch.toLowerCase())
+        );
+
+        // Sort customers
+        const sortedCustomers = [...filteredCustomers].sort((a, b) => {
+          switch (customerSortBy) {
+            case 'name':
+              return a.name.localeCompare(b.name, 'he');
+            case 'orders':
+              return b.ordersCount - a.ordersCount;
+            case 'recent':
+            default:
+              return new Date(b.lastOrderDate).getTime() - new Date(a.lastOrderDate).getTime();
+          }
+        });
+
+        // Export function
+        const exportCustomers = () => {
+          const csvContent = [
+            ['שם לקוח', 'טלפון', 'כתובת', 'מספר הזמנות', 'סה"כ הוצאות', 'הזמנה אחרונה'].join(','),
+            ...sortedCustomers.map(c => [
+              `"${c.name}"`,
+              c.phone,
+              `"${c.address}"`,
+              c.ordersCount,
+              c.totalSpent,
+              new Date(c.lastOrderDate).toLocaleDateString('he-IL')
+            ].join(','))
+          ].join('\n');
+          
+          const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
+          link.click();
+          
+          toast({
+            title: "הקובץ הורד בהצלחה",
+            description: `${sortedCustomers.length} לקוחות יוצאו לקובץ CSV`,
+          });
+        };
 
         return (
           <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
-            <h2 className="text-xl md:text-2xl font-bold mb-4">לקוחות ({uniqueCustomers.length})</h2>
-            <div className="space-y-3">
-              {uniqueCustomers.map((customer) => (
-                <div key={customer.phone} className="glass-card p-4 rounded-xl">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-base">{customer.name}</p>
-                      <p className="text-muted-foreground">{customer.phone}</p>
-                      <p className="text-muted-foreground">{customer.address}</p>
-                    </div>
-                    <div className="text-left">
-                      <span className="bg-primary/10 text-primary px-3 py-1.5 rounded-full text-base">
-                        {customer.ordersCount} הזמנות
-                      </span>
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+              <div>
+                <h2 className="text-xl md:text-2xl font-bold">לקוחות</h2>
+                <p className="text-muted-foreground text-sm">{uniqueCustomers.length} לקוחות רשומים</p>
+              </div>
+              <Button onClick={exportCustomers} variant="outline" className="gap-2">
+                <Download className="w-4 h-4" />
+                ייצוא לקוחות
+              </Button>
+            </div>
+
+            {/* Search and Filters */}
+            <div className="glass-card p-4 rounded-xl mb-4 space-y-3">
+              <div className="relative">
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="חיפוש לפי שם, טלפון או כתובת..."
+                  value={customerSearch}
+                  onChange={(e) => setCustomerSearch(e.target.value)}
+                  className="pr-10"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="text-sm text-muted-foreground flex items-center gap-1">
+                  <ArrowUpDown className="w-3 h-3" />
+                  מיון:
+                </span>
+                <Button
+                  variant={customerSortBy === 'recent' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setCustomerSortBy('recent')}
+                >
+                  לפי תאריך
+                </Button>
+                <Button
+                  variant={customerSortBy === 'orders' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setCustomerSortBy('orders')}
+                >
+                  לפי הזמנות
+                </Button>
+                <Button
+                  variant={customerSortBy === 'name' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setCustomerSortBy('name')}
+                >
+                  לפי שם
+                </Button>
+              </div>
+            </div>
+
+            {/* Stats Summary */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              <div className="glass-card p-3 rounded-xl text-center">
+                <p className="text-2xl font-bold text-primary">{uniqueCustomers.length}</p>
+                <p className="text-xs text-muted-foreground">סה"כ לקוחות</p>
+              </div>
+              <div className="glass-card p-3 rounded-xl text-center">
+                <p className="text-2xl font-bold text-success">
+                  {uniqueCustomers.filter(c => c.ordersCount > 1).length}
+                </p>
+                <p className="text-xs text-muted-foreground">לקוחות חוזרים</p>
+              </div>
+              <div className="glass-card p-3 rounded-xl text-center">
+                <p className="text-2xl font-bold text-accent">
+                  {(uniqueCustomers.reduce((sum, c) => sum + c.ordersCount, 0) / uniqueCustomers.length || 0).toFixed(1)}
+                </p>
+                <p className="text-xs text-muted-foreground">ממוצע הזמנות</p>
+              </div>
+              <div className="glass-card p-3 rounded-xl text-center">
+                <p className="text-2xl font-bold text-warning">
+                  ₪{uniqueCustomers.reduce((sum, c) => sum + c.totalSpent, 0).toLocaleString()}
+                </p>
+                <p className="text-xs text-muted-foreground">סה"כ הכנסות</p>
+              </div>
+            </div>
+
+            {/* Customers List */}
+            {sortedCustomers.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>{customerSearch ? 'לא נמצאו לקוחות התואמים לחיפוש' : 'אין לקוחות עדיין'}</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {sortedCustomers.map((customer) => (
+                  <div key={customer.phone} className="glass-card p-4 rounded-xl hover:bg-muted/30 transition-colors">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <span className="text-primary font-bold text-lg">
+                            {customer.name.charAt(0)}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-foreground text-lg">{customer.name}</p>
+                          <div className="flex items-center gap-2 text-muted-foreground text-sm mt-1">
+                            <Phone className="w-3 h-3" />
+                            <span dir="ltr">{customer.phone}</span>
+                          </div>
+                          {customer.address && (
+                            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                              <MapPin className="w-3 h-3" />
+                              <span className="truncate">{customer.address}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="text-center">
+                          <p className="text-lg font-bold text-primary">{customer.ordersCount}</p>
+                          <p className="text-xs text-muted-foreground">הזמנות</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-lg font-bold text-success">₪{customer.totalSpent}</p>
+                          <p className="text-xs text-muted-foreground">סה"כ</p>
+                        </div>
+                        <div className="text-center hidden sm:block">
+                          <p className="text-sm font-medium text-foreground">
+                            {new Date(customer.lastOrderDate).toLocaleDateString('he-IL')}
+                          </p>
+                          <p className="text-xs text-muted-foreground">אחרון</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         );
 
