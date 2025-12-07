@@ -11,6 +11,7 @@ import PromotionsOptIn from '@/components/PromotionsOptIn';
 import OrderSummary from '@/components/OrderSummary';
 import OrderSummarySheet from '@/components/OrderSummarySheet';
 import StickyHeader from '@/components/StickyHeader';
+import PrivacyConsentModal from '@/components/PrivacyConsentModal';
 import { useRepairStore } from '@/store/repairStore';
 import logo from '@/assets/logo.png';
 import { FileText, Download } from 'lucide-react';
@@ -22,6 +23,10 @@ const CustomerTracker = () => {
   const [error, setError] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [hasAcceptedPrivacy, setHasAcceptedPrivacy] = useState(() => {
+    return localStorage.getItem('privacy_consent_accepted') === 'true';
+  });
 
   const {
     orders,
@@ -122,12 +127,25 @@ const CustomerTracker = () => {
     if (order) {
       setCurrentOrder(order);
       setError('');
+      // Show privacy modal if not accepted yet
+      if (!hasAcceptedPrivacy) {
+        setShowPrivacyModal(true);
+      }
     } else {
       setError('לא נמצאה הזמנה עם מספר הטלפון הזה. וודאו שהמספר נכון או צרו קשר עם התמיכה.');
       setCurrentOrder(null);
     }
     
     setIsSearching(false);
+  };
+
+  const handlePrivacyAccept = () => {
+    setHasAcceptedPrivacy(true);
+    setShowPrivacyModal(false);
+    // Sync with promotions opt-in if communication was accepted
+    if (currentOrder && localStorage.getItem('privacy_consent_communication') === 'true') {
+      setWantsPromotions(currentOrder.id, true);
+    }
   };
 
   const handleBack = () => {
@@ -166,6 +184,13 @@ const CustomerTracker = () => {
   return (
     <div className="min-h-screen bg-background pb-28">
       <Header showBackButton onBack={handleBack} />
+      
+      {/* Privacy Consent Modal */}
+      <PrivacyConsentModal
+        open={showPrivacyModal}
+        onAccept={handlePrivacyAccept}
+        customerName={currentOrder.customerName}
+      />
       
       {/* Sticky header when scrolling */}
       {showTechnicianTracker && (
