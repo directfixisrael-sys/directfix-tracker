@@ -52,6 +52,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import SwipeableOrderCard from '@/components/SwipeableOrderCard';
 import AdminLiveChat from '@/components/AdminLiveChat';
 import PullToRefresh from '@/components/PullToRefresh';
+import PriceManagement from '@/components/admin/PriceManagement';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -739,7 +740,6 @@ ${trackingUrl}
               <ul className="space-y-2 text-muted-foreground">
                 <li>• ניהול טכנאים</li>
                 <li>• הגדרות הודעות SMS</li>
-                <li>• עריכת מחירון</li>
                 <li>• התאמה אישית של סטטוסים</li>
               </ul>
             </div>
@@ -758,6 +758,9 @@ ${trackingUrl}
             </Button>
           </div>
         );
+
+      case 'prices':
+        return <PriceManagement />;
 
       case 'feedback':
         const ordersWithFeedback = orders.filter(o => o.rating);
@@ -1376,6 +1379,18 @@ ${trackingUrl}
             )}
           </button>
           <button 
+            onClick={() => setActiveTab('prices')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'prices' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <FileText className="w-5 h-5" />
+            <span>ניהול מחירון</span>
+          </button>
+          <button 
             onClick={() => setActiveTab('settings')}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
@@ -1451,6 +1466,7 @@ ${trackingUrl}
               {activeTab === 'orders' && 'ניהול הזמנות'}
               {activeTab === 'customers' && 'לקוחות'}
               {activeTab === 'messages' && 'הודעות'}
+              {activeTab === 'prices' && 'ניהול מחירון'}
               {activeTab === 'settings' && 'הגדרות'}
               {activeTab === 'feedback' && 'משוב לקוחות'}
               {activeTab === 'analytics' && 'אנליטיקס'}

@@ -1,0 +1,662 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle 
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { 
+  Plus, 
+  Pencil, 
+  Trash2, 
+  Smartphone, 
+  Battery, 
+  Phone,
+  Search,
+  Loader2,
+  GripVertical,
+  Save
+} from 'lucide-react';
+import { toast } from 'sonner';
+
+interface IphoneModel {
+  id: string;
+  name: string;
+  screen_price: number;
+  battery_price: number;
+  is_active: boolean;
+  sort_order: number;
+}
+
+interface RepairType {
+  id: string;
+  name: string;
+  description: string | null;
+  icon: string;
+  is_phone_only: boolean;
+  is_active: boolean;
+  sort_order: number;
+}
+
+type TabType = 'models' | 'repairs';
+
+const PriceManagement = () => {
+  const [activeTab, setActiveTab] = useState<TabType>('models');
+  const [models, setModels] = useState<IphoneModel[]>([]);
+  const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Model dialog state
+  const [isModelDialogOpen, setIsModelDialogOpen] = useState(false);
+  const [editingModel, setEditingModel] = useState<IphoneModel | null>(null);
+  const [modelForm, setModelForm] = useState({
+    name: '',
+    screen_price: 0,
+    battery_price: 0,
+    is_active: true,
+  });
+  
+  // Repair type dialog state
+  const [isRepairDialogOpen, setIsRepairDialogOpen] = useState(false);
+  const [editingRepair, setEditingRepair] = useState<RepairType | null>(null);
+  const [repairForm, setRepairForm] = useState({
+    name: '',
+    description: '',
+    icon: 'smartphone',
+    is_phone_only: false,
+    is_active: true,
+  });
+  
+  // Delete dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ type: 'model' | 'repair'; id: string } | null>(null);
+
+  // Load data
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const [modelsRes, repairsRes] = await Promise.all([
+        supabase.from('iphone_models').select('*').order('sort_order'),
+        supabase.from('repair_types').select('*').order('sort_order'),
+      ]);
+
+      if (modelsRes.data) setModels(modelsRes.data);
+      if (repairsRes.data) setRepairTypes(repairsRes.data);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast.error('שגיאה בטעינת הנתונים');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Model functions
+  const openModelDialog = (model?: IphoneModel) => {
+    if (model) {
+      setEditingModel(model);
+      setModelForm({
+        name: model.name,
+        screen_price: model.screen_price,
+        battery_price: model.battery_price,
+        is_active: model.is_active,
+      });
+    } else {
+      setEditingModel(null);
+      setModelForm({
+        name: '',
+        screen_price: 0,
+        battery_price: 0,
+        is_active: true,
+      });
+    }
+    setIsModelDialogOpen(true);
+  };
+
+  const saveModel = async () => {
+    if (!modelForm.name.trim()) {
+      toast.error('יש להזין שם דגם');
+      return;
+    }
+
+    try {
+      if (editingModel) {
+        const { error } = await supabase
+          .from('iphone_models')
+          .update({
+            name: modelForm.name.trim(),
+            screen_price: modelForm.screen_price,
+            battery_price: modelForm.battery_price,
+            is_active: modelForm.is_active,
+          })
+          .eq('id', editingModel.id);
+
+        if (error) throw error;
+        toast.success('הדגם עודכן בהצלחה');
+      } else {
+        const maxOrder = Math.max(...models.map(m => m.sort_order), 0);
+        const { error } = await supabase
+          .from('iphone_models')
+          .insert({
+            name: modelForm.name.trim(),
+            screen_price: modelForm.screen_price,
+            battery_price: modelForm.battery_price,
+            is_active: modelForm.is_active,
+            sort_order: maxOrder + 1,
+          });
+
+        if (error) throw error;
+        toast.success('הדגם נוסף בהצלחה');
+      }
+
+      setIsModelDialogOpen(false);
+      loadData();
+    } catch (error) {
+      console.error('Error saving model:', error);
+      toast.error('שגיאה בשמירת הדגם');
+    }
+  };
+
+  const toggleModelActive = async (model: IphoneModel) => {
+    try {
+      const { error } = await supabase
+        .from('iphone_models')
+        .update({ is_active: !model.is_active })
+        .eq('id', model.id);
+
+      if (error) throw error;
+      
+      setModels(models.map(m => 
+        m.id === model.id ? { ...m, is_active: !m.is_active } : m
+      ));
+      toast.success(model.is_active ? 'הדגם הוסתר' : 'הדגם הופעל');
+    } catch (error) {
+      console.error('Error toggling model:', error);
+      toast.error('שגיאה בעדכון הדגם');
+    }
+  };
+
+  // Repair type functions
+  const openRepairDialog = (repair?: RepairType) => {
+    if (repair) {
+      setEditingRepair(repair);
+      setRepairForm({
+        name: repair.name,
+        description: repair.description || '',
+        icon: repair.icon,
+        is_phone_only: repair.is_phone_only,
+        is_active: repair.is_active,
+      });
+    } else {
+      setEditingRepair(null);
+      setRepairForm({
+        name: '',
+        description: '',
+        icon: 'smartphone',
+        is_phone_only: false,
+        is_active: true,
+      });
+    }
+    setIsRepairDialogOpen(true);
+  };
+
+  const saveRepair = async () => {
+    if (!repairForm.name.trim()) {
+      toast.error('יש להזין שם סוג תיקון');
+      return;
+    }
+
+    try {
+      if (editingRepair) {
+        const { error } = await supabase
+          .from('repair_types')
+          .update({
+            name: repairForm.name.trim(),
+            description: repairForm.description.trim() || null,
+            icon: repairForm.icon,
+            is_phone_only: repairForm.is_phone_only,
+            is_active: repairForm.is_active,
+          })
+          .eq('id', editingRepair.id);
+
+        if (error) throw error;
+        toast.success('סוג התיקון עודכן בהצלחה');
+      } else {
+        const maxOrder = Math.max(...repairTypes.map(r => r.sort_order), 0);
+        const { error } = await supabase
+          .from('repair_types')
+          .insert({
+            name: repairForm.name.trim(),
+            description: repairForm.description.trim() || null,
+            icon: repairForm.icon,
+            is_phone_only: repairForm.is_phone_only,
+            is_active: repairForm.is_active,
+            sort_order: maxOrder + 1,
+          });
+
+        if (error) throw error;
+        toast.success('סוג התיקון נוסף בהצלחה');
+      }
+
+      setIsRepairDialogOpen(false);
+      loadData();
+    } catch (error) {
+      console.error('Error saving repair type:', error);
+      toast.error('שגיאה בשמירת סוג התיקון');
+    }
+  };
+
+  const toggleRepairActive = async (repair: RepairType) => {
+    try {
+      const { error } = await supabase
+        .from('repair_types')
+        .update({ is_active: !repair.is_active })
+        .eq('id', repair.id);
+
+      if (error) throw error;
+      
+      setRepairTypes(repairTypes.map(r => 
+        r.id === repair.id ? { ...r, is_active: !r.is_active } : r
+      ));
+      toast.success(repair.is_active ? 'סוג התיקון הוסתר' : 'סוג התיקון הופעל');
+    } catch (error) {
+      console.error('Error toggling repair:', error);
+      toast.error('שגיאה בעדכון סוג התיקון');
+    }
+  };
+
+  // Delete functions
+  const handleDelete = (type: 'model' | 'repair', id: string) => {
+    setItemToDelete({ type, id });
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+
+    try {
+      if (itemToDelete.type === 'model') {
+        const { error } = await supabase
+          .from('iphone_models')
+          .delete()
+          .eq('id', itemToDelete.id);
+        if (error) throw error;
+        toast.success('הדגם נמחק בהצלחה');
+      } else {
+        const { error } = await supabase
+          .from('repair_types')
+          .delete()
+          .eq('id', itemToDelete.id);
+        if (error) throw error;
+        toast.success('סוג התיקון נמחק בהצלחה');
+      }
+
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
+      loadData();
+    } catch (error) {
+      console.error('Error deleting:', error);
+      toast.error('שגיאה במחיקה');
+    }
+  };
+
+  // Filter models
+  const filteredModels = models.filter(model =>
+    model.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getRepairIcon = (icon: string) => {
+    switch (icon) {
+      case 'battery': return Battery;
+      case 'phone': return Phone;
+      default: return Smartphone;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
+      {/* Header */}
+      <div className="mb-6">
+        <h2 className="text-xl md:text-2xl font-bold mb-2">ניהול מחירון</h2>
+        <p className="text-muted-foreground text-sm">עריכת דגמי אייפון, מחירים וסוגי תיקונים</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2 mb-4">
+        <Button
+          variant={activeTab === 'models' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('models')}
+          className="gap-2"
+        >
+          <Smartphone className="w-4 h-4" />
+          דגמים ומחירים
+        </Button>
+        <Button
+          variant={activeTab === 'repairs' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('repairs')}
+          className="gap-2"
+        >
+          <Battery className="w-4 h-4" />
+          סוגי תיקון
+        </Button>
+      </div>
+
+      {activeTab === 'models' && (
+        <>
+          {/* Search and Add */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            <div className="relative flex-1">
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="חיפוש דגם..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pr-10"
+              />
+            </div>
+            <Button onClick={() => openModelDialog()} className="gap-2">
+              <Plus className="w-4 h-4" />
+              הוסף דגם
+            </Button>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            <Card className="p-3 text-center">
+              <p className="text-2xl font-bold text-primary">{models.length}</p>
+              <p className="text-xs text-muted-foreground">סה"כ דגמים</p>
+            </Card>
+            <Card className="p-3 text-center">
+              <p className="text-2xl font-bold text-success">{models.filter(m => m.is_active).length}</p>
+              <p className="text-xs text-muted-foreground">דגמים פעילים</p>
+            </Card>
+            <Card className="p-3 text-center">
+              <p className="text-2xl font-bold text-muted-foreground">{models.filter(m => !m.is_active).length}</p>
+              <p className="text-xs text-muted-foreground">דגמים מוסתרים</p>
+            </Card>
+          </div>
+
+          {/* Models List */}
+          <div className="space-y-2">
+            {filteredModels.map((model) => (
+              <Card 
+                key={model.id} 
+                className={`p-4 transition-all ${!model.is_active ? 'opacity-50' : ''}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Smartphone className="w-5 h-5 text-primary" />
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold truncate">{model.name}</p>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>מסך: ₪{model.screen_price}</span>
+                      <span>סוללה: ₪{model.battery_price}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={model.is_active}
+                      onCheckedChange={() => toggleModelActive(model)}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openModelDialog(model)}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete('model', model.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
+
+      {activeTab === 'repairs' && (
+        <>
+          {/* Add Button */}
+          <div className="flex justify-end mb-4">
+            <Button onClick={() => openRepairDialog()} className="gap-2">
+              <Plus className="w-4 h-4" />
+              הוסף סוג תיקון
+            </Button>
+          </div>
+
+          {/* Repair Types List */}
+          <div className="space-y-2">
+            {repairTypes.map((repair) => {
+              const Icon = getRepairIcon(repair.icon);
+              return (
+                <Card 
+                  key={repair.id} 
+                  className={`p-4 transition-all ${!repair.is_active ? 'opacity-50' : ''}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      repair.is_phone_only ? 'bg-warning/10' : 'bg-primary/10'
+                    }`}>
+                      <Icon className={`w-6 h-6 ${repair.is_phone_only ? 'text-warning' : 'text-primary'}`} />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold">{repair.name}</p>
+                      {repair.description && (
+                        <p className="text-sm text-muted-foreground">{repair.description}</p>
+                      )}
+                      {repair.is_phone_only && (
+                        <span className="inline-block text-xs bg-warning/10 text-warning px-2 py-0.5 rounded-full mt-1">
+                          הזמנה טלפונית בלבד
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={repair.is_active}
+                        onCheckedChange={() => toggleRepairActive(repair)}
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => openRepairDialog(repair)}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete('repair', repair.id)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {/* Model Dialog */}
+      <Dialog open={isModelDialogOpen} onOpenChange={setIsModelDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingModel ? 'עריכת דגם' : 'הוספת דגם חדש'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">שם הדגם</label>
+              <Input
+                placeholder="לדוגמה: iPhone 15 Pro"
+                value={modelForm.name}
+                onChange={(e) => setModelForm({ ...modelForm, name: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">מחיר מסך (₪)</label>
+                <Input
+                  type="number"
+                  value={modelForm.screen_price}
+                  onChange={(e) => setModelForm({ ...modelForm, screen_price: Number(e.target.value) })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">מחיר סוללה (₪)</label>
+                <Input
+                  type="number"
+                  value={modelForm.battery_price}
+                  onChange={(e) => setModelForm({ ...modelForm, battery_price: Number(e.target.value) })}
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">הצג ללקוחות</span>
+              <Switch
+                checked={modelForm.is_active}
+                onCheckedChange={(checked) => setModelForm({ ...modelForm, is_active: checked })}
+              />
+            </div>
+            <Button onClick={saveModel} className="w-full gap-2">
+              <Save className="w-4 h-4" />
+              {editingModel ? 'שמור שינויים' : 'הוסף דגם'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Repair Type Dialog */}
+      <Dialog open={isRepairDialogOpen} onOpenChange={setIsRepairDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingRepair ? 'עריכת סוג תיקון' : 'הוספת סוג תיקון חדש'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">שם סוג התיקון</label>
+              <Input
+                placeholder="לדוגמה: החלפת מסך"
+                value={repairForm.name}
+                onChange={(e) => setRepairForm({ ...repairForm, name: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">תיאור</label>
+              <Input
+                placeholder="תיאור קצר של התיקון"
+                value={repairForm.description}
+                onChange={(e) => setRepairForm({ ...repairForm, description: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">אייקון</label>
+              <div className="flex gap-2">
+                {[
+                  { id: 'smartphone', icon: Smartphone, label: 'מסך' },
+                  { id: 'battery', icon: Battery, label: 'סוללה' },
+                  { id: 'phone', icon: Phone, label: 'טלפון' },
+                ].map(({ id, icon: Icon, label }) => (
+                  <Button
+                    key={id}
+                    type="button"
+                    variant={repairForm.icon === id ? 'default' : 'outline'}
+                    onClick={() => setRepairForm({ ...repairForm, icon: id })}
+                    className="flex-1 gap-2"
+                  >
+                    <Icon className="w-4 h-4" />
+                    {label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">הזמנה טלפונית בלבד</p>
+                <p className="text-xs text-muted-foreground">לא ניתן להזמין דרך האתר</p>
+              </div>
+              <Switch
+                checked={repairForm.is_phone_only}
+                onCheckedChange={(checked) => setRepairForm({ ...repairForm, is_phone_only: checked })}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">הצג ללקוחות</span>
+              <Switch
+                checked={repairForm.is_active}
+                onCheckedChange={(checked) => setRepairForm({ ...repairForm, is_active: checked })}
+              />
+            </div>
+            <Button onClick={saveRepair} className="w-full gap-2">
+              <Save className="w-4 h-4" />
+              {editingRepair ? 'שמור שינויים' : 'הוסף סוג תיקון'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>האם אתה בטוח?</AlertDialogTitle>
+            <AlertDialogDescription>
+              פעולה זו היא בלתי הפיכה. הפריט יימחק לצמיתות מהמערכת.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row-reverse gap-2">
+            <AlertDialogCancel>ביטול</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              מחק
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default PriceManagement;

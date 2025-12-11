@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      iphone_models: {
+        Row: {
+          battery_price: number
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          screen_price: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          battery_price?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          screen_price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          battery_price?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          screen_price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           id: string
@@ -148,6 +181,42 @@ export type Database = {
           endpoint?: string
           id?: string
           p256dh?: string
+        }
+        Relationships: []
+      }
+      repair_types: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          is_active: boolean
+          is_phone_only: boolean
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean
+          is_phone_only?: boolean
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean
+          is_phone_only?: boolean
+          name?: string
+          sort_order?: number
+          updated_at?: string
         }
         Relationships: []
       }
