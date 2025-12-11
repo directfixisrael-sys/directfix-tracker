@@ -3,49 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2 } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logo from '@/assets/logo.png';
 
-// iPhone models with prices
-const iphoneModels = [
-  { id: 'iphone-16-pro-max', name: 'iPhone 16 Pro Max', screenPrice: 1350, batteryPrice: 280 },
-  { id: 'iphone-16-pro', name: 'iPhone 16 Pro', screenPrice: 1250, batteryPrice: 280 },
-  { id: 'iphone-16-plus', name: 'iPhone 16 Plus', screenPrice: 1100, batteryPrice: 250 },
-  { id: 'iphone-16', name: 'iPhone 16', screenPrice: 1000, batteryPrice: 250 },
-  { id: 'iphone-15-pro-max', name: 'iPhone 15 Pro Max', screenPrice: 1200, batteryPrice: 250 },
-  { id: 'iphone-15-pro', name: 'iPhone 15 Pro', screenPrice: 1100, batteryPrice: 250 },
-  { id: 'iphone-15-plus', name: 'iPhone 15 Plus', screenPrice: 950, batteryPrice: 220 },
-  { id: 'iphone-15', name: 'iPhone 15', screenPrice: 850, batteryPrice: 220 },
-  { id: 'iphone-14-pro-max', name: 'iPhone 14 Pro Max', screenPrice: 1000, batteryPrice: 220 },
-  { id: 'iphone-14-pro', name: 'iPhone 14 Pro', screenPrice: 900, batteryPrice: 220 },
-  { id: 'iphone-14-plus', name: 'iPhone 14 Plus', screenPrice: 750, batteryPrice: 200 },
-  { id: 'iphone-14', name: 'iPhone 14', screenPrice: 650, batteryPrice: 200 },
-  { id: 'iphone-13-pro-max', name: 'iPhone 13 Pro Max', screenPrice: 800, batteryPrice: 200 },
-  { id: 'iphone-13-pro', name: 'iPhone 13 Pro', screenPrice: 700, batteryPrice: 200 },
-  { id: 'iphone-13', name: 'iPhone 13', screenPrice: 550, batteryPrice: 180 },
-  { id: 'iphone-13-mini', name: 'iPhone 13 Mini', screenPrice: 500, batteryPrice: 180 },
-  { id: 'iphone-12-pro-max', name: 'iPhone 12 Pro Max', screenPrice: 650, batteryPrice: 180 },
-  { id: 'iphone-12-pro', name: 'iPhone 12 Pro', screenPrice: 600, batteryPrice: 180 },
-  { id: 'iphone-12', name: 'iPhone 12', screenPrice: 450, batteryPrice: 150 },
-  { id: 'iphone-12-mini', name: 'iPhone 12 Mini', screenPrice: 400, batteryPrice: 150 },
-  { id: 'iphone-11-pro-max', name: 'iPhone 11 Pro Max', screenPrice: 550, batteryPrice: 150 },
-  { id: 'iphone-11-pro', name: 'iPhone 11 Pro', screenPrice: 500, batteryPrice: 150 },
-  { id: 'iphone-11', name: 'iPhone 11', screenPrice: 350, batteryPrice: 130 },
-  { id: 'iphone-xr', name: 'iPhone XR', screenPrice: 300, batteryPrice: 130 },
-  { id: 'iphone-xs-max', name: 'iPhone XS Max', screenPrice: 400, batteryPrice: 130 },
-  { id: 'iphone-xs', name: 'iPhone XS', screenPrice: 350, batteryPrice: 130 },
-  { id: 'iphone-x', name: 'iPhone X', screenPrice: 300, batteryPrice: 120 },
-  { id: 'iphone-8-plus', name: 'iPhone 8 Plus', screenPrice: 250, batteryPrice: 100 },
-  { id: 'iphone-8', name: 'iPhone 8', screenPrice: 200, batteryPrice: 100 },
-];
+interface IphoneModel {
+  id: string;
+  name: string;
+  screen_price: number;
+  battery_price: number;
+}
 
-const repairTypes = [
-  { id: 'screen', name: 'החלפת מסך', icon: Smartphone, description: 'מסך שבור או לא מגיב' },
-  { id: 'battery', name: 'החלפת סוללה', icon: Battery, description: 'סוללה חלשה או נפוחה' },
-  { id: 'other', name: 'תיקון אחר', icon: Phone, description: 'צור קשר טלפוני' },
-];
+interface RepairType {
+  id: string;
+  name: string;
+  description: string | null;
+  icon: string;
+  is_phone_only: boolean;
+}
 
 type Step = 'model' | 'repair' | 'price' | 'details' | 'success';
 
@@ -54,8 +31,11 @@ const NewRepairOrder = () => {
   const { addOrder } = useRepairStore();
   
   const [step, setStep] = useState<Step>('model');
-  const [selectedModel, setSelectedModel] = useState<typeof iphoneModels[0] | null>(null);
-  const [selectedRepair, setSelectedRepair] = useState<string | null>(null);
+  const [models, setModels] = useState<IphoneModel[]>([]);
+  const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedModel, setSelectedModel] = useState<IphoneModel | null>(null);
+  const [selectedRepair, setSelectedRepair] = useState<RepairType | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,14 +44,44 @@ const NewRepairOrder = () => {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
+
+  // Load data from database
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const [modelsRes, repairsRes] = await Promise.all([
+          supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'),
+          supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'),
+        ]);
+
+        if (modelsRes.data) setModels(modelsRes.data);
+        if (repairsRes.data) setRepairTypes(repairsRes.data);
+      } catch (error) {
+        console.error('Error loading data:', error);
+        toast.error('שגיאה בטעינת הנתונים');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
   
-  const filteredModels = iphoneModels.filter(model =>
+  const filteredModels = models.filter(model =>
     model.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getPrice = () => {
     if (!selectedModel || !selectedRepair) return 0;
-    return selectedRepair === 'screen' ? selectedModel.screenPrice : selectedModel.batteryPrice;
+    // Check if it's screen or battery based on the repair name
+    const isScreen = selectedRepair.name.includes('מסך');
+    return isScreen ? selectedModel.screen_price : selectedModel.battery_price;
+  };
+
+  const getRepairTypeName = () => {
+    if (!selectedRepair) return '';
+    return selectedRepair.name;
   };
 
   const goToStep = (newStep: Step) => {
@@ -82,17 +92,17 @@ const NewRepairOrder = () => {
     }, 200);
   };
 
-  const handleModelSelect = (model: typeof iphoneModels[0]) => {
+  const handleModelSelect = (model: IphoneModel) => {
     setSelectedModel(model);
     goToStep('repair');
   };
 
-  const handleRepairSelect = (repairId: string) => {
-    if (repairId === 'other') {
+  const handleRepairSelect = (repair: RepairType) => {
+    if (repair.is_phone_only) {
       window.location.href = 'tel:0528692886';
       return;
     }
-    setSelectedRepair(repairId);
+    setSelectedRepair(repair);
     goToStep('price');
   };
 
@@ -118,18 +128,16 @@ const NewRepairOrder = () => {
     setIsSubmitting(true);
 
     try {
-      const repairTypeText = selectedRepair === 'screen' ? 'החלפת מסך' : 'החלפת סוללה';
-      
       await addOrder({
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
         customerAddress: customerAddress.trim(),
         deviceType: selectedModel?.name || '',
-        issueDescription: repairTypeText,
+        issueDescription: getRepairTypeName(),
         repairPrice: getPrice(),
         status: 'pending',
         accessories: [],
-        notes: [`הזמנה מהאתר - ${repairTypeText}`],
+        notes: [`הזמנה מהאתר - ${getRepairTypeName()}`],
         wantsPromotions: false,
       });
 
@@ -143,6 +151,14 @@ const NewRepairOrder = () => {
 
   const handleTrackOrder = () => {
     navigate('/track');
+  };
+
+  const getRepairIcon = (icon: string) => {
+    switch (icon) {
+      case 'battery': return Battery;
+      case 'phone': return Phone;
+      default: return Smartphone;
+    }
   };
 
   // Floating phone illustration component
@@ -161,6 +177,18 @@ const NewRepairOrder = () => {
       )}
     </div>
   );
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">טוען...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -263,15 +291,19 @@ const NewRepairOrder = () => {
 
             <div className="space-y-3">
               {repairTypes.map((repair, index) => {
-                const Icon = repair.icon;
-                const isOther = repair.id === 'other';
+                const Icon = getRepairIcon(repair.icon);
+                const isPhoneOnly = repair.is_phone_only;
+                
+                // Calculate price for this repair type
+                const isScreen = repair.name.includes('מסך');
+                const price = selectedModel ? (isScreen ? selectedModel.screen_price : selectedModel.battery_price) : 0;
                 
                 return (
                   <Card
                     key={repair.id}
-                    onClick={() => handleRepairSelect(repair.id)}
+                    onClick={() => handleRepairSelect(repair)}
                     className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] ${
-                      isOther 
+                      isPhoneOnly 
                         ? 'border-dashed border-2 hover:border-warning hover:bg-warning/5' 
                         : 'hover:border-primary hover:shadow-lg'
                     }`}
@@ -279,20 +311,20 @@ const NewRepairOrder = () => {
                   >
                     <div className="flex items-center gap-4">
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
-                        isOther ? 'bg-warning/10' : 'bg-primary/10'
+                        isPhoneOnly ? 'bg-warning/10' : 'bg-primary/10'
                       }`}>
-                        <Icon className={`w-7 h-7 ${isOther ? 'text-warning' : 'text-primary'}`} />
+                        <Icon className={`w-7 h-7 ${isPhoneOnly ? 'text-warning' : 'text-primary'}`} />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg">{repair.name}</h3>
-                        <p className="text-muted-foreground text-sm">{repair.description}</p>
-                        {!isOther && selectedModel && (
-                          <p className="text-primary font-bold mt-1">
-                            ₪{repair.id === 'screen' ? selectedModel.screenPrice : selectedModel.batteryPrice}
-                          </p>
+                        {repair.description && (
+                          <p className="text-muted-foreground text-sm">{repair.description}</p>
+                        )}
+                        {!isPhoneOnly && selectedModel && (
+                          <p className="text-primary font-bold mt-1">₪{price}</p>
                         )}
                       </div>
-                      {isOther && (
+                      {isPhoneOnly && (
                         <Phone className="w-5 h-5 text-warning" />
                       )}
                     </div>
@@ -335,9 +367,7 @@ const NewRepairOrder = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">סוג תיקון</span>
-                  <span className="font-semibold">
-                    {selectedRepair === 'screen' ? 'החלפת מסך' : 'החלפת סוללה'}
-                  </span>
+                  <span className="font-semibold">{getRepairTypeName()}</span>
                 </div>
                 <div className="border-t border-border pt-4">
                   <div className="flex justify-between items-center">
@@ -418,7 +448,7 @@ const NewRepairOrder = () => {
 
             <Card className="p-4 bg-muted/30">
               <div className="flex justify-between items-center text-sm">
-                <span>{selectedModel?.name} • {selectedRepair === 'screen' ? 'מסך' : 'סוללה'}</span>
+                <span>{selectedModel?.name} • {getRepairTypeName()}</span>
                 <span className="font-bold text-primary">₪{getPrice()}</span>
               </div>
             </Card>
@@ -468,7 +498,7 @@ const NewRepairOrder = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">תיקון</span>
-                  <span className="font-medium">{selectedRepair === 'screen' ? 'החלפת מסך' : 'החלפת סוללה'}</span>
+                  <span className="font-medium">{getRepairTypeName()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">מחיר</span>
