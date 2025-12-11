@@ -3,16 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logo from '@/assets/logo.png';
 
+// Info tooltips for repair types
+const repairInfoTooltips: Record<string, string> = {
+  'מסך מקורי': 'מסך מקורי מבית Apple - איכות תצוגה מעולה, צבעים מדויקים, True Tone פעיל, ואחריות מלאה',
+  'מסך תואם': 'מסך איכותי תואם - מחיר משתלם יותר, איכות תצוגה טובה, מתאים לשימוש יומיומי רגיל',
+  'סוללה מקורית': 'סוללה מקורית Apple עם 100% בריאות סוללה, ללא התראות במערכת, וביצועים מקסימליים',
+};
+
 interface IphoneModel {
   id: string;
   name: string;
-  screen_price: number;
+  original_screen_price: number;
+  compatible_screen_price: number;
   battery_price: number;
 }
 
@@ -75,8 +84,14 @@ const NewRepairOrder = () => {
   const getPrice = () => {
     if (!selectedModel || !selectedRepair) return 0;
     // Check if it's screen or battery based on the repair name
-    const isScreen = selectedRepair.name.includes('מסך');
-    return isScreen ? selectedModel.screen_price : selectedModel.battery_price;
+    const isOriginalScreen = selectedRepair.name.includes('מסך מקורי');
+    const isCompatibleScreen = selectedRepair.name.includes('מסך תואם');
+    const isBattery = selectedRepair.name.includes('סוללה');
+    
+    if (isOriginalScreen) return selectedModel.original_screen_price;
+    if (isCompatibleScreen) return selectedModel.compatible_screen_price;
+    if (isBattery) return selectedModel.battery_price;
+    return 0;
   };
 
   const getRepairTypeName = () => {
@@ -295,8 +310,16 @@ const NewRepairOrder = () => {
                 const isPhoneOnly = repair.is_phone_only;
                 
                 // Calculate price for this repair type
-                const isScreen = repair.name.includes('מסך');
-                const price = selectedModel ? (isScreen ? selectedModel.screen_price : selectedModel.battery_price) : 0;
+                const isOriginalScreen = repair.name.includes('מסך מקורי');
+                const isCompatibleScreen = repair.name.includes('מסך תואם');
+                const isBattery = repair.name.includes('סוללה');
+                
+                let price = 0;
+                if (selectedModel) {
+                  if (isOriginalScreen) price = selectedModel.original_screen_price;
+                  else if (isCompatibleScreen) price = selectedModel.compatible_screen_price;
+                  else if (isBattery) price = selectedModel.battery_price;
+                }
                 
                 return (
                   <Card
@@ -316,7 +339,29 @@ const NewRepairOrder = () => {
                         <Icon className={`w-7 h-7 ${isPhoneOnly ? 'text-warning' : 'text-primary'}`} />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{repair.name}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-lg">{repair.name}</h3>
+                          {!isPhoneOnly && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button 
+                                  type="button"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-muted-foreground hover:text-primary transition-colors"
+                                >
+                                  <HelpCircle className="w-4 h-4" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="max-w-xs text-center bg-popover border border-border shadow-lg z-50">
+                                <p className="text-sm">
+                                  {isOriginalScreen && repairInfoTooltips['מסך מקורי']}
+                                  {isCompatibleScreen && repairInfoTooltips['מסך תואם']}
+                                  {isBattery && repairInfoTooltips['סוללה מקורית']}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
                         {repair.description && (
                           <p className="text-muted-foreground text-sm">{repair.description}</p>
                         )}

@@ -37,7 +37,8 @@ import { toast } from 'sonner';
 interface IphoneModel {
   id: string;
   name: string;
-  screen_price: number;
+  original_screen_price: number;
+  compatible_screen_price: number;
   battery_price: number;
   is_active: boolean;
   sort_order: number;
@@ -67,7 +68,8 @@ const PriceManagement = () => {
   const [editingModel, setEditingModel] = useState<IphoneModel | null>(null);
   const [modelForm, setModelForm] = useState({
     name: '',
-    screen_price: 0,
+    original_screen_price: 0,
+    compatible_screen_price: 0,
     battery_price: 0,
     is_active: true,
   });
@@ -116,7 +118,8 @@ const PriceManagement = () => {
       setEditingModel(model);
       setModelForm({
         name: model.name,
-        screen_price: model.screen_price,
+        original_screen_price: model.original_screen_price,
+        compatible_screen_price: model.compatible_screen_price,
         battery_price: model.battery_price,
         is_active: model.is_active,
       });
@@ -124,7 +127,8 @@ const PriceManagement = () => {
       setEditingModel(null);
       setModelForm({
         name: '',
-        screen_price: 0,
+        original_screen_price: 0,
+        compatible_screen_price: 0,
         battery_price: 0,
         is_active: true,
       });
@@ -144,7 +148,8 @@ const PriceManagement = () => {
           .from('iphone_models')
           .update({
             name: modelForm.name.trim(),
-            screen_price: modelForm.screen_price,
+            original_screen_price: modelForm.original_screen_price,
+            compatible_screen_price: modelForm.compatible_screen_price,
             battery_price: modelForm.battery_price,
             is_active: modelForm.is_active,
           })
@@ -158,7 +163,8 @@ const PriceManagement = () => {
           .from('iphone_models')
           .insert({
             name: modelForm.name.trim(),
-            screen_price: modelForm.screen_price,
+            original_screen_price: modelForm.original_screen_price,
+            compatible_screen_price: modelForm.compatible_screen_price,
             battery_price: modelForm.battery_price,
             is_active: modelForm.is_active,
             sort_order: maxOrder + 1,
@@ -417,8 +423,9 @@ const PriceManagement = () => {
                   
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold truncate">{model.name}</p>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>מסך: ₪{model.screen_price}</span>
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                      <span>מסך מקורי: ₪{model.original_screen_price}</span>
+                      <span>מסך תואם: ₪{model.compatible_screen_price}</span>
                       <span>סוללה: ₪{model.battery_price}</span>
                     </div>
                   </div>
@@ -535,21 +542,29 @@ const PriceManagement = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">מחיר מסך (₪)</label>
+                <label className="block text-sm font-medium mb-2">מסך מקורי (₪)</label>
                 <Input
                   type="number"
-                  value={modelForm.screen_price}
-                  onChange={(e) => setModelForm({ ...modelForm, screen_price: Number(e.target.value) })}
+                  value={modelForm.original_screen_price}
+                  onChange={(e) => setModelForm({ ...modelForm, original_screen_price: Number(e.target.value) })}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">מחיר סוללה (₪)</label>
+                <label className="block text-sm font-medium mb-2">מסך תואם (₪)</label>
                 <Input
                   type="number"
-                  value={modelForm.battery_price}
-                  onChange={(e) => setModelForm({ ...modelForm, battery_price: Number(e.target.value) })}
+                  value={modelForm.compatible_screen_price}
+                  onChange={(e) => setModelForm({ ...modelForm, compatible_screen_price: Number(e.target.value) })}
                 />
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">סוללה מקורית (₪)</label>
+              <Input
+                type="number"
+                value={modelForm.battery_price}
+                onChange={(e) => setModelForm({ ...modelForm, battery_price: Number(e.target.value) })}
+              />
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">הצג ללקוחות</span>
