@@ -17,31 +17,34 @@ export type Database = {
       iphone_models: {
         Row: {
           battery_price: number
+          compatible_screen_price: number
           created_at: string
           id: string
           is_active: boolean
           name: string
-          screen_price: number
+          original_screen_price: number
           sort_order: number
           updated_at: string
         }
         Insert: {
           battery_price?: number
+          compatible_screen_price?: number
           created_at?: string
           id?: string
           is_active?: boolean
           name: string
-          screen_price?: number
+          original_screen_price?: number
           sort_order?: number
           updated_at?: string
         }
         Update: {
           battery_price?: number
+          compatible_screen_price?: number
           created_at?: string
           id?: string
           is_active?: boolean
           name?: string
-          screen_price?: number
+          original_screen_price?: number
           sort_order?: number
           updated_at?: string
         }
