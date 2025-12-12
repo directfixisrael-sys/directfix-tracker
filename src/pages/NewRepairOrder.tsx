@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -71,6 +71,9 @@ const NewRepairOrder = () => {
   // Schedule fields
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
+  
+  // Gift animation
+  const [showGiftAnimation, setShowGiftAnimation] = useState(false);
   
   // Form fields
   const [customerName, setCustomerName] = useState('');
@@ -175,7 +178,12 @@ const NewRepairOrder = () => {
       return;
     }
     setSelectedRepair(repair);
-    goToStep('price');
+    // Show gift animation
+    setShowGiftAnimation(true);
+    setTimeout(() => {
+      setShowGiftAnimation(false);
+      goToStep('price');
+    }, 2500);
   };
 
   const handlePriceConfirm = () => {
@@ -344,9 +352,51 @@ const NewRepairOrder = () => {
         )}
       </div>
 
+      {/* Gift Animation Overlay */}
+      {showGiftAnimation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm animate-fade-in">
+          <div className="text-center space-y-4">
+            <div className="relative animate-bounce">
+              <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-2xl mx-auto">
+                <Gift className="w-12 h-12 text-white animate-pulse" />
+              </div>
+              <div className="absolute -top-2 -right-2 text-3xl animate-spin-slow">✨</div>
+              <div className="absolute -bottom-2 -left-2 text-3xl animate-spin-slow" style={{ animationDelay: '200ms' }}>🎁</div>
+            </div>
+            <div className="space-y-2 animate-scale-in" style={{ animationDelay: '300ms' }}>
+              <h3 className="text-xl font-bold text-foreground">🎉 מבצע דצמבר!</h3>
+              <div className="bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 rounded-xl p-4 border border-amber-500/30">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Shield className="w-6 h-6 text-amber-500" />
+                  <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+                    מגן מסך במתנה!
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">על כל תיקון - מגן מסך איכותי בחינם</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       <div className={`p-4 transition-all duration-200 ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
         
+        {/* December Promotion Banner */}
+        {step === 'model' && (
+          <div className="mb-4 animate-fade-in">
+            <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/15 to-amber-500/10 rounded-xl p-3 border border-amber-500/20 flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Gift className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-amber-600 dark:text-amber-400">🎄 מבצע דצמבר</p>
+                <p className="text-xs text-muted-foreground">מגן מסך במתנה על כל תיקון!</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Step 1: Select Model */}
         {step === 'model' && (
           <div className="space-y-3 animate-fade-in">
