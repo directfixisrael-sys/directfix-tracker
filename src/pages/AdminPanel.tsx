@@ -55,6 +55,7 @@ import PullToRefresh from '@/components/PullToRefresh';
 import PriceManagement from '@/components/admin/PriceManagement';
 import VacationManagement from '@/components/admin/VacationManagement';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
+import PromotionsManagement from '@/components/admin/PromotionsManagement';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -772,6 +773,9 @@ ${trackingUrl}
 
       case 'prices':
         return <PriceManagement />;
+
+      case 'promotions':
+        return <PromotionsManagement />;
 
       case 'feedback':
         const ordersWithFeedback = orders.filter(o => o.rating);

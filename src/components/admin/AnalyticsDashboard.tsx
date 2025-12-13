@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { RepairOrder } from '@/types/repair';
 import { cn } from '@/lib/utils';
+import DateRangePicker, { DateRange } from './DateRangePicker';
+import { subDays, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
 
 interface AnalyticsDashboardProps {
   orders: RepairOrder[];
@@ -41,7 +43,20 @@ interface AnalyticsData {
 const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: startOfDay(subDays(new Date(), 7)),
+    to: endOfDay(new Date()),
+    label: 'שבוע אחרון',
+  });
   
+  // Filter orders by date range
+  const filteredOrders = useMemo(() => {
+    return orders.filter(order => {
+      const orderDate = new Date(order.createdAt);
+      return isWithinInterval(orderDate, { start: dateRange.from, end: dateRange.to });
+    });
+  }, [orders, dateRange]);
+
   // Calculate real-time viewers (orders being viewed within last 2 minutes)
   const activeViewers = orders.filter(o => {
     if (!o.isViewing || !o.lastViewedAt) return false;
@@ -50,31 +65,26 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
     return diffMs < 2 * 60 * 1000;
   });
 
-  // Calculate orders stats
-  const todayOrders = orders.filter(o => {
+  // Calculate orders stats using filtered orders
+  const todayOrders = filteredOrders.filter(o => {
     const created = new Date(o.createdAt);
     const today = new Date();
     return created.toDateString() === today.toDateString();
   });
 
-  const weekOrders = orders.filter(o => {
-    const created = new Date(o.createdAt);
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    return created > weekAgo;
-  });
+  const periodOrders = filteredOrders;
 
-  const completedOrders = orders.filter(o => o.status === 'completed');
-  const pendingOrders = orders.filter(o => o.status === 'pending');
+  const completedOrders = filteredOrders.filter(o => o.status === 'completed');
+  const pendingOrders = filteredOrders.filter(o => o.status === 'pending');
   
   // Calculate funnel
-  const startedRepairProcess = orders.length;
-  const confirmedOrders = orders.filter(o => 
+  const startedRepairProcess = filteredOrders.length;
+  const confirmedOrders = filteredOrders.filter(o => 
     !['pending'].includes(o.status)
   ).length;
 
   // Calculate average rating
-  const ratedOrders = orders.filter(o => o.rating);
+  const ratedOrders = filteredOrders.filter(o => o.rating);
   const avgRating = ratedOrders.length > 0 
     ? (ratedOrders.reduce((sum, o) => sum + (o.rating || 0), 0) / ratedOrders.length).toFixed(1)
     : '--';
@@ -122,22 +132,25 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
   return (
     <div className="flex-1 p-4 md:p-6 overflow-y-auto pb-24 md:pb-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-foreground">אנליטיקס</h2>
           <p className="text-sm text-muted-foreground">
             עודכן לאחרונה: {lastUpdated.toLocaleTimeString('he-IL')}
           </p>
         </div>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => setLastUpdated(new Date())}
-          className="gap-2"
-        >
-          <RefreshCw className="w-4 h-4" />
-          רענן
-        </Button>
+        <div className="flex items-center gap-2">
+          <DateRangePicker value={dateRange} onChange={setDateRange} />
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setLastUpdated(new Date())}
+            className="gap-2"
+          >
+            <RefreshCw className="w-4 h-4" />
+            רענן
+          </Button>
+        </div>
       </div>
 
       {/* Real-time Section */}
@@ -226,7 +239,7 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
       <Card className="p-4">
         <h3 className="font-semibold mb-4 flex items-center gap-2">
           <Smartphone className="w-5 h-5 text-primary" />
-          סטטיסטיקות הזמנות
+          סטטיסטיקות הזמנות ({dateRange.label})
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center p-3 bg-muted/50 rounded-lg">
@@ -234,8 +247,8 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
             <p className="text-xs text-muted-foreground">הזמנות היום</p>
           </div>
           <div className="text-center p-3 bg-muted/50 rounded-lg">
-            <p className="text-3xl font-bold text-accent">{weekOrders.length}</p>
-            <p className="text-xs text-muted-foreground">הזמנות השבוע</p>
+            <p className="text-3xl font-bold text-accent">{periodOrders.length}</p>
+            <p className="text-xs text-muted-foreground">בתקופה</p>
           </div>
           <div className="text-center p-3 bg-muted/50 rounded-lg">
             <p className="text-3xl font-bold text-success">{completedOrders.length}</p>
