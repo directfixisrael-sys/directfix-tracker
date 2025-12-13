@@ -1,19 +1,56 @@
+import { useState, useEffect } from 'react';
 import { RepairOrder } from '@/types/repair';
 import { Smartphone, Wrench, Gift, Shield } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Promotion {
+  id: string;
+  title: string;
+  description: string;
+  badge_text: string | null;
+  icon: string | null;
+}
 
 interface OrderSummaryProps {
   order: RepairOrder;
 }
 
 const OrderSummary = ({ order }: OrderSummaryProps) => {
+  const [activePromotion, setActivePromotion] = useState<Promotion | null>(null);
+
+  useEffect(() => {
+    const loadPromotion = async () => {
+      const { data } = await supabase
+        .from('promotions')
+        .select('*')
+        .eq('is_active', true)
+        .limit(1)
+        .single();
+      
+      if (data) {
+        setActivePromotion(data);
+      }
+    };
+    loadPromotion();
+  }, []);
+
   const accessoriesTotal = order.accessories
     .filter(a => a.selected)
     .reduce((sum, a) => sum + a.price, 0);
   
   const totalPrice = order.repairPrice + accessoriesTotal;
 
-  // Check if this is a December order (for promotion)
-  const isDecemberPromotion = true; // Active promotion
+  const getPromotionIcon = (icon: string | null) => {
+    switch (icon) {
+      case 'gift': return '🎁';
+      case 'tag': return '🏷️';
+      case 'sparkles': return '✨';
+      case 'percent': return '💯';
+      case 'fire': return '🔥';
+      case 'star': return '⭐';
+      default: return '🎁';
+    }
+  };
 
   return (
     <div className="wolt-card p-5 animate-slide-up" style={{ animationDelay: '0.3s' }}>
@@ -40,17 +77,19 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
           </div>
         </div>
 
-        {/* Promotion Banner */}
-        {isDecemberPromotion && (
+        {/* Active Promotion Banner - Dynamic from DB */}
+        {activePromotion && (
           <div className="flex items-center gap-4 bg-gradient-to-r from-amber-500/10 via-orange-500/15 to-amber-500/10 rounded-xl p-3 border border-amber-500/20">
             <div className="w-11 h-11 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
               <Gift className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">🎉 מבצע דצמבר!</p>
+              <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                {getPromotionIcon(activePromotion.icon)} {activePromotion.title}
+              </p>
               <div className="flex items-center gap-1.5">
                 <Shield className="w-3.5 h-3.5 text-amber-500" />
-                <p className="font-semibold text-foreground">מגן מסך במתנה</p>
+                <p className="font-semibold text-foreground">{activePromotion.description}</p>
               </div>
             </div>
           </div>
@@ -80,11 +119,11 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
           </div>
         ))}
 
-        {isDecemberPromotion && (
+        {activePromotion && (
           <div className="flex justify-between text-sm">
             <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1">
               <Gift className="w-3 h-3" />
-              מגן מסך (מבצע)
+              {activePromotion.description} (מבצע)
             </span>
             <span className="font-medium text-success">חינם!</span>
           </div>
