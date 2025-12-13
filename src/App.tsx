@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AccessibilityWidget } from "@/components/AccessibilityWidget";
 import Index from "./pages/Index";
 import CustomerTracker from "./pages/CustomerTracker";
 import AdminPanel from "./pages/AdminPanel";
@@ -22,6 +23,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <AccessibilityWidget />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/track" element={<CustomerTracker />} />

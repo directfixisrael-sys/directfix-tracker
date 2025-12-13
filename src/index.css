@@ -102,6 +102,36 @@
   * {
     font-family: 'Rubik', sans-serif;
   }
+
+  /* High Contrast Mode */
+  html.high-contrast {
+    filter: contrast(1.25);
+  }
+  
+  html.high-contrast body {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+  }
+  
+  html.high-contrast.dark body {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+  }
+
+  /* Reduce Animations */
+  html.reduce-animations *,
+  html.reduce-animations *::before,
+  html.reduce-animations *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Large Pointer */
+  html.large-pointer,
+  html.large-pointer * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' stroke='%23fff' stroke-width='1' d='M5.5 3.21V20.8l4.86-4.86h6.21L5.5 3.21z'/%3E%3C/svg%3E") 0 0, auto !important;
+  }
 }
 
 @layer components {
