@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
@@ -91,6 +92,8 @@ const NewRepairOrder = () => {
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
   const [customerNotes, setCustomerNotes] = useState('');
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+  const [acceptContact, setAcceptContact] = useState(false);
 
   // Helper to get promotion icon
   const getPromotionIcon = (icon: string | null) => {
@@ -694,6 +697,31 @@ const NewRepairOrder = () => {
               </div>
             </div>
 
+            {/* Consent Checkboxes */}
+            <div className="space-y-3 mt-4 pt-4 border-t border-border">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <Checkbox 
+                  checked={acceptPrivacy} 
+                  onCheckedChange={(checked) => setAcceptPrivacy(checked === true)}
+                  className="mt-0.5"
+                />
+                <span className="text-xs text-muted-foreground leading-relaxed">
+                  אני מאשר/ת שקראתי והסכמתי ל<span className="text-primary font-medium">מדיניות הפרטיות</span> ו<span className="text-primary font-medium">תנאי השימוש</span>
+                </span>
+              </label>
+              
+              <label className="flex items-start gap-3 cursor-pointer">
+                <Checkbox 
+                  checked={acceptContact} 
+                  onCheckedChange={(checked) => setAcceptContact(checked === true)}
+                  className="mt-0.5"
+                />
+                <span className="text-xs text-muted-foreground leading-relaxed">
+                  אני מסכים/ה לקבל עדכונים בוואטסאפ או בשיחת טלפון לגבי התיקון ולאחריו
+                </span>
+              </label>
+            </div>
+
             <Card className="p-3 bg-muted/30">
               <div className="flex justify-between items-center text-xs">
                 <span>{selectedModel?.name} • {getRepairTypeName()}</span>
@@ -768,7 +796,7 @@ const NewRepairOrder = () => {
               המשך לפרטים
             </Button>}
           
-          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full h-12 text-base rounded-xl">
+          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact} className="w-full h-12 text-base rounded-xl">
               {isSubmitting ? <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   שולח...
