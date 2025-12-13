@@ -341,8 +341,8 @@ const NewRepairOrder = () => {
                 <Gift className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-xs font-bold text-amber-600 dark:text-amber-400">🎄 מבצע דצמבר</p>
-                <p className="text-xs text-muted-foreground">מגן מסך במתנה על כל תיקון!</p>
+                <p className="font-bold text-amber-600 dark:text-amber-400 text-base">מבצע דצמבר!</p>
+                <p className="text-xs font-medium text-secondary-foreground">קבלו מגן מסך במתנה על כל תיקון!</p>
               </div>
             </div>
           </div>}
@@ -350,14 +350,12 @@ const NewRepairOrder = () => {
         {/* Step 1: Select Model */}
         {step === 'model' && <div className="space-y-3 animate-fade-in">
             <div className="text-center mb-4">
-              <div className="flex justify-center mb-3">
-                <PhoneIllustration animate />
-              </div>
-              <h2 className="text-lg font-bold mb-1">בחר דגם</h2>
+              
+              <h2 className="font-bold mb-1 text-center text-xl">בחר דגם</h2>
               <p className="text-muted-foreground text-sm">איזה מכשיר צריך תיקון?</p>
             </div>
 
-            <Input placeholder="🔍 חפש דגם..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="h-10 text-sm rounded-xl" />
+            
 
             <div className="grid grid-cols-2 gap-2 max-h-[55vh] overflow-y-auto">
               {filteredModels.map((model, index) => <Card key={model.id} onClick={() => handleModelSelect(model)} className="p-3 cursor-pointer hover:border-primary hover:shadow-lg transition-all duration-200 active:scale-95" style={{
@@ -367,7 +365,7 @@ const NewRepairOrder = () => {
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                       <Smartphone className="w-5 h-5 text-primary" />
                     </div>
-                    <span className="font-medium text-xs leading-tight">{model.name}</span>
+                    <span className="font-medium leading-tight text-sm">{model.name}</span>
                   </div>
                 </Card>)}
             </div>
