@@ -42,7 +42,8 @@ import {
   Search,
   Phone,
   MapPin,
-  ArrowUpDown
+  ArrowUpDown,
+  Gift
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -1231,6 +1232,18 @@ ${trackingUrl}
             <span className="text-[10px]">משוב</span>
           </button>
           <button 
+            onClick={() => setActiveTab('promotions')}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
+              activeTab === 'promotions' 
+                ? "bg-primary/10 text-primary" 
+                : "text-muted-foreground"
+            )}
+          >
+            <Gift className="w-5 h-5" />
+            <span className="text-[10px]">מבצעים</span>
+          </button>
+          <button 
             onClick={() => setActiveTab('settings')}
             className={cn(
               "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
@@ -1376,6 +1389,18 @@ ${trackingUrl}
               );
             })()}
           </button>
+          <button 
+            onClick={() => setActiveTab('promotions')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'promotions' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <Gift className="w-5 h-5" />
+            <span>מבצעים</span>
+          </button>
         </nav>
 
         {/* Back to home link */}
@@ -1402,6 +1427,7 @@ ${trackingUrl}
               {activeTab === 'settings' && 'הגדרות'}
               {activeTab === 'feedback' && 'משוב לקוחות'}
               {activeTab === 'analytics' && 'אנליטיקס'}
+              {activeTab === 'promotions' && 'ניהול מבצעים'}
             </h1>
             <p className="text-xs md:text-sm text-muted-foreground">
               {activeTab === 'orders' && `${orders.length} הזמנות`}

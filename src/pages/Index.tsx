@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Smartphone, Settings, Wrench, Sparkles, ShoppingBag } from 'lucide-react';
+import { Smartphone, Wrench, Sparkles } from 'lucide-react';
 import logo from '@/assets/logo.png';
 
 const Index = () => {
@@ -41,18 +41,6 @@ const Index = () => {
             >
               <Smartphone className="w-5 h-5" />
               עקוב אחר התיקון שלך
-            </Button>
-
-            {/* Device Purchase Button */}
-            <Button 
-              variant="outline"
-              size="lg" 
-              className="w-full h-14 text-base font-semibold rounded-xl gap-3 border-2 bg-gradient-to-l from-accent/10 to-primary/10 border-primary/30 hover:border-primary/50"
-              onClick={() => navigate('/devices')}
-            >
-              <ShoppingBag className="w-5 h-5 text-primary" />
-              <span>קניית מכשירים</span>
-              <span className="text-xs bg-success text-success-foreground px-2 py-0.5 rounded-full">חדש!</span>
             </Button>
           </div>
         </div>
