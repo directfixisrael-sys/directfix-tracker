@@ -127,9 +127,21 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // 2. Send WhatsApp to customer and business owner
+    console.log("Twilio config check:", {
+      hasSid: !!twilioAccountSid,
+      hasToken: !!twilioAuthToken,
+      hasWhatsAppNumber: !!twilioWhatsAppNumber,
+      whatsAppNumber: twilioWhatsAppNumber
+    });
+
     if (twilioAccountSid && twilioAuthToken && twilioWhatsAppNumber) {
       const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
       const authString = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
+
+      // Format the From number - ensure it has + prefix
+      const fromNumber = twilioWhatsAppNumber.startsWith('+') 
+        ? twilioWhatsAppNumber 
+        : `+${twilioWhatsAppNumber}`;
 
       // 2a. Send WhatsApp to customer
       try {
@@ -138,6 +150,14 @@ const handler = async (req: Request): Promise<Response> => {
         if (formattedPhone.startsWith('0')) {
           formattedPhone = '972' + formattedPhone.slice(1);
         }
+        if (!formattedPhone.startsWith('972')) {
+          formattedPhone = '972' + formattedPhone;
+        }
+
+        console.log("Sending WhatsApp to customer:", {
+          from: `whatsapp:${fromNumber}`,
+          to: `whatsapp:+${formattedPhone}`
+        });
 
         const customerWhatsappMessage = `🎉 *ההזמנה התקבלה!*
 
@@ -163,7 +183,7 @@ ${orderData.promotionTitle ? `🎁 *${orderData.promotionTitle}*\n` : ''}
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           body: new URLSearchParams({
-            From: `whatsapp:${twilioWhatsAppNumber}`,
+            From: `whatsapp:${fromNumber}`,
             To: `whatsapp:+${formattedPhone}`,
             Body: customerWhatsappMessage,
           }),
@@ -171,7 +191,7 @@ ${orderData.promotionTitle ? `🎁 *${orderData.promotionTitle}*\n` : ''}
 
         const customerWhatsappResult = await customerWhatsappResponse.json();
         results.whatsapp = customerWhatsappResult;
-        console.log("Customer WhatsApp sent:", customerWhatsappResult);
+        console.log("Customer WhatsApp response:", JSON.stringify(customerWhatsappResult));
       } catch (whatsappError: unknown) {
         console.error("Error sending customer WhatsApp:", whatsappError);
         const errorMessage = whatsappError instanceof Error ? whatsappError.message : 'Unknown error';
@@ -180,6 +200,11 @@ ${orderData.promotionTitle ? `🎁 *${orderData.promotionTitle}*\n` : ''}
 
       // 2b. Send WhatsApp to business owner
       try {
+        console.log("Sending WhatsApp to business:", {
+          from: `whatsapp:${fromNumber}`,
+          to: `whatsapp:+${businessPhone}`
+        });
+
         const businessWhatsappMessage = `🔔 *הזמנה חדשה!*
 
 👤 *לקוח:* ${orderData.customerName}
@@ -200,7 +225,7 @@ ${orderData.notes ? `📝 *הערות:* ${orderData.notes}\n` : ''}${orderData.p
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           body: new URLSearchParams({
-            From: `whatsapp:${twilioWhatsAppNumber}`,
+            From: `whatsapp:${fromNumber}`,
             To: `whatsapp:+${businessPhone}`,
             Body: businessWhatsappMessage,
           }),
@@ -208,12 +233,15 @@ ${orderData.notes ? `📝 *הערות:* ${orderData.notes}\n` : ''}${orderData.p
 
         const businessWhatsappResult = await businessWhatsappResponse.json();
         results.businessWhatsapp = businessWhatsappResult;
-        console.log("Business WhatsApp sent:", businessWhatsappResult);
+        console.log("Business WhatsApp response:", JSON.stringify(businessWhatsappResult));
       } catch (businessWhatsappError: unknown) {
         console.error("Error sending business WhatsApp:", businessWhatsappError);
         const errorMessage = businessWhatsappError instanceof Error ? businessWhatsappError.message : 'Unknown error';
         results.businessWhatsapp = { error: errorMessage };
       }
+    } else {
+      console.log("Twilio WhatsApp not configured - missing credentials");
+      results.whatsapp = { error: "Twilio not configured" };
     }
 
     // 3. Send confirmation email to customer (if email provided)
