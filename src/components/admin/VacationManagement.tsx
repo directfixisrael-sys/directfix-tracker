@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Calendar, Plus, Trash2, Loader2 } from 'lucide-react';
+import { Calendar, Plus, Trash2, Loader2, CalendarRange } from 'lucide-react';
 
 interface BlockedDate {
   id: string;
@@ -17,8 +19,10 @@ const VacationManagement = () => {
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [newDate, setNewDate] = useState('');
+  const [newEndDate, setNewEndDate] = useState('');
   const [newReason, setNewReason] = useState('');
   const [isAdding, setIsAdding] = useState(false);
+  const [isDateRange, setIsDateRange] = useState(false);
 
   useEffect(() => {
     loadBlockedDates();
@@ -47,19 +51,51 @@ const VacationManagement = () => {
       return;
     }
 
+    if (isDateRange && !newEndDate) {
+      toast.error('אנא בחר תאריך סיום');
+      return;
+    }
+
+    if (isDateRange && new Date(newEndDate) < new Date(newDate)) {
+      toast.error('תאריך הסיום חייב להיות אחרי תאריך ההתחלה');
+      return;
+    }
+
     setIsAdding(true);
     try {
-      const { error } = await supabase
-        .from('blocked_dates')
-        .insert({
-          date: newDate,
-          reason: newReason || null,
-        });
+      if (isDateRange) {
+        // Generate all dates in range
+        const dates: { date: string; reason: string | null }[] = [];
+        const start = new Date(newDate);
+        const end = new Date(newEndDate);
+        
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          dates.push({
+            date: d.toISOString().split('T')[0],
+            reason: newReason || null,
+          });
+        }
 
-      if (error) throw error;
+        const { error } = await supabase
+          .from('blocked_dates')
+          .insert(dates);
 
-      toast.success('התאריך נחסם בהצלחה');
+        if (error) throw error;
+        toast.success(`${dates.length} תאריכים נחסמו בהצלחה`);
+      } else {
+        const { error } = await supabase
+          .from('blocked_dates')
+          .insert({
+            date: newDate,
+            reason: newReason || null,
+          });
+
+        if (error) throw error;
+        toast.success('התאריך נחסם בהצלחה');
+      }
+
       setNewDate('');
+      setNewEndDate('');
       setNewReason('');
       loadBlockedDates();
     } catch (error) {
@@ -123,10 +159,26 @@ const VacationManagement = () => {
           <Calendar className="w-5 h-5 text-primary" />
           הוסף תאריך חסום / חופשה
         </h3>
+        
+        {/* Toggle for date range */}
+        <div className="flex items-center gap-3 mb-4 p-3 bg-muted/50 rounded-lg">
+          <CalendarRange className="w-4 h-4 text-muted-foreground" />
+          <Label htmlFor="date-range" className="text-sm cursor-pointer flex-1">
+            טווח תאריכים (מתאריך עד תאריך)
+          </Label>
+          <Switch
+            id="date-range"
+            checked={isDateRange}
+            onCheckedChange={setIsDateRange}
+          />
+        </div>
+
         <div className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="text-sm text-muted-foreground mb-1 block">תאריך</label>
+              <label className="text-sm text-muted-foreground mb-1 block">
+                {isDateRange ? 'מתאריך' : 'תאריך'}
+              </label>
               <Input
                 type="date"
                 value={newDate}
@@ -134,18 +186,29 @@ const VacationManagement = () => {
                 min={new Date().toISOString().split('T')[0]}
               />
             </div>
-            <div>
-              <label className="text-sm text-muted-foreground mb-1 block">סיבה (לא חובה)</label>
-              <Input
-                placeholder="למשל: חופשה, חג..."
-                value={newReason}
-                onChange={(e) => setNewReason(e.target.value)}
-              />
-            </div>
+            {isDateRange && (
+              <div>
+                <label className="text-sm text-muted-foreground mb-1 block">עד תאריך</label>
+                <Input
+                  type="date"
+                  value={newEndDate}
+                  onChange={(e) => setNewEndDate(e.target.value)}
+                  min={newDate || new Date().toISOString().split('T')[0]}
+                />
+              </div>
+            )}
+          </div>
+          <div>
+            <label className="text-sm text-muted-foreground mb-1 block">סיבה (לא חובה)</label>
+            <Input
+              placeholder="למשל: חופשה, חג..."
+              value={newReason}
+              onChange={(e) => setNewReason(e.target.value)}
+            />
           </div>
           <Button 
             onClick={handleAddBlockedDate}
-            disabled={isAdding || !newDate}
+            disabled={isAdding || !newDate || (isDateRange && !newEndDate)}
             className="w-full md:w-auto"
           >
             {isAdding ? (
@@ -153,7 +216,7 @@ const VacationManagement = () => {
             ) : (
               <Plus className="w-4 h-4 ml-2" />
             )}
-            הוסף תאריך חסום
+            {isDateRange ? 'הוסף טווח תאריכים' : 'הוסף תאריך חסום'}
           </Button>
         </div>
       </Card>
@@ -161,7 +224,7 @@ const VacationManagement = () => {
       {/* Future blocked dates */}
       {futureDates.length > 0 && (
         <div>
-          <h3 className="font-semibold mb-3 text-foreground">תאריכים חסומים קרובים</h3>
+          <h3 className="font-semibold mb-3 text-foreground">תאריכים חסומים קרובים ({futureDates.length})</h3>
           <div className="space-y-2">
             {futureDates.map((blockedDate) => (
               <Card key={blockedDate.id} className="p-3 flex items-center justify-between">

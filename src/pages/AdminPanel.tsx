@@ -54,6 +54,7 @@ import AdminLiveChat from '@/components/AdminLiveChat';
 import PullToRefresh from '@/components/PullToRefresh';
 import PriceManagement from '@/components/admin/PriceManagement';
 import VacationManagement from '@/components/admin/VacationManagement';
+import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -843,90 +844,7 @@ ${trackingUrl}
         );
 
       case 'analytics':
-        // Check if viewer is active - must have isViewing=true AND lastViewedAt within last 2 minutes
-        const now = new Date();
-        const viewingOrders = orders.filter(o => {
-          if (!o.isViewing || !o.lastViewedAt) return false;
-          const lastViewed = new Date(o.lastViewedAt);
-          const diffMs = now.getTime() - lastViewed.getTime();
-          const diffMinutes = diffMs / (1000 * 60);
-          return diffMinutes < 2; // Active if viewed within last 2 minutes
-        });
-        const completedOrders = orders.filter(o => o.status === 'completed');
-        const pendingOrders = orders.filter(o => o.status === 'pending');
-        
-        return (
-          <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
-            <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">אנליטיקס</h2>
-            
-            {/* Stats cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
-              <div className="glass-card p-5 rounded-xl">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Smartphone className="w-6 h-6 text-primary" />
-                  </div>
-                  <span className="text-muted-foreground text-base">סה"כ הזמנות</span>
-                </div>
-                <p className="text-4xl font-bold text-foreground">{orders.length}</p>
-              </div>
-              
-              <div className="glass-card p-5 rounded-xl">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 bg-success/10 rounded-lg flex items-center justify-center">
-                    <Activity className="w-6 h-6 text-success" />
-                  </div>
-                  <span className="text-muted-foreground text-base">הושלמו</span>
-                </div>
-                <p className="text-4xl font-bold text-success">{completedOrders.length}</p>
-              </div>
-              
-              <div className="glass-card p-5 rounded-xl">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 bg-warning/10 rounded-lg flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-warning" />
-                  </div>
-                  <span className="text-muted-foreground text-base">ממתינות</span>
-                </div>
-                <p className="text-4xl font-bold text-warning">{pendingOrders.length}</p>
-              </div>
-            </div>
-
-            {/* Live viewing */}
-            <div className="glass-card p-5 rounded-xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-3 h-3 bg-success rounded-full animate-pulse" />
-                <h3 className="font-bold text-foreground text-lg">צופים כרגע בעמוד המעקב</h3>
-                <span className="bg-success/10 text-success px-3 py-1 rounded-full">
-                  {viewingOrders.length} לקוחות
-                </span>
-              </div>
-              
-              {viewingOrders.length === 0 ? (
-                <p className="text-muted-foreground">אין לקוחות שצופים כרגע</p>
-              ) : (
-                <div className="space-y-3">
-                  {viewingOrders.map((order) => (
-                    <div key={order.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <Eye className="w-5 h-5 text-success" />
-                        <div>
-                          <p className="font-medium text-foreground text-base">{order.customerName}</p>
-                          <p className="text-sm text-muted-foreground">{order.deviceType}</p>
-                        </div>
-                      </div>
-                      <div className="text-left">
-                        <span className={cn("status-badge text-xs", getStatusColor(order.status))}>
-                          {statusLabels[order.status]}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        );
+        return <AnalyticsDashboard orders={orders} />;
 
       default: // orders
         const ordersList = (
@@ -1323,8 +1241,8 @@ ${trackingUrl}
         </div>
       </nav>
 
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 bg-sidebar border-l border-sidebar-border flex-col">
+      {/* Desktop Sidebar - Fixed */}
+      <aside className="hidden md:flex w-64 bg-sidebar border-l border-sidebar-border flex-col fixed right-0 top-0 h-screen z-40">
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -1467,8 +1385,8 @@ ${trackingUrl}
         </div>
       </aside>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col">
+      {/* Main content - with margin for fixed sidebar */}
+      <div className="flex-1 flex flex-col md:mr-64">
         {/* Header */}
         <header className="bg-card border-b border-border px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
           <div>
