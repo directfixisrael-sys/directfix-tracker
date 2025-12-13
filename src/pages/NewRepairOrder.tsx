@@ -349,15 +349,9 @@ const NewRepairOrder = () => {
 
         {/* Step 1: Select Model */}
         {step === 'model' && <div className="space-y-3 animate-fade-in">
-            <div className="text-center mb-4">
-              
-              <h2 className="font-bold mb-1 text-center text-xl">בחר דגם</h2>
-              <p className="text-muted-foreground text-sm">איזה מכשיר צריך תיקון?</p>
-            </div>
+            <p className="text-muted-foreground text-xs text-center">בחר את המכשיר לתיקון</p>
 
-            
-
-            <div className="grid grid-cols-2 gap-2 max-h-[55vh] overflow-y-auto">
+            <div className="grid grid-cols-2 gap-2">
               {filteredModels.map((model, index) => <Card key={model.id} onClick={() => handleModelSelect(model)} className="p-3 cursor-pointer hover:border-primary hover:shadow-lg transition-all duration-200 active:scale-95" style={{
             animationDelay: `${index * 30}ms`
           }}>
