@@ -61,6 +61,7 @@ const NewRepairOrder = () => {
   const [step, setStep] = useState<Step>('model');
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
+  const [blockedDates, setBlockedDates] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedModel, setSelectedModel] = useState<IphoneModel | null>(null);
   const [selectedRepair, setSelectedRepair] = useState<RepairType | null>(null);
@@ -86,13 +87,15 @@ const NewRepairOrder = () => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [modelsRes, repairsRes] = await Promise.all([
+        const [modelsRes, repairsRes, blockedRes] = await Promise.all([
           supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'),
           supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'),
+          supabase.from('blocked_dates').select('date'),
         ]);
 
         if (modelsRes.data) setModels(modelsRes.data);
         if (repairsRes.data) setRepairTypes(repairsRes.data);
+        if (blockedRes.data) setBlockedDates(blockedRes.data.map(d => d.date));
       } catch (error) {
         console.error('Error loading data:', error);
         toast.error('שגיאה בטעינת הנתונים');
@@ -104,14 +107,18 @@ const NewRepairOrder = () => {
     loadData();
   }, []);
 
-  // Get available dates (next 7 days)
+  // Get available dates (next 7 days, excluding blocked dates)
   const getAvailableDates = () => {
     const dates: Date[] = [];
     const today = new Date();
     for (let i = 0; i < 7; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
-      dates.push(date);
+      // Check if this date is blocked
+      const dateStr = date.toISOString().split('T')[0];
+      if (!blockedDates.includes(dateStr)) {
+        dates.push(date);
+      }
     }
     return dates;
   };
@@ -296,7 +303,7 @@ const NewRepairOrder = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border z-10">
         <div className="flex items-center justify-between p-3">
@@ -380,7 +387,7 @@ const NewRepairOrder = () => {
       )}
 
       {/* Content */}
-      <div className={`p-4 transition-all duration-200 ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
+      <div className={`flex-1 p-4 pb-24 overflow-y-auto transition-all duration-200 ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
         
         {/* December Promotion Banner */}
         {step === 'model' && (
@@ -415,7 +422,7 @@ const NewRepairOrder = () => {
               className="h-10 text-sm rounded-xl"
             />
 
-            <div className="grid grid-cols-2 gap-2 max-h-[55vh] overflow-y-auto pb-16">
+            <div className="grid grid-cols-2 gap-2 max-h-[55vh] overflow-y-auto">
               {filteredModels.map((model, index) => (
                 <Card
                   key={model.id}
@@ -584,13 +591,6 @@ const NewRepairOrder = () => {
                 </p>
               </div>
             </div>
-
-            <Button 
-              onClick={handlePriceConfirm}
-              className="w-full h-12 text-base rounded-xl"
-            >
-              אישור והמשך
-            </Button>
           </div>
         )}
 
@@ -680,14 +680,6 @@ const NewRepairOrder = () => {
                 </p>
               </Card>
             )}
-
-            <Button 
-              onClick={handleScheduleConfirm}
-              disabled={!selectedDate || !selectedTimeSlot}
-              className="w-full h-12 text-base rounded-xl"
-            >
-              המשך לפרטים
-            </Button>
           </div>
         )}
 
@@ -760,21 +752,6 @@ const NewRepairOrder = () => {
                 {formatSelectedDateTime()}
               </div>
             </Card>
-
-            <Button 
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="w-full h-12 text-base rounded-xl"
-            >
-              {isSubmitting ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  שולח...
-                </div>
-              ) : (
-                'שלח הזמנה'
-              )}
-            </Button>
           </div>
         )}
 
@@ -837,6 +814,47 @@ const NewRepairOrder = () => {
           </div>
         )}
       </div>
+
+      {/* Sticky Footer with Action Buttons */}
+      {step !== 'success' && step !== 'model' && step !== 'repair' && (
+        <div className="sticky bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border p-4 safe-area-pb">
+          {step === 'price' && (
+            <Button 
+              onClick={handlePriceConfirm}
+              className="w-full h-12 text-base rounded-xl"
+            >
+              אישור והמשך
+            </Button>
+          )}
+          
+          {step === 'schedule' && (
+            <Button 
+              onClick={handleScheduleConfirm}
+              disabled={!selectedDate || !selectedTimeSlot}
+              className="w-full h-12 text-base rounded-xl"
+            >
+              המשך לפרטים
+            </Button>
+          )}
+          
+          {step === 'details' && (
+            <Button 
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="w-full h-12 text-base rounded-xl"
+            >
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                  שולח...
+                </div>
+              ) : (
+                'שלח הזמנה'
+              )}
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 };
