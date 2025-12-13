@@ -265,6 +265,28 @@ const NewRepairOrder = () => {
         notes,
         wantsPromotions: false
       });
+
+      // Send notifications (email + WhatsApp)
+      try {
+        await supabase.functions.invoke('send-order-notifications', {
+          body: {
+            customerName: customerName.trim(),
+            customerPhone: customerPhone.trim(),
+            customerAddress: customerAddress.trim(),
+            deviceType: selectedModel?.name || '',
+            repairType: getRepairTypeName(),
+            repairPrice: getPrice(),
+            scheduledTime: scheduleNote,
+            notes: customerNotes.trim(),
+            promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined
+          }
+        });
+        console.log('Notifications sent successfully');
+      } catch (notificationError) {
+        console.error('Error sending notifications:', notificationError);
+        // Don't fail the order if notifications fail
+      }
+
       goToStep('success');
     } catch (error) {
       toast.error('אירעה שגיאה, נסה שוב');
