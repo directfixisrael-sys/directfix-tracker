@@ -46,7 +46,10 @@ const handler = async (req: Request): Promise<Response> => {
     const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
     const twilioWhatsAppNumber = Deno.env.get("TWILIO_WHATSAPP_NUMBER");
 
-    const results: { email?: unknown; whatsapp?: unknown; customerEmail?: unknown } = {};
+    const results: { email?: unknown; whatsapp?: unknown; customerEmail?: unknown; businessWhatsapp?: unknown } = {};
+
+    // Business owner phone number
+    const businessPhone = "972528692886";
 
     // 1. Send email to business owner
     const businessEmailHtml = `
@@ -123,8 +126,12 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
-    // 2. Send WhatsApp to customer
+    // 2. Send WhatsApp to customer and business owner
     if (twilioAccountSid && twilioAuthToken && twilioWhatsAppNumber) {
+      const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
+      const authString = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
+
+      // 2a. Send WhatsApp to customer
       try {
         // Format phone number for WhatsApp (Israel format)
         let formattedPhone = orderData.customerPhone.replace(/\D/g, '');
@@ -132,7 +139,7 @@ const handler = async (req: Request): Promise<Response> => {
           formattedPhone = '972' + formattedPhone.slice(1);
         }
 
-        const whatsappMessage = `🎉 *ההזמנה התקבלה!*
+        const customerWhatsappMessage = `🎉 *ההזמנה התקבלה!*
 
 היי ${orderData.customerName}! 👋
 
@@ -149,10 +156,7 @@ ${orderData.promotionTitle ? `🎁 *${orderData.promotionTitle}*\n` : ''}
 
 לכל שאלה - אנחנו כאן! 📞`;
 
-        const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
-        const authString = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
-
-        const whatsappResponse = await fetch(twilioUrl, {
+        const customerWhatsappResponse = await fetch(twilioUrl, {
           method: 'POST',
           headers: {
             'Authorization': `Basic ${authString}`,
@@ -161,17 +165,54 @@ ${orderData.promotionTitle ? `🎁 *${orderData.promotionTitle}*\n` : ''}
           body: new URLSearchParams({
             From: `whatsapp:${twilioWhatsAppNumber}`,
             To: `whatsapp:+${formattedPhone}`,
-            Body: whatsappMessage,
+            Body: customerWhatsappMessage,
           }),
         });
 
-        const whatsappResult = await whatsappResponse.json();
-        results.whatsapp = whatsappResult;
-        console.log("WhatsApp sent:", whatsappResult);
+        const customerWhatsappResult = await customerWhatsappResponse.json();
+        results.whatsapp = customerWhatsappResult;
+        console.log("Customer WhatsApp sent:", customerWhatsappResult);
       } catch (whatsappError: unknown) {
-        console.error("Error sending WhatsApp:", whatsappError);
+        console.error("Error sending customer WhatsApp:", whatsappError);
         const errorMessage = whatsappError instanceof Error ? whatsappError.message : 'Unknown error';
         results.whatsapp = { error: errorMessage };
+      }
+
+      // 2b. Send WhatsApp to business owner
+      try {
+        const businessWhatsappMessage = `🔔 *הזמנה חדשה!*
+
+👤 *לקוח:* ${orderData.customerName}
+📞 *טלפון:* ${orderData.customerPhone}
+📍 *כתובת:* ${orderData.customerAddress}
+
+📱 *דגם:* ${orderData.deviceType}
+🔧 *תיקון:* ${orderData.repairType}
+💰 *מחיר:* ₪${orderData.repairPrice}
+📅 *מועד:* ${orderData.scheduledTime}
+
+${orderData.notes ? `📝 *הערות:* ${orderData.notes}\n` : ''}${orderData.promotionTitle ? `🎁 *מבצע:* ${orderData.promotionTitle}` : ''}`;
+
+        const businessWhatsappResponse = await fetch(twilioUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${authString}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            From: `whatsapp:${twilioWhatsAppNumber}`,
+            To: `whatsapp:+${businessPhone}`,
+            Body: businessWhatsappMessage,
+          }),
+        });
+
+        const businessWhatsappResult = await businessWhatsappResponse.json();
+        results.businessWhatsapp = businessWhatsappResult;
+        console.log("Business WhatsApp sent:", businessWhatsappResult);
+      } catch (businessWhatsappError: unknown) {
+        console.error("Error sending business WhatsApp:", businessWhatsappError);
+        const errorMessage = businessWhatsappError instanceof Error ? businessWhatsappError.message : 'Unknown error';
+        results.businessWhatsapp = { error: errorMessage };
       }
     }
 
