@@ -110,7 +110,7 @@ const handler = async (req: Request): Promise<Response> => {
         const businessEmail = await sendEmail(
           resendApiKey,
           "iPhix <onboarding@resend.dev>",
-          ["your-email@example.com"], // יש להחליף למייל שלך
+          ["eliran.nissim@me.com"],
           `🎉 הזמנה חדשה - ${orderData.customerName} - ${orderData.deviceType}`,
           businessEmailHtml
         );
