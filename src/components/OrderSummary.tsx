@@ -25,7 +25,7 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
         .select('*')
         .eq('is_active', true)
         .limit(1)
-        .single();
+        .maybeSingle();
       
       if (data) {
         setActivePromotion(data);

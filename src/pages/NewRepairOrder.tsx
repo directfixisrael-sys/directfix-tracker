@@ -110,16 +110,26 @@ const NewRepairOrder = () => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [modelsRes, repairsRes, blockedRes, promotionsRes] = await Promise.all([
+        const [modelsRes, repairsRes, blockedRes] = await Promise.all([
           supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), 
           supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), 
-          supabase.from('blocked_dates').select('date'),
-          supabase.from('promotions').select('*').eq('is_active', true).limit(1).single()
+          supabase.from('blocked_dates').select('date')
         ]);
         if (modelsRes.data) setModels(modelsRes.data);
         if (repairsRes.data) setRepairTypes(repairsRes.data);
         if (blockedRes.data) setBlockedDates(blockedRes.data.map(d => d.date));
-        if (promotionsRes.data) setActivePromotion(promotionsRes.data);
+        
+        // Load promotion separately to avoid error if none exists
+        const { data: promotionData } = await supabase
+          .from('promotions')
+          .select('*')
+          .eq('is_active', true)
+          .limit(1)
+          .maybeSingle();
+        
+        if (promotionData) {
+          setActivePromotion(promotionData);
+        }
       } catch (error) {
         console.error('Error loading data:', error);
         toast.error('שגיאה בטעינת הנתונים');
@@ -187,6 +197,8 @@ const NewRepairOrder = () => {
     setTimeout(() => {
       setStep(newStep);
       setIsAnimating(false);
+      // Scroll to top when changing steps
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 200);
   };
   const handleModelSelect = (model: IphoneModel) => {
