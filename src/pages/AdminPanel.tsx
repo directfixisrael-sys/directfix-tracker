@@ -53,6 +53,7 @@ import SwipeableOrderCard from '@/components/SwipeableOrderCard';
 import AdminLiveChat from '@/components/AdminLiveChat';
 import PullToRefresh from '@/components/PullToRefresh';
 import PriceManagement from '@/components/admin/PriceManagement';
+import VacationManagement from '@/components/admin/VacationManagement';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -733,6 +734,15 @@ ${trackingUrl}
             
             {/* Push Notifications */}
             <PushNotificationToggle />
+            
+            {/* Vacation Management */}
+            <div className="glass-card p-4 md:p-6 rounded-xl">
+              <h3 className="font-bold text-foreground mb-4 text-lg">ניהול ימי חופשה / חסימות</h3>
+              <p className="text-muted-foreground text-sm mb-4">
+                חסום תאריכים שבהם לא ניתן להזמין תיקונים (חופשות, חגים, ימים מלאים)
+              </p>
+              <VacationManagement />
+            </div>
             
             {/* Other settings */}
             <div className="glass-card p-6 rounded-xl">
