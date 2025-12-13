@@ -50,6 +50,13 @@ interface RepairType {
   icon: string;
   is_phone_only: boolean;
 }
+interface Promotion {
+  id: string;
+  title: string;
+  description: string;
+  badge_text: string | null;
+  icon: string | null;
+}
 type Step = 'model' | 'repair' | 'price' | 'schedule' | 'details' | 'success';
 const NewRepairOrder = () => {
   const navigate = useNavigate();
@@ -64,6 +71,7 @@ const NewRepairOrder = () => {
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
+  const [activePromotion, setActivePromotion] = useState<Promotion | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedModel, setSelectedModel] = useState<IphoneModel | null>(null);
   const [selectedRepair, setSelectedRepair] = useState<RepairType | null>(null);
@@ -84,15 +92,34 @@ const NewRepairOrder = () => {
   const [customerAddress, setCustomerAddress] = useState('');
   const [customerNotes, setCustomerNotes] = useState('');
 
+  // Helper to get promotion icon
+  const getPromotionIcon = (icon: string | null) => {
+    switch (icon) {
+      case 'gift': return '🎁';
+      case 'tag': return '🏷️';
+      case 'sparkles': return '✨';
+      case 'percent': return '💯';
+      case 'fire': return '🔥';
+      case 'star': return '⭐';
+      default: return '🎁';
+    }
+  };
+
   // Load data from database
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [modelsRes, repairsRes, blockedRes] = await Promise.all([supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), supabase.from('blocked_dates').select('date')]);
+        const [modelsRes, repairsRes, blockedRes, promotionsRes] = await Promise.all([
+          supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), 
+          supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), 
+          supabase.from('blocked_dates').select('date'),
+          supabase.from('promotions').select('*').eq('is_active', true).limit(1).single()
+        ]);
         if (modelsRes.data) setModels(modelsRes.data);
         if (repairsRes.data) setRepairTypes(repairsRes.data);
         if (blockedRes.data) setBlockedDates(blockedRes.data.map(d => d.date));
+        if (promotionsRes.data) setActivePromotion(promotionsRes.data);
       } catch (error) {
         console.error('Error loading data:', error);
         toast.error('שגיאה בטעינת הנתונים');
@@ -302,8 +329,8 @@ const NewRepairOrder = () => {
           </div>}
       </div>
 
-      {/* Gift Animation Overlay */}
-      {showGiftAnimation && <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm animate-fade-in">
+      {/* Gift Animation Overlay - Dynamic from DB */}
+      {showGiftAnimation && activePromotion && <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm animate-fade-in">
           <div className="text-center space-y-4">
             <div className="relative animate-bounce">
               <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-2xl mx-auto">
@@ -312,20 +339,20 @@ const NewRepairOrder = () => {
               <div className="absolute -top-2 -right-2 text-3xl animate-spin-slow">✨</div>
               <div className="absolute -bottom-2 -left-2 text-3xl animate-spin-slow" style={{
             animationDelay: '200ms'
-          }}>🎁</div>
+          }}>{getPromotionIcon(activePromotion.icon)}</div>
             </div>
             <div className="space-y-2 animate-scale-in" style={{
           animationDelay: '300ms'
         }}>
-              <h3 className="text-xl font-bold text-foreground">🎉 מבצע דצמבר!</h3>
+              <h3 className="text-xl font-bold text-foreground">{getPromotionIcon(activePromotion.icon)} {activePromotion.title}</h3>
               <div className="bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 rounded-xl p-4 border border-amber-500/30">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Shield className="w-6 h-6 text-amber-500" />
                   <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
-                    מגן מסך במתנה!
+                    {activePromotion.description}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground">על כל תיקון - מגן מסך איכותי בחינם</p>
+                <p className="text-sm text-muted-foreground">על כל תיקון</p>
               </div>
             </div>
           </div>
@@ -334,15 +361,15 @@ const NewRepairOrder = () => {
       {/* Content */}
       <div className={`flex-1 p-4 pb-24 overflow-y-auto transition-all duration-200 ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
         
-        {/* December Promotion Banner */}
-        {step === 'model' && <div className="mb-4 animate-fade-in">
+        {/* Promotion Banner - Dynamic from DB */}
+        {step === 'model' && activePromotion && <div className="mb-4 animate-fade-in">
             <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/15 to-amber-500/10 rounded-xl p-3 border border-amber-500/20 flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
                 <Gift className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="font-bold text-amber-600 dark:text-amber-400 text-base">מבצע דצמבר!</p>
-                <p className="text-xs font-medium text-secondary-foreground">קבלו מגן מסך במתנה על כל תיקון!</p>
+                <p className="font-bold text-amber-600 dark:text-amber-400 text-base">{activePromotion.title}</p>
+                <p className="text-xs font-medium text-secondary-foreground">{activePromotion.description}</p>
               </div>
             </div>
           </div>}
