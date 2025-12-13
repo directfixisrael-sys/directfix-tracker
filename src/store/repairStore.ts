@@ -275,28 +275,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
       console.error('Error adding order:', error);
     } else {
       console.log('Order added successfully:', data);
-      
-      // Send WhatsApp notification with tracking link
-      try {
-        const trackingUrl = `${window.location.origin}/track?phone=${encodeURIComponent(orderData.customerPhone)}`;
-        
-        const response = await supabase.functions.invoke('send-whatsapp', {
-          body: {
-            to: orderData.customerPhone,
-            customerName: orderData.customerName,
-            orderId: data.id,
-            trackingUrl,
-          },
-        });
-        
-        if (response.error) {
-          console.error('Error sending WhatsApp:', response.error);
-        } else {
-          console.log('WhatsApp sent successfully:', response.data);
-        }
-      } catch (e) {
-        console.error('Error sending WhatsApp notification:', e);
-      }
+      // Note: WhatsApp notifications are now sent from NewRepairOrder via send-order-notifications
     }
   },
 
