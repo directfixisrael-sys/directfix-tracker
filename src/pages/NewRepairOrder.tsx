@@ -501,6 +501,17 @@ const NewRepairOrder = () => {
                   <span className="text-muted-foreground">סוג תיקון</span>
                   <span className="font-semibold">{getRepairTypeName()}</span>
                 </div>
+                
+                {/* Active Promotion - Dynamic */}
+                {activePromotion && (
+                  <div className="flex justify-between items-center text-sm bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-2 -mx-1">
+                    <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
+                      {getPromotionIcon(activePromotion.icon)} {activePromotion.title}
+                    </span>
+                    <span className="font-semibold text-success">{activePromotion.description}</span>
+                  </div>
+                )}
+                
                 <div className="border-t border-border pt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-bold">סה"כ</span>
@@ -510,15 +521,62 @@ const NewRepairOrder = () => {
               </div>
             </Card>
 
-            <div className="bg-muted/50 rounded-xl p-3 flex items-start gap-2">
-              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                <CheckCircle2 className="w-4 h-4 text-primary" />
+            {/* Payment Info with Icons */}
+            <div className="bg-muted/50 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm">תשלום בסיום התיקון בלבד</p>
+                    <p className="text-muted-foreground text-xs mt-0.5">
+                      מזומן, אשראי או ביט
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-xs">תשלום בסיום התיקון בלבד</p>
-                <p className="text-muted-foreground text-xs mt-0.5">
-                  מזומן, אשראי או ביט
-                </p>
+              
+              {/* Payment Method Icons */}
+              <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-border">
+                {/* Apple Pay */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-12 h-8 bg-foreground rounded-md flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" className="w-6 h-4 text-background" fill="currentColor">
+                      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                    </svg>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">Apple Pay</span>
+                </div>
+                
+                {/* Google Pay */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-12 h-8 bg-card border border-border rounded-md flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" className="w-6 h-4" fill="none">
+                      <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z" fill="#4285F4"/>
+                    </svg>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">Google Pay</span>
+                </div>
+                
+                {/* Credit Card */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-12 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" className="w-5 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                      <line x1="1" y1="10" x2="23" y2="10"/>
+                    </svg>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">אשראי</span>
+                </div>
+                
+                {/* Cash */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-12 h-8 bg-gradient-to-br from-success to-green-600 rounded-md flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">₪</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">מזומן</span>
+                </div>
               </div>
             </div>
           </div>}
