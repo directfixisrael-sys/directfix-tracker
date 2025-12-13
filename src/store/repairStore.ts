@@ -6,11 +6,11 @@ interface RepairStore {
   orders: RepairOrder[];
   messages: ChatMessage[];
   currentOrder: RepairOrder | null;
-  activeTab: 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices';
+  activeTab: 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions';
   isLoading: boolean;
   
   // Tab actions
-  setActiveTab: (tab: 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices') => void;
+  setActiveTab: (tab: 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions') => void;
   
   // Data loading
   loadOrders: () => Promise<void>;
