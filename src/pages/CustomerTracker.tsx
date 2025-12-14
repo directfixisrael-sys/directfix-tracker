@@ -178,7 +178,7 @@ const CustomerTracker = () => {
   }
 
   const showTechnicianTracker = currentOrder.status === 'on_the_way' && currentOrder.technicianName;
-  const showAccessories = ['confirmed', 'technician_assigned', 'on_the_way'].includes(currentOrder.status);
+  const showAccessories = currentOrder.status !== 'completed';
   const showRating = currentOrder.status === 'completed';
 
   return (
