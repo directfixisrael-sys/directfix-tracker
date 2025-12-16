@@ -35,6 +35,54 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          current_uses: number
+          description: string | null
+          discount_type: string
+          discount_value: number
+          end_date: string | null
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          min_order_amount: number | null
+          start_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          current_uses?: number
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_order_amount?: number | null
+          start_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          current_uses?: number
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_order_amount?: number | null
+          start_date?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       iphone_models: {
         Row: {
           battery_price: number
@@ -113,10 +161,13 @@ export type Database = {
         Row: {
           accessories: Json
           completed_at: string | null
+          coupon_code: string | null
+          coupon_discount: number | null
           created_at: string
           customer_address: string
           customer_name: string
           customer_phone: string
+          device_images: string[] | null
           device_type: string
           estimated_arrival: string | null
           feedback: string | null
@@ -139,10 +190,13 @@ export type Database = {
         Insert: {
           accessories?: Json
           completed_at?: string | null
+          coupon_code?: string | null
+          coupon_discount?: number | null
           created_at?: string
           customer_address?: string
           customer_name: string
           customer_phone: string
+          device_images?: string[] | null
           device_type?: string
           estimated_arrival?: string | null
           feedback?: string | null
@@ -165,10 +219,13 @@ export type Database = {
         Update: {
           accessories?: Json
           completed_at?: string | null
+          coupon_code?: string | null
+          coupon_discount?: number | null
           created_at?: string
           customer_address?: string
           customer_name?: string
           customer_phone?: string
+          device_images?: string[] | null
           device_type?: string
           estimated_arrival?: string | null
           feedback?: string | null

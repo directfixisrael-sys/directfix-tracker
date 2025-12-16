@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -94,6 +94,20 @@ const NewRepairOrder = () => {
   const [customerNotes, setCustomerNotes] = useState('');
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptContact, setAcceptContact] = useState(false);
+  
+  // Coupon fields
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discount_type: 'fixed' | 'percentage';
+    discount_value: number;
+  } | null>(null);
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  
+  // Image upload
+  const [deviceImages, setDeviceImages] = useState<string[]>([]);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Helper to get promotion icon
   const getPromotionIcon = (icon: string | null) => {
@@ -240,6 +254,128 @@ const NewRepairOrder = () => {
     const dateStr = `${selectedDate.getDate()}/${selectedDate.getMonth() + 1}`;
     return `יום ${dayName} ${dateStr} בשעות ${selectedTimeSlot}`;
   };
+
+  // Coupon validation
+  const validateCoupon = async () => {
+    if (!couponCode.trim()) return;
+    
+    setIsValidatingCoupon(true);
+    try {
+      const { data, error } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', couponCode.toUpperCase().trim())
+        .eq('is_active', true)
+        .single();
+
+      if (error || !data) {
+        toast.error('קוד הקופון לא נמצא או לא תקף');
+        setAppliedCoupon(null);
+        return;
+      }
+
+      // Check if coupon is within date range
+      const now = new Date();
+      if (data.start_date && new Date(data.start_date) > now) {
+        toast.error('הקופון עדיין לא פעיל');
+        setAppliedCoupon(null);
+        return;
+      }
+      if (data.end_date && new Date(data.end_date) < now) {
+        toast.error('הקופון פג תוקף');
+        setAppliedCoupon(null);
+        return;
+      }
+
+      // Check usage limit
+      if (data.max_uses && data.current_uses >= data.max_uses) {
+        toast.error('הקופון מוצה');
+        setAppliedCoupon(null);
+        return;
+      }
+
+      // Check minimum order amount
+      if (data.min_order_amount && getPrice() < data.min_order_amount) {
+        toast.error(`הקופון דורש הזמנה מינימלית של ₪${data.min_order_amount}`);
+        setAppliedCoupon(null);
+        return;
+      }
+
+      setAppliedCoupon({
+        code: data.code,
+        discount_type: data.discount_type as 'fixed' | 'percentage',
+        discount_value: data.discount_value,
+      });
+      toast.success('הקופון הופעל בהצלחה!');
+    } catch (err) {
+      toast.error('שגיאה באימות הקופון');
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+  };
+
+  const getDiscount = () => {
+    if (!appliedCoupon) return 0;
+    if (appliedCoupon.discount_type === 'percentage') {
+      return Math.round(getPrice() * (appliedCoupon.discount_value / 100));
+    }
+    return appliedCoupon.discount_value;
+  };
+
+  const getFinalPrice = () => {
+    return Math.max(0, getPrice() - getDiscount());
+  };
+
+  // Image upload
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    if (deviceImages.length >= 3) {
+      toast.error('ניתן להעלות עד 3 תמונות');
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      for (const file of Array.from(files)) {
+        if (deviceImages.length >= 3) break;
+        
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        const { data, error } = await supabase.storage
+          .from('device-images')
+          .upload(fileName, file);
+
+        if (error) throw error;
+
+        const { data: urlData } = supabase.storage
+          .from('device-images')
+          .getPublicUrl(fileName);
+
+        setDeviceImages(prev => [...prev, urlData.publicUrl]);
+      }
+      toast.success('התמונה הועלתה בהצלחה');
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      toast.error('שגיאה בהעלאת התמונה');
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setDeviceImages(prev => prev.filter((_, i) => i !== index));
+  };
   const handleSubmit = async () => {
     if (!customerName.trim() || !customerPhone.trim() || !customerAddress.trim()) {
       toast.error('אנא מלא את כל השדות');
@@ -256,13 +392,31 @@ const NewRepairOrder = () => {
       if (customerNotes.trim()) {
         notes.push(`הערות לקוח: ${customerNotes.trim()}`);
       }
+      if (appliedCoupon) {
+        notes.push(`קופון: ${appliedCoupon.code} - הנחה של ${appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : `₪${appliedCoupon.discount_value}`}`);
+        // Update coupon usage - fetch current and increment
+        const { data: couponData } = await supabase
+          .from('coupons')
+          .select('current_uses')
+          .eq('code', appliedCoupon.code)
+          .single();
+        if (couponData) {
+          await supabase
+            .from('coupons')
+            .update({ current_uses: couponData.current_uses + 1 })
+            .eq('code', appliedCoupon.code);
+        }
+      }
+      if (deviceImages.length > 0) {
+        notes.push(`תמונות מכשיר: ${deviceImages.length} תמונות צורפו`);
+      }
       await addOrder({
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
         customerAddress: customerAddress.trim(),
         deviceType: selectedModel?.name || '',
         issueDescription: getRepairTypeName(),
-        repairPrice: getPrice(),
+        repairPrice: getFinalPrice(),
         status: 'pending',
         accessories: [],
         notes,
@@ -695,6 +849,100 @@ const NewRepairOrder = () => {
                 </label>
                 <Textarea placeholder="למשל: קומה 3, יש אינטרקום, לחייג בהגעה..." value={customerNotes} onChange={e => setCustomerNotes(e.target.value)} className="text-sm rounded-xl resize-none" rows={2} />
               </div>
+
+              {/* Image Upload */}
+              <div>
+                <label className="block text-xs font-medium mb-1.5">
+                  תמונה של המכשיר <span className="text-muted-foreground">(לא חובה)</span>
+                </label>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+                {deviceImages.length > 0 ? (
+                  <div className="flex gap-2 flex-wrap mb-2">
+                    {deviceImages.map((url, index) => (
+                      <div key={index} className="relative w-20 h-20 rounded-lg overflow-hidden border border-border">
+                        <img src={url} alt={`Device ${index + 1}`} className="w-full h-full object-cover" />
+                        <button
+                          onClick={() => removeImage(index)}
+                          className="absolute top-0.5 right-0.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                    {deviceImages.length < 3 && (
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploadingImage}
+                        className="w-20 h-20 rounded-lg border-2 border-dashed border-border flex items-center justify-center hover:border-primary transition-colors"
+                      >
+                        {isUploadingImage ? (
+                          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                        ) : (
+                          <Camera className="w-5 h-5 text-muted-foreground" />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploadingImage}
+                    className="w-full h-20 rounded-xl border-2 border-dashed border-border flex items-center justify-center gap-2 hover:border-primary transition-colors"
+                  >
+                    {isUploadingImage ? (
+                      <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <Camera className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">הוסף תמונה (עד 3)</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+
+              {/* Coupon Code */}
+              <div>
+                <label className="block text-xs font-medium mb-1.5">
+                  קוד קופון <span className="text-muted-foreground">(לא חובה)</span>
+                </label>
+                {appliedCoupon ? (
+                  <div className="flex items-center gap-2 bg-success/10 border border-success/30 rounded-xl px-3 py-2">
+                    <Tag className="w-4 h-4 text-success" />
+                    <span className="flex-1 font-mono font-medium text-success">{appliedCoupon.code}</span>
+                    <span className="text-sm text-success font-bold">
+                      -{appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : `₪${appliedCoupon.discount_value}`}
+                    </span>
+                    <button onClick={removeCoupon} className="text-muted-foreground hover:text-foreground">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="הכנס קוד קופון"
+                      value={couponCode}
+                      onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                      className="h-10 text-sm rounded-xl font-mono flex-1"
+                    />
+                    <Button 
+                      variant="outline" 
+                      onClick={validateCoupon}
+                      disabled={!couponCode.trim() || isValidatingCoupon}
+                      className="h-10 rounded-xl"
+                    >
+                      {isValidatingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : 'הפעל'}
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Consent Checkboxes */}
@@ -725,8 +973,18 @@ const NewRepairOrder = () => {
             <Card className="p-3 bg-muted/30">
               <div className="flex justify-between items-center text-xs">
                 <span>{selectedModel?.name} • {getRepairTypeName()}</span>
-                <span className="font-bold text-primary">₪{getPrice()}</span>
+                <div className="text-right">
+                  {appliedCoupon && (
+                    <span className="text-muted-foreground line-through mr-2">₪{getPrice()}</span>
+                  )}
+                  <span className="font-bold text-primary">₪{getFinalPrice()}</span>
+                </div>
               </div>
+              {appliedCoupon && (
+                <div className="text-xs text-success mt-1">
+                  קופון {appliedCoupon.code} - חיסכת ₪{getDiscount()}!
+                </div>
+              )}
               <div className="text-xs text-muted-foreground mt-1">
                 {formatSelectedDateTime()}
               </div>
