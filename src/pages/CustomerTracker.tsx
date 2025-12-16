@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import PhoneInput from '@/components/PhoneInput';
 import StatusTimeline from '@/components/StatusTimeline';
 import TechnicianTracker from '@/components/TechnicianTracker';
+import RepairInProgress from '@/components/RepairInProgress';
 import AccessoriesUpsell from '@/components/AccessoriesUpsell';
 import LiveChat from '@/components/LiveChat';
 import RatingPrompt from '@/components/RatingPrompt';
@@ -178,6 +179,7 @@ const CustomerTracker = () => {
   }
 
   const showTechnicianTracker = currentOrder.status === 'on_the_way' && currentOrder.technicianName;
+  const showRepairInProgress = (currentOrder.status === 'in_progress' || currentOrder.status === 'arrived') && currentOrder.technicianName;
   const showAccessories = currentOrder.status !== 'completed';
   const showRating = currentOrder.status === 'completed';
 
@@ -278,13 +280,21 @@ const CustomerTracker = () => {
           </div>
         )}
 
-        {/* Technician tracker */}
+        {/* Technician tracker - on the way */}
         {showTechnicianTracker && (
           <TechnicianTracker
             technicianName={currentOrder.technicianName!}
             estimatedArrival={currentOrder.estimatedArrival}
             customerAddress={currentOrder.customerAddress}
             wazeLink={currentOrder.wazeLink}
+          />
+        )}
+
+        {/* Repair in progress */}
+        {showRepairInProgress && (
+          <RepairInProgress
+            technicianName={currentOrder.technicianName}
+            deviceType={currentOrder.deviceType}
           />
         )}
 
