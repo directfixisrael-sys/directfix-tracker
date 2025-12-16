@@ -1208,6 +1208,10 @@ const NewRepairOrder = () => {
               <div>
                 <label className="block text-xs font-medium mb-1.5">כתובת (עיר, רחוב, מספר בית/דירה)</label>
                 <Input placeholder="למשל: הרצליה, סוקולוב 15, דירה 4" value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="h-10 text-sm rounded-xl" />
+                <p className="text-[11px] text-muted-foreground mt-1.5 flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />
+                  אזור השירות שלנו: השרון, המרכז וגוש דן (ממודיעין ועד נתניה)
+                </p>
               </div>
 
               <div>
