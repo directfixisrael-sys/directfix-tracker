@@ -58,7 +58,14 @@ interface Promotion {
   badge_text: string | null;
   icon: string | null;
 }
-type Step = 'model' | 'repair' | 'price' | 'schedule' | 'details' | 'success';
+interface RepairBundle {
+  id: string;
+  name: string;
+  primary_repair_type: string;
+  addon_repair_type: string;
+  discount_percent: number;
+}
+type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'success';
 const NewRepairOrder = () => {
   const navigate = useNavigate();
   const {
@@ -73,6 +80,9 @@ const NewRepairOrder = () => {
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
   const [activePromotion, setActivePromotion] = useState<Promotion | null>(null);
+  const [repairBundles, setRepairBundles] = useState<RepairBundle[]>([]);
+  const [selectedBundleAddon, setSelectedBundleAddon] = useState<boolean>(false);
+  const [currentBundle, setCurrentBundle] = useState<RepairBundle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedModel, setSelectedModel] = useState<IphoneModel | null>(null);
   const [selectedRepair, setSelectedRepair] = useState<RepairType | null>(null);
@@ -129,14 +139,16 @@ const NewRepairOrder = () => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [modelsRes, repairsRes, blockedRes] = await Promise.all([
+        const [modelsRes, repairsRes, blockedRes, bundlesRes] = await Promise.all([
           supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), 
           supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), 
-          supabase.from('blocked_dates').select('date')
+          supabase.from('blocked_dates').select('date'),
+          supabase.from('repair_bundles').select('*').eq('is_active', true)
         ]);
         if (modelsRes.data) setModels(modelsRes.data);
         if (repairsRes.data) setRepairTypes(repairsRes.data);
         if (blockedRes.data) setBlockedDates(blockedRes.data.map(d => d.date));
+        if (bundlesRes.data) setRepairBundles(bundlesRes.data);
         
         // Load promotion separately to avoid error if none exists
         const { data: promotionData } = await supabase
@@ -207,6 +219,17 @@ const NewRepairOrder = () => {
     if (isBattery) return selectedModel.battery_price;
     return 0;
   };
+  
+  const getBundleAddonPrice = () => {
+    if (!selectedModel || !selectedBundleAddon || !currentBundle) return 0;
+    const basePrice = selectedModel.battery_price;
+    const discountedPrice = Math.round(basePrice * (1 - currentBundle.discount_percent / 100));
+    return discountedPrice;
+  };
+  
+  const getTotalPrice = () => {
+    return getPrice() + getBundleAddonPrice();
+  };
   const getRepairTypeName = () => {
     if (!selectedRepair) return '';
     return selectedRepair.name;
@@ -241,12 +264,42 @@ const NewRepairOrder = () => {
     }
     if (pendingRepair) {
       setSelectedRepair(pendingRepair);
-      // Show gift animation
+      
+      // Check if there's a bundle offer for this repair type
+      const isScreenRepair = pendingRepair.name.includes('מסך');
+      const bundle = repairBundles.find(b => 
+        pendingRepair.name.includes(b.primary_repair_type)
+      );
+      
+      if (bundle && isScreenRepair) {
+        setCurrentBundle(bundle);
+        setSelectedBundleAddon(false);
+        goToStep('bundle');
+      } else {
+        // Show gift animation only if there's no bundle step
+        if (activePromotion) {
+          setShowGiftAnimation(true);
+          setTimeout(() => {
+            setShowGiftAnimation(false);
+            goToStep('price');
+          }, 2500);
+        } else {
+          goToStep('price');
+        }
+      }
+    }
+  };
+  
+  const handleBundleDecision = (acceptBundle: boolean) => {
+    setSelectedBundleAddon(acceptBundle);
+    if (activePromotion) {
       setShowGiftAnimation(true);
       setTimeout(() => {
         setShowGiftAnimation(false);
         goToStep('price');
       }, 2500);
+    } else {
+      goToStep('price');
     }
   };
   const handlePriceConfirm = () => {
@@ -336,13 +389,13 @@ const NewRepairOrder = () => {
   const getDiscount = () => {
     if (!appliedCoupon) return 0;
     if (appliedCoupon.discount_type === 'percentage') {
-      return Math.round(getPrice() * (appliedCoupon.discount_value / 100));
+      return Math.round(getTotalPrice() * (appliedCoupon.discount_value / 100));
     }
     return appliedCoupon.discount_value;
   };
 
   const getFinalPrice = () => {
-    return Math.max(0, getPrice() - getDiscount());
+    return Math.max(0, getTotalPrice() - getDiscount());
   };
 
   // Image upload
@@ -402,7 +455,15 @@ const NewRepairOrder = () => {
     setIsSubmitting(true);
     try {
       const scheduleNote = formatSelectedDateTime();
-      const notes = [`הזמנה מהאתר - ${getRepairTypeName()}`, `מועד מבוקש: ${scheduleNote}`];
+      const repairDescription = selectedBundleAddon && currentBundle 
+        ? `${getRepairTypeName()} + החלפת סוללה (חבילה)`
+        : getRepairTypeName();
+      const notes = [`הזמנה מהאתר - ${repairDescription}`, `מועד מבוקש: ${scheduleNote}`];
+      
+      if (selectedBundleAddon && currentBundle && selectedModel) {
+        notes.push(`חבילת תיקון: ${currentBundle.name} - סוללה ב-${currentBundle.discount_percent}% הנחה (₪${getBundleAddonPrice()} במקום ₪${selectedModel.battery_price})`);
+      }
+      
       if (customerNotes.trim()) {
         notes.push(`הערות לקוח: ${customerNotes.trim()}`);
       }
@@ -429,7 +490,7 @@ const NewRepairOrder = () => {
         customerPhone: customerPhone.trim(),
         customerAddress: customerAddress.trim(),
         deviceType: selectedModel?.name || '',
-        issueDescription: getRepairTypeName(),
+        issueDescription: repairDescription,
         repairPrice: getFinalPrice(),
         status: 'pending',
         accessories: [],
@@ -439,14 +500,17 @@ const NewRepairOrder = () => {
 
       // Send notifications (email + WhatsApp)
       try {
+        const repairTypeForNotification = selectedBundleAddon && currentBundle 
+          ? `${getRepairTypeName()} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)`
+          : getRepairTypeName();
         await supabase.functions.invoke('send-order-notifications', {
           body: {
             customerName: customerName.trim(),
             customerPhone: customerPhone.trim(),
             customerAddress: customerAddress.trim(),
             deviceType: selectedModel?.name || '',
-            repairType: getRepairTypeName(),
-            repairPrice: getPrice(),
+            repairType: repairTypeForNotification,
+            repairPrice: getFinalPrice(),
             scheduledTime: scheduleNote,
             notes: customerNotes.trim(),
             promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined
@@ -514,7 +578,16 @@ const NewRepairOrder = () => {
         <div className="flex items-center justify-between p-3">
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={() => {
-            if (step === 'model') navigate('/');else if (step === 'repair') goToStep('model');else if (step === 'price') goToStep('repair');else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
+            if (step === 'model') navigate('/');
+            else if (step === 'repair') goToStep('model');
+            else if (step === 'bundle') goToStep('repair');
+            else if (step === 'price') {
+              if (currentBundle) goToStep('bundle');
+              else goToStep('repair');
+            }
+            else if (step === 'schedule') goToStep('price');
+            else if (step === 'details') goToStep('schedule');
+            else navigate('/');
           }} className="rounded-full h-9 w-9">
               <ArrowRight className="w-4 h-4" />
             </Button>
@@ -529,7 +602,15 @@ const NewRepairOrder = () => {
         {/* Progress bar */}
         {step !== 'success' && <div className="px-3 pb-2">
             <div className="flex gap-1.5">
-              {['model', 'repair', 'price', 'schedule', 'details'].map((s, i) => <div key={s} className={`h-1 flex-1 rounded-full transition-all duration-500 ${['model', 'repair', 'price', 'schedule', 'details'].indexOf(step) >= i ? 'bg-primary' : 'bg-muted'}`} />)}
+              {['model', 'repair', 'price', 'schedule', 'details'].map((s, i) => {
+                const allSteps = ['model', 'repair', 'bundle', 'price', 'schedule', 'details'];
+                const displaySteps = ['model', 'repair', 'price', 'schedule', 'details'];
+                const currentIdx = allSteps.indexOf(step);
+                const displayIdx = displaySteps.indexOf(s);
+                // Map bundle to be between repair (1) and price (2)
+                const adjustedCurrentIdx = currentIdx >= 3 ? currentIdx - 1 : (currentIdx === 2 ? 1.5 : currentIdx);
+                return <div key={s} className={`h-1 flex-1 rounded-full transition-all duration-500 ${adjustedCurrentIdx >= displayIdx ? 'bg-primary' : 'bg-muted'}`} />;
+              })}
             </div>
           </div>}
       </div>
@@ -972,6 +1053,81 @@ const NewRepairOrder = () => {
             </p>
           </div>}
 
+        {/* Step 2.5: Bundle Offer */}
+        {step === 'bundle' && currentBundle && selectedModel && <div className="space-y-5 animate-fade-in">
+            <div className="text-center mb-6">
+              <div className="flex justify-center mb-4">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-gradient-to-br from-amber-500/20 to-orange-500/10 rounded-full flex items-center justify-center">
+                    <Gift className="w-10 h-10 text-amber-500 animate-bounce-slow" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs px-2 py-1 rounded-full font-bold shadow-lg animate-pulse">
+                    -{currentBundle.discount_percent}%
+                  </div>
+                </div>
+              </div>
+              <h2 className="font-bold mb-2 text-xl">הצעה מיוחדת! 🎉</h2>
+              <p className="text-muted-foreground text-sm">מצאנו לך מבצע משתלם</p>
+            </div>
+
+            <Card className="p-5 bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-card border-2 border-amber-500/30">
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center gap-3">
+                  <div className="flex flex-col items-center">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                      <Smartphone className="w-6 h-6 text-primary" />
+                    </div>
+                    <span className="text-xs text-muted-foreground mt-1">{selectedRepair?.name}</span>
+                  </div>
+                  <span className="text-2xl">+</span>
+                  <div className="flex flex-col items-center">
+                    <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center">
+                      <Battery className="w-6 h-6 text-amber-500" />
+                    </div>
+                    <span className="text-xs text-muted-foreground mt-1">החלפת סוללה</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-lg font-bold">
+                    הוסף החלפת סוללה ב-
+                    <span className="text-amber-500">{currentBundle.discount_percent}% הנחה!</span>
+                  </p>
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-muted-foreground line-through text-sm">₪{selectedModel.battery_price}</span>
+                    <span className="text-2xl font-bold text-success">₪{Math.round(selectedModel.battery_price * (1 - currentBundle.discount_percent / 100))}</span>
+                  </div>
+                </div>
+
+                <p className="text-xs text-muted-foreground">
+                  💡 רוב הלקוחות שמחליפים מסך מוסיפים גם סוללה חדשה
+                </p>
+              </div>
+            </Card>
+
+            <div className="space-y-3">
+              <Button 
+                onClick={() => handleBundleDecision(true)}
+                className="w-full h-14 text-base font-bold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg"
+              >
+                <Battery className="w-5 h-5 ml-2" />
+                כן, תוסיפו סוללה בהנחה!
+              </Button>
+              
+              <Button 
+                variant="outline"
+                onClick={() => handleBundleDecision(false)}
+                className="w-full h-12 text-sm rounded-xl"
+              >
+                לא תודה, רק {selectedRepair?.name}
+              </Button>
+            </div>
+
+            <p className="text-center text-xs text-muted-foreground">
+              🔋 סוללה מקורית עם 100% בריאות
+            </p>
+          </div>}
+
         {/* Step 3: Price Confirmation */}
         {step === 'price' && <div className="space-y-5 animate-fade-in">
             <div className="text-center mb-6">
@@ -983,7 +1139,7 @@ const NewRepairOrder = () => {
                     </div>
                   </div>
                   <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-base px-2 py-0.5 rounded-full font-bold shadow-lg">
-                    ₪{getPrice()}
+                    ₪{getTotalPrice()}
                   </div>
                 </div>
               </div>
@@ -999,8 +1155,25 @@ const NewRepairOrder = () => {
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">סוג תיקון</span>
-                  <span className="font-semibold">{getRepairTypeName()}</span>
+                  <div className="text-left">
+                    <span className="font-semibold">{getRepairTypeName()}</span>
+                    <span className="text-muted-foreground mr-2">₪{getPrice()}</span>
+                  </div>
                 </div>
+                
+                {/* Bundle Addon */}
+                {selectedBundleAddon && currentBundle && selectedModel && (
+                  <div className="flex justify-between items-center text-sm bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-2 -mx-1">
+                    <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
+                      <Battery className="w-4 h-4" /> החלפת סוללה
+                      <span className="text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full">-{currentBundle.discount_percent}%</span>
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs line-through text-muted-foreground">₪{selectedModel.battery_price}</span>
+                      <span className="font-semibold text-success">₪{getBundleAddonPrice()}</span>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Active Promotion - Dynamic */}
                 {activePromotion && (
@@ -1053,7 +1226,7 @@ const NewRepairOrder = () => {
                     <span className="font-bold">סה"כ</span>
                     <div className="text-right">
                       {appliedCoupon && (
-                        <span className="text-muted-foreground line-through text-sm mr-2">₪{getPrice()}</span>
+                        <span className="text-muted-foreground line-through text-sm mr-2">₪{getTotalPrice()}</span>
                       )}
                       <span className="text-xl font-bold text-primary">₪{getFinalPrice()}</span>
                     </div>
@@ -1061,6 +1234,11 @@ const NewRepairOrder = () => {
                   {appliedCoupon && (
                     <div className="text-xs text-success mt-1 text-left">
                       🎉 חיסכת ₪{getDiscount()} עם קופון {appliedCoupon.code}!
+                    </div>
+                  )}
+                  {selectedBundleAddon && currentBundle && (
+                    <div className="text-xs text-amber-500 mt-1 text-left">
+                      🔋 כולל סוללה בהנחה של {currentBundle.discount_percent}%
                     </div>
                   )}
                 </div>
