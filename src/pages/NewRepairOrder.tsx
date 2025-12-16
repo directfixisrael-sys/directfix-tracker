@@ -1012,11 +1012,57 @@ const NewRepairOrder = () => {
                   </div>
                 )}
                 
+                {/* Coupon Section */}
                 <div className="border-t border-border pt-3">
+                  <label className="block text-xs font-medium mb-2 text-muted-foreground">
+                    יש לך קוד קופון?
+                  </label>
+                  {appliedCoupon ? (
+                    <div className="flex items-center gap-2 bg-success/10 border border-success/30 rounded-xl px-3 py-2">
+                      <Tag className="w-4 h-4 text-success" />
+                      <span className="flex-1 font-mono font-medium text-success">{appliedCoupon.code}</span>
+                      <span className="text-sm text-success font-bold">
+                        -{appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : `₪${appliedCoupon.discount_value}`}
+                      </span>
+                      <button onClick={removeCoupon} className="text-muted-foreground hover:text-foreground">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="הכנס קוד קופון"
+                        value={couponCode}
+                        onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                        className="h-9 text-sm rounded-lg font-mono flex-1"
+                      />
+                      <Button 
+                        variant="outline" 
+                        onClick={validateCoupon}
+                        disabled={!couponCode.trim() || isValidatingCoupon}
+                        className="h-9 rounded-lg text-xs"
+                      >
+                        {isValidatingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : 'הפעל'}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t border-border pt-3 mt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-bold">סה"כ</span>
-                    <span className="text-xl font-bold text-primary">₪{getPrice()}</span>
+                    <div className="text-right">
+                      {appliedCoupon && (
+                        <span className="text-muted-foreground line-through text-sm mr-2">₪{getPrice()}</span>
+                      )}
+                      <span className="text-xl font-bold text-primary">₪{getFinalPrice()}</span>
+                    </div>
                   </div>
+                  {appliedCoupon && (
+                    <div className="text-xs text-success mt-1 text-left">
+                      🎉 חיסכת ₪{getDiscount()} עם קופון {appliedCoupon.code}!
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
@@ -1186,42 +1232,6 @@ const NewRepairOrder = () => {
                   </div>
                 </div>
               )}
-
-              {/* Coupon Code */}
-              <div>
-                <label className="block text-xs font-medium mb-1.5">
-                  קוד קופון <span className="text-muted-foreground">(לא חובה)</span>
-                </label>
-                {appliedCoupon ? (
-                  <div className="flex items-center gap-2 bg-success/10 border border-success/30 rounded-xl px-3 py-2">
-                    <Tag className="w-4 h-4 text-success" />
-                    <span className="flex-1 font-mono font-medium text-success">{appliedCoupon.code}</span>
-                    <span className="text-sm text-success font-bold">
-                      -{appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : `₪${appliedCoupon.discount_value}`}
-                    </span>
-                    <button onClick={removeCoupon} className="text-muted-foreground hover:text-foreground">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="הכנס קוד קופון"
-                      value={couponCode}
-                      onChange={e => setCouponCode(e.target.value.toUpperCase())}
-                      className="h-10 text-sm rounded-xl font-mono flex-1"
-                    />
-                    <Button 
-                      variant="outline" 
-                      onClick={validateCoupon}
-                      disabled={!couponCode.trim() || isValidatingCoupon}
-                      className="h-10 rounded-xl"
-                    >
-                      {isValidatingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : 'הפעל'}
-                    </Button>
-                  </div>
-                )}
-              </div>
             </div>
 
             {/* Consent Checkboxes */}
