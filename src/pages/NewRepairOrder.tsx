@@ -700,17 +700,85 @@ const NewRepairOrder = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5">
-              {filteredModels.map((model, index) => <Card key={model.id} onClick={() => handleModelSelect(model)} className="p-3.5 cursor-pointer hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 active:scale-95 group" style={{
-            animationDelay: `${index * 40}ms`
-          }}>
-                  <div className="flex flex-col items-center text-center gap-2">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary/15 to-primary/5 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <Smartphone className="w-6 h-6 text-primary" />
+            <div className="grid grid-cols-2 gap-3">
+              {filteredModels.map((model, index) => {
+                // Determine model series for styling
+                const is16Series = model.name.includes('16');
+                const is15Series = model.name.includes('15');
+                const is14Series = model.name.includes('14');
+                const is13Series = model.name.includes('13');
+                const isPro = model.name.includes('Pro');
+                const isMax = model.name.includes('Max');
+                const isPlus = model.name.includes('Plus');
+                
+                // Color scheme based on series
+                const getGradient = () => {
+                  if (is16Series) return isPro ? 'from-slate-700 via-slate-600 to-slate-500' : 'from-blue-500 via-blue-400 to-cyan-400';
+                  if (is15Series) return isPro ? 'from-slate-800 via-slate-700 to-slate-600' : 'from-pink-400 via-rose-400 to-orange-300';
+                  if (is14Series) return isPro ? 'from-violet-700 via-purple-600 to-purple-500' : 'from-sky-400 via-blue-400 to-indigo-400';
+                  if (is13Series) return isPro ? 'from-emerald-700 via-teal-600 to-teal-500' : 'from-red-400 via-rose-400 to-pink-400';
+                  return 'from-gray-600 via-gray-500 to-gray-400';
+                };
+                
+                // Phone size based on model
+                const getPhoneSize = () => {
+                  if (isMax) return { w: 'w-10', h: 'h-[4.5rem]' };
+                  if (isPlus) return { w: 'w-9', h: 'h-16' };
+                  if (isPro && !isMax) return { w: 'w-8', h: 'h-14' };
+                  return { w: 'w-7', h: 'h-12' };
+                };
+                
+                const phoneSize = getPhoneSize();
+                
+                return (
+                  <Card 
+                    key={model.id} 
+                    onClick={() => handleModelSelect(model)} 
+                    className="p-4 cursor-pointer hover:border-primary hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500 active:scale-95 group overflow-hidden relative animate-fade-in"
+                    style={{ animationDelay: `${index * 60}ms` }}
+                  >
+                    {/* Background glow effect */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${getGradient()} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+                    
+                    <div className="flex flex-col items-center text-center gap-3 relative">
+                      {/* iPhone Visual */}
+                      <div className="relative group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500">
+                        {/* Phone body */}
+                        <div className={`${phoneSize.w} ${phoneSize.h} bg-gradient-to-b ${getGradient()} rounded-[0.6rem] relative overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300`}>
+                          {/* Notch/Dynamic Island */}
+                          <div className={`absolute top-1 left-1/2 -translate-x-1/2 ${is16Series || is15Series || is14Series ? 'w-4 h-1.5 rounded-full' : 'w-5 h-1 rounded-b-lg'} bg-black/80`} />
+                          
+                          {/* Screen */}
+                          <div className="absolute inset-[3px] top-3 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-[0.4rem] flex items-center justify-center">
+                            {/* Apple logo */}
+                            <svg className="w-3 h-3 text-white/20" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                            </svg>
+                          </div>
+                          
+                          {/* Camera bump for Pro models */}
+                          {isPro && (
+                            <div className="absolute -top-0.5 -left-0.5 w-3 h-3 bg-gray-800 rounded-br-lg flex items-center justify-center">
+                              <div className="w-1.5 h-1.5 bg-gray-600 rounded-full" />
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Reflection effect */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 rounded-[0.6rem] pointer-events-none" />
+                      </div>
+                      
+                      {/* Model name */}
+                      <div className="space-y-0.5">
+                        <span className="font-bold text-sm block group-hover:text-primary transition-colors duration-300">{model.name}</span>
+                        {isPro && (
+                          <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Pro</span>
+                        )}
+                      </div>
                     </div>
-                    <span className="font-semibold leading-tight text-sm">{model.name}</span>
-                  </div>
-                </Card>)}
+                  </Card>
+                );
+              })}
             </div>
           </div>}
 
