@@ -45,7 +45,8 @@ import {
   ArrowUpDown,
   Gift,
   CreditCard,
-  DollarSign
+  DollarSign,
+  Package
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -60,6 +61,7 @@ import VacationManagement from '@/components/admin/VacationManagement';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import PromotionsManagement from '@/components/admin/PromotionsManagement';
 import CouponManagement from '@/components/admin/CouponManagement';
+import BundleManagement from '@/components/admin/BundleManagement';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -786,6 +788,9 @@ ${trackingUrl}
 
       case 'coupons':
         return <CouponManagement />;
+
+      case 'bundles':
+        return <BundleManagement />;
 
       case 'feedback':
         const ordersWithFeedback = orders.filter(o => o.rating);
@@ -1531,6 +1536,18 @@ ${trackingUrl}
             <CreditCard className="w-5 h-5" />
             <span>קופונים</span>
           </button>
+          <button 
+            onClick={() => setActiveTab('bundles')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'bundles' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <Package className="w-5 h-5" />
+            <span>חבילות תיקון</span>
+          </button>
         </nav>
 
         {/* Back to home link */}
@@ -1558,6 +1575,8 @@ ${trackingUrl}
               {activeTab === 'feedback' && 'משוב לקוחות'}
               {activeTab === 'analytics' && 'אנליטיקס'}
               {activeTab === 'promotions' && 'ניהול מבצעים'}
+              {activeTab === 'coupons' && 'ניהול קופונים'}
+              {activeTab === 'bundles' && 'ניהול חבילות תיקון'}
             </h1>
             <p className="text-xs md:text-sm text-muted-foreground">
               {activeTab === 'orders' && `${orders.length} הזמנות`}
