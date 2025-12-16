@@ -797,32 +797,133 @@ const NewRepairOrder = () => {
               <p className="text-muted-foreground text-sm">בחר את סוג התיקון</p>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               {repairTypes.map((repair, index) => {
-            const Icon = getRepairIcon(repair.icon);
-            const isPhoneOnly = repair.is_phone_only;
-            const isOriginalScreen = repair.name.includes('מסך מקורי');
-            const isCompatibleScreen = repair.name.includes('מסך תואם');
-            const isBattery = repair.name.includes('סוללה');
-            let price = 0;
-            if (selectedModel) {
-              if (isOriginalScreen) price = selectedModel.original_screen_price;else if (isCompatibleScreen) price = selectedModel.compatible_screen_price;else if (isBattery) price = selectedModel.battery_price;
-            }
-            const infoKey = isOriginalScreen ? 'מסך מקורי' : isCompatibleScreen ? 'מסך תואם' : isBattery ? 'סוללה מקורית' : null;
-            const info = infoKey ? repairInfoDescriptions[infoKey] : null;
-            return <Card key={repair.id} onClick={() => handleRepairSelect(repair)} className={`p-4 cursor-pointer transition-all duration-200 active:scale-[0.98] ${isPhoneOnly ? 'border-dashed border-2 hover:border-warning hover:bg-warning/5' : 'hover:border-primary hover:shadow-lg'}`} style={{
-              animationDelay: `${index * 100}ms`
-            }}>
-                    <div className="flex items-center gap-3">
-                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${isPhoneOnly ? 'bg-warning/10' : 'bg-primary/10'}`}>
-                        <Icon className={`w-5 h-5 ${isPhoneOnly ? 'text-warning' : 'text-primary'}`} />
+                const isPhoneOnly = repair.is_phone_only;
+                const isOriginalScreen = repair.name.includes('מסך מקורי');
+                const isCompatibleScreen = repair.name.includes('מסך תואם');
+                const isBattery = repair.name.includes('סוללה');
+                
+                let price = 0;
+                if (selectedModel) {
+                  if (isOriginalScreen) price = selectedModel.original_screen_price;
+                  else if (isCompatibleScreen) price = selectedModel.compatible_screen_price;
+                  else if (isBattery) price = selectedModel.battery_price;
+                }
+                
+                const infoKey = isOriginalScreen ? 'מסך מקורי' : isCompatibleScreen ? 'מסך תואם' : isBattery ? 'סוללה מקורית' : null;
+                const info = infoKey ? repairInfoDescriptions[infoKey] : null;
+                
+                // Custom icon styling based on repair type
+                const getIconConfig = () => {
+                  if (isOriginalScreen) return {
+                    gradient: 'from-emerald-500 via-green-500 to-teal-500',
+                    bgGradient: 'from-emerald-500/20 to-teal-500/10',
+                    icon: (
+                      <div className="relative">
+                        <div className="w-6 h-9 bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg border-2 border-emerald-400 relative overflow-hidden">
+                          <div className="absolute inset-0.5 bg-gradient-to-br from-emerald-400/30 to-teal-400/20 rounded" />
+                          <div className="absolute top-0.5 left-1/2 -translate-x-1/2 w-2 h-0.5 bg-emerald-400 rounded-full" />
+                          <div className="absolute inset-1 top-2 flex items-center justify-center">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                          </div>
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full flex items-center justify-center">
+                          <span className="text-[6px] text-white font-bold">✓</span>
+                        </div>
                       </div>
+                    ),
+                    badge: 'מקורי Apple'
+                  };
+                  if (isCompatibleScreen) return {
+                    gradient: 'from-blue-500 via-sky-500 to-cyan-500',
+                    bgGradient: 'from-blue-500/20 to-cyan-500/10',
+                    icon: (
+                      <div className="relative">
+                        <div className="w-6 h-9 bg-gradient-to-b from-gray-700 to-gray-800 rounded-lg border-2 border-blue-400 relative overflow-hidden">
+                          <div className="absolute inset-0.5 bg-gradient-to-br from-blue-400/20 to-cyan-400/10 rounded" />
+                          <div className="absolute top-0.5 left-1/2 -translate-x-1/2 w-2 h-0.5 bg-blue-400 rounded-full" />
+                          <div className="absolute inset-1 top-2 flex items-center justify-center">
+                            <Sparkles className="w-3 h-3 text-blue-400" />
+                          </div>
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center">
+                          <span className="text-[6px] text-white font-bold">₪</span>
+                        </div>
+                      </div>
+                    ),
+                    badge: 'חסכוני'
+                  };
+                  if (isBattery) return {
+                    gradient: 'from-amber-500 via-orange-500 to-yellow-500',
+                    bgGradient: 'from-amber-500/20 to-yellow-500/10',
+                    icon: (
+                      <div className="relative">
+                        <div className="w-8 h-5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-md relative overflow-hidden border border-amber-300">
+                          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-2 bg-amber-300 rounded-l" />
+                          <div className="absolute inset-0.5 left-1 flex items-center">
+                            <div className="flex-1 h-3 bg-gradient-to-r from-green-400 via-green-500 to-green-400 rounded-sm animate-pulse" />
+                          </div>
+                        </div>
+                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
+                          <div className="w-0.5 h-1 bg-amber-400 animate-bounce" style={{animationDelay: '0ms'}} />
+                          <div className="w-0.5 h-1.5 bg-orange-400 animate-bounce" style={{animationDelay: '100ms'}} />
+                          <div className="w-0.5 h-1 bg-yellow-400 animate-bounce" style={{animationDelay: '200ms'}} />
+                        </div>
+                      </div>
+                    ),
+                    badge: '100% בריאות'
+                  };
+                  return {
+                    gradient: 'from-violet-500 via-purple-500 to-fuchsia-500',
+                    bgGradient: 'from-violet-500/20 to-fuchsia-500/10',
+                    icon: <Phone className="w-6 h-6 text-violet-500" />,
+                    badge: null
+                  };
+                };
+                
+                const iconConfig = getIconConfig();
+                
+                return (
+                  <Card 
+                    key={repair.id} 
+                    onClick={() => handleRepairSelect(repair)} 
+                    className={`p-4 cursor-pointer transition-all duration-300 active:scale-[0.98] group overflow-hidden relative animate-fade-in ${
+                      isPhoneOnly 
+                        ? 'border-dashed border-2 hover:border-warning hover:bg-warning/5' 
+                        : 'hover:border-primary hover:shadow-xl hover:shadow-primary/10'
+                    }`}
+                    style={{ animationDelay: `${index * 80}ms` }}
+                  >
+                    {/* Background gradient on hover */}
+                    <div className={`absolute inset-0 bg-gradient-to-r ${iconConfig.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                    
+                    <div className="flex items-center gap-4 relative">
+                      {/* Custom Icon */}
+                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${iconConfig.bgGradient} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                        {isPhoneOnly ? (
+                          <Phone className="w-6 h-6 text-warning" />
+                        ) : (
+                          iconConfig.icon
+                        )}
+                      </div>
+                      
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-sm">{repair.name}</h3>
-                          {!isPhoneOnly && info && <Dialog>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-bold text-sm group-hover:text-primary transition-colors">{repair.name}</h3>
+                          {!isPhoneOnly && iconConfig.badge && (
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r ${iconConfig.gradient} text-white font-medium`}>
+                              {iconConfig.badge}
+                            </span>
+                          )}
+                          {!isPhoneOnly && info && (
+                            <Dialog>
                               <DialogTrigger asChild>
-                                <button type="button" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-primary transition-colors p-1">
+                                <button 
+                                  type="button" 
+                                  onClick={e => e.stopPropagation()} 
+                                  className="text-muted-foreground hover:text-primary transition-colors p-1"
+                                >
                                   <HelpCircle className="w-4 h-4" />
                                 </button>
                               </DialogTrigger>
@@ -834,15 +935,36 @@ const NewRepairOrder = () => {
                                   {info.description}
                                 </p>
                               </DialogContent>
-                            </Dialog>}
+                            </Dialog>
+                          )}
                         </div>
-                        {repair.description && <p className="text-muted-foreground text-xs">{repair.description}</p>}
-                        {!isPhoneOnly && selectedModel && <p className="text-primary font-bold text-sm mt-0.5">₪{price}</p>}
+                        {repair.description && (
+                          <p className="text-muted-foreground text-xs mt-0.5">{repair.description}</p>
+                        )}
+                        {!isPhoneOnly && selectedModel && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`text-lg font-bold bg-gradient-to-r ${iconConfig.gradient} bg-clip-text text-transparent`}>
+                              ₪{price}
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      {isPhoneOnly && <Phone className="w-4 h-4 text-warning" />}
+                      
+                      {/* Arrow indicator */}
+                      {!isPhoneOnly && (
+                        <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                          <ArrowRight className="w-4 h-4 rotate-180" />
+                        </div>
+                      )}
+                      {isPhoneOnly && (
+                        <div className="w-8 h-8 rounded-full bg-warning/20 flex items-center justify-center">
+                          <Phone className="w-4 h-4 text-warning" />
+                        </div>
+                      )}
                     </div>
-                  </Card>;
-          })}
+                  </Card>
+                );
+              })}
             </div>
 
             <p className="text-center text-xs text-muted-foreground mt-4">
