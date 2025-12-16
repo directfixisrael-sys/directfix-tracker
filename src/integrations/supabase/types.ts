@@ -160,6 +160,8 @@ export type Database = {
       orders: {
         Row: {
           accessories: Json
+          bundle_discount: number | null
+          bundle_items: Json | null
           completed_at: string | null
           coupon_code: string | null
           coupon_discount: number | null
@@ -185,10 +187,13 @@ export type Database = {
           technician_name: string | null
           updated_at: string
           wants_promotions: boolean
+          warranty_expiry: string | null
           waze_link: string | null
         }
         Insert: {
           accessories?: Json
+          bundle_discount?: number | null
+          bundle_items?: Json | null
           completed_at?: string | null
           coupon_code?: string | null
           coupon_discount?: number | null
@@ -214,10 +219,13 @@ export type Database = {
           technician_name?: string | null
           updated_at?: string
           wants_promotions?: boolean
+          warranty_expiry?: string | null
           waze_link?: string | null
         }
         Update: {
           accessories?: Json
+          bundle_discount?: number | null
+          bundle_items?: Json | null
           completed_at?: string | null
           coupon_code?: string | null
           coupon_discount?: number | null
@@ -243,6 +251,7 @@ export type Database = {
           technician_name?: string | null
           updated_at?: string
           wants_promotions?: boolean
+          warranty_expiry?: string | null
           waze_link?: string | null
         }
         Relationships: []
@@ -307,6 +316,80 @@ export type Database = {
           endpoint?: string
           id?: string
           p256dh?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string | null
+          referred_discount: number
+          referred_phone: string
+          referrer_discount: number
+          referrer_phone: string
+          status: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          referred_discount?: number
+          referred_phone: string
+          referrer_discount?: number
+          referrer_phone: string
+          status?: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          referred_discount?: number
+          referred_phone?: string
+          referrer_discount?: number
+          referrer_phone?: string
+          status?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repair_bundles: {
+        Row: {
+          addon_repair_type: string
+          created_at: string
+          discount_percent: number
+          id: string
+          is_active: boolean
+          name: string
+          primary_repair_type: string
+        }
+        Insert: {
+          addon_repair_type: string
+          created_at?: string
+          discount_percent?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          primary_repair_type: string
+        }
+        Update: {
+          addon_repair_type?: string
+          created_at?: string
+          discount_percent?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          primary_repair_type?: string
         }
         Relationships: []
       }
