@@ -1117,11 +1117,38 @@ ${trackingUrl}
                       </Button>
                     </div>
                     {selectedOrder.invoiceLink && (
-                      <div className="mt-3 p-2 bg-success/10 rounded-lg">
-                        <p className="text-sm text-success font-medium">✓ חשבונית זמינה ללקוח</p>
-                        <p className="text-xs text-muted-foreground mt-1 truncate" dir="ltr">
-                          {selectedOrder.invoiceLink}
-                        </p>
+                      <div className="mt-3 space-y-2">
+                        <div className="p-2 bg-success/10 rounded-lg">
+                          <p className="text-sm text-success font-medium">✓ חשבונית זמינה ללקוח</p>
+                          <p className="text-xs text-muted-foreground mt-1 truncate" dir="ltr">
+                            {selectedOrder.invoiceLink}
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => {
+                              setInvoiceLink(selectedOrder.invoiceLink || '');
+                            }}
+                          >
+                            <Edit className="w-4 h-4 mr-1" />
+                            ערוך
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => {
+                              updateInvoiceLink(selectedOrder.id, '');
+                              toast({ title: "קישור חשבונית הוסר" });
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            הסר
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -1179,17 +1206,31 @@ ${trackingUrl}
                             </Button>
                           )}
                         </div>
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          className="w-full"
-                          onClick={() => {
-                            updatePaymentLink(selectedOrder.id, '');
-                            toast({ title: "קישור תשלום הוסר" });
-                          }}
-                        >
-                          הסר קישור תשלום
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => {
+                              setPaymentLink(selectedOrder.paymentLink || '');
+                            }}
+                          >
+                            <Edit className="w-4 h-4 mr-1" />
+                            ערוך
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => {
+                              updatePaymentLink(selectedOrder.id, '');
+                              toast({ title: "קישור תשלום הוסר" });
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            הסר
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>
