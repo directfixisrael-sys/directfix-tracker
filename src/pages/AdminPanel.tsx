@@ -59,6 +59,7 @@ import PriceManagement from '@/components/admin/PriceManagement';
 import VacationManagement from '@/components/admin/VacationManagement';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import PromotionsManagement from '@/components/admin/PromotionsManagement';
+import CouponManagement from '@/components/admin/CouponManagement';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -782,6 +783,9 @@ ${trackingUrl}
 
       case 'promotions':
         return <PromotionsManagement />;
+
+      case 'coupons':
+        return <CouponManagement />;
 
       case 'feedback':
         const ordersWithFeedback = orders.filter(o => o.rating);
@@ -1514,6 +1518,18 @@ ${trackingUrl}
           >
             <Gift className="w-5 h-5" />
             <span>מבצעים</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('coupons')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'coupons' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <CreditCard className="w-5 h-5" />
+            <span>קופונים</span>
           </button>
         </nav>
 
