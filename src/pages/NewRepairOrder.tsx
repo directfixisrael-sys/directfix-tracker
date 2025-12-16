@@ -107,6 +107,8 @@ const NewRepairOrder = () => {
   // Image upload
   const [deviceImages, setDeviceImages] = useState<string[]>([]);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [showImageUploadOption, setShowImageUploadOption] = useState(false);
+  const [pendingRepair, setPendingRepair] = useState<RepairType | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Helper to get promotion icon
@@ -227,13 +229,25 @@ const NewRepairOrder = () => {
       window.location.href = 'tel:0528692886';
       return;
     }
-    setSelectedRepair(repair);
-    // Show gift animation
-    setShowGiftAnimation(true);
-    setTimeout(() => {
-      setShowGiftAnimation(false);
-      goToStep('price');
-    }, 2500);
+    // Show image upload option first
+    setPendingRepair(repair);
+    setShowImageUploadOption(true);
+  };
+  
+  const continueAfterImageOption = (wantsToUpload: boolean) => {
+    setShowImageUploadOption(false);
+    if (wantsToUpload && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+    if (pendingRepair) {
+      setSelectedRepair(pendingRepair);
+      // Show gift animation
+      setShowGiftAnimation(true);
+      setTimeout(() => {
+        setShowGiftAnimation(false);
+        goToStep('price');
+      }, 2500);
+    }
   };
   const handlePriceConfirm = () => {
     goToStep('schedule');
@@ -549,6 +563,90 @@ const NewRepairOrder = () => {
           </div>
         </div>}
 
+      {/* Image Upload Option Dialog */}
+      {showImageUploadOption && <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm animate-fade-in p-4">
+          <Card className="w-full max-w-sm p-6 space-y-5 animate-scale-in">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Camera className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-lg font-bold mb-2">רוצה להעלות תמונה?</h3>
+              <p className="text-muted-foreground text-sm">
+                אפשר להעלות תמונה של מצב המכשיר<br/>
+                <span className="text-xs">(לא חובה)</span>
+              </p>
+            </div>
+            
+            {/* Uploaded images preview */}
+            {deviceImages.length > 0 && (
+              <div className="flex gap-2 justify-center flex-wrap">
+                {deviceImages.map((img, idx) => (
+                  <div key={idx} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border">
+                    <img src={img} alt={`תמונה ${idx + 1}`} className="w-full h-full object-cover" />
+                    <button
+                      onClick={() => removeImage(idx)}
+                      className="absolute top-0 right-0 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            <div className="flex gap-3">
+              <Button 
+                variant="outline" 
+                className="flex-1" 
+                onClick={() => continueAfterImageOption(false)}
+              >
+                דלג
+              </Button>
+              <Button 
+                className="flex-1 gap-2" 
+                onClick={() => {
+                  if (fileInputRef.current) {
+                    fileInputRef.current.click();
+                  }
+                }}
+                disabled={isUploadingImage || deviceImages.length >= 3}
+              >
+                {isUploadingImage ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <Image className="w-4 h-4" />
+                    העלה תמונה
+                  </>
+                )}
+              </Button>
+            </div>
+            
+            {deviceImages.length > 0 && (
+              <Button 
+                className="w-full" 
+                onClick={() => continueAfterImageOption(false)}
+              >
+                המשך להזמנה
+              </Button>
+            )}
+            
+            <p className="text-center text-xs text-muted-foreground">
+              ניתן להעלות עד 3 תמונות
+            </p>
+          </Card>
+          
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+        </div>}
+
       {/* Content */}
       <div className={`flex-1 p-4 pb-24 overflow-y-auto transition-all duration-200 ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
         
@@ -565,19 +663,52 @@ const NewRepairOrder = () => {
             </div>
           </div>}
 
-        {/* Step 1: Select Model */}
-        {step === 'model' && <div className="space-y-3 animate-fade-in">
-            <p className="text-muted-foreground text-xs text-center">בחר את המכשיר לתיקון</p>
+        {/* Step 1: Select Model - Enhanced Welcome */}
+        {step === 'model' && <div className="space-y-5 animate-fade-in">
+            {/* Hero Welcome Section */}
+            <div className="text-center py-4">
+              <div className="relative inline-block mb-4">
+                <div className="w-24 h-24 bg-gradient-to-br from-primary via-primary/80 to-primary/60 rounded-3xl flex items-center justify-center shadow-2xl shadow-primary/30 animate-pulse-slow">
+                  <Wrench className="w-12 h-12 text-primary-foreground" />
+                </div>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-success rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                  <Sparkles className="w-4 h-4 text-success-foreground" />
+                </div>
+              </div>
+              <h1 className="text-2xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                ברוכים הבאים! 👋
+              </h1>
+              <p className="text-muted-foreground text-sm leading-relaxed max-w-xs mx-auto">
+                תיקון מקצועי עד הבית<br/>
+                <span className="text-primary font-medium">בחרו את הדגם שלכם להתחלה</span>
+              </p>
+            </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              {filteredModels.map((model, index) => <Card key={model.id} onClick={() => handleModelSelect(model)} className="p-3 cursor-pointer hover:border-primary hover:shadow-lg transition-all duration-200 active:scale-95" style={{
-            animationDelay: `${index * 30}ms`
+            {/* Features Strip */}
+            <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-success" />
+                <span>אחריות מלאה</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-primary" />
+                <span>תיקון מהיר</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-warning" />
+                <span>עד הבית</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              {filteredModels.map((model, index) => <Card key={model.id} onClick={() => handleModelSelect(model)} className="p-3.5 cursor-pointer hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 active:scale-95 group" style={{
+            animationDelay: `${index * 40}ms`
           }}>
-                  <div className="flex flex-col items-center text-center gap-1.5">
-                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                      <Smartphone className="w-5 h-5 text-primary" />
+                  <div className="flex flex-col items-center text-center gap-2">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary/15 to-primary/5 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <Smartphone className="w-6 h-6 text-primary" />
                     </div>
-                    <span className="font-medium leading-tight text-sm">{model.name}</span>
+                    <span className="font-semibold leading-tight text-sm">{model.name}</span>
                   </div>
                 </Card>)}
             </div>
@@ -850,63 +981,21 @@ const NewRepairOrder = () => {
                 <Textarea placeholder="למשל: קומה 3, יש אינטרקום, לחייג בהגעה..." value={customerNotes} onChange={e => setCustomerNotes(e.target.value)} className="text-sm rounded-xl resize-none" rows={2} />
               </div>
 
-              {/* Image Upload */}
-              <div>
-                <label className="block text-xs font-medium mb-1.5">
-                  תמונה של המכשיר <span className="text-muted-foreground">(לא חובה)</span>
-                </label>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept="image/*"
-                  multiple
-                  className="hidden"
-                  onChange={handleImageUpload}
-                />
-                {deviceImages.length > 0 ? (
-                  <div className="flex gap-2 flex-wrap mb-2">
+              {/* Uploaded Images Display */}
+              {deviceImages.length > 0 && (
+                <div>
+                  <label className="block text-xs font-medium mb-1.5">
+                    תמונות שהועלו
+                  </label>
+                  <div className="flex gap-2 flex-wrap">
                     {deviceImages.map((url, index) => (
-                      <div key={index} className="relative w-20 h-20 rounded-lg overflow-hidden border border-border">
-                        <img src={url} alt={`Device ${index + 1}`} className="w-full h-full object-cover" />
-                        <button
-                          onClick={() => removeImage(index)}
-                          className="absolute top-0.5 right-0.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
+                      <div key={index} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border">
+                        <img src={url} alt={`תמונה ${index + 1}`} className="w-full h-full object-cover" />
                       </div>
                     ))}
-                    {deviceImages.length < 3 && (
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploadingImage}
-                        className="w-20 h-20 rounded-lg border-2 border-dashed border-border flex items-center justify-center hover:border-primary transition-colors"
-                      >
-                        {isUploadingImage ? (
-                          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                        ) : (
-                          <Camera className="w-5 h-5 text-muted-foreground" />
-                        )}
-                      </button>
-                    )}
                   </div>
-                ) : (
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploadingImage}
-                    className="w-full h-20 rounded-xl border-2 border-dashed border-border flex items-center justify-center gap-2 hover:border-primary transition-colors"
-                  >
-                    {isUploadingImage ? (
-                      <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                    ) : (
-                      <>
-                        <Camera className="w-5 h-5 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">הוסף תמונה (עד 3)</span>
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Coupon Code */}
               <div>
