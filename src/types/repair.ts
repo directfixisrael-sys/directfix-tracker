@@ -67,7 +67,7 @@ export const statusLabels: Record<RepairStatus, string> = {
   technician_assigned: 'טכנאי שובץ',
   on_the_way: 'הטכנאי בדרך אליך',
   arrived: 'טכנאי הגיע',
-  in_progress: 'התיקון בתהליך',
+  in_progress: 'עובדים על המכשיר שלך',
   completed: 'התיקון הושלם',
 };
 
