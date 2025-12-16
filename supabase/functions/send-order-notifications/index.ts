@@ -113,7 +113,7 @@ const handler = async (req: Request): Promise<Response> => {
         const businessEmail = await sendEmail(
           resendApiKey,
           "iPhix <onboarding@resend.dev>",
-          ["eliran.nissim@me.com"],
+          ["directfixisrael@gmail.com"],
           `🎉 הזמנה חדשה - ${orderData.customerName} - ${orderData.deviceType}`,
           businessEmailHtml
         );
