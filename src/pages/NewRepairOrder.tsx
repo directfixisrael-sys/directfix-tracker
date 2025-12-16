@@ -1081,191 +1081,59 @@ const NewRepairOrder = () => {
             </div>
           </div>}
 
-        {/* Step 4: Schedule - Enhanced */}
-        {step === 'schedule' && <div className="space-y-5 animate-fade-in">
-            <div className="text-center mb-6">
-              <div className="flex justify-center mb-4">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-violet-500/20 via-purple-500/15 to-fuchsia-500/10 rounded-3xl flex items-center justify-center shadow-lg">
-                    <div className="w-14 h-14 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-inner">
-                      <Calendar className="w-7 h-7 text-white" />
-                    </div>
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-success rounded-full flex items-center justify-center shadow-lg animate-bounce">
-                    <Clock className="w-3 h-3 text-success-foreground" />
-                  </div>
+        {/* Step 4: Schedule */}
+        {step === 'schedule' && <div className="space-y-4 animate-fade-in">
+            <div className="text-center mb-4">
+              <div className="flex justify-center mb-3">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center">
+                  <Calendar className="w-8 h-8 text-primary" />
                 </div>
               </div>
-              <h2 className="text-xl font-bold mb-1">מתי נוח לך?</h2>
-              <p className="text-muted-foreground text-sm">בחר יום ושעה לביקור הטכנאי</p>
+              <h2 className="text-lg font-bold mb-1">קביעת מועד</h2>
+              <p className="text-muted-foreground text-sm">מתי נוח שהטכנאי יגיע?</p>
             </div>
 
-            {/* Date selection - Enhanced */}
+            {/* Date selection */}
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-xs font-bold text-primary">1</span>
-                </div>
-                <label className="text-sm font-semibold">בחר יום</label>
-              </div>
-              <div className="grid grid-cols-4 gap-2.5">
+              <label className="block text-xs font-medium mb-2 text-muted-foreground">בחר יום</label>
+              <div className="grid grid-cols-4 gap-2">
                 {getAvailableDates().map((date, index) => {
-                  const dayName = hebrewDays[date.getDay()];
-                  const isToday = index === 0;
-                  const isTomorrow = index === 1;
-                  const isSelected = selectedDate?.toDateString() === date.toDateString();
-                  const hasAvailableSlots = getTimeSlotsForDate(date).some(slot => isSlotAvailable(date, slot));
-                  const isFriday = date.getDay() === 5;
-                  const isSaturday = date.getDay() === 6;
-                  
-                  return (
-                    <button 
-                      key={index} 
-                      onClick={() => {
-                        setSelectedDate(date);
-                        setSelectedTimeSlot('');
-                      }} 
-                      disabled={!hasAvailableSlots} 
-                      className={`p-3 rounded-2xl border-2 text-center transition-all duration-300 relative overflow-hidden group ${
-                        isSelected 
-                          ? 'border-primary bg-gradient-to-br from-primary/20 to-primary/5 shadow-lg shadow-primary/20 scale-105' 
-                          : hasAvailableSlots 
-                            ? 'border-border hover:border-primary/50 hover:bg-muted/50 hover:scale-102' 
-                            : 'border-border/30 opacity-40 cursor-not-allowed'
-                      }`}
-                      style={{ animationDelay: `${index * 50}ms` }}
-                    >
-                      {/* Selection indicator */}
-                      {isSelected && (
-                        <div className="absolute top-1 right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center animate-scale-in">
-                          <CheckCircle2 className="w-3 h-3 text-primary-foreground" />
-                        </div>
-                      )}
-                      
-                      {/* Day name */}
-                      <div className={`text-xs font-bold mb-0.5 ${isSelected ? 'text-primary' : ''}`}>
-                        {isToday ? '🏠 היום' : isTomorrow ? 'מחר' : dayName}
-                      </div>
-                      
-                      {/* Date */}
-                      <div className={`text-lg font-bold ${isSelected ? 'text-primary' : ''}`}>
-                        {date.getDate()}
-                      </div>
-                      
-                      {/* Month */}
-                      <div className="text-[10px] text-muted-foreground">
-                        {['ינו', 'פבר', 'מרץ', 'אפר', 'מאי', 'יונ', 'יול', 'אוג', 'ספט', 'אוק', 'נוב', 'דצמ'][date.getMonth()]}
-                      </div>
-                      
-                      {/* Special day indicator */}
-                      {(isFriday || isSaturday) && hasAvailableSlots && (
-                        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0.5 rounded-full bg-warning/20 text-warning">
-                          {isFriday ? 'שישי' : 'מוצ"ש'}
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
+              const dayName = hebrewDays[date.getDay()];
+              const isToday = index === 0;
+              const isSelected = selectedDate?.toDateString() === date.toDateString();
+              const hasAvailableSlots = getTimeSlotsForDate(date).some(slot => isSlotAvailable(date, slot));
+              return <button key={index} onClick={() => {
+                setSelectedDate(date);
+                setSelectedTimeSlot('');
+              }} disabled={!hasAvailableSlots} className={`p-2 rounded-lg border text-center transition-all ${isSelected ? 'border-primary bg-primary/10 text-primary' : hasAvailableSlots ? 'border-border hover:border-primary/50' : 'border-border/50 opacity-50 cursor-not-allowed'}`}>
+                      <div className="text-xs font-medium">{isToday ? 'היום' : dayName}</div>
+                      <div className="text-xs text-muted-foreground">{date.getDate()}/{date.getMonth() + 1}</div>
+                    </button>;
+            })}
               </div>
             </div>
 
-            {/* Time slot selection - Enhanced */}
-            {selectedDate && (
-              <div className="animate-fade-in">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-xs font-bold text-primary">2</span>
-                  </div>
-                  <label className="text-sm font-semibold">בחר שעה</label>
+            {/* Time slot selection */}
+            {selectedDate && <div className="animate-fade-in">
+                <label className="block text-xs font-medium mb-2 text-muted-foreground">בחר שעה</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {getTimeSlotsForDate(selectedDate).map(slot => {
+              const isAvailable = isSlotAvailable(selectedDate, slot);
+              const isSelected = selectedTimeSlot === slot;
+              return <button key={slot} onClick={() => setSelectedTimeSlot(slot)} disabled={!isAvailable} className={`p-3 rounded-lg border text-center transition-all flex items-center justify-center gap-2 ${isSelected ? 'border-primary bg-primary/10 text-primary' : isAvailable ? 'border-border hover:border-primary/50' : 'border-border/50 opacity-50 cursor-not-allowed'}`}>
+                        <Clock className="w-4 h-4" />
+                        <span className="text-sm font-medium">{slot}</span>
+                      </button>;
+            })}
                 </div>
-                <div className="grid grid-cols-2 gap-2.5">
-                  {getTimeSlotsForDate(selectedDate).map((slot, index) => {
-                    const isAvailable = isSlotAvailable(selectedDate, slot);
-                    const isSelected = selectedTimeSlot === slot;
-                    const startHour = parseInt(slot.split(':')[0]);
-                    const isMorning = startHour < 12;
-                    const isAfternoon = startHour >= 12 && startHour < 17;
-                    const isEvening = startHour >= 17;
-                    
-                    const getTimeIcon = () => {
-                      if (isMorning) return '🌅';
-                      if (isAfternoon) return '☀️';
-                      return '🌙';
-                    };
-                    
-                    const getTimeLabel = () => {
-                      if (isMorning) return 'בוקר';
-                      if (isAfternoon) return 'צהריים';
-                      return 'ערב';
-                    };
-                    
-                    return (
-                      <button 
-                        key={slot} 
-                        onClick={() => setSelectedTimeSlot(slot)} 
-                        disabled={!isAvailable} 
-                        className={`p-4 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden group ${
-                          isSelected 
-                            ? 'border-primary bg-gradient-to-br from-primary/20 to-primary/5 shadow-lg shadow-primary/20' 
-                            : isAvailable 
-                              ? 'border-border hover:border-primary/50 hover:bg-muted/50' 
-                              : 'border-border/30 opacity-40 cursor-not-allowed'
-                        }`}
-                        style={{ animationDelay: `${index * 60}ms` }}
-                      >
-                        {/* Selection indicator */}
-                        {isSelected && (
-                          <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-scale-in">
-                            <CheckCircle2 className="w-3 h-3 text-primary-foreground" />
-                          </div>
-                        )}
-                        
-                        <div className="flex items-center gap-3">
-                          {/* Time icon */}
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
-                            isSelected 
-                              ? 'bg-primary/20' 
-                              : 'bg-muted/50 group-hover:bg-primary/10'
-                          }`}>
-                            {getTimeIcon()}
-                          </div>
-                          
-                          <div className="text-right">
-                            <div className={`text-base font-bold ${isSelected ? 'text-primary' : ''}`}>
-                              {slot}
-                            </div>
-                            <div className="text-[10px] text-muted-foreground">
-                              {getTimeLabel()}
-                            </div>
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+              </div>}
 
-            {/* Selected summary - Enhanced */}
-            {selectedDate && selectedTimeSlot && (
-              <Card className="p-4 bg-gradient-to-r from-success/10 via-emerald-500/10 to-teal-500/10 border-success/30 animate-scale-in">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-success/20 rounded-2xl flex items-center justify-center">
-                    <CheckCircle2 className="w-6 h-6 text-success" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">מועד נבחר</p>
-                    <p className="font-bold text-success">{formatSelectedDateTime()}</p>
-                  </div>
-                </div>
-              </Card>
-            )}
-            
-            {/* Info note */}
-            <div className="flex items-center gap-2 text-xs text-muted-foreground justify-center">
-              <Clock className="w-3.5 h-3.5" />
-              <span>הטכנאי יגיע בשעות שנבחרו</span>
-            </div>
+            {selectedDate && selectedTimeSlot && <Card className="p-3 bg-primary/5 border-primary/20 animate-fade-in">
+                <p className="text-sm text-center">
+                  <span className="text-muted-foreground">מועד נבחר: </span>
+                  <span className="font-semibold">{formatSelectedDateTime()}</span>
+                </p>
+              </Card>}
           </div>}
 
         {/* Step 5: Customer Details */}
