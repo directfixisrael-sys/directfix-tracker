@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -9,16 +9,16 @@ import {
   Smartphone,
   Globe,
   Activity,
-  ArrowUp,
-  ArrowDown,
-  Minus,
   RefreshCw,
-  Calendar
+  DollarSign,
+  BarChart3
 } from 'lucide-react';
 import { RepairOrder } from '@/types/repair';
 import { cn } from '@/lib/utils';
 import DateRangePicker, { DateRange } from './DateRangePicker';
-import { subDays, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
+import { subDays, startOfDay, endOfDay, isWithinInterval, format, eachDayOfInterval, startOfMonth, endOfMonth, subMonths } from 'date-fns';
+import { he } from 'date-fns/locale';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts';
 
 interface AnalyticsDashboardProps {
   orders: RepairOrder[];
@@ -40,13 +40,15 @@ interface AnalyticsData {
   devices: { device: string; count: number }[];
 }
 
+const COLORS = ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(var(--warning))', 'hsl(var(--success))', 'hsl(var(--destructive))'];
+
 const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [dateRange, setDateRange] = useState<DateRange>({
-    from: startOfDay(subDays(new Date(), 7)),
+    from: startOfMonth(new Date()),
     to: endOfDay(new Date()),
-    label: 'שבוע אחרון',
+    label: 'החודש הנוכחי',
   });
   
   // Filter orders by date range
@@ -56,6 +58,78 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
       return isWithinInterval(orderDate, { start: dateRange.from, end: dateRange.to });
     });
   }, [orders, dateRange]);
+
+  // Calculate revenue data
+  const revenueData = useMemo(() => {
+    const calculateOrderTotal = (order: RepairOrder) => {
+      const accessoriesTotal = Array.isArray(order.accessories) 
+        ? order.accessories.reduce((sum: number, acc: any) => sum + (acc.price || 0), 0)
+        : 0;
+      return (order.repairPrice || 0) + accessoriesTotal;
+    };
+
+    // Total revenue
+    const totalRevenue = filteredOrders.reduce((sum, order) => sum + calculateOrderTotal(order), 0);
+    
+    // Completed orders revenue
+    const completedRevenue = filteredOrders
+      .filter(o => o.status === 'completed')
+      .reduce((sum, order) => sum + calculateOrderTotal(order), 0);
+
+    // Daily revenue for chart
+    const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to });
+    const dailyRevenue = days.map(day => {
+      const dayOrders = filteredOrders.filter(order => {
+        const orderDate = new Date(order.createdAt);
+        return orderDate.toDateString() === day.toDateString();
+      });
+      const revenue = dayOrders.reduce((sum, order) => sum + calculateOrderTotal(order), 0);
+      return {
+        date: format(day, 'dd/MM', { locale: he }),
+        revenue,
+        orders: dayOrders.length,
+      };
+    });
+
+    // Revenue by device type
+    const deviceRevenue: Record<string, number> = {};
+    filteredOrders.forEach(order => {
+      const device = order.deviceType || 'אחר';
+      deviceRevenue[device] = (deviceRevenue[device] || 0) + calculateOrderTotal(order);
+    });
+    const revenueByDevice = Object.entries(deviceRevenue)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+
+    // Average order value
+    const avgOrderValue = filteredOrders.length > 0 
+      ? totalRevenue / filteredOrders.length 
+      : 0;
+
+    // Compare to previous period
+    const periodDays = Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
+    const previousFrom = subDays(dateRange.from, periodDays);
+    const previousTo = subDays(dateRange.to, periodDays);
+    const previousOrders = orders.filter(order => {
+      const orderDate = new Date(order.createdAt);
+      return isWithinInterval(orderDate, { start: previousFrom, end: previousTo });
+    });
+    const previousRevenue = previousOrders.reduce((sum, order) => sum + calculateOrderTotal(order), 0);
+    const revenueChange = previousRevenue > 0 
+      ? ((totalRevenue - previousRevenue) / previousRevenue) * 100 
+      : 0;
+
+    return {
+      totalRevenue,
+      completedRevenue,
+      dailyRevenue,
+      revenueByDevice,
+      avgOrderValue,
+      revenueChange,
+      previousRevenue,
+    };
+  }, [filteredOrders, dateRange, orders]);
 
   // Calculate real-time viewers (orders being viewed within last 2 minutes)
   const activeViewers = orders.filter(o => {
@@ -120,6 +194,10 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
     return `${minutes}:${secs.toString().padStart(2, '0')} דקות`;
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 }).format(amount);
+  };
+
   const getDeviceIcon = (device: string) => {
     switch (device) {
       case 'mobile': return '📱';
@@ -158,7 +236,137 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center animate-pulse">
             <Activity className="w-6 h-6 text-success" />
+      </div>
+
+      {/* Revenue Report Section */}
+      <Card className="p-4 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+          <DollarSign className="w-5 h-5 text-primary" />
+          דוח הכנסות ({dateRange.label})
+        </h3>
+        
+        {/* Revenue Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-card p-4 rounded-lg border">
+            <p className="text-xs text-muted-foreground mb-1">סה״כ הכנסות</p>
+            <p className="text-2xl font-bold text-primary">{formatCurrency(revenueData.totalRevenue)}</p>
+            {revenueData.revenueChange !== 0 && (
+              <p className={cn(
+                "text-xs mt-1 flex items-center gap-1",
+                revenueData.revenueChange > 0 ? "text-success" : "text-destructive"
+              )}>
+                {revenueData.revenueChange > 0 ? '↑' : '↓'}
+                {Math.abs(revenueData.revenueChange).toFixed(1)}% מהתקופה הקודמת
+              </p>
+            )}
           </div>
+          <div className="bg-card p-4 rounded-lg border">
+            <p className="text-xs text-muted-foreground mb-1">הכנסות שהושלמו</p>
+            <p className="text-2xl font-bold text-success">{formatCurrency(revenueData.completedRevenue)}</p>
+          </div>
+          <div className="bg-card p-4 rounded-lg border">
+            <p className="text-xs text-muted-foreground mb-1">ממוצע להזמנה</p>
+            <p className="text-2xl font-bold text-accent">{formatCurrency(revenueData.avgOrderValue)}</p>
+          </div>
+          <div className="bg-card p-4 rounded-lg border">
+            <p className="text-xs text-muted-foreground mb-1">הזמנות בתקופה</p>
+            <p className="text-2xl font-bold">{filteredOrders.length}</p>
+          </div>
+        </div>
+
+        {/* Revenue Chart */}
+        <div className="bg-card p-4 rounded-lg border mb-6">
+          <h4 className="font-semibold mb-4 flex items-center gap-2">
+            <BarChart3 className="w-4 h-4" />
+            הכנסות לפי יום
+          </h4>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={revenueData.dailyRevenue}>
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 10 }}
+                  interval="preserveStartEnd"
+                />
+                <YAxis 
+                  tick={{ fontSize: 10 }}
+                  tickFormatter={(value) => `₪${value}`}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [formatCurrency(value), 'הכנסות']}
+                  labelFormatter={(label) => `תאריך: ${label}`}
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    direction: 'rtl'
+                  }}
+                />
+                <Bar 
+                  dataKey="revenue" 
+                  fill="hsl(var(--primary))" 
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Revenue by Device Type */}
+        {revenueData.revenueByDevice.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-card p-4 rounded-lg border">
+              <h4 className="font-semibold mb-4">הכנסות לפי סוג מכשיר</h4>
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={revenueData.revenueByDevice}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={70}
+                      paddingAngle={2}
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                      labelLine={false}
+                    >
+                      {revenueData.revenueByDevice.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value: number) => formatCurrency(value)}
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="bg-card p-4 rounded-lg border">
+              <h4 className="font-semibold mb-4">פירוט לפי מכשיר</h4>
+              <div className="space-y-3">
+                {revenueData.revenueByDevice.map((device, index) => (
+                  <div key={device.name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                      />
+                      <span className="text-sm">{device.name}</span>
+                    </div>
+                    <span className="font-medium">{formatCurrency(device.value)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </Card>
           <div>
             <p className="text-sm text-muted-foreground">צופים כרגע באתר</p>
             <div className="flex items-baseline gap-2">
