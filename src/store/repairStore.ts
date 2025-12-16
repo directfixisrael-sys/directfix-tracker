@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import { RepairOrder, ChatMessage, RepairStatus, Accessory } from '@/types/repair';
+import { RepairOrder, ChatMessage, RepairStatus, Accessory, PaymentStatus } from '@/types/repair';
 
 interface RepairStore {
   orders: RepairOrder[];
@@ -32,6 +32,8 @@ interface RepairStore {
   updateEstimatedArrival: (orderId: string, eta: string) => Promise<void>;
   updateWazeLink: (orderId: string, wazeLink: string) => Promise<void>;
   updateInvoiceLink: (orderId: string, invoiceLink: string) => Promise<void>;
+  updatePaymentLink: (orderId: string, paymentLink: string) => Promise<void>;
+  updatePaymentStatus: (orderId: string, paymentStatus: PaymentStatus) => Promise<void>;
   addNote: (orderId: string, note: string) => Promise<void>;
   addSupportMessage: (orderId: string, message: string) => Promise<void>;
   markMessageAsRead: (messageId: string) => Promise<void>;
@@ -69,6 +71,8 @@ const dbToOrder = (row: any): RepairOrder => ({
   isViewing: row.is_viewing || false,
   wazeLink: row.waze_link,
   invoiceLink: row.invoice_link,
+  paymentLink: row.payment_link,
+  paymentStatus: row.payment_status as PaymentStatus || 'none',
 });
 
 // Convert database row to ChatMessage
@@ -332,6 +336,31 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
 
     if (error) {
       console.error('Error updating invoice link:', error);
+    }
+  },
+
+  updatePaymentLink: async (orderId, paymentLink) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ 
+        payment_link: paymentLink,
+        payment_status: paymentLink ? 'pending' : 'none'
+      })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error updating payment link:', error);
+    }
+  },
+
+  updatePaymentStatus: async (orderId, paymentStatus) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ payment_status: paymentStatus })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error updating payment status:', error);
     }
   },
 

@@ -43,7 +43,9 @@ import {
   Phone,
   MapPin,
   ArrowUpDown,
-  Gift
+  Gift,
+  CreditCard,
+  DollarSign
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -73,6 +75,7 @@ const AdminPanel = () => {
   const [eta, setEta] = useState('');
   const [wazeLink, setWazeLink] = useState('');
   const [invoiceLink, setInvoiceLink] = useState('');
+  const [paymentLink, setPaymentLink] = useState('');
   const [statusNote, setStatusNote] = useState('');
   const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -103,6 +106,8 @@ const AdminPanel = () => {
     updateEstimatedArrival,
     updateWazeLink,
     updateInvoiceLink,
+    updatePaymentLink,
+    updatePaymentStatus,
     addNote, 
     addSupportMessage,
     deleteOrder,
@@ -1117,6 +1122,74 @@ ${trackingUrl}
                         <p className="text-xs text-muted-foreground mt-1 truncate" dir="ltr">
                           {selectedOrder.invoiceLink}
                         </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Payment link */}
+                  <div className="glass-card rounded-xl p-6">
+                    <h3 className="font-semibold text-foreground mb-4 text-lg flex items-center gap-2">
+                      <CreditCard className="w-5 h-5" />
+                      קישור לתשלום
+                    </h3>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="הכנס קישור לתשלום..."
+                        value={paymentLink}
+                        onChange={(e) => setPaymentLink(e.target.value)}
+                        className="flex-1"
+                        dir="ltr"
+                      />
+                      <Button onClick={() => {
+                        if (selectedOrder && paymentLink) {
+                          updatePaymentLink(selectedOrder.id, paymentLink);
+                          toast({ title: "קישור תשלום עודכן", description: "הלקוח יראה התראה על תשלום ממתין" });
+                          setPaymentLink('');
+                        }
+                      }}>
+                        שמור
+                      </Button>
+                    </div>
+                    {selectedOrder.paymentLink && (
+                      <div className="mt-3 space-y-2">
+                        <div className="p-2 bg-warning/10 rounded-lg flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-warning font-medium flex items-center gap-2">
+                              <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warning opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-warning"></span>
+                              </span>
+                              {selectedOrder.paymentStatus === 'paid' ? 'שולם ✓' : 'ממתין לתשלום'}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1 truncate" dir="ltr">
+                              {selectedOrder.paymentLink}
+                            </p>
+                          </div>
+                          {selectedOrder.paymentStatus !== 'paid' && (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                updatePaymentStatus(selectedOrder.id, 'paid');
+                                toast({ title: "סומן כשולם" });
+                              }}
+                            >
+                              <DollarSign className="w-4 h-4 mr-1" />
+                              סמן כשולם
+                            </Button>
+                          )}
+                        </div>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          className="w-full"
+                          onClick={() => {
+                            updatePaymentLink(selectedOrder.id, '');
+                            toast({ title: "קישור תשלום הוסר" });
+                          }}
+                        >
+                          הסר קישור תשלום
+                        </Button>
                       </div>
                     )}
                   </div>

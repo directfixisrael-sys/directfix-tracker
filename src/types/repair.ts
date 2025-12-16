@@ -7,6 +7,8 @@ export type RepairStatus =
   | 'in_progress' 
   | 'completed';
 
+export type PaymentStatus = 'none' | 'pending' | 'paid';
+
 export interface RepairOrder {
   id: string;
   customerPhone: string;
@@ -30,6 +32,8 @@ export interface RepairOrder {
   isViewing?: boolean;
   wazeLink?: string;
   invoiceLink?: string;
+  paymentLink?: string;
+  paymentStatus?: PaymentStatus;
 }
 
 export interface Accessory {

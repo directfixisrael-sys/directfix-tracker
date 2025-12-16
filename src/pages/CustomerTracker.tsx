@@ -14,7 +14,7 @@ import StickyHeader from '@/components/StickyHeader';
 import PrivacyConsentModal from '@/components/PrivacyConsentModal';
 import { useRepairStore } from '@/store/repairStore';
 import logo from '@/assets/logo.png';
-import { FileText, Download } from 'lucide-react';
+import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const CustomerTracker = () => {
@@ -210,6 +210,38 @@ const CustomerTracker = () => {
           <p className="text-muted-foreground text-sm">שלום,</p>
           <h1 className="text-2xl font-bold text-foreground">{currentOrder.customerName} 👋</h1>
         </div>
+
+        {/* Payment pending notification */}
+        {currentOrder.paymentLink && currentOrder.paymentStatus === 'pending' && (
+          <div className="glass-card rounded-xl p-5 animate-fade-in border-2 border-warning/50 bg-warning/5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="relative">
+                <div className="w-10 h-10 bg-warning/20 rounded-lg flex items-center justify-center">
+                  <CreditCard className="w-5 h-5 text-warning" />
+                </div>
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-success"></span>
+                </span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">חשבונית ממתינה לתשלום</h3>
+                <p className="text-sm text-muted-foreground">לחצו לתשלום מאובטח</p>
+              </div>
+            </div>
+            <a 
+              href={currentOrder.paymentLink} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-full"
+            >
+              <Button className="w-full gap-2 bg-warning hover:bg-warning/90 text-warning-foreground">
+                <ExternalLink className="w-4 h-4" />
+                לתשלום
+              </Button>
+            </a>
+          </div>
+        )}
 
         {/* Rating prompt - show at top when completed */}
         {showRating && (

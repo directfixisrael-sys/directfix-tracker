@@ -126,6 +126,8 @@ export type Database = {
           issue_description: string
           last_viewed_at: string | null
           notes: string[]
+          payment_link: string | null
+          payment_status: string | null
           rating: number | null
           repair_price: number
           status: string
@@ -150,6 +152,8 @@ export type Database = {
           issue_description?: string
           last_viewed_at?: string | null
           notes?: string[]
+          payment_link?: string | null
+          payment_status?: string | null
           rating?: number | null
           repair_price?: number
           status?: string
@@ -174,6 +178,8 @@ export type Database = {
           issue_description?: string
           last_viewed_at?: string | null
           notes?: string[]
+          payment_link?: string | null
+          payment_status?: string | null
           rating?: number | null
           repair_price?: number
           status?: string
