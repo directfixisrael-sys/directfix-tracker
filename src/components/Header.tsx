@@ -16,7 +16,7 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
   };
 
   return (
-    <header className="bg-card/80 backdrop-blur-lg border-b border-border/50 sticky top-0 z-50">
+    <header className="bg-card/80 backdrop-blur-lg border-b border-border/50 sticky top-0 z-50 pt-[env(safe-area-inset-top)]">
       <div className="container flex items-center justify-between h-14 px-4">
         {showBackButton ? (
           <button 
