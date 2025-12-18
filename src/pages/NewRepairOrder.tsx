@@ -629,7 +629,7 @@ const NewRepairOrder = () => {
                 const event = new CustomEvent('open-accessibility-widget');
                 window.dispatchEvent(event);
               }} 
-              className="h-9 w-9 rounded-full text-blue-500 hover:text-blue-600 hover:bg-blue-500/10"
+              className="h-9 w-9 rounded-full bg-blue-500 text-white hover:bg-blue-600 hover:text-white"
             >
               <Accessibility className="w-4 h-4" />
             </Button>
