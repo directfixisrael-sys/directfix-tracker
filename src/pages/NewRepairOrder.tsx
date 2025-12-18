@@ -622,6 +622,13 @@ const NewRepairOrder = () => {
             <h1 className="text-base font-semibold">הזמנת תיקון</h1>
           </div>
           <div className="flex items-center gap-1">
+            <a
+              href="tel:033106020"
+              className="h-9 w-9 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center transition-colors"
+              aria-label="התקשר 033106020"
+            >
+              <Phone className="w-4 h-4" />
+            </a>
             <Button 
               variant="ghost" 
               size="icon" 
