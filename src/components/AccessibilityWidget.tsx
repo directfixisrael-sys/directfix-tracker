@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Accessibility, Plus, Minus, Eye, Sparkles, RotateCcw, X } from "lucide-react";
+import { Accessibility, Plus, Minus, Eye, Sparkles, RotateCcw, X, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -103,22 +103,40 @@ export function AccessibilityWidget({ showFloatingButton = true }: { showFloatin
 
   return (
     <>
-      {/* Floating Button - Optional */}
-      {showFloatingButton && (
-        <button
-          onClick={() => setIsOpen(true)}
+      {/* Floating Buttons Container */}
+      <div className="fixed bottom-24 left-4 z-50 flex flex-col gap-3">
+        {/* Phone Call Button */}
+        <a
+          href="tel:033106020"
           className={cn(
-            "fixed bottom-24 left-4 z-50 w-12 h-12 rounded-full",
-            "bg-blue-500 text-white shadow-lg",
+            "w-12 h-12 rounded-full",
+            "bg-green-500 text-white shadow-lg",
             "flex items-center justify-center",
-            "hover:scale-110 hover:bg-blue-600 transition-all",
-            "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            "hover:scale-110 hover:bg-green-600 transition-all",
+            "focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
           )}
-          aria-label="פתח תפריט נגישות"
+          aria-label="התקשר 033106020"
         >
-          <Accessibility className="w-6 h-6" />
-        </button>
-      )}
+          <Phone className="w-6 h-6" />
+        </a>
+
+        {/* Accessibility Button - Optional */}
+        {showFloatingButton && (
+          <button
+            onClick={() => setIsOpen(true)}
+            className={cn(
+              "w-12 h-12 rounded-full",
+              "bg-blue-500 text-white shadow-lg",
+              "flex items-center justify-center",
+              "hover:scale-110 hover:bg-blue-600 transition-all",
+              "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            )}
+            aria-label="פתח תפריט נגישות"
+          >
+            <Accessibility className="w-6 h-6" />
+          </button>
+        )}
+      </div>
 
       {/* Modal Overlay */}
       {isOpen && (
