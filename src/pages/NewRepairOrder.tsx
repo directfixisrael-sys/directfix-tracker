@@ -12,6 +12,7 @@ import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logo from '@/assets/logo.png';
+import { trackPurchase } from '@/lib/fbPixel';
 
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
@@ -521,6 +522,9 @@ const NewRepairOrder = () => {
         console.error('Error sending notifications:', notificationError);
         // Don't fail the order if notifications fail
       }
+
+      // Track Facebook Pixel Purchase event
+      trackPurchase(getFinalPrice());
 
       goToStep('success');
     } catch (error) {
