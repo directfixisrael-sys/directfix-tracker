@@ -19,6 +19,7 @@ import DateRangePicker, { DateRange } from './DateRangePicker';
 import { subDays, startOfDay, endOfDay, isWithinInterval, format, eachDayOfInterval, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts';
+import { useLiveVisitors } from '@/hooks/useLiveVisitors';
 
 interface AnalyticsDashboardProps {
   orders: RepairOrder[];
@@ -41,6 +42,72 @@ interface AnalyticsData {
 }
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(var(--warning))', 'hsl(var(--success))', 'hsl(var(--destructive))'];
+
+// Page name translations
+const PAGE_NAMES: Record<string, string> = {
+  '/': 'דף הבית',
+  '/order': 'הזמנה חדשה',
+  '/track': 'מעקב הזמנה',
+  '/admin': 'פאנל ניהול',
+  '/purchase': 'רכישת מכשיר',
+};
+
+// Live Visitors Card Component
+const LiveVisitorsCard = ({ activeViewers }: { activeViewers: any[] }) => {
+  const { totalVisitors, visitorsByPage, visitors } = useLiveVisitors();
+  
+  return (
+    <Card className="p-4 bg-gradient-to-br from-success/10 to-success/5 border-success/20">
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center animate-pulse">
+          <Activity className="w-6 h-6 text-success" />
+        </div>
+        <div>
+          <p className="text-sm text-muted-foreground">מבקרים כרגע באתר</p>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-success">{totalVisitors}</span>
+            <span className="text-sm text-success">בזמן אמת</span>
+          </div>
+        </div>
+      </div>
+      
+      {/* Visitors by page */}
+      {totalVisitors > 0 && (
+        <div className="mt-4 pt-4 border-t border-success/20">
+          <p className="text-xs text-muted-foreground mb-2">לפי עמוד:</p>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(visitorsByPage).map(([page, count]) => (
+              <span 
+                key={page} 
+                className="text-xs bg-success/20 text-success px-2 py-1 rounded-full flex items-center gap-1"
+              >
+                <Eye className="w-3 h-3" />
+                {PAGE_NAMES[page] || page}: {count}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Order viewers (existing functionality) */}
+      {activeViewers.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-success/20">
+          <p className="text-xs text-muted-foreground mb-2">לקוחות צופים בהזמנות:</p>
+          <div className="flex flex-wrap gap-2">
+            {activeViewers.map(viewer => (
+              <span 
+                key={viewer.id} 
+                className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full"
+              >
+                {viewer.customerName}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+};
 
 const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -231,12 +298,8 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
         </div>
       </div>
 
-      {/* Real-time Section */}
-      <Card className="p-4 bg-gradient-to-br from-success/10 to-success/5 border-success/20">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center animate-pulse">
-            <Activity className="w-6 h-6 text-success" />
-      </div>
+      {/* Real-time Visitors Section */}
+      <LiveVisitorsCard activeViewers={activeViewers} />
 
       {/* Revenue Report Section */}
       <Card className="p-4 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
@@ -363,30 +426,6 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
-        )}
-      </Card>
-          <div>
-            <p className="text-sm text-muted-foreground">צופים כרגע באתר</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-success">{activeViewers.length}</span>
-              <span className="text-sm text-success">בזמן אמת</span>
-            </div>
-          </div>
-        </div>
-        {activeViewers.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-success/20">
-            <p className="text-xs text-muted-foreground mb-2">לקוחות צופים:</p>
-            <div className="flex flex-wrap gap-2">
-              {activeViewers.map(viewer => (
-                <span 
-                  key={viewer.id} 
-                  className="text-xs bg-success/20 text-success px-2 py-1 rounded-full"
-                >
-                  {viewer.customerName}
-                </span>
-              ))}
             </div>
           </div>
         )}

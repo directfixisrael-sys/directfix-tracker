@@ -12,6 +12,7 @@ import NewRepairOrder from "./pages/NewRepairOrder";
 import DevicePurchase from "./pages/DevicePurchase";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
+import { VisitorTracker } from "./components/VisitorTracker";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <VisitorTracker />
           <AccessibilityWidget showFloatingButton={false} />
           <Routes>
             <Route path="/" element={<Index />} />
