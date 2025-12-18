@@ -14,28 +14,44 @@ export const initFacebookPixel = () => {
   if (typeof window === 'undefined') return;
   
   // Avoid re-initialization
-  if (window.fbq) return;
+  if (window.fbq) {
+    console.log('Facebook Pixel: Already initialized');
+    return;
+  }
+
+  console.log('Facebook Pixel: Initializing...');
 
   // Facebook Pixel base code
   const n = window.fbq = function(...args: any[]) {
-    n.callMethod ? n.callMethod(...args) : n.queue.push(args);
+    if (n.callMethod) {
+      n.callMethod.apply(n, args);
+    } else {
+      n.queue.push(args);
+    }
   } as any;
   
   if (!window._fbq) window._fbq = n;
   n.push = n;
   n.loaded = true;
   n.version = '2.0';
-  n.queue = [];
+  n.queue = [] as any[];
   
   // Load the Facebook Pixel script
   const script = document.createElement('script');
   script.async = true;
   script.src = 'https://connect.facebook.net/en_US/fbevents.js';
+  script.onload = () => {
+    console.log('Facebook Pixel: Script loaded successfully');
+  };
+  script.onerror = () => {
+    console.error('Facebook Pixel: Failed to load script');
+  };
   document.head.appendChild(script);
   
   // Initialize with your Pixel ID
   window.fbq('init', FB_PIXEL_ID);
   window.fbq('track', 'PageView');
+  console.log('Facebook Pixel: PageView tracked');
 };
 
 // Track Purchase/Conversion event
