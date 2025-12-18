@@ -17,12 +17,19 @@ const defaultSettings: AccessibilitySettings = {
   largePointer: false,
 };
 
-export function AccessibilityWidget() {
+export function AccessibilityWidget({ showFloatingButton = true }: { showFloatingButton?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const [settings, setSettings] = useState<AccessibilitySettings>(() => {
     const saved = localStorage.getItem("accessibility-settings");
     return saved ? JSON.parse(saved) : defaultSettings;
   });
+
+  // Listen for custom event to open the widget
+  useEffect(() => {
+    const handleOpenWidget = () => setIsOpen(true);
+    window.addEventListener('open-accessibility-widget', handleOpenWidget);
+    return () => window.removeEventListener('open-accessibility-widget', handleOpenWidget);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("accessibility-settings", JSON.stringify(settings));
@@ -96,20 +103,22 @@ export function AccessibilityWidget() {
 
   return (
     <>
-      {/* Floating Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className={cn(
-          "fixed bottom-24 left-4 z-50 w-12 h-12 rounded-full",
-          "bg-primary text-primary-foreground shadow-lg",
-          "flex items-center justify-center",
-          "hover:scale-110 transition-transform",
-          "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-        )}
-        aria-label="פתח תפריט נגישות"
-      >
-        <Accessibility className="w-6 h-6" />
-      </button>
+      {/* Floating Button - Optional */}
+      {showFloatingButton && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className={cn(
+            "fixed bottom-24 left-4 z-50 w-12 h-12 rounded-full",
+            "bg-blue-500 text-white shadow-lg",
+            "flex items-center justify-center",
+            "hover:scale-110 hover:bg-blue-600 transition-all",
+            "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          )}
+          aria-label="פתח תפריט נגישות"
+        >
+          <Accessibility className="w-6 h-6" />
+        </button>
+      )}
 
       {/* Modal Overlay */}
       {isOpen && (

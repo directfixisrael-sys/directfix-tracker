@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -621,9 +621,22 @@ const NewRepairOrder = () => {
             <img src={logo} alt="Logo" className="h-7 w-auto" />
             <h1 className="text-base font-semibold">הזמנת תיקון</h1>
           </div>
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-full">
-            {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => {
+                const event = new CustomEvent('open-accessibility-widget');
+                window.dispatchEvent(event);
+              }} 
+              className="h-9 w-9 rounded-full text-blue-500 hover:text-blue-600 hover:bg-blue-500/10"
+            >
+              <Accessibility className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-full">
+              {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </Button>
+          </div>
         </div>
         
         {/* Progress bar */}
