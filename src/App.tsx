@@ -23,7 +23,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <AccessibilityWidget />
+          <AccessibilityWidget showFloatingButton={false} />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/track" element={<CustomerTracker />} />
