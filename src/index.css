@@ -91,28 +91,30 @@
 
   html {
     direction: rtl;
-    font-size: 18px;
+    font-size: 16px;
   }
   
   @media (min-width: 640px) {
     html {
-      font-size: 22px;
+      font-size: 17px;
     }
   }
   
   @media (min-width: 1024px) {
     html {
-      font-size: 24px;
+      font-size: 18px;
     }
   }
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Rubik', sans-serif;
+    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   * {
-    font-family: 'Rubik', sans-serif;
+    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   /* High Contrast Mode */

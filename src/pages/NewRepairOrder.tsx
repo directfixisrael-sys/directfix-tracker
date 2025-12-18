@@ -760,115 +760,39 @@ const NewRepairOrder = () => {
           </div>}
 
         {/* Step 1: Select Model - Enhanced Welcome */}
-        {step === 'model' && <div className="space-y-5 animate-fade-in">
-            {/* Hero Welcome Section */}
-            <div className="text-center py-4">
-              <div className="relative inline-block mb-4">
-                <div className="w-24 h-24 bg-gradient-to-br from-primary via-primary/80 to-primary/60 rounded-3xl flex items-center justify-center shadow-2xl shadow-primary/30 animate-pulse-slow">
-                  <Wrench className="w-12 h-12 text-primary-foreground" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-success rounded-full flex items-center justify-center shadow-lg animate-bounce">
-                  <Sparkles className="w-4 h-4 text-success-foreground" />
-                </div>
-              </div>
-              <h1 className="text-2xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-                ברוכים הבאים! 👋
+        {step === 'model' && <div className="space-y-8 animate-fade-in">
+            {/* Hero Welcome Section - Apple style */}
+            <div className="text-center py-8">
+              <h1 className="text-4xl font-bold mb-3 tracking-tight">
+                הזמנת תיקון
               </h1>
-              <p className="text-muted-foreground text-sm leading-relaxed max-w-xs mx-auto">
-                תיקון מקצועי עד הבית<br/>
-                <span className="text-primary font-medium">בחרו את הדגם שלכם להתחלה</span>
+              <p className="text-xl text-muted-foreground">
+                בחרו את הדגם שלכם
               </p>
             </div>
 
-            {/* Features Strip */}
-            <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-success" />
-                <span>אחריות מלאה</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-primary" />
-                <span>תיקון מהיר</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-warning" />
-                <span>עד הבית</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               {filteredModels.map((model, index) => {
-                // Determine model series for styling
-                const is16Series = model.name.includes('16');
-                const is15Series = model.name.includes('15');
-                const is14Series = model.name.includes('14');
-                const is13Series = model.name.includes('13');
                 const isPro = model.name.includes('Pro');
-                const isMax = model.name.includes('Max');
-                const isPlus = model.name.includes('Plus');
-                
-                // Color scheme based on series
-                const getGradient = () => {
-                  if (is16Series) return isPro ? 'from-slate-700 via-slate-600 to-slate-500' : 'from-blue-500 via-blue-400 to-cyan-400';
-                  if (is15Series) return isPro ? 'from-slate-800 via-slate-700 to-slate-600' : 'from-pink-400 via-rose-400 to-orange-300';
-                  if (is14Series) return isPro ? 'from-violet-700 via-purple-600 to-purple-500' : 'from-sky-400 via-blue-400 to-indigo-400';
-                  if (is13Series) return isPro ? 'from-emerald-700 via-teal-600 to-teal-500' : 'from-red-400 via-rose-400 to-pink-400';
-                  return 'from-gray-600 via-gray-500 to-gray-400';
-                };
-                
-                // Phone size based on model
-                const getPhoneSize = () => {
-                  if (isMax) return { w: 'w-10', h: 'h-[4.5rem]' };
-                  if (isPlus) return { w: 'w-9', h: 'h-16' };
-                  if (isPro && !isMax) return { w: 'w-8', h: 'h-14' };
-                  return { w: 'w-7', h: 'h-12' };
-                };
-                
-                const phoneSize = getPhoneSize();
                 
                 return (
                   <Card 
                     key={model.id} 
                     onClick={() => handleModelSelect(model)} 
-                    className="p-4 cursor-pointer hover:border-primary hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500 active:scale-95 group overflow-hidden relative animate-fade-in"
-                    style={{ animationDelay: `${index * 60}ms` }}
+                    className="p-6 cursor-pointer hover:bg-muted/50 border-2 border-transparent hover:border-primary/20 transition-all duration-300 active:scale-[0.98] rounded-2xl"
+                    style={{ animationDelay: `${index * 40}ms` }}
                   >
-                    {/* Background glow effect */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${getGradient()} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
-                    
-                    <div className="flex flex-col items-center text-center gap-3 relative">
-                      {/* iPhone Visual */}
-                      <div className="relative group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500">
-                        {/* Phone body */}
-                        <div className={`${phoneSize.w} ${phoneSize.h} bg-gradient-to-b ${getGradient()} rounded-[0.6rem] relative overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300`}>
-                          {/* Notch/Dynamic Island */}
-                          <div className={`absolute top-1 left-1/2 -translate-x-1/2 ${is16Series || is15Series || is14Series ? 'w-4 h-1.5 rounded-full' : 'w-5 h-1 rounded-b-lg'} bg-black/80`} />
-                          
-                          {/* Screen */}
-                          <div className="absolute inset-[3px] top-3 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-[0.4rem] flex items-center justify-center">
-                            {/* Apple logo */}
-                            <svg className="w-3 h-3 text-white/20" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                            </svg>
-                          </div>
-                          
-                          {/* Camera bump for Pro models */}
-                          {isPro && (
-                            <div className="absolute -top-0.5 -left-0.5 w-3 h-3 bg-gray-800 rounded-br-lg flex items-center justify-center">
-                              <div className="w-1.5 h-1.5 bg-gray-600 rounded-full" />
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Reflection effect */}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 rounded-[0.6rem] pointer-events-none" />
+                    <div className="flex flex-col items-center text-center gap-3">
+                      {/* Simple iPhone icon */}
+                      <div className="w-12 h-20 bg-muted rounded-xl flex items-center justify-center">
+                        <Smartphone className="w-8 h-8 text-muted-foreground" />
                       </div>
                       
                       {/* Model name */}
-                      <div className="space-y-0.5">
-                        <span className="font-bold text-sm block group-hover:text-primary transition-colors duration-300">{model.name}</span>
+                      <div>
+                        <span className="font-semibold text-lg block">{model.name}</span>
                         {isPro && (
-                          <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Pro</span>
+                          <span className="text-sm text-muted-foreground">Pro</span>
                         )}
                       </div>
                     </div>
@@ -879,18 +803,10 @@ const NewRepairOrder = () => {
           </div>}
 
         {/* Step 2: Select Repair Type */}
-        {step === 'repair' && <div className="space-y-4 animate-fade-in">
-            <div className="text-center mb-4">
-              <div className="flex justify-center mb-3">
-                <div className="relative">
-                  <PhoneIllustration />
-                  <div className="absolute -bottom-1 -left-1 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-full font-medium">
-                    {selectedModel?.name}
-                  </div>
-                </div>
-              </div>
-              <h2 className="text-lg font-bold mb-1">מה הבעיה?</h2>
-              <p className="text-muted-foreground text-sm">בחר את סוג התיקון</p>
+        {step === 'repair' && <div className="space-y-6 animate-fade-in">
+            <div className="text-center mb-6">
+              <p className="text-muted-foreground text-lg mb-2">{selectedModel?.name}</p>
+              <h2 className="text-3xl font-bold">מה צריך לתקן?</h2>
             </div>
 
             <div className="space-y-3">
@@ -910,108 +826,33 @@ const NewRepairOrder = () => {
                 const infoKey = isOriginalScreen ? 'מסך מקורי' : isCompatibleScreen ? 'מסך תואם' : isBattery ? 'סוללה מקורית' : null;
                 const info = infoKey ? repairInfoDescriptions[infoKey] : null;
                 
-                // Custom icon styling based on repair type
-                const getIconConfig = () => {
-                  if (isOriginalScreen) return {
-                    gradient: 'from-emerald-500 via-green-500 to-teal-500',
-                    bgGradient: 'from-emerald-500/20 to-teal-500/10',
-                    icon: (
-                      <div className="relative">
-                        <div className="w-6 h-9 bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg border-2 border-emerald-400 relative overflow-hidden">
-                          <div className="absolute inset-0.5 bg-gradient-to-br from-emerald-400/30 to-teal-400/20 rounded" />
-                          <div className="absolute top-0.5 left-1/2 -translate-x-1/2 w-2 h-0.5 bg-emerald-400 rounded-full" />
-                          <div className="absolute inset-1 top-2 flex items-center justify-center">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                          </div>
-                        </div>
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full flex items-center justify-center">
-                          <span className="text-[6px] text-white font-bold">✓</span>
-                        </div>
-                      </div>
-                    ),
-                    badge: 'מקורי Apple'
-                  };
-                  if (isCompatibleScreen) return {
-                    gradient: 'from-blue-500 via-sky-500 to-cyan-500',
-                    bgGradient: 'from-blue-500/20 to-cyan-500/10',
-                    icon: (
-                      <div className="relative">
-                        <div className="w-6 h-9 bg-gradient-to-b from-gray-700 to-gray-800 rounded-lg border-2 border-blue-400 relative overflow-hidden">
-                          <div className="absolute inset-0.5 bg-gradient-to-br from-blue-400/20 to-cyan-400/10 rounded" />
-                          <div className="absolute top-0.5 left-1/2 -translate-x-1/2 w-2 h-0.5 bg-blue-400 rounded-full" />
-                          <div className="absolute inset-1 top-2 flex items-center justify-center">
-                            <Sparkles className="w-3 h-3 text-blue-400" />
-                          </div>
-                        </div>
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center">
-                          <span className="text-[6px] text-white font-bold">₪</span>
-                        </div>
-                      </div>
-                    ),
-                    badge: 'חסכוני'
-                  };
-                  if (isBattery) return {
-                    gradient: 'from-amber-500 via-orange-500 to-yellow-500',
-                    bgGradient: 'from-amber-500/20 to-yellow-500/10',
-                    icon: (
-                      <div className="relative">
-                        <div className="w-8 h-5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-md relative overflow-hidden border border-amber-300">
-                          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-2 bg-amber-300 rounded-l" />
-                          <div className="absolute inset-0.5 left-1 flex items-center">
-                            <div className="flex-1 h-3 bg-gradient-to-r from-green-400 via-green-500 to-green-400 rounded-sm animate-pulse" />
-                          </div>
-                        </div>
-                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
-                          <div className="w-0.5 h-1 bg-amber-400 animate-bounce" style={{animationDelay: '0ms'}} />
-                          <div className="w-0.5 h-1.5 bg-orange-400 animate-bounce" style={{animationDelay: '100ms'}} />
-                          <div className="w-0.5 h-1 bg-yellow-400 animate-bounce" style={{animationDelay: '200ms'}} />
-                        </div>
-                      </div>
-                    ),
-                    badge: '100% בריאות'
-                  };
-                  return {
-                    gradient: 'from-violet-500 via-purple-500 to-fuchsia-500',
-                    bgGradient: 'from-violet-500/20 to-fuchsia-500/10',
-                    icon: <Phone className="w-6 h-6 text-violet-500" />,
-                    badge: null
-                  };
+                const getIcon = () => {
+                  if (isOriginalScreen || isCompatibleScreen) return Smartphone;
+                  if (isBattery) return Battery;
+                  return Phone;
                 };
                 
-                const iconConfig = getIconConfig();
+                const IconComponent = getIcon();
                 
                 return (
                   <Card 
                     key={repair.id} 
                     onClick={() => handleRepairSelect(repair)} 
-                    className={`p-4 cursor-pointer transition-all duration-300 active:scale-[0.98] group overflow-hidden relative animate-fade-in ${
+                    className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 ${
                       isPhoneOnly 
-                        ? 'border-dashed border-2 hover:border-warning hover:bg-warning/5' 
-                        : 'hover:border-primary hover:shadow-xl hover:shadow-primary/10'
+                        ? 'border-dashed border-muted-foreground/30' 
+                        : 'border-transparent hover:border-primary/20 hover:bg-muted/30'
                     }`}
-                    style={{ animationDelay: `${index * 80}ms` }}
                   >
-                    {/* Background gradient on hover */}
-                    <div className={`absolute inset-0 bg-gradient-to-r ${iconConfig.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                    
-                    <div className="flex items-center gap-4 relative">
-                      {/* Custom Icon */}
-                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${iconConfig.bgGradient} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                        {isPhoneOnly ? (
-                          <Phone className="w-6 h-6 text-warning" />
-                        ) : (
-                          iconConfig.icon
-                        )}
+                    <div className="flex items-center gap-4">
+                      {/* Simple Icon */}
+                      <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center">
+                        <IconComponent className="w-7 h-7 text-foreground/70" />
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-bold text-sm group-hover:text-primary transition-colors">{repair.name}</h3>
-                          {!isPhoneOnly && iconConfig.badge && (
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r ${iconConfig.gradient} text-white font-medium`}>
-                              {iconConfig.badge}
-                            </span>
-                          )}
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-xl">{repair.name}</h3>
                           {!isPhoneOnly && info && (
                             <Dialog>
                               <DialogTrigger asChild>
@@ -1020,14 +861,14 @@ const NewRepairOrder = () => {
                                   onClick={e => e.stopPropagation()} 
                                   className="text-muted-foreground hover:text-primary transition-colors p-1"
                                 >
-                                  <HelpCircle className="w-4 h-4" />
+                                  <HelpCircle className="w-5 h-5" />
                                 </button>
                               </DialogTrigger>
                               <DialogContent className="max-w-sm" onClick={e => e.stopPropagation()}>
                                 <DialogHeader>
                                   <DialogTitle className="text-right">{info.title}</DialogTitle>
                                 </DialogHeader>
-                                <p className="text-sm text-muted-foreground text-right leading-relaxed">
+                                <p className="text-base text-muted-foreground text-right leading-relaxed">
                                   {info.description}
                                 </p>
                               </DialogContent>
@@ -1035,37 +876,21 @@ const NewRepairOrder = () => {
                           )}
                         </div>
                         {repair.description && (
-                          <p className="text-muted-foreground text-xs mt-0.5">{repair.description}</p>
+                          <p className="text-muted-foreground text-base mt-1">{repair.description}</p>
                         )}
                         {!isPhoneOnly && selectedModel && (
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className={`text-lg font-bold bg-gradient-to-r ${iconConfig.gradient} bg-clip-text text-transparent`}>
-                              ₪{price}
-                            </span>
-                          </div>
+                          <p className="text-2xl font-bold text-primary mt-2">₪{price}</p>
                         )}
                       </div>
                       
-                      {/* Arrow indicator */}
                       {!isPhoneOnly && (
-                        <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-                          <ArrowRight className="w-4 h-4 rotate-180" />
-                        </div>
-                      )}
-                      {isPhoneOnly && (
-                        <div className="w-8 h-8 rounded-full bg-warning/20 flex items-center justify-center">
-                          <Phone className="w-4 h-4 text-warning" />
-                        </div>
+                        <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />
                       )}
                     </div>
                   </Card>
                 );
               })}
             </div>
-
-            <p className="text-center text-xs text-muted-foreground mt-4">
-              💡 תיקונים נוספים - יש להתקשר
-            </p>
           </div>}
 
         {/* Step 2.5: Bundle Offer */}
