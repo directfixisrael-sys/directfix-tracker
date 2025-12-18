@@ -779,7 +779,7 @@ const NewRepairOrder = () => {
                   <Card 
                     key={model.id} 
                     onClick={() => handleModelSelect(model)} 
-                    className="p-6 cursor-pointer hover:bg-muted/50 border-2 border-transparent hover:border-primary/20 transition-all duration-300 active:scale-[0.98] rounded-2xl"
+                    className="p-6 cursor-pointer hover:bg-muted/50 border border-border hover:border-primary/40 transition-all duration-300 active:scale-[0.98] rounded-2xl"
                     style={{ animationDelay: `${index * 40}ms` }}
                   >
                     <div className="flex flex-col items-center text-center gap-3">
@@ -838,10 +838,10 @@ const NewRepairOrder = () => {
                   <Card 
                     key={repair.id} 
                     onClick={() => handleRepairSelect(repair)} 
-                    className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 ${
+                    className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border ${
                       isPhoneOnly 
                         ? 'border-dashed border-muted-foreground/30' 
-                        : 'border-transparent hover:border-primary/20 hover:bg-muted/30'
+                        : 'border-border hover:border-primary/40 hover:bg-muted/30'
                     }`}
                   >
                     <div className="flex items-center gap-4">
