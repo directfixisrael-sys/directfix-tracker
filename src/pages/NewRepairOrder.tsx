@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logo from '@/assets/logo.png';
 import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
+import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
 
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
@@ -121,6 +122,17 @@ const NewRepairOrder = () => {
   const [showImageUploadOption, setShowImageUploadOption] = useState(false);
   const [pendingRepair, setPendingRepair] = useState<RepairType | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Privacy consent
+  const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
+
+  // Check privacy consent on mount
+  useEffect(() => {
+    const hasAcceptedPrivacy = localStorage.getItem('order_privacy_consent') === 'true';
+    if (!hasAcceptedPrivacy) {
+      setShowPrivacyConsent(true);
+    }
+  }, []);
 
   // Helper to get promotion icon
   const getPromotionIcon = (icon: string | null) => {
@@ -746,6 +758,12 @@ const NewRepairOrder = () => {
       {/* Content */}
       <div className={`flex-1 p-4 pb-24 overflow-y-auto transition-all duration-200 ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
         
+        {/* Privacy Consent Modal */}
+        <OrderPrivacyConsent 
+          open={showPrivacyConsent} 
+          onAccept={() => setShowPrivacyConsent(false)} 
+        />
+
         {/* Promotion Banner - Dynamic from DB */}
         {step === 'model' && activePromotion && <div className="mb-4 animate-fade-in">
             <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/15 to-amber-500/10 rounded-xl p-3 border border-amber-500/20 flex items-center gap-3">
