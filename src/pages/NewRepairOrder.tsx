@@ -1159,8 +1159,8 @@ const NewRepairOrder = () => {
 
             {/* Date selection */}
             <div>
-              <label className="block text-xs font-medium mb-2 text-muted-foreground">בחר יום</label>
-              <div className="grid grid-cols-4 gap-2">
+              <label className="block text-base font-medium mb-3 text-muted-foreground">בחר יום</label>
+              <div className="grid grid-cols-4 gap-3">
                 {getAvailableDates().map((date, index) => {
               const dayName = hebrewDays[date.getDay()];
               const isToday = index === 0;
@@ -1169,9 +1169,9 @@ const NewRepairOrder = () => {
               return <button key={index} onClick={() => {
                 setSelectedDate(date);
                 setSelectedTimeSlot('');
-              }} disabled={!hasAvailableSlots} className={`p-2 rounded-lg border text-center transition-all ${isSelected ? 'border-primary bg-primary/10 text-primary' : hasAvailableSlots ? 'border-border hover:border-primary/50' : 'border-border/50 opacity-50 cursor-not-allowed'}`}>
-                      <div className="text-xs font-medium">{isToday ? 'היום' : dayName}</div>
-                      <div className="text-xs text-muted-foreground">{date.getDate()}/{date.getMonth() + 1}</div>
+              }} disabled={!hasAvailableSlots} className={`p-3 rounded-xl border text-center transition-all ${isSelected ? 'border-primary bg-primary/10 text-primary' : hasAvailableSlots ? 'border-border hover:border-primary/50' : 'border-border/50 opacity-50 cursor-not-allowed'}`}>
+                      <div className="text-base font-semibold">{isToday ? 'היום' : dayName}</div>
+                      <div className="text-base text-muted-foreground">{date.getDate()}/{date.getMonth() + 1}</div>
                     </button>;
             })}
               </div>
@@ -1179,21 +1179,21 @@ const NewRepairOrder = () => {
 
             {/* Time slot selection */}
             {selectedDate && <div className="animate-fade-in">
-                <label className="block text-xs font-medium mb-2 text-muted-foreground">בחר שעה</label>
-                <div className="grid grid-cols-2 gap-2">
+                <label className="block text-base font-medium mb-3 text-muted-foreground">בחר שעה</label>
+                <div className="grid grid-cols-2 gap-3">
                   {getTimeSlotsForDate(selectedDate).map(slot => {
               const isAvailable = isSlotAvailable(selectedDate, slot);
               const isSelected = selectedTimeSlot === slot;
-              return <button key={slot} onClick={() => setSelectedTimeSlot(slot)} disabled={!isAvailable} className={`p-3 rounded-lg border text-center transition-all flex items-center justify-center gap-2 ${isSelected ? 'border-primary bg-primary/10 text-primary' : isAvailable ? 'border-border hover:border-primary/50' : 'border-border/50 opacity-50 cursor-not-allowed'}`}>
-                        <Clock className="w-4 h-4" />
-                        <span className="text-sm font-medium">{slot}</span>
+              return <button key={slot} onClick={() => setSelectedTimeSlot(slot)} disabled={!isAvailable} className={`p-4 rounded-xl border text-center transition-all flex items-center justify-center gap-2 ${isSelected ? 'border-primary bg-primary/10 text-primary' : isAvailable ? 'border-border hover:border-primary/50' : 'border-border/50 opacity-50 cursor-not-allowed'}`}>
+                        <Clock className="w-5 h-5" />
+                        <span className="text-lg font-medium">{slot}</span>
                       </button>;
             })}
                 </div>
               </div>}
 
-            {selectedDate && selectedTimeSlot && <Card className="p-3 bg-primary/5 border-primary/20 animate-fade-in">
-                <p className="text-sm text-center">
+            {selectedDate && selectedTimeSlot && <Card className="p-4 bg-primary/5 border-primary/20 animate-fade-in">
+                <p className="text-lg text-center">
                   <span className="text-muted-foreground">מועד נבחר: </span>
                   <span className="font-semibold">{formatSelectedDateTime()}</span>
                 </p>
@@ -1285,22 +1285,22 @@ const NewRepairOrder = () => {
               </label>
             </div>
 
-            <Card className="p-3 bg-muted/30">
-              <div className="flex justify-between items-center text-xs">
-                <span>{selectedModel?.name} • {getRepairTypeName()}</span>
+            <Card className="p-4 bg-muted/30">
+              <div className="flex justify-between items-center text-base">
+                <span className="font-medium">{selectedModel?.name} • {getRepairTypeName()}</span>
                 <div className="text-right">
                   {appliedCoupon && (
-                    <span className="text-muted-foreground line-through mr-2">₪{getPrice()}</span>
+                    <span className="text-muted-foreground line-through mr-2 text-base">₪{getPrice()}</span>
                   )}
-                  <span className="font-bold text-primary">₪{getFinalPrice()}</span>
+                  <span className="font-bold text-primary text-xl">₪{getFinalPrice()}</span>
                 </div>
               </div>
               {appliedCoupon && (
-                <div className="text-xs text-success mt-1">
+                <div className="text-base text-success mt-2">
                   קופון {appliedCoupon.code} - חיסכת ₪{getDiscount()}!
                 </div>
               )}
-              <div className="text-xs text-muted-foreground mt-1">
+              <div className="text-base text-muted-foreground mt-2">
                 {formatSelectedDateTime()}
               </div>
             </Card>
