@@ -788,79 +788,80 @@ const NewRepairOrder = () => {
             </div>
           </div>}
 
-        {/* Step 1: Select Model - Compact grid approach */}
-        {step === 'model' && <div className="space-y-8 animate-fade-in">
+        {/* Step 1: Select Model - Search-first approach */}
+        {step === 'model' && <div className="space-y-6 animate-fade-in min-h-[60vh] flex flex-col">
             {/* Hero Welcome Section */}
-            <div className="text-center py-6">
+            <div className="text-center py-8">
               <h1 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight">
-                הזמנת תיקון
+                שלום! 👋
               </h1>
-              <p className="text-xl md:text-2xl text-muted-foreground">
-                {!selectedGeneration ? 'באיזה iPhone מדובר?' : 'בחרו את הדגם המדויק'}
+              <p className="text-xl text-muted-foreground">
+                איזה iPhone יש לך?
               </p>
             </div>
 
-            {/* Step 1a: Select Generation - Compact Grid */}
-            {!selectedGeneration && (
-              <div className="animate-fade-in" key="generations">
-                <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                  {generations.map(([gen], index) => (
-                    <button
-                      key={gen}
-                      onClick={() => setSelectedGeneration(gen)}
-                      className="p-4 md:p-6 bg-muted/50 hover:bg-muted rounded-2xl border-2 border-transparent hover:border-primary/30 transition-all duration-200 active:scale-95 animate-fade-in flex flex-col items-center justify-center gap-2"
-                      style={{ animationDelay: `${index * 40}ms` }}
-                    >
-                      <span className="text-2xl md:text-3xl font-bold">{gen}</span>
-                      <span className="text-xs md:text-sm text-muted-foreground">iPhone</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Search Input */}
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder="חפש דגם... (לדוגמה: 15 Pro)"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-14 text-lg pr-12 rounded-2xl border-2 focus:border-primary bg-muted/30"
+              />
+              <Smartphone className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            </div>
 
-            {/* Step 1b: Select Specific Model - Clean List */}
-            {selectedGeneration && (
-              <div className="space-y-5 animate-fade-in" key="models">
-                <button
-                  onClick={() => setSelectedGeneration(null)}
-                  className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-lg font-medium"
-                >
-                  <ArrowRight className="w-5 h-5" />
-                  iPhone {selectedGeneration}
-                </button>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  {modelsInSelectedGeneration.map((model, index) => {
-                    // Extract variant name (Pro Max, Pro, Plus, or regular)
-                    const variant = model.name.replace(`iPhone ${selectedGeneration}`, '').trim() || '';
-                    const displayName = variant || 'רגיל';
-                    const isPro = variant.includes('Pro');
-                    const isMax = variant.includes('Max');
-                    
-                    return (
+            {/* Results */}
+            <div className="flex-1 overflow-auto">
+              {searchQuery ? (
+                /* Search Results */
+                <div className="space-y-2 animate-fade-in">
+                  {filteredModels.length > 0 ? (
+                    filteredModels.slice(0, 8).map((model, index) => (
                       <button
-                        key={model.id} 
-                        onClick={() => handleModelSelect(model)} 
-                        className={`p-5 rounded-2xl border-2 border-transparent transition-all duration-200 active:scale-95 animate-fade-in text-center ${
-                          isPro 
-                            ? 'bg-gradient-to-br from-primary/10 to-primary/5 hover:border-primary/40' 
-                            : 'bg-muted/50 hover:bg-muted hover:border-primary/30'
-                        }`}
-                        style={{ animationDelay: `${index * 50}ms` }}
+                        key={model.id}
+                        onClick={() => handleModelSelect(model)}
+                        className="w-full p-4 text-right bg-muted/30 hover:bg-muted rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-between group animate-fade-in"
+                        style={{ animationDelay: `${index * 30}ms` }}
                       >
-                        <span className={`font-semibold text-xl block ${isPro ? 'text-primary' : ''}`}>
-                          {displayName}
-                        </span>
-                        {isMax && (
-                          <span className="text-xs text-muted-foreground mt-1 block">מסך גדול</span>
-                        )}
+                        <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary rotate-180 transition-colors" />
+                        <span className="font-medium text-lg">{model.name}</span>
                       </button>
-                    );
-                  })}
+                    ))
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">לא נמצאו תוצאות</p>
+                  )}
                 </div>
-              </div>
-            )}
+              ) : (
+                /* Popular Models Quick Select */
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground text-center">או בחר מהרשימה</p>
+                  
+                  {/* Popular/Recent - Show top 6 models */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {models.slice(0, 6).map((model, index) => (
+                      <button
+                        key={model.id}
+                        onClick={() => handleModelSelect(model)}
+                        className="p-4 bg-muted/40 hover:bg-muted rounded-xl transition-all duration-200 active:scale-95 text-center animate-fade-in"
+                        style={{ animationDelay: `${index * 40}ms` }}
+                      >
+                        <span className="font-medium text-base">{model.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Show all button */}
+                  <button
+                    onClick={() => setSearchQuery(' ')}
+                    className="w-full py-3 text-primary hover:text-primary/80 transition-colors text-base font-medium"
+                  >
+                    הצג את כל הדגמים ←
+                  </button>
+                </div>
+              )}
+            </div>
           </div>}
 
         {/* Step 2: Select Repair Type */}
