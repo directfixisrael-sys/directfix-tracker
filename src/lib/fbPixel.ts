@@ -1,5 +1,5 @@
 // Facebook Pixel Helper
-const FB_PIXEL_ID = '2696331610705317';
+const FB_PIXEL_ID = '1404099044750782';
 
 // Declare fbq for TypeScript
 declare global {
