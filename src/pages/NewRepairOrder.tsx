@@ -12,7 +12,7 @@ import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logo from '@/assets/logo.png';
-import { trackPurchase } from '@/lib/fbPixel';
+import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
 
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
@@ -266,6 +266,17 @@ const NewRepairOrder = () => {
     if (pendingRepair) {
       setSelectedRepair(pendingRepair);
       
+      // Track AddToCart event for Facebook Pixel
+      if (selectedModel) {
+        const isOriginalScreen = pendingRepair.name.includes('מסך מקורי');
+        const isCompatibleScreen = pendingRepair.name.includes('מסך תואם');
+        const isBattery = pendingRepair.name.includes('סוללה');
+        let repairPrice = 0;
+        if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;
+        else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;
+        else if (isBattery) repairPrice = selectedModel.battery_price;
+        trackAddToCart(pendingRepair.name, repairPrice);
+      }
       // Check if there's a bundle offer for this repair type
       const isScreenRepair = pendingRepair.name.includes('מסך');
       const bundle = repairBundles.find(b => 
