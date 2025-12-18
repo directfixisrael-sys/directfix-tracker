@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 interface Visitor {
   visitorId: string;
@@ -24,28 +25,54 @@ const getVisitorId = () => {
   return visitorId;
 };
 
-export const useLiveVisitors = (trackPresence: boolean = false) => {
-  const [state, setState] = useState<LiveVisitorsState>({
-    totalVisitors: 0,
-    visitorsByPage: {},
-    visitors: [],
-  });
+// Shared channel reference
+let sharedChannel: RealtimeChannel | null = null;
+let channelRefCount = 0;
 
-  useEffect(() => {
-    const visitorId = getVisitorId();
-    const currentPage = window.location.pathname;
-
-    const channel = supabase.channel('live-visitors', {
+const getOrCreateChannel = (visitorId: string): RealtimeChannel => {
+  if (!sharedChannel) {
+    console.log('[LiveVisitors] Creating new shared channel');
+    sharedChannel = supabase.channel('live-visitors-presence', {
       config: {
         presence: {
           key: visitorId,
         },
       },
     });
+  }
+  channelRefCount++;
+  return sharedChannel;
+};
+
+const releaseChannel = () => {
+  channelRefCount--;
+  if (channelRefCount <= 0 && sharedChannel) {
+    console.log('[LiveVisitors] Releasing shared channel');
+    supabase.removeChannel(sharedChannel);
+    sharedChannel = null;
+    channelRefCount = 0;
+  }
+};
+
+export const useLiveVisitors = () => {
+  const [state, setState] = useState<LiveVisitorsState>({
+    totalVisitors: 0,
+    visitorsByPage: {},
+    visitors: [],
+  });
+  const channelRef = useRef<RealtimeChannel | null>(null);
+
+  useEffect(() => {
+    const visitorId = getVisitorId();
+    const channel = getOrCreateChannel(visitorId);
+    channelRef.current = channel;
+
+    console.log('[LiveVisitors] Setting up presence listener');
 
     // Handle presence sync events
     channel.on('presence', { event: 'sync' }, () => {
       const presenceState = channel.presenceState();
+      console.log('[LiveVisitors] Presence sync:', presenceState);
       
       const visitors: Visitor[] = [];
       const visitorsByPage: Record<string, number> = {};
@@ -63,6 +90,8 @@ export const useLiveVisitors = (trackPresence: boolean = false) => {
         });
       });
 
+      console.log('[LiveVisitors] Total visitors:', visitors.length, 'By page:', visitorsByPage);
+      
       setState({
         totalVisitors: visitors.length,
         visitorsByPage,
@@ -70,69 +99,23 @@ export const useLiveVisitors = (trackPresence: boolean = false) => {
       });
     });
 
-    // Subscribe and track this user's presence if enabled
-    channel.subscribe(async (status) => {
-      if (status === 'SUBSCRIBED' && trackPresence) {
-        await channel.track({
-          visitorId,
-          page: currentPage,
-          enteredAt: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-        });
-      }
+    channel.on('presence', { event: 'join' }, ({ key, newPresences }) => {
+      console.log('[LiveVisitors] User joined:', key, newPresences);
     });
 
-    // Update page when route changes
-    const handleRouteChange = async () => {
-      if (trackPresence) {
-        await channel.track({
-          visitorId,
-          page: window.location.pathname,
-          enteredAt: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-        });
-      }
-    };
-
-    // Listen for route changes
-    window.addEventListener('popstate', handleRouteChange);
-
-    return () => {
-      window.removeEventListener('popstate', handleRouteChange);
-      supabase.removeChannel(channel);
-    };
-  }, [trackPresence]);
-
-  return state;
-};
-
-// Hook for tracking visitor on current page
-export const useTrackVisitor = () => {
-  useEffect(() => {
-    const visitorId = getVisitorId();
-    const currentPage = window.location.pathname;
-
-    const channel = supabase.channel('live-visitors', {
-      config: {
-        presence: {
-          key: visitorId,
-        },
-      },
+    channel.on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+      console.log('[LiveVisitors] User left:', key, leftPresences);
     });
 
-    channel.subscribe(async (status) => {
-      if (status === 'SUBSCRIBED') {
-        await channel.track({
-          visitorId,
-          page: currentPage,
-          enteredAt: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-        });
-      }
+    // Subscribe to the channel
+    channel.subscribe((status) => {
+      console.log('[LiveVisitors] Subscription status:', status);
     });
 
     return () => {
-      supabase.removeChannel(channel);
+      releaseChannel();
     };
   }, []);
+
+  return state;
 };
