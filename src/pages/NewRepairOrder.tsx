@@ -763,10 +763,10 @@ const NewRepairOrder = () => {
         {step === 'model' && <div className="space-y-8 animate-fade-in">
             {/* Hero Welcome Section - Apple style */}
             <div className="text-center py-8">
-              <h1 className="text-4xl font-bold mb-3 tracking-tight">
+              <h1 className="text-5xl font-bold mb-4 tracking-tight">
                 הזמנת תיקון
               </h1>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-2xl text-muted-foreground">
                 בחרו את הדגם שלכם
               </p>
             </div>
@@ -805,8 +805,8 @@ const NewRepairOrder = () => {
         {/* Step 2: Select Repair Type */}
         {step === 'repair' && <div className="space-y-6 animate-fade-in">
             <div className="text-center mb-6">
-              <p className="text-muted-foreground text-lg mb-2">{selectedModel?.name}</p>
-              <h2 className="text-3xl font-bold">מה צריך לתקן?</h2>
+              <p className="text-muted-foreground text-xl mb-2">{selectedModel?.name}</p>
+              <h2 className="text-4xl font-bold">מה צריך לתקן?</h2>
             </div>
 
             <div className="space-y-3">
@@ -983,8 +983,8 @@ const NewRepairOrder = () => {
                   </div>
                 </div>
               </div>
-              <h2 className="font-bold mb-1 text-xl">סיכום הזמנה</h2>
-              <p className="text-muted-foreground text-sm">אישור מחיר התיקון</p>
+              <h2 className="font-bold mb-2 text-3xl">סיכום הזמנה</h2>
+              <p className="text-muted-foreground text-lg">אישור מחיר התיקון</p>
             </div>
 
             <Card className="p-4 bg-gradient-to-br from-card to-muted/30">
@@ -1149,12 +1149,12 @@ const NewRepairOrder = () => {
         {step === 'schedule' && <div className="space-y-4 animate-fade-in">
             <div className="text-center mb-4">
               <div className="flex justify-center mb-3">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center">
-                  <Calendar className="w-8 h-8 text-primary" />
+                <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center">
+                  <Calendar className="w-10 h-10 text-primary" />
                 </div>
               </div>
-              <h2 className="text-lg font-bold mb-1">קביעת מועד</h2>
-              <p className="text-muted-foreground text-sm">מתי נוח שהטכנאי יגיע?</p>
+              <h2 className="text-3xl font-bold mb-2">קביעת מועד</h2>
+              <p className="text-muted-foreground text-lg">מתי נוח שהטכנאי יגיע?</p>
             </div>
 
             {/* Date selection */}
@@ -1202,45 +1202,45 @@ const NewRepairOrder = () => {
 
         {/* Step 5: Customer Details */}
         {step === 'details' && <div className="space-y-4 animate-fade-in">
-            <div className="text-center mb-4">
+            <div className="text-center mb-6">
               <div className="flex justify-center mb-3">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center">
-                  <MapPin className="w-8 h-8 text-primary" />
+                <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center">
+                  <MapPin className="w-10 h-10 text-primary" />
                 </div>
               </div>
-              <h2 className="text-lg font-bold mb-1">פרטי הזמנה</h2>
-              <p className="text-muted-foreground text-sm">לאן לשלוח את הטכנאי?</p>
+              <h2 className="text-3xl font-bold mb-2">פרטי הזמנה</h2>
+              <p className="text-muted-foreground text-lg">לאן לשלוח את הטכנאי?</p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium mb-1.5">שם מלא</label>
-                <Input placeholder="הכנס שם מלא" value={customerName} onChange={e => setCustomerName(e.target.value)} className="h-10 text-sm rounded-xl" />
+                <label className="block text-base font-medium mb-2">שם מלא</label>
+                <Input placeholder="הכנס שם מלא" value={customerName} onChange={e => setCustomerName(e.target.value)} className="h-14 text-lg rounded-xl" />
               </div>
 
               <div>
-                <label className="block text-xs font-medium mb-1.5">מספר טלפון</label>
-                <Input placeholder="050-0000000" value={customerPhone} onChange={e => setCustomerPhone(formatPhone(e.target.value))} type="tel" className="h-10 text-sm rounded-xl text-left" dir="ltr" />
+                <label className="block text-base font-medium mb-2">מספר טלפון</label>
+                <Input placeholder="050-0000000" value={customerPhone} onChange={e => setCustomerPhone(formatPhone(e.target.value))} type="tel" className="h-14 text-lg rounded-xl text-left" dir="ltr" />
               </div>
 
               <div>
-                <label className="block text-xs font-medium mb-1.5">כתובת (עיר, רחוב, מספר בית/דירה)</label>
-                <Input placeholder="למשל: הרצליה, סוקולוב 15, דירה 4" value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="h-10 text-sm rounded-xl" />
-                <div className="mt-2 p-2.5 bg-primary/10 border border-primary/20 rounded-lg flex items-center gap-2">
-                  <div className="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-3.5 h-3.5 text-primary" />
+                <label className="block text-base font-medium mb-2">כתובת (עיר, רחוב, מספר בית/דירה)</label>
+                <Input placeholder="למשל: הרצליה, סוקולוב 15, דירה 4" value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="h-14 text-lg rounded-xl" />
+                <div className="mt-2 p-3 bg-primary/10 border border-primary/20 rounded-lg flex items-center gap-2">
+                  <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-4 h-4 text-primary" />
                   </div>
-                  <p className="text-xs text-foreground">
+                  <p className="text-sm text-foreground">
                     <span className="font-medium">אזור השירות:</span> השרון, המרכז וגוש דן (ממודיעין ועד נתניה)
                   </p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium mb-1.5">
+                <label className="block text-base font-medium mb-2">
                   הערות לטכנאי <span className="text-muted-foreground">(לא חובה)</span>
                 </label>
-                <Textarea placeholder="למשל: קומה 3, יש אינטרקום, לחייג בהגעה..." value={customerNotes} onChange={e => setCustomerNotes(e.target.value)} className="text-sm rounded-xl resize-none" rows={2} />
+                <Textarea placeholder="למשל: קומה 3, יש אינטרקום, לחייג בהגעה..." value={customerNotes} onChange={e => setCustomerNotes(e.target.value)} className="text-lg rounded-xl resize-none" rows={2} />
               </div>
 
               {/* Uploaded Images Display */}
@@ -1261,14 +1261,14 @@ const NewRepairOrder = () => {
             </div>
 
             {/* Consent Checkboxes */}
-            <div className="space-y-3 mt-4 pt-4 border-t border-border">
+            <div className="space-y-4 mt-6 pt-6 border-t border-border">
               <label className="flex items-start gap-3 cursor-pointer">
                 <Checkbox 
                   checked={acceptPrivacy} 
                   onCheckedChange={(checked) => setAcceptPrivacy(checked === true)}
-                  className="mt-0.5"
+                  className="mt-1 w-5 h-5"
                 />
-                <span className="text-xs text-muted-foreground leading-relaxed">
+                <span className="text-base text-muted-foreground leading-relaxed">
                   אני מאשר/ת שקראתי והסכמתי ל<span className="text-primary font-medium">מדיניות הפרטיות</span> ו<span className="text-primary font-medium">תנאי השימוש</span>
                 </span>
               </label>
@@ -1277,9 +1277,9 @@ const NewRepairOrder = () => {
                 <Checkbox 
                   checked={acceptContact} 
                   onCheckedChange={(checked) => setAcceptContact(checked === true)}
-                  className="mt-0.5"
+                  className="mt-1 w-5 h-5"
                 />
-                <span className="text-xs text-muted-foreground leading-relaxed">
+                <span className="text-base text-muted-foreground leading-relaxed">
                   אני מסכים/ה לקבל עדכונים בוואטסאפ או בשיחת טלפון לגבי התיקון ולאחריו
                 </span>
               </label>

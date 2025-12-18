@@ -53,27 +53,27 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
   };
 
   return (
-    <div className="wolt-card p-5 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-      <h3 className="text-lg font-bold text-foreground mb-5">פרטי התיקון</h3>
+    <div className="wolt-card p-6 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+      <h3 className="text-2xl font-bold text-foreground mb-6">פרטי התיקון</h3>
       
-      <div className="space-y-4 mb-6">
+      <div className="space-y-5 mb-6">
         <div className="flex items-center gap-4">
-          <div className="w-11 h-11 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Smartphone className="w-5 h-5 text-primary" />
+          <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Smartphone className="w-7 h-7 text-primary" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">מכשיר</p>
-            <p className="font-semibold text-foreground">{order.deviceType}</p>
+            <p className="text-sm text-muted-foreground">מכשיר</p>
+            <p className="font-semibold text-foreground text-xl">{order.deviceType}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="w-11 h-11 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Wrench className="w-5 h-5 text-primary" />
+          <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Wrench className="w-7 h-7 text-primary" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">תקלה</p>
-            <p className="font-semibold text-foreground">{order.issueDescription}</p>
+            <p className="text-sm text-muted-foreground">תקלה</p>
+            <p className="font-semibold text-foreground text-xl">{order.issueDescription}</p>
           </div>
         </div>
 
@@ -106,32 +106,32 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
       </div>
 
       {/* Price breakdown */}
-      <div className="border-t border-border pt-4 space-y-3">
-        <div className="flex justify-between text-sm">
+      <div className="border-t border-border pt-5 space-y-4">
+        <div className="flex justify-between text-base">
           <span className="text-muted-foreground">עלות תיקון</span>
-          <span className="font-medium text-foreground">₪{order.repairPrice}</span>
+          <span className="font-medium text-foreground text-lg">₪{order.repairPrice}</span>
         </div>
         
         {order.accessories.filter(a => a.selected).map(acc => (
-          <div key={acc.id} className="flex justify-between text-sm">
+          <div key={acc.id} className="flex justify-between text-base">
             <span className="text-muted-foreground">{acc.name}</span>
-            <span className="font-medium text-foreground">₪{acc.price}</span>
+            <span className="font-medium text-foreground text-lg">₪{acc.price}</span>
           </div>
         ))}
 
         {activePromotion && (
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-base">
             <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1">
-              <Gift className="w-3 h-3" />
+              <Gift className="w-4 h-4" />
               {activePromotion.description} (מבצע)
             </span>
-            <span className="font-medium text-success">חינם!</span>
+            <span className="font-medium text-success text-lg">חינם!</span>
           </div>
         )}
 
-        <div className="flex justify-between pt-3 border-t border-border">
-          <span className="font-bold text-foreground">סה״כ לתשלום</span>
-          <span className="font-bold text-primary text-xl">₪{totalPrice}</span>
+        <div className="flex justify-between pt-4 border-t border-border">
+          <span className="font-bold text-foreground text-xl">סה״כ לתשלום</span>
+          <span className="font-bold text-primary text-2xl">₪{totalPrice}</span>
         </div>
       </div>
     </div>
