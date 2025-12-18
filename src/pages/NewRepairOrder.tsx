@@ -67,6 +67,28 @@ interface RepairBundle {
   discount_percent: number;
 }
 type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'success';
+
+// Extract unique iPhone generations from model names
+const getGenerations = (models: IphoneModel[]) => {
+  const generationMap = new Map<string, IphoneModel[]>();
+  
+  models.forEach(model => {
+    // Extract generation number (e.g., "16" from "iPhone 16 Pro Max")
+    const match = model.name.match(/iPhone (\d+)/);
+    if (match) {
+      const gen = match[1];
+      if (!generationMap.has(gen)) {
+        generationMap.set(gen, []);
+      }
+      generationMap.get(gen)!.push(model);
+    }
+  });
+  
+  // Sort generations in descending order (newest first)
+  return Array.from(generationMap.entries())
+    .sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+};
+
 const NewRepairOrder = () => {
   const navigate = useNavigate();
   const {
@@ -90,6 +112,9 @@ const NewRepairOrder = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Two-step model selection
+  const [selectedGeneration, setSelectedGeneration] = useState<string | null>(null);
 
   // Schedule fields
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -210,6 +235,10 @@ const NewRepairOrder = () => {
     return slotDate > twoHoursFromNow;
   };
   const filteredModels = models.filter(model => model.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const generations = getGenerations(models);
+  const modelsInSelectedGeneration = selectedGeneration 
+    ? models.filter(m => m.name.includes(`iPhone ${selectedGeneration}`))
+    : [];
   const getPrice = () => {
     if (!selectedModel || !selectedRepair) return 0;
     const isOriginalScreen = selectedRepair.name.includes('מסך מקורי');
@@ -759,47 +788,84 @@ const NewRepairOrder = () => {
             </div>
           </div>}
 
-        {/* Step 1: Select Model - Enhanced Welcome */}
+        {/* Step 1: Select Model - Two-step approach */}
         {step === 'model' && <div className="space-y-8 animate-fade-in">
-            {/* Hero Welcome Section - Apple style */}
+            {/* Hero Welcome Section */}
             <div className="text-center py-8">
               <h1 className="text-5xl font-bold mb-4 tracking-tight">
                 הזמנת תיקון
               </h1>
               <p className="text-2xl text-muted-foreground">
-                בחרו את הדגם שלכם
+                {!selectedGeneration ? 'באיזה iPhone מדובר?' : `iPhone ${selectedGeneration}`}
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              {filteredModels.map((model, index) => {
-                const isPro = model.name.includes('Pro');
-                
-                return (
+            {/* Step 1a: Select Generation */}
+            {!selectedGeneration && (
+              <div className="space-y-3">
+                {generations.map(([gen, _models], index) => (
                   <Card 
-                    key={model.id} 
-                    onClick={() => handleModelSelect(model)} 
-                    className="p-6 cursor-pointer hover:bg-muted/50 border-2 border-transparent hover:border-primary/20 transition-all duration-300 active:scale-[0.98] rounded-2xl"
-                    style={{ animationDelay: `${index * 40}ms` }}
+                    key={gen}
+                    onClick={() => setSelectedGeneration(gen)}
+                    className="p-5 cursor-pointer hover:bg-muted/30 border-2 border-transparent hover:border-primary/20 transition-all duration-200 active:scale-[0.98] rounded-2xl"
+                    style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <div className="flex flex-col items-center text-center gap-3">
-                      {/* Simple iPhone icon */}
-                      <div className="w-12 h-20 bg-muted rounded-xl flex items-center justify-center">
-                        <Smartphone className="w-8 h-8 text-muted-foreground" />
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-muted rounded-2xl flex items-center justify-center">
+                        <Smartphone className="w-7 h-7 text-foreground/70" />
                       </div>
-                      
-                      {/* Model name */}
-                      <div>
-                        <span className="font-semibold text-lg block">{model.name}</span>
-                        {isPro && (
-                          <span className="text-sm text-muted-foreground">Pro</span>
-                        )}
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-2xl">iPhone {gen}</h3>
+                        <p className="text-muted-foreground text-base">{_models.length} דגמים</p>
                       </div>
+                      <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />
                     </div>
                   </Card>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
+
+            {/* Step 1b: Select Specific Model */}
+            {selectedGeneration && (
+              <div className="space-y-4">
+                <button
+                  onClick={() => setSelectedGeneration(null)}
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-lg"
+                >
+                  <ArrowRight className="w-5 h-5" />
+                  חזרה לבחירת דור
+                </button>
+                
+                <div className="space-y-3">
+                  {modelsInSelectedGeneration.map((model, index) => {
+                    // Extract variant name (Pro Max, Pro, Plus, or regular)
+                    const variant = model.name.replace(`iPhone ${selectedGeneration}`, '').trim() || 'רגיל';
+                    
+                    return (
+                      <Card 
+                        key={model.id} 
+                        onClick={() => handleModelSelect(model)} 
+                        className="p-5 cursor-pointer hover:bg-muted/30 border-2 border-transparent hover:border-primary/20 transition-all duration-200 active:scale-[0.98] rounded-2xl"
+                        style={{ animationDelay: `${index * 50}ms` }}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-14 h-14 bg-muted rounded-2xl flex items-center justify-center">
+                            <Smartphone className="w-7 h-7 text-foreground/70" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-2xl">{model.name}</h3>
+                            {variant !== 'רגיל' && (
+                              <p className="text-muted-foreground text-base">{variant}</p>
+                            )}
+                          </div>
+                          <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>}
 
         {/* Step 2: Select Repair Type */}
