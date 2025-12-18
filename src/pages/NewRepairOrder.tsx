@@ -12,23 +12,7 @@ import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logo from '@/assets/logo.png';
-import iphone16Img from '@/assets/iphone-16.png';
-import iphone15Img from '@/assets/iphone-15.png';
-import iphone14Img from '@/assets/iphone-14.png';
-import iphone13Img from '@/assets/iphone-13.png';
-import iphone12Img from '@/assets/iphone-12.png';
-import iphone11Img from '@/assets/iphone-11.png';
 import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
-
-// iPhone generation images map
-const iphoneImages: Record<string, string> = {
-  '16': iphone16Img,
-  '15': iphone15Img,
-  '14': iphone14Img,
-  '13': iphone13Img,
-  '12': iphone12Img,
-  '11': iphone11Img,
-};
 
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
@@ -83,28 +67,6 @@ interface RepairBundle {
   discount_percent: number;
 }
 type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'success';
-
-// Extract unique iPhone generations from model names
-const getGenerations = (models: IphoneModel[]) => {
-  const generationMap = new Map<string, IphoneModel[]>();
-  
-  models.forEach(model => {
-    // Extract generation number (e.g., "16" from "iPhone 16 Pro Max")
-    const match = model.name.match(/iPhone (\d+)/);
-    if (match) {
-      const gen = match[1];
-      if (!generationMap.has(gen)) {
-        generationMap.set(gen, []);
-      }
-      generationMap.get(gen)!.push(model);
-    }
-  });
-  
-  // Sort generations in descending order (newest first)
-  return Array.from(generationMap.entries())
-    .sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
-};
-
 const NewRepairOrder = () => {
   const navigate = useNavigate();
   const {
@@ -128,9 +90,6 @@ const NewRepairOrder = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Two-step model selection
-  const [selectedGeneration, setSelectedGeneration] = useState<string | null>(null);
 
   // Schedule fields
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -251,10 +210,6 @@ const NewRepairOrder = () => {
     return slotDate > twoHoursFromNow;
   };
   const filteredModels = models.filter(model => model.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  const generations = getGenerations(models);
-  const modelsInSelectedGeneration = selectedGeneration 
-    ? models.filter(m => m.name.includes(`iPhone ${selectedGeneration}`))
-    : [];
   const getPrice = () => {
     if (!selectedModel || !selectedRepair) return 0;
     const isOriginalScreen = selectedRepair.name.includes('מסך מקורי');
@@ -804,96 +759,47 @@ const NewRepairOrder = () => {
             </div>
           </div>}
 
-        {/* Step 1: Select Model - Visual gallery approach */}
-        {step === 'model' && <div className="space-y-6 animate-fade-in">
-            {/* Hero Welcome Section */}
-            <div className="text-center py-6">
-              <h1 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight">
-                שלום! 👋
+        {/* Step 1: Select Model - Enhanced Welcome */}
+        {step === 'model' && <div className="space-y-8 animate-fade-in">
+            {/* Hero Welcome Section - Apple style */}
+            <div className="text-center py-8">
+              <h1 className="text-5xl font-bold mb-4 tracking-tight">
+                הזמנת תיקון
               </h1>
-              <p className="text-xl text-muted-foreground">
-                {!selectedGeneration ? 'בחר את דור האייפון שלך' : `iPhone ${selectedGeneration}`}
+              <p className="text-2xl text-muted-foreground">
+                בחרו את הדגם שלכם
               </p>
             </div>
 
-            {/* Generation Gallery with Images */}
-            {!selectedGeneration && (
-              <div className="grid grid-cols-3 gap-3 animate-fade-in">
-                {generations.map(([gen], index) => {
-                  const imgSrc = iphoneImages[gen];
-                  return (
-                    <button
-                      key={gen}
-                      onClick={() => setSelectedGeneration(gen)}
-                      className="group relative p-3 bg-gradient-to-b from-muted/60 to-muted/30 hover:from-muted hover:to-muted/60 rounded-2xl border-2 border-transparent hover:border-primary/30 transition-all duration-300 active:scale-95 animate-fade-in flex flex-col items-center"
-                      style={{ animationDelay: `${index * 50}ms` }}
-                    >
-                      {imgSrc ? (
-                        <img 
-                          src={imgSrc} 
-                          alt={`iPhone ${gen}`} 
-                          className="w-16 h-20 md:w-20 md:h-24 object-contain mb-2 group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-16 h-20 md:w-20 md:h-24 bg-muted rounded-xl flex items-center justify-center mb-2">
-                          <Smartphone className="w-8 h-10 text-muted-foreground" />
-                        </div>
-                      )}
-                      <span className="font-bold text-lg md:text-xl">{gen}</span>
-                      <span className="text-xs text-muted-foreground">iPhone</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Model Selection after Generation */}
-            {selectedGeneration && (
-              <div className="space-y-4 animate-fade-in">
-                <button
-                  onClick={() => setSelectedGeneration(null)}
-                  className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-lg font-medium"
-                >
-                  <ArrowRight className="w-5 h-5" />
-                  חזרה
-                </button>
+            <div className="grid grid-cols-2 gap-4">
+              {filteredModels.map((model, index) => {
+                const isPro = model.name.includes('Pro');
                 
-                <div className="flex justify-center mb-4">
-                  {iphoneImages[selectedGeneration] && (
-                    <img 
-                      src={iphoneImages[selectedGeneration]} 
-                      alt={`iPhone ${selectedGeneration}`}
-                      className="h-32 object-contain animate-fade-in"
-                    />
-                  )}
-                </div>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  {modelsInSelectedGeneration.map((model, index) => {
-                    const variant = model.name.replace(`iPhone ${selectedGeneration}`, '').trim() || '';
-                    const displayName = variant || 'רגיל';
-                    const isPro = variant.includes('Pro');
-                    
-                    return (
-                      <button
-                        key={model.id} 
-                        onClick={() => handleModelSelect(model)} 
-                        className={`p-5 rounded-2xl border-2 transition-all duration-200 active:scale-95 animate-fade-in text-center ${
-                          isPro 
-                            ? 'bg-gradient-to-br from-primary/15 to-primary/5 border-primary/20 hover:border-primary/50' 
-                            : 'bg-muted/40 border-transparent hover:bg-muted hover:border-primary/30'
-                        }`}
-                        style={{ animationDelay: `${index * 60}ms` }}
-                      >
-                        <span className={`font-semibold text-xl block ${isPro ? 'text-primary' : ''}`}>
-                          {displayName}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+                return (
+                  <Card 
+                    key={model.id} 
+                    onClick={() => handleModelSelect(model)} 
+                    className="p-6 cursor-pointer hover:bg-muted/50 border-2 border-transparent hover:border-primary/20 transition-all duration-300 active:scale-[0.98] rounded-2xl"
+                    style={{ animationDelay: `${index * 40}ms` }}
+                  >
+                    <div className="flex flex-col items-center text-center gap-3">
+                      {/* Simple iPhone icon */}
+                      <div className="w-12 h-20 bg-muted rounded-xl flex items-center justify-center">
+                        <Smartphone className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                      
+                      {/* Model name */}
+                      <div>
+                        <span className="font-semibold text-lg block">{model.name}</span>
+                        {isPro && (
+                          <span className="text-sm text-muted-foreground">Pro</span>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
           </div>}
 
         {/* Step 2: Select Repair Type */}
