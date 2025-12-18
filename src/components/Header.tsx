@@ -1,4 +1,4 @@
-import { ArrowRight, Moon, Sun } from 'lucide-react';
+import { ArrowRight, Moon, Sun, Phone, Accessibility } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/ThemeProvider';
 import logo from '@/assets/logo.png';
@@ -30,7 +30,14 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
           <div />
         )}
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <a
+            href="tel:033106020"
+            className="h-9 w-9 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center transition-colors"
+            aria-label="התקשר 033106020"
+          >
+            <Phone className="w-4 h-4" />
+          </a>
           <Button
             variant="ghost"
             size="icon"
@@ -42,6 +49,15 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
             ) : (
               <Moon className="w-4 h-4" />
             )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => window.dispatchEvent(new CustomEvent('open-accessibility-widget'))}
+            className="h-9 w-9 rounded-full"
+            aria-label="נגישות"
+          >
+            <Accessibility className="w-4 h-4" />
           </Button>
           <img 
             src={logo} 
