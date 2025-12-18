@@ -12,7 +12,23 @@ import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logo from '@/assets/logo.png';
+import iphone16Img from '@/assets/iphone-16.png';
+import iphone15Img from '@/assets/iphone-15.png';
+import iphone14Img from '@/assets/iphone-14.png';
+import iphone13Img from '@/assets/iphone-13.png';
+import iphone12Img from '@/assets/iphone-12.png';
+import iphone11Img from '@/assets/iphone-11.png';
 import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
+
+// iPhone generation images map
+const iphoneImages: Record<string, string> = {
+  '16': iphone16Img,
+  '15': iphone15Img,
+  '14': iphone14Img,
+  '13': iphone13Img,
+  '12': iphone12Img,
+  '11': iphone11Img,
+};
 
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
@@ -788,80 +804,96 @@ const NewRepairOrder = () => {
             </div>
           </div>}
 
-        {/* Step 1: Select Model - Search-first approach */}
-        {step === 'model' && <div className="space-y-6 animate-fade-in min-h-[60vh] flex flex-col">
+        {/* Step 1: Select Model - Visual gallery approach */}
+        {step === 'model' && <div className="space-y-6 animate-fade-in">
             {/* Hero Welcome Section */}
-            <div className="text-center py-8">
+            <div className="text-center py-6">
               <h1 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight">
                 שלום! 👋
               </h1>
               <p className="text-xl text-muted-foreground">
-                איזה iPhone יש לך?
+                {!selectedGeneration ? 'בחר את דור האייפון שלך' : `iPhone ${selectedGeneration}`}
               </p>
             </div>
 
-            {/* Search Input */}
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder="חפש דגם... (לדוגמה: 15 Pro)"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-14 text-lg pr-12 rounded-2xl border-2 focus:border-primary bg-muted/30"
-              />
-              <Smartphone className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            </div>
+            {/* Generation Gallery with Images */}
+            {!selectedGeneration && (
+              <div className="grid grid-cols-3 gap-3 animate-fade-in">
+                {generations.map(([gen], index) => {
+                  const imgSrc = iphoneImages[gen];
+                  return (
+                    <button
+                      key={gen}
+                      onClick={() => setSelectedGeneration(gen)}
+                      className="group relative p-3 bg-gradient-to-b from-muted/60 to-muted/30 hover:from-muted hover:to-muted/60 rounded-2xl border-2 border-transparent hover:border-primary/30 transition-all duration-300 active:scale-95 animate-fade-in flex flex-col items-center"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      {imgSrc ? (
+                        <img 
+                          src={imgSrc} 
+                          alt={`iPhone ${gen}`} 
+                          className="w-16 h-20 md:w-20 md:h-24 object-contain mb-2 group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-16 h-20 md:w-20 md:h-24 bg-muted rounded-xl flex items-center justify-center mb-2">
+                          <Smartphone className="w-8 h-10 text-muted-foreground" />
+                        </div>
+                      )}
+                      <span className="font-bold text-lg md:text-xl">{gen}</span>
+                      <span className="text-xs text-muted-foreground">iPhone</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
-            {/* Results */}
-            <div className="flex-1 overflow-auto">
-              {searchQuery ? (
-                /* Search Results */
-                <div className="space-y-2 animate-fade-in">
-                  {filteredModels.length > 0 ? (
-                    filteredModels.slice(0, 8).map((model, index) => (
-                      <button
-                        key={model.id}
-                        onClick={() => handleModelSelect(model)}
-                        className="w-full p-4 text-right bg-muted/30 hover:bg-muted rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-between group animate-fade-in"
-                        style={{ animationDelay: `${index * 30}ms` }}
-                      >
-                        <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary rotate-180 transition-colors" />
-                        <span className="font-medium text-lg">{model.name}</span>
-                      </button>
-                    ))
-                  ) : (
-                    <p className="text-center text-muted-foreground py-8">לא נמצאו תוצאות</p>
+            {/* Model Selection after Generation */}
+            {selectedGeneration && (
+              <div className="space-y-4 animate-fade-in">
+                <button
+                  onClick={() => setSelectedGeneration(null)}
+                  className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-lg font-medium"
+                >
+                  <ArrowRight className="w-5 h-5" />
+                  חזרה
+                </button>
+                
+                <div className="flex justify-center mb-4">
+                  {iphoneImages[selectedGeneration] && (
+                    <img 
+                      src={iphoneImages[selectedGeneration]} 
+                      alt={`iPhone ${selectedGeneration}`}
+                      className="h-32 object-contain animate-fade-in"
+                    />
                   )}
                 </div>
-              ) : (
-                /* Popular Models Quick Select */
-                <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground text-center">או בחר מהרשימה</p>
-                  
-                  {/* Popular/Recent - Show top 6 models */}
-                  <div className="grid grid-cols-2 gap-2">
-                    {models.slice(0, 6).map((model, index) => (
+                
+                <div className="grid grid-cols-2 gap-3">
+                  {modelsInSelectedGeneration.map((model, index) => {
+                    const variant = model.name.replace(`iPhone ${selectedGeneration}`, '').trim() || '';
+                    const displayName = variant || 'רגיל';
+                    const isPro = variant.includes('Pro');
+                    
+                    return (
                       <button
-                        key={model.id}
-                        onClick={() => handleModelSelect(model)}
-                        className="p-4 bg-muted/40 hover:bg-muted rounded-xl transition-all duration-200 active:scale-95 text-center animate-fade-in"
-                        style={{ animationDelay: `${index * 40}ms` }}
+                        key={model.id} 
+                        onClick={() => handleModelSelect(model)} 
+                        className={`p-5 rounded-2xl border-2 transition-all duration-200 active:scale-95 animate-fade-in text-center ${
+                          isPro 
+                            ? 'bg-gradient-to-br from-primary/15 to-primary/5 border-primary/20 hover:border-primary/50' 
+                            : 'bg-muted/40 border-transparent hover:bg-muted hover:border-primary/30'
+                        }`}
+                        style={{ animationDelay: `${index * 60}ms` }}
                       >
-                        <span className="font-medium text-base">{model.name}</span>
+                        <span className={`font-semibold text-xl block ${isPro ? 'text-primary' : ''}`}>
+                          {displayName}
+                        </span>
                       </button>
-                    ))}
-                  </div>
-                  
-                  {/* Show all button */}
-                  <button
-                    onClick={() => setSearchQuery(' ')}
-                    className="w-full py-3 text-primary hover:text-primary/80 transition-colors text-base font-medium"
-                  >
-                    הצג את כל הדגמים ←
-                  </button>
+                    );
+                  })}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>}
 
         {/* Step 2: Select Repair Type */}
