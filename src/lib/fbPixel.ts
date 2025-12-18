@@ -69,6 +69,19 @@ export const trackPurchase = (value: number, currency: string = 'ILS') => {
 export const trackLead = () => {
   if (typeof window !== 'undefined' && window.fbq) {
     window.fbq('track', 'Lead');
+    console.log('Facebook Pixel: Lead event tracked');
+  }
+};
+
+// Track AddToCart event (when selecting a repair)
+export const trackAddToCart = (contentName: string, value: number) => {
+  if (typeof window !== 'undefined' && window.fbq) {
+    window.fbq('track', 'AddToCart', {
+      content_name: contentName,
+      value: value,
+      currency: 'ILS',
+    });
+    console.log('Facebook Pixel: AddToCart event tracked', { contentName, value });
   }
 };
 
@@ -79,5 +92,6 @@ export const trackInitiateCheckout = (value: number) => {
       value: value,
       currency: 'ILS',
     });
+    console.log('Facebook Pixel: InitiateCheckout event tracked', { value });
   }
 };
