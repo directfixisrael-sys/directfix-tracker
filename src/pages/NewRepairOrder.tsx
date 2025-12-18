@@ -788,79 +788,74 @@ const NewRepairOrder = () => {
             </div>
           </div>}
 
-        {/* Step 1: Select Model - Two-step approach */}
+        {/* Step 1: Select Model - Compact grid approach */}
         {step === 'model' && <div className="space-y-8 animate-fade-in">
             {/* Hero Welcome Section */}
-            <div className="text-center py-8">
-              <h1 className="text-5xl font-bold mb-4 tracking-tight">
+            <div className="text-center py-6">
+              <h1 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight">
                 הזמנת תיקון
               </h1>
-              <p className="text-2xl text-muted-foreground">
-                {!selectedGeneration ? 'באיזה iPhone מדובר?' : `iPhone ${selectedGeneration}`}
+              <p className="text-xl md:text-2xl text-muted-foreground">
+                {!selectedGeneration ? 'באיזה iPhone מדובר?' : 'בחרו את הדגם המדויק'}
               </p>
             </div>
 
-            {/* Step 1a: Select Generation */}
+            {/* Step 1a: Select Generation - Compact Grid */}
             {!selectedGeneration && (
-              <div className="space-y-3 animate-fade-in" key="generations">
-                {generations.map(([gen, _models], index) => (
-                  <Card 
-                    key={gen}
-                    onClick={() => setSelectedGeneration(gen)}
-                    className="p-5 cursor-pointer hover:bg-muted/30 border-2 border-transparent hover:border-primary/20 transition-all duration-200 active:scale-[0.98] rounded-2xl animate-fade-in"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-muted rounded-2xl flex items-center justify-center">
-                        <Smartphone className="w-7 h-7 text-foreground/70" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-2xl">iPhone {gen}</h3>
-                        <p className="text-muted-foreground text-base">{_models.length} דגמים</p>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />
-                    </div>
-                  </Card>
-                ))}
+              <div className="animate-fade-in" key="generations">
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                  {generations.map(([gen], index) => (
+                    <button
+                      key={gen}
+                      onClick={() => setSelectedGeneration(gen)}
+                      className="p-4 md:p-6 bg-muted/50 hover:bg-muted rounded-2xl border-2 border-transparent hover:border-primary/30 transition-all duration-200 active:scale-95 animate-fade-in flex flex-col items-center justify-center gap-2"
+                      style={{ animationDelay: `${index * 40}ms` }}
+                    >
+                      <span className="text-2xl md:text-3xl font-bold">{gen}</span>
+                      <span className="text-xs md:text-sm text-muted-foreground">iPhone</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* Step 1b: Select Specific Model */}
+            {/* Step 1b: Select Specific Model - Clean List */}
             {selectedGeneration && (
-              <div className="space-y-4 animate-fade-in" key="models">
+              <div className="space-y-5 animate-fade-in" key="models">
                 <button
                   onClick={() => setSelectedGeneration(null)}
-                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-lg animate-fade-in"
+                  className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-lg font-medium"
                 >
                   <ArrowRight className="w-5 h-5" />
-                  חזרה לבחירת דור
+                  iPhone {selectedGeneration}
                 </button>
                 
-                <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
                   {modelsInSelectedGeneration.map((model, index) => {
                     // Extract variant name (Pro Max, Pro, Plus, or regular)
-                    const variant = model.name.replace(`iPhone ${selectedGeneration}`, '').trim() || 'רגיל';
+                    const variant = model.name.replace(`iPhone ${selectedGeneration}`, '').trim() || '';
+                    const displayName = variant || 'רגיל';
+                    const isPro = variant.includes('Pro');
+                    const isMax = variant.includes('Max');
                     
                     return (
-                      <Card 
+                      <button
                         key={model.id} 
                         onClick={() => handleModelSelect(model)} 
-                        className="p-5 cursor-pointer hover:bg-muted/30 border-2 border-transparent hover:border-primary/20 transition-all duration-200 active:scale-[0.98] rounded-2xl animate-fade-in"
-                        style={{ animationDelay: `${index * 60}ms` }}
+                        className={`p-5 rounded-2xl border-2 border-transparent transition-all duration-200 active:scale-95 animate-fade-in text-center ${
+                          isPro 
+                            ? 'bg-gradient-to-br from-primary/10 to-primary/5 hover:border-primary/40' 
+                            : 'bg-muted/50 hover:bg-muted hover:border-primary/30'
+                        }`}
+                        style={{ animationDelay: `${index * 50}ms` }}
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="w-14 h-14 bg-muted rounded-2xl flex items-center justify-center">
-                            <Smartphone className="w-7 h-7 text-foreground/70" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-2xl">{model.name}</h3>
-                            {variant !== 'רגיל' && (
-                              <p className="text-muted-foreground text-base">{variant}</p>
-                            )}
-                          </div>
-                          <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />
-                        </div>
-                      </Card>
+                        <span className={`font-semibold text-xl block ${isPro ? 'text-primary' : ''}`}>
+                          {displayName}
+                        </span>
+                        {isMax && (
+                          <span className="text-xs text-muted-foreground mt-1 block">מסך גדול</span>
+                        )}
+                      </button>
                     );
                   })}
                 </div>
