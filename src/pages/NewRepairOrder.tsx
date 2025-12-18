@@ -802,12 +802,12 @@ const NewRepairOrder = () => {
 
             {/* Step 1a: Select Generation */}
             {!selectedGeneration && (
-              <div className="space-y-3">
+              <div className="space-y-3 animate-fade-in" key="generations">
                 {generations.map(([gen, _models], index) => (
                   <Card 
                     key={gen}
                     onClick={() => setSelectedGeneration(gen)}
-                    className="p-5 cursor-pointer hover:bg-muted/30 border-2 border-transparent hover:border-primary/20 transition-all duration-200 active:scale-[0.98] rounded-2xl"
+                    className="p-5 cursor-pointer hover:bg-muted/30 border-2 border-transparent hover:border-primary/20 transition-all duration-200 active:scale-[0.98] rounded-2xl animate-fade-in"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <div className="flex items-center gap-4">
@@ -827,10 +827,10 @@ const NewRepairOrder = () => {
 
             {/* Step 1b: Select Specific Model */}
             {selectedGeneration && (
-              <div className="space-y-4">
+              <div className="space-y-4 animate-fade-in" key="models">
                 <button
                   onClick={() => setSelectedGeneration(null)}
-                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-lg"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-lg animate-fade-in"
                 >
                   <ArrowRight className="w-5 h-5" />
                   חזרה לבחירת דור
@@ -845,8 +845,8 @@ const NewRepairOrder = () => {
                       <Card 
                         key={model.id} 
                         onClick={() => handleModelSelect(model)} 
-                        className="p-5 cursor-pointer hover:bg-muted/30 border-2 border-transparent hover:border-primary/20 transition-all duration-200 active:scale-[0.98] rounded-2xl"
-                        style={{ animationDelay: `${index * 50}ms` }}
+                        className="p-5 cursor-pointer hover:bg-muted/30 border-2 border-transparent hover:border-primary/20 transition-all duration-200 active:scale-[0.98] rounded-2xl animate-fade-in"
+                        style={{ animationDelay: `${index * 60}ms` }}
                       >
                         <div className="flex items-center gap-4">
                           <div className="w-14 h-14 bg-muted rounded-2xl flex items-center justify-center">
