@@ -261,6 +261,27 @@ const NewRepairOrder = () => {
     setSelectedModel(model);
     goToStep('repair');
   };
+
+  // Smart search handlers
+  const handleSmartModelAndRepair = (modelName: string, repairName: string) => {
+    const model = models.find(m => m.name === modelName);
+    const repair = repairTypes.find(r => r.name === repairName);
+    if (model && repair) {
+      setSelectedModel(model);
+      setSelectedRepair(repair);
+      // Skip straight to image upload option like normal flow
+      setPendingRepair(repair);
+      setShowImageUploadOption(true);
+    }
+  };
+
+  const handleSmartModelOnly = (modelName: string) => {
+    const model = models.find(m => m.name === modelName);
+    if (model) {
+      handleModelSelect(model);
+    }
+  };
+
   const handleRepairSelect = (repair: RepairType) => {
     if (repair.is_phone_only) {
       window.location.href = 'tel:0528692886';
