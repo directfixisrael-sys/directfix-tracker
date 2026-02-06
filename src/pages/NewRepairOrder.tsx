@@ -974,6 +974,39 @@ const NewRepairOrder = () => {
                         </div>
                       </div>}
                   </div>}
+
+                {/* Static Benefits - Website Order Perks */}
+                <div className="border-t border-border pt-3 mt-2 space-y-2.5">
+                  <p className="text-xs font-semibold text-muted-foreground mb-2">🎁 הטבות למזמינים דרך האתר</p>
+                  
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-foreground flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-primary" />
+                      הגעה ותיקון במקום — ללא עלות נוספת
+                    </span>
+                    <span className="font-semibold text-success">₪0</span>
+                  </div>
+
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-foreground flex items-center gap-1.5">
+                      <Shield className="w-3.5 h-3.5 text-primary" />
+                      אחריות מורחבת למסכים — 4 חודשים
+                    </span>
+                    <span className="font-semibold text-success">₪0</span>
+                  </div>
+
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-foreground flex items-center gap-1.5">
+                      <Shield className="w-3.5 h-3.5 text-primary" />
+                      אחריות מורחבת לסוללות — 13 חודשים
+                    </span>
+                    <span className="font-semibold text-success">₪0</span>
+                  </div>
+
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    * במקום 3 חודשי אחריות למסכים ו-12 חודשים לסוללות בהזמנה רגילה
+                  </p>
+                </div>
                 
                 {/* Coupon Section */}
                 <div className="border-t border-border pt-3">
