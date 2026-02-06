@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { RepairOrder } from '@/types/repair';
-import { Smartphone, Wrench, Gift, Shield } from 'lucide-react';
+import { Smartphone, Wrench, Gift, Shield, MapPin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Promotion {
@@ -141,6 +141,39 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
             </div>
           </div>
         )}
+
+        {/* Static Benefits - Website Order Perks */}
+        <div className="border-t border-border pt-4 mt-2 space-y-3">
+          <p className="text-sm font-semibold text-muted-foreground">🎁 הטבות למזמינים דרך האתר</p>
+          
+          <div className="flex justify-between text-base">
+            <span className="text-foreground flex items-center gap-1.5">
+              <MapPin className="w-4 h-4 text-primary" />
+              הגעה ותיקון במקום — ללא עלות נוספת
+            </span>
+            <span className="font-semibold text-success text-lg">₪0</span>
+          </div>
+
+          <div className="flex justify-between text-base">
+            <span className="text-foreground flex items-center gap-1.5">
+              <Shield className="w-4 h-4 text-primary" />
+              אחריות מורחבת למסכים — 4 חודשים
+            </span>
+            <span className="font-semibold text-success text-lg">₪0</span>
+          </div>
+
+          <div className="flex justify-between text-base">
+            <span className="text-foreground flex items-center gap-1.5">
+              <Shield className="w-4 h-4 text-primary" />
+              אחריות מורחבת לסוללות — 13 חודשים
+            </span>
+            <span className="font-semibold text-success text-lg">₪0</span>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            * במקום 3 חודשי אחריות למסכים ו-12 חודשים לסוללות בהזמנה רגילה
+          </p>
+        </div>
 
         <div className="flex justify-between pt-4 border-t border-border">
           <span className="font-bold text-foreground text-xl">סה״כ לתשלום</span>
