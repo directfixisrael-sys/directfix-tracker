@@ -707,7 +707,14 @@ const NewRepairOrder = () => {
                     {activePromotion.description}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground">על כל תיקון</p>
+                {activePromotion.value && activePromotion.value > 0 && (
+                  <div className="flex items-center justify-center gap-2 mt-1">
+                    <span className="text-sm text-muted-foreground">שווי:</span>
+                    <span className="line-through text-sm text-muted-foreground">₪{activePromotion.value}</span>
+                    <span className="text-sm font-bold text-success">חינם! 🎉</span>
+                  </div>
+                )}
+                <p className="text-sm text-muted-foreground mt-1">על כל תיקון</p>
               </div>
             </div>
           </div>
