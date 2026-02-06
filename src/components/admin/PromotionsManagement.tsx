@@ -255,7 +255,10 @@ const PromotionsManagement = () => {
                       </span>
                     )}
                   </div>
-                  <p className="text-muted-foreground text-sm mb-2">{promotion.description}</p>
+                   <p className="text-muted-foreground text-sm mb-2">{promotion.description}</p>
+                   {promotion.value && promotion.value > 0 && (
+                     <p className="text-sm font-medium text-primary mb-2">שווי הטבה: ₪{promotion.value}</p>
+                   )}
                   {(promotion.start_date || promotion.end_date) && (
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Calendar className="w-3 h-3" />
