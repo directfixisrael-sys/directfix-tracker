@@ -1,17 +1,55 @@
+import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { RepairOrder } from '@/types/repair';
-import { Receipt, Smartphone, Wrench } from 'lucide-react';
+import { Receipt, Smartphone, Wrench, Gift, Shield } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Promotion {
+  id: string;
+  title: string;
+  description: string;
+  badge_text: string | null;
+  icon: string | null;
+  value: number | null;
+}
 
 interface OrderSummarySheetProps {
   order: RepairOrder;
 }
 
 const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
+  const [activePromotion, setActivePromotion] = useState<Promotion | null>(null);
+
+  useEffect(() => {
+    const loadPromotion = async () => {
+      const { data } = await supabase
+        .from('promotions')
+        .select('*')
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle();
+      if (data) setActivePromotion(data);
+    };
+    loadPromotion();
+  }, []);
+
   const accessoriesTotal = order.accessories
     .filter(a => a.selected)
     .reduce((sum, a) => sum + a.price, 0);
   
   const totalPrice = order.repairPrice + accessoriesTotal;
+
+  const getPromotionIcon = (icon: string | null) => {
+    switch (icon) {
+      case 'gift': return '🎁';
+      case 'tag': return '🏷️';
+      case 'sparkles': return '✨';
+      case 'percent': return '💯';
+      case 'fire': return '🔥';
+      case 'star': return '⭐';
+      default: return '🎁';
+    }
+  };
 
   return (
     <Sheet>
@@ -49,6 +87,33 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
             </div>
           </div>
 
+          {/* Active Promotion */}
+          {activePromotion && (
+            <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/15 to-amber-500/10 rounded-xl p-3 border border-amber-500/20">
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-9 h-9 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow">
+                  <Gift className="w-4 h-4 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                    {getPromotionIcon(activePromotion.icon)} {activePromotion.title}
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <Shield className="w-3 h-3 text-amber-500" />
+                    <p className="font-semibold text-foreground text-sm">{activePromotion.description}</p>
+                  </div>
+                </div>
+              </div>
+              {activePromotion.value && activePromotion.value > 0 && (
+                <div className="flex items-center gap-2 mt-1 mr-12">
+                  <span className="text-xs text-muted-foreground">שווי:</span>
+                  <span className="line-through text-xs text-muted-foreground">₪{activePromotion.value}</span>
+                  <span className="text-xs font-bold text-success">חינם! 🎉</span>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Notes */}
           {order.notes.length > 0 && (
             <div className="bg-muted/50 rounded-xl p-4">
@@ -72,6 +137,21 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
                 <span className="font-medium text-foreground">₪{acc.price}</span>
               </div>
             ))}
+
+            {activePromotion && (
+              <div className="flex justify-between text-sm">
+                <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                  <Gift className="w-3.5 h-3.5" />
+                  {activePromotion.description}
+                </span>
+                <div className="flex items-center gap-2">
+                  {activePromotion.value && activePromotion.value > 0 && (
+                    <span className="line-through text-muted-foreground text-xs">₪{activePromotion.value}</span>
+                  )}
+                  <span className="font-bold text-success">חינם! 🎉</span>
+                </div>
+              </div>
+            )}
 
             <div className="flex justify-between pt-3 border-t border-border">
               <span className="font-bold text-foreground">סה״כ לתשלום</span>

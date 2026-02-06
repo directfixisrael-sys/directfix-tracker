@@ -1099,11 +1099,22 @@ const NewRepairOrder = () => {
                 
                 {/* Active Promotion - Dynamic */}
                 {activePromotion && (
-                  <div className="flex justify-between items-center text-sm bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-2 -mx-1">
-                    <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
-                      {getPromotionIcon(activePromotion.icon)} {activePromotion.title}
-                    </span>
-                    <span className="font-semibold text-success">{activePromotion.description}</span>
+                  <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-3 -mx-1 space-y-1">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
+                        {getPromotionIcon(activePromotion.icon)} {activePromotion.title}
+                      </span>
+                      <span className="font-semibold text-success">{activePromotion.description}</span>
+                    </div>
+                    {activePromotion.value && activePromotion.value > 0 && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-muted-foreground text-xs">שווי הטבה</span>
+                        <div className="flex items-center gap-2">
+                          <span className="line-through text-xs text-muted-foreground">₪{activePromotion.value}</span>
+                          <span className="font-bold text-success">חינם! 🎉</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 
