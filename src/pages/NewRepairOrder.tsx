@@ -831,6 +831,14 @@ const NewRepairOrder = () => {
               </p>
             </div>
 
+            {/* Smart AI Search */}
+            <SmartRepairInput
+              models={models}
+              repairTypes={repairTypes}
+              onModelAndRepairFound={handleSmartModelAndRepair}
+              onModelFound={handleSmartModelOnly}
+            />
+
             <div className="grid grid-cols-2 gap-4">
               {filteredModels.map((model, index) => {
                 const isPro = model.name.includes('Pro');
