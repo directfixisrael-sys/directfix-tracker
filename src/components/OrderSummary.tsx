@@ -126,7 +126,12 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
               <Gift className="w-4 h-4" />
               {activePromotion.description} (מבצע)
             </span>
-            <span className="font-medium text-success text-lg">חינם!</span>
+            <div className="flex items-center gap-2">
+              {activePromotion.value && activePromotion.value > 0 && (
+                <span className="line-through text-muted-foreground text-sm">₪{activePromotion.value}</span>
+              )}
+              <span className="font-bold text-success text-lg">חינם! 🎉</span>
+            </div>
           </div>
         )}
 
