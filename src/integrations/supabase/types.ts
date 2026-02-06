@@ -268,6 +268,7 @@ export type Database = {
           start_date: string | null
           title: string
           updated_at: string
+          value: number | null
         }
         Insert: {
           badge_text?: string | null
@@ -280,6 +281,7 @@ export type Database = {
           start_date?: string | null
           title: string
           updated_at?: string
+          value?: number | null
         }
         Update: {
           badge_text?: string | null
@@ -292,6 +294,7 @@ export type Database = {
           start_date?: string | null
           title?: string
           updated_at?: string
+          value?: number | null
         }
         Relationships: []
       }
