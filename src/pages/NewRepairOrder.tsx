@@ -108,7 +108,7 @@ const NewRepairOrder = () => {
   const [customerNotes, setCustomerNotes] = useState('');
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptContact, setAcceptContact] = useState(false);
-  
+
   // Coupon fields
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{
@@ -117,7 +117,7 @@ const NewRepairOrder = () => {
     discount_value: number;
   } | null>(null);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
-  
+
   // Image upload
   const [deviceImages, setDeviceImages] = useState<string[]>([]);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -139,13 +139,20 @@ const NewRepairOrder = () => {
   // Helper to get promotion icon
   const getPromotionIcon = (icon: string | null) => {
     switch (icon) {
-      case 'gift': return '🎁';
-      case 'tag': return '🏷️';
-      case 'sparkles': return '✨';
-      case 'percent': return '💯';
-      case 'fire': return '🔥';
-      case 'star': return '⭐';
-      default: return '🎁';
+      case 'gift':
+        return '🎁';
+      case 'tag':
+        return '🏷️';
+      case 'sparkles':
+        return '✨';
+      case 'percent':
+        return '💯';
+      case 'fire':
+        return '🔥';
+      case 'star':
+        return '⭐';
+      default:
+        return '🎁';
     }
   };
 
@@ -154,25 +161,16 @@ const NewRepairOrder = () => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [modelsRes, repairsRes, blockedRes, bundlesRes] = await Promise.all([
-          supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), 
-          supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), 
-          supabase.from('blocked_dates').select('date'),
-          supabase.from('repair_bundles').select('*').eq('is_active', true)
-        ]);
+        const [modelsRes, repairsRes, blockedRes, bundlesRes] = await Promise.all([supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), supabase.from('blocked_dates').select('date'), supabase.from('repair_bundles').select('*').eq('is_active', true)]);
         if (modelsRes.data) setModels(modelsRes.data);
         if (repairsRes.data) setRepairTypes(repairsRes.data);
         if (blockedRes.data) setBlockedDates(blockedRes.data.map(d => d.date));
         if (bundlesRes.data) setRepairBundles(bundlesRes.data);
-        
+
         // Load promotion separately to avoid error if none exists
-        const { data: promotionData } = await supabase
-          .from('promotions')
-          .select('*')
-          .eq('is_active', true)
-          .limit(1)
-          .maybeSingle();
-        
+        const {
+          data: promotionData
+        } = await supabase.from('promotions').select('*').eq('is_active', true).limit(1).maybeSingle();
         if (promotionData) {
           setActivePromotion(promotionData);
         }
@@ -234,14 +232,12 @@ const NewRepairOrder = () => {
     if (isBattery) return selectedModel.battery_price;
     return 0;
   };
-  
   const getBundleAddonPrice = () => {
     if (!selectedModel || !selectedBundleAddon || !currentBundle) return 0;
     const basePrice = selectedModel.battery_price;
     const discountedPrice = Math.round(basePrice * (1 - currentBundle.discount_percent / 100));
     return discountedPrice;
   };
-  
   const getTotalPrice = () => {
     return getPrice() + getBundleAddonPrice();
   };
@@ -255,7 +251,10 @@ const NewRepairOrder = () => {
       setStep(newStep);
       setIsAnimating(false);
       // Scroll to top when changing steps
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     }, 200);
   };
   const handleModelSelect = (model: IphoneModel) => {
@@ -275,14 +274,12 @@ const NewRepairOrder = () => {
       setShowImageUploadOption(true);
     }
   };
-
   const handleSmartModelOnly = (modelName: string) => {
     const model = models.find(m => m.name === modelName);
     if (model) {
       handleModelSelect(model);
     }
   };
-
   const handleRepairSelect = (repair: RepairType) => {
     if (repair.is_phone_only) {
       window.location.href = 'tel:0528692886';
@@ -292,7 +289,6 @@ const NewRepairOrder = () => {
     setPendingRepair(repair);
     setShowImageUploadOption(true);
   };
-  
   const continueAfterImageOption = (wantsToUpload: boolean) => {
     setShowImageUploadOption(false);
     if (wantsToUpload && fileInputRef.current) {
@@ -300,24 +296,19 @@ const NewRepairOrder = () => {
     }
     if (pendingRepair) {
       setSelectedRepair(pendingRepair);
-      
+
       // Track AddToCart event for Facebook Pixel
       if (selectedModel) {
         const isOriginalScreen = pendingRepair.name.includes('מסך מקורי');
         const isCompatibleScreen = pendingRepair.name.includes('מסך תואם');
         const isBattery = pendingRepair.name.includes('סוללה');
         let repairPrice = 0;
-        if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;
-        else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;
-        else if (isBattery) repairPrice = selectedModel.battery_price;
+        if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;else if (isBattery) repairPrice = selectedModel.battery_price;
         trackAddToCart(pendingRepair.name, repairPrice);
       }
       // Check if there's a bundle offer for this repair type
       const isScreenRepair = pendingRepair.name.includes('מסך');
-      const bundle = repairBundles.find(b => 
-        pendingRepair.name.includes(b.primary_repair_type)
-      );
-      
+      const bundle = repairBundles.find(b => pendingRepair.name.includes(b.primary_repair_type));
       if (bundle && isScreenRepair) {
         setCurrentBundle(bundle);
         setSelectedBundleAddon(false);
@@ -336,7 +327,6 @@ const NewRepairOrder = () => {
       }
     }
   };
-  
   const handleBundleDecision = (acceptBundle: boolean) => {
     setSelectedBundleAddon(acceptBundle);
     if (activePromotion) {
@@ -372,16 +362,12 @@ const NewRepairOrder = () => {
   // Coupon validation
   const validateCoupon = async () => {
     if (!couponCode.trim()) return;
-    
     setIsValidatingCoupon(true);
     try {
-      const { data, error } = await supabase
-        .from('coupons')
-        .select('*')
-        .eq('code', couponCode.toUpperCase().trim())
-        .eq('is_active', true)
-        .single();
-
+      const {
+        data,
+        error
+      } = await supabase.from('coupons').select('*').eq('code', couponCode.toUpperCase().trim()).eq('is_active', true).single();
       if (error || !data) {
         toast.error('קוד הקופון לא נמצא או לא תקף');
         setAppliedCoupon(null);
@@ -414,11 +400,10 @@ const NewRepairOrder = () => {
         setAppliedCoupon(null);
         return;
       }
-
       setAppliedCoupon({
         code: data.code,
         discount_type: data.discount_type as 'fixed' | 'percentage',
-        discount_value: data.discount_value,
+        discount_value: data.discount_value
       });
       toast.success('הקופון הופעל בהצלחה!');
     } catch (err) {
@@ -427,12 +412,10 @@ const NewRepairOrder = () => {
       setIsValidatingCoupon(false);
     }
   };
-
   const removeCoupon = () => {
     setAppliedCoupon(null);
     setCouponCode('');
   };
-
   const getDiscount = () => {
     if (!appliedCoupon) return 0;
     if (appliedCoupon.discount_type === 'percentage') {
@@ -440,7 +423,6 @@ const NewRepairOrder = () => {
     }
     return appliedCoupon.discount_value;
   };
-
   const getFinalPrice = () => {
     return Math.max(0, getTotalPrice() - getDiscount());
   };
@@ -449,30 +431,24 @@ const NewRepairOrder = () => {
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
-    
     if (deviceImages.length >= 3) {
       toast.error('ניתן להעלות עד 3 תמונות');
       return;
     }
-
     setIsUploadingImage(true);
     try {
       for (const file of Array.from(files)) {
         if (deviceImages.length >= 3) break;
-        
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        
-        const { data, error } = await supabase.storage
-          .from('device-images')
-          .upload(fileName, file);
-
+        const {
+          data,
+          error
+        } = await supabase.storage.from('device-images').upload(fileName, file);
         if (error) throw error;
-
-        const { data: urlData } = supabase.storage
-          .from('device-images')
-          .getPublicUrl(fileName);
-
+        const {
+          data: urlData
+        } = supabase.storage.from('device-images').getPublicUrl(fileName);
         setDeviceImages(prev => [...prev, urlData.publicUrl]);
       }
       toast.success('התמונה הועלתה בהצלחה');
@@ -486,7 +462,6 @@ const NewRepairOrder = () => {
       }
     }
   };
-
   const removeImage = (index: number) => {
     setDeviceImages(prev => prev.filter((_, i) => i !== index));
   };
@@ -502,31 +477,24 @@ const NewRepairOrder = () => {
     setIsSubmitting(true);
     try {
       const scheduleNote = formatSelectedDateTime();
-      const repairDescription = selectedBundleAddon && currentBundle 
-        ? `${getRepairTypeName()} + החלפת סוללה (חבילה)`
-        : getRepairTypeName();
+      const repairDescription = selectedBundleAddon && currentBundle ? `${getRepairTypeName()} + החלפת סוללה (חבילה)` : getRepairTypeName();
       const notes = [`הזמנה מהאתר - ${repairDescription}`, `מועד מבוקש: ${scheduleNote}`];
-      
       if (selectedBundleAddon && currentBundle && selectedModel) {
         notes.push(`חבילת תיקון: ${currentBundle.name} - סוללה ב-${currentBundle.discount_percent}% הנחה (₪${getBundleAddonPrice()} במקום ₪${selectedModel.battery_price})`);
       }
-      
       if (customerNotes.trim()) {
         notes.push(`הערות לקוח: ${customerNotes.trim()}`);
       }
       if (appliedCoupon) {
         notes.push(`קופון: ${appliedCoupon.code} - הנחה של ${appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : `₪${appliedCoupon.discount_value}`}`);
         // Update coupon usage - fetch current and increment
-        const { data: couponData } = await supabase
-          .from('coupons')
-          .select('current_uses')
-          .eq('code', appliedCoupon.code)
-          .single();
+        const {
+          data: couponData
+        } = await supabase.from('coupons').select('current_uses').eq('code', appliedCoupon.code).single();
         if (couponData) {
-          await supabase
-            .from('coupons')
-            .update({ current_uses: couponData.current_uses + 1 })
-            .eq('code', appliedCoupon.code);
+          await supabase.from('coupons').update({
+            current_uses: couponData.current_uses + 1
+          }).eq('code', appliedCoupon.code);
         }
       }
       if (deviceImages.length > 0) {
@@ -547,9 +515,7 @@ const NewRepairOrder = () => {
 
       // Send notifications (email + WhatsApp)
       try {
-        const repairTypeForNotification = selectedBundleAddon && currentBundle 
-          ? `${getRepairTypeName()} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)`
-          : getRepairTypeName();
+        const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${getRepairTypeName()} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : getRepairTypeName();
         await supabase.functions.invoke('send-order-notifications', {
           body: {
             customerName: customerName.trim(),
@@ -571,7 +537,6 @@ const NewRepairOrder = () => {
 
       // Track Facebook Pixel Purchase event
       trackPurchase(getFinalPrice());
-
       goToStep('success');
     } catch (error) {
       toast.error('אירעה שגיאה, נסה שוב');
@@ -628,16 +593,9 @@ const NewRepairOrder = () => {
         <div className="flex items-center justify-between p-3">
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={() => {
-            if (step === 'model') navigate('/');
-            else if (step === 'repair') goToStep('model');
-            else if (step === 'bundle') goToStep('repair');
-            else if (step === 'price') {
-              if (currentBundle) goToStep('bundle');
-              else goToStep('repair');
-            }
-            else if (step === 'schedule') goToStep('price');
-            else if (step === 'details') goToStep('schedule');
-            else navigate('/');
+            if (step === 'model') navigate('/');else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
+              if (currentBundle) goToStep('bundle');else goToStep('repair');
+            } else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
           }} className="rounded-full h-9 w-9">
               <ArrowRight className="w-4 h-4" />
             </Button>
@@ -645,22 +603,13 @@ const NewRepairOrder = () => {
             <h1 className="text-base font-semibold">הזמנת תיקון</h1>
           </div>
           <div className="flex items-center gap-1">
-            <a
-              href="tel:033106020"
-              className="h-9 w-9 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center transition-colors"
-              aria-label="התקשר 033106020"
-            >
+            <a href="tel:033106020" className="h-9 w-9 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center transition-colors" aria-label="התקשר 033106020">
               <Phone className="w-4 h-4" />
             </a>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => {
-                const event = new CustomEvent('open-accessibility-widget');
-                window.dispatchEvent(event);
-              }} 
-              className="h-9 w-9 rounded-full bg-blue-500 text-white hover:bg-blue-600 hover:text-white"
-            >
+            <Button variant="ghost" size="icon" onClick={() => {
+            const event = new CustomEvent('open-accessibility-widget');
+            window.dispatchEvent(event);
+          }} className="h-9 w-9 rounded-full bg-blue-500 text-white hover:bg-blue-600 hover:text-white">
               <Accessibility className="w-4 h-4" />
             </Button>
             <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-full">
@@ -673,14 +622,14 @@ const NewRepairOrder = () => {
         {step !== 'success' && <div className="px-3 pb-2">
             <div className="flex gap-1.5">
               {['model', 'repair', 'price', 'schedule', 'details'].map((s, i) => {
-                const allSteps = ['model', 'repair', 'bundle', 'price', 'schedule', 'details'];
-                const displaySteps = ['model', 'repair', 'price', 'schedule', 'details'];
-                const currentIdx = allSteps.indexOf(step);
-                const displayIdx = displaySteps.indexOf(s);
-                // Map bundle to be between repair (1) and price (2)
-                const adjustedCurrentIdx = currentIdx >= 3 ? currentIdx - 1 : (currentIdx === 2 ? 1.5 : currentIdx);
-                return <div key={s} className={`h-1 flex-1 rounded-full transition-all duration-500 ${adjustedCurrentIdx >= displayIdx ? 'bg-primary' : 'bg-muted'}`} />;
-              })}
+            const allSteps = ['model', 'repair', 'bundle', 'price', 'schedule', 'details'];
+            const displaySteps = ['model', 'repair', 'price', 'schedule', 'details'];
+            const currentIdx = allSteps.indexOf(step);
+            const displayIdx = displaySteps.indexOf(s);
+            // Map bundle to be between repair (1) and price (2)
+            const adjustedCurrentIdx = currentIdx >= 3 ? currentIdx - 1 : currentIdx === 2 ? 1.5 : currentIdx;
+            return <div key={s} className={`h-1 flex-1 rounded-full transition-all duration-500 ${adjustedCurrentIdx >= displayIdx ? 'bg-primary' : 'bg-muted'}`} />;
+          })}
             </div>
           </div>}
       </div>
@@ -708,13 +657,11 @@ const NewRepairOrder = () => {
                     {activePromotion.description}
                   </span>
                 </div>
-                {activePromotion.value && activePromotion.value > 0 && (
-                  <div className="flex items-center justify-center gap-2 mt-1">
+                {activePromotion.value && activePromotion.value > 0 && <div className="flex items-center justify-center gap-2 mt-1">
                     <span className="text-sm text-muted-foreground">שווי:</span>
                     <span className="line-through text-sm text-muted-foreground">₪{activePromotion.value}</span>
                     <span className="text-sm font-bold text-success">חינם! 🎉</span>
-                  </div>
-                )}
+                  </div>}
                 <p className="text-sm text-muted-foreground mt-1">על כל תיקון</p>
               </div>
             </div>
@@ -730,64 +677,40 @@ const NewRepairOrder = () => {
               </div>
               <h3 className="text-lg font-bold mb-2">רוצה להעלות תמונה?</h3>
               <p className="text-muted-foreground text-sm">
-                אפשר להעלות תמונה של מצב המכשיר<br/>
+                אפשר להעלות תמונה של מצב המכשיר<br />
                 <span className="text-xs">(לא חובה)</span>
               </p>
             </div>
             
             {/* Uploaded images preview */}
-            {deviceImages.length > 0 && (
-              <div className="flex gap-2 justify-center flex-wrap">
-                {deviceImages.map((img, idx) => (
-                  <div key={idx} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border">
+            {deviceImages.length > 0 && <div className="flex gap-2 justify-center flex-wrap">
+                {deviceImages.map((img, idx) => <div key={idx} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border">
                     <img src={img} alt={`תמונה ${idx + 1}`} className="w-full h-full object-cover" />
-                    <button
-                      onClick={() => removeImage(idx)}
-                      className="absolute top-0 right-0 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center"
-                    >
+                    <button onClick={() => removeImage(idx)} className="absolute top-0 right-0 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center">
                       <X className="w-3 h-3" />
                     </button>
-                  </div>
-                ))}
-              </div>
-            )}
+                  </div>)}
+              </div>}
             
             <div className="flex gap-3">
-              <Button 
-                variant="outline" 
-                className="flex-1" 
-                onClick={() => continueAfterImageOption(false)}
-              >
+              <Button variant="outline" className="flex-1" onClick={() => continueAfterImageOption(false)}>
                 דלג
               </Button>
-              <Button 
-                className="flex-1 gap-2" 
-                onClick={() => {
-                  if (fileInputRef.current) {
-                    fileInputRef.current.click();
-                  }
-                }}
-                disabled={isUploadingImage || deviceImages.length >= 3}
-              >
-                {isUploadingImage ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
+              <Button className="flex-1 gap-2" onClick={() => {
+            if (fileInputRef.current) {
+              fileInputRef.current.click();
+            }
+          }} disabled={isUploadingImage || deviceImages.length >= 3}>
+                {isUploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <>
                     <Image className="w-4 h-4" />
                     העלה תמונה
-                  </>
-                )}
+                  </>}
               </Button>
             </div>
             
-            {deviceImages.length > 0 && (
-              <Button 
-                className="w-full" 
-                onClick={() => continueAfterImageOption(false)}
-              >
+            {deviceImages.length > 0 && <Button className="w-full" onClick={() => continueAfterImageOption(false)}>
                 המשך להזמנה
-              </Button>
-            )}
+              </Button>}
             
             <p className="text-center text-xs text-muted-foreground">
               ניתן להעלות עד 3 תמונות
@@ -795,24 +718,14 @@ const NewRepairOrder = () => {
           </Card>
           
           {/* Hidden file input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageUpload}
-            className="hidden"
-          />
+          <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
         </div>}
 
       {/* Content */}
       <div className={`flex-1 p-4 pb-24 overflow-y-auto transition-all duration-200 ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
         
         {/* Privacy Consent Modal */}
-        <OrderPrivacyConsent 
-          open={showPrivacyConsent} 
-          onAccept={() => setShowPrivacyConsent(false)} 
-        />
+        <OrderPrivacyConsent open={showPrivacyConsent} onAccept={() => setShowPrivacyConsent(false)} />
 
         {/* Promotion Banner - Dynamic from DB */}
         {step === 'model' && activePromotion && <div className="mb-4 animate-fade-in">
@@ -821,15 +734,13 @@ const NewRepairOrder = () => {
                 <Gift className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <p className="font-bold text-amber-600 dark:text-amber-400 text-base">{activePromotion.title}</p>
-                <p className="text-xs font-medium text-secondary-foreground">{activePromotion.description}</p>
-                {activePromotion.value && activePromotion.value > 0 && (
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-muted-foreground">שווי:</span>
-                    <span className="line-through text-xs text-muted-foreground">₪{activePromotion.value}</span>
-                    <span className="text-xs font-bold text-success">חינם! 🎉</span>
-                  </div>
-                )}
+                <p className="font-bold text-amber-600 dark:text-amber-400 text-lg text-center">{activePromotion.title}</p>
+                <p className="text-xs font-medium text-secondary-foreground text-center">{activePromotion.description}</p>
+                {activePromotion.value && activePromotion.value > 0 && <div className="flex items-center gap-2 mt-1">
+                    <span className="text-muted-foreground text-base text-center">שווי:</span>
+                    <span className="line-through text-base text-primary text-center">₪{activePromotion.value}</span>
+                    <span className="font-bold text-success text-base text-center">חינם! 🎉</span>
+                  </div>}
               </div>
             </div>
           </div>}
@@ -847,24 +758,14 @@ const NewRepairOrder = () => {
             </div>
 
             {/* Smart AI Search */}
-            <SmartRepairInput
-              models={models}
-              repairTypes={repairTypes}
-              onModelAndRepairFound={handleSmartModelAndRepair}
-              onModelFound={handleSmartModelOnly}
-            />
+            <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
 
             <div className="grid grid-cols-2 gap-4">
               {filteredModels.map((model, index) => {
-                const isPro = model.name.includes('Pro');
-                
-                return (
-                  <Card 
-                    key={model.id} 
-                    onClick={() => handleModelSelect(model)} 
-                    className="p-6 cursor-pointer hover:bg-muted/50 border border-border hover:border-primary/40 transition-all duration-300 active:scale-[0.98] rounded-2xl"
-                    style={{ animationDelay: `${index * 40}ms` }}
-                  >
+            const isPro = model.name.includes('Pro');
+            return <Card key={model.id} onClick={() => handleModelSelect(model)} className="p-6 cursor-pointer hover:bg-muted/50 border border-border hover:border-primary/40 transition-all duration-300 active:scale-[0.98] rounded-2xl" style={{
+              animationDelay: `${index * 40}ms`
+            }}>
                     <div className="flex flex-col items-center text-center gap-3">
                       {/* Simple iPhone icon */}
                       <div className="w-12 h-20 bg-muted rounded-xl flex items-center justify-center">
@@ -874,14 +775,11 @@ const NewRepairOrder = () => {
                       {/* Model name */}
                       <div>
                         <span className="font-semibold text-lg block">{model.name}</span>
-                        {isPro && (
-                          <span className="text-sm text-muted-foreground">Pro</span>
-                        )}
+                        {isPro && <span className="text-sm text-muted-foreground">Pro</span>}
                       </div>
                     </div>
-                  </Card>
-                );
-              })}
+                  </Card>;
+          })}
             </div>
           </div>}
 
@@ -894,39 +792,23 @@ const NewRepairOrder = () => {
 
             <div className="space-y-3">
               {repairTypes.map((repair, index) => {
-                const isPhoneOnly = repair.is_phone_only;
-                const isOriginalScreen = repair.name.includes('מסך מקורי');
-                const isCompatibleScreen = repair.name.includes('מסך תואם');
-                const isBattery = repair.name.includes('סוללה');
-                
-                let price = 0;
-                if (selectedModel) {
-                  if (isOriginalScreen) price = selectedModel.original_screen_price;
-                  else if (isCompatibleScreen) price = selectedModel.compatible_screen_price;
-                  else if (isBattery) price = selectedModel.battery_price;
-                }
-                
-                const infoKey = isOriginalScreen ? 'מסך מקורי' : isCompatibleScreen ? 'מסך תואם' : isBattery ? 'סוללה מקורית' : null;
-                const info = infoKey ? repairInfoDescriptions[infoKey] : null;
-                
-                const getIcon = () => {
-                  if (isOriginalScreen || isCompatibleScreen) return Smartphone;
-                  if (isBattery) return Battery;
-                  return Phone;
-                };
-                
-                const IconComponent = getIcon();
-                
-                return (
-                  <Card 
-                    key={repair.id} 
-                    onClick={() => handleRepairSelect(repair)} 
-                    className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border ${
-                      isPhoneOnly 
-                        ? 'border-dashed border-muted-foreground/30' 
-                        : 'border-border hover:border-primary/40 hover:bg-muted/30'
-                    }`}
-                  >
+            const isPhoneOnly = repair.is_phone_only;
+            const isOriginalScreen = repair.name.includes('מסך מקורי');
+            const isCompatibleScreen = repair.name.includes('מסך תואם');
+            const isBattery = repair.name.includes('סוללה');
+            let price = 0;
+            if (selectedModel) {
+              if (isOriginalScreen) price = selectedModel.original_screen_price;else if (isCompatibleScreen) price = selectedModel.compatible_screen_price;else if (isBattery) price = selectedModel.battery_price;
+            }
+            const infoKey = isOriginalScreen ? 'מסך מקורי' : isCompatibleScreen ? 'מסך תואם' : isBattery ? 'סוללה מקורית' : null;
+            const info = infoKey ? repairInfoDescriptions[infoKey] : null;
+            const getIcon = () => {
+              if (isOriginalScreen || isCompatibleScreen) return Smartphone;
+              if (isBattery) return Battery;
+              return Phone;
+            };
+            const IconComponent = getIcon();
+            return <Card key={repair.id} onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border ${isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-border hover:border-primary/40 hover:bg-muted/30'}`}>
                     <div className="flex items-center gap-4">
                       {/* Simple Icon */}
                       <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center">
@@ -936,14 +818,9 @@ const NewRepairOrder = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-xl">{repair.name}</h3>
-                          {!isPhoneOnly && info && (
-                            <Dialog>
+                          {!isPhoneOnly && info && <Dialog>
                               <DialogTrigger asChild>
-                                <button 
-                                  type="button" 
-                                  onClick={e => e.stopPropagation()} 
-                                  className="text-muted-foreground hover:text-primary transition-colors p-1"
-                                >
+                                <button type="button" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-primary transition-colors p-1">
                                   <HelpCircle className="w-5 h-5" />
                                 </button>
                               </DialogTrigger>
@@ -955,24 +832,16 @@ const NewRepairOrder = () => {
                                   {info.description}
                                 </p>
                               </DialogContent>
-                            </Dialog>
-                          )}
+                            </Dialog>}
                         </div>
-                        {repair.description && (
-                          <p className="text-muted-foreground text-base mt-1">{repair.description}</p>
-                        )}
-                        {!isPhoneOnly && selectedModel && (
-                          <p className="text-2xl font-bold text-primary mt-2">₪{price}</p>
-                        )}
+                        {repair.description && <p className="text-muted-foreground text-base mt-1">{repair.description}</p>}
+                        {!isPhoneOnly && selectedModel && <p className="text-2xl font-bold text-primary mt-2">₪{price}</p>}
                       </div>
                       
-                      {!isPhoneOnly && (
-                        <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />
-                      )}
+                      {!isPhoneOnly && <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />}
                     </div>
-                  </Card>
-                );
-              })}
+                  </Card>;
+          })}
             </div>
           </div>}
 
@@ -1029,19 +898,12 @@ const NewRepairOrder = () => {
             </Card>
 
             <div className="space-y-3">
-              <Button 
-                onClick={() => handleBundleDecision(true)}
-                className="w-full h-14 text-base font-bold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg"
-              >
+              <Button onClick={() => handleBundleDecision(true)} className="w-full h-14 text-base font-bold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg">
                 <Battery className="w-5 h-5 ml-2" />
                 כן, תוסיפו סוללה בהנחה!
               </Button>
               
-              <Button 
-                variant="outline"
-                onClick={() => handleBundleDecision(false)}
-                className="w-full h-12 text-sm rounded-xl"
-              >
+              <Button variant="outline" onClick={() => handleBundleDecision(false)} className="w-full h-12 text-sm rounded-xl">
                 לא תודה, רק {selectedRepair?.name}
               </Button>
             </div>
@@ -1085,8 +947,7 @@ const NewRepairOrder = () => {
                 </div>
                 
                 {/* Bundle Addon */}
-                {selectedBundleAddon && currentBundle && selectedModel && (
-                  <div className="flex justify-between items-center text-sm bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-2 -mx-1">
+                {selectedBundleAddon && currentBundle && selectedModel && <div className="flex justify-between items-center text-sm bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-2 -mx-1">
                     <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
                       <Battery className="w-4 h-4" /> החלפת סוללה
                       <span className="text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full">-{currentBundle.discount_percent}%</span>
@@ -1095,37 +956,31 @@ const NewRepairOrder = () => {
                       <span className="text-xs line-through text-muted-foreground">₪{selectedModel.battery_price}</span>
                       <span className="font-semibold text-success">₪{getBundleAddonPrice()}</span>
                     </div>
-                  </div>
-                )}
+                  </div>}
                 
                 {/* Active Promotion - Dynamic */}
-                {activePromotion && (
-                  <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-3 -mx-1 space-y-1">
+                {activePromotion && <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-3 -mx-1 space-y-1">
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
                         {getPromotionIcon(activePromotion.icon)} {activePromotion.title}
                       </span>
                       <span className="font-semibold text-success">{activePromotion.description}</span>
                     </div>
-                    {activePromotion.value && activePromotion.value > 0 && (
-                      <div className="flex justify-between items-center text-sm">
+                    {activePromotion.value && activePromotion.value > 0 && <div className="flex justify-between items-center text-sm">
                         <span className="text-muted-foreground text-xs">שווי הטבה</span>
                         <div className="flex items-center gap-2">
                           <span className="line-through text-xs text-muted-foreground">₪{activePromotion.value}</span>
                           <span className="font-bold text-success">חינם! 🎉</span>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                      </div>}
+                  </div>}
                 
                 {/* Coupon Section */}
                 <div className="border-t border-border pt-3">
                   <label className="block text-xs font-medium mb-2 text-muted-foreground">
                     יש לך קוד קופון?
                   </label>
-                  {appliedCoupon ? (
-                    <div className="flex items-center gap-2 bg-success/10 border border-success/30 rounded-xl px-3 py-2">
+                  {appliedCoupon ? <div className="flex items-center gap-2 bg-success/10 border border-success/30 rounded-xl px-3 py-2">
                       <Tag className="w-4 h-4 text-success" />
                       <span className="flex-1 font-mono font-medium text-success">{appliedCoupon.code}</span>
                       <span className="text-sm text-success font-bold">
@@ -1134,47 +989,28 @@ const NewRepairOrder = () => {
                       <button onClick={removeCoupon} className="text-muted-foreground hover:text-foreground">
                         <X className="w-4 h-4" />
                       </button>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="הכנס קוד קופון"
-                        value={couponCode}
-                        onChange={e => setCouponCode(e.target.value.toUpperCase())}
-                        className="h-9 text-sm rounded-lg font-mono flex-1"
-                      />
-                      <Button 
-                        variant="outline" 
-                        onClick={validateCoupon}
-                        disabled={!couponCode.trim() || isValidatingCoupon}
-                        className="h-9 rounded-lg text-xs"
-                      >
+                    </div> : <div className="flex gap-2">
+                      <Input placeholder="הכנס קוד קופון" value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())} className="h-9 text-sm rounded-lg font-mono flex-1" />
+                      <Button variant="outline" onClick={validateCoupon} disabled={!couponCode.trim() || isValidatingCoupon} className="h-9 rounded-lg text-xs">
                         {isValidatingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : 'הפעל'}
                       </Button>
-                    </div>
-                  )}
+                    </div>}
                 </div>
 
                 <div className="border-t border-border pt-3 mt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-bold">סה"כ</span>
                     <div className="text-right">
-                      {appliedCoupon && (
-                        <span className="text-muted-foreground line-through text-sm mr-2">₪{getTotalPrice()}</span>
-                      )}
+                      {appliedCoupon && <span className="text-muted-foreground line-through text-sm mr-2">₪{getTotalPrice()}</span>}
                       <span className="text-xl font-bold text-primary">₪{getFinalPrice()}</span>
                     </div>
                   </div>
-                  {appliedCoupon && (
-                    <div className="text-xs text-success mt-1 text-left">
+                  {appliedCoupon && <div className="text-xs text-success mt-1 text-left">
                       🎉 חיסכת ₪{getDiscount()} עם קופון {appliedCoupon.code}!
-                    </div>
-                  )}
-                  {selectedBundleAddon && currentBundle && (
-                    <div className="text-xs text-amber-500 mt-1 text-left">
+                    </div>}
+                  {selectedBundleAddon && currentBundle && <div className="text-xs text-amber-500 mt-1 text-left">
                       🔋 כולל סוללה בהנחה של {currentBundle.discount_percent}%
-                    </div>
-                  )}
+                    </div>}
                 </div>
               </div>
             </Card>
@@ -1201,7 +1037,7 @@ const NewRepairOrder = () => {
                 <div className="flex flex-col items-center gap-1">
                   <div className="w-12 h-8 bg-foreground rounded-md flex items-center justify-center">
                     <svg viewBox="0 0 24 24" className="w-6 h-4 text-background" fill="currentColor">
-                      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
                     </svg>
                   </div>
                   <span className="text-[10px] text-muted-foreground">Apple Pay</span>
@@ -1211,7 +1047,7 @@ const NewRepairOrder = () => {
                 <div className="flex flex-col items-center gap-1">
                   <div className="w-12 h-8 bg-card border border-border rounded-md flex items-center justify-center">
                     <svg viewBox="0 0 24 24" className="w-6 h-4" fill="none">
-                      <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z" fill="#4285F4"/>
+                      <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z" fill="#4285F4" />
                     </svg>
                   </div>
                   <span className="text-[10px] text-muted-foreground">Google Pay</span>
@@ -1221,8 +1057,8 @@ const NewRepairOrder = () => {
                 <div className="flex flex-col items-center gap-1">
                   <div className="w-12 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md flex items-center justify-center">
                     <svg viewBox="0 0 24 24" className="w-5 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                      <line x1="1" y1="10" x2="23" y2="10"/>
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                      <line x1="1" y1="10" x2="23" y2="10" />
                     </svg>
                   </div>
                   <span className="text-[10px] text-muted-foreground">אשראי</span>
@@ -1338,41 +1174,29 @@ const NewRepairOrder = () => {
               </div>
 
               {/* Uploaded Images Display */}
-              {deviceImages.length > 0 && (
-                <div>
+              {deviceImages.length > 0 && <div>
                   <label className="block text-xs font-medium mb-1.5">
                     תמונות שהועלו
                   </label>
                   <div className="flex gap-2 flex-wrap">
-                    {deviceImages.map((url, index) => (
-                      <div key={index} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border">
+                    {deviceImages.map((url, index) => <div key={index} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border">
                         <img src={url} alt={`תמונה ${index + 1}`} className="w-full h-full object-cover" />
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
-                </div>
-              )}
+                </div>}
             </div>
 
             {/* Consent Checkboxes */}
             <div className="space-y-4 mt-6 pt-6 border-t border-border">
               <label className="flex items-start gap-3 cursor-pointer">
-                <Checkbox 
-                  checked={acceptPrivacy} 
-                  onCheckedChange={(checked) => setAcceptPrivacy(checked === true)}
-                  className="mt-1 w-5 h-5"
-                />
+                <Checkbox checked={acceptPrivacy} onCheckedChange={checked => setAcceptPrivacy(checked === true)} className="mt-1 w-5 h-5" />
                 <span className="text-base text-muted-foreground leading-relaxed">
                   אני מאשר/ת שקראתי והסכמתי ל<span className="text-primary font-medium">מדיניות הפרטיות</span> ו<span className="text-primary font-medium">תנאי השימוש</span>
                 </span>
               </label>
               
               <label className="flex items-start gap-3 cursor-pointer">
-                <Checkbox 
-                  checked={acceptContact} 
-                  onCheckedChange={(checked) => setAcceptContact(checked === true)}
-                  className="mt-1 w-5 h-5"
-                />
+                <Checkbox checked={acceptContact} onCheckedChange={checked => setAcceptContact(checked === true)} className="mt-1 w-5 h-5" />
                 <span className="text-base text-muted-foreground leading-relaxed">
                   אני מסכים/ה לקבל עדכונים בוואטסאפ או בשיחת טלפון לגבי התיקון ולאחריו
                 </span>
@@ -1383,17 +1207,13 @@ const NewRepairOrder = () => {
               <div className="flex justify-between items-center text-base">
                 <span className="font-medium">{selectedModel?.name} • {getRepairTypeName()}</span>
                 <div className="text-right">
-                  {appliedCoupon && (
-                    <span className="text-muted-foreground line-through mr-2 text-base">₪{getPrice()}</span>
-                  )}
+                  {appliedCoupon && <span className="text-muted-foreground line-through mr-2 text-base">₪{getPrice()}</span>}
                   <span className="font-bold text-primary text-xl">₪{getFinalPrice()}</span>
                 </div>
               </div>
-              {appliedCoupon && (
-                <div className="text-base text-success mt-2">
+              {appliedCoupon && <div className="text-base text-success mt-2">
                   קופון {appliedCoupon.code} - חיסכת ₪{getDiscount()}!
-                </div>
-              )}
+                </div>}
               <div className="text-base text-muted-foreground mt-2">
                 {formatSelectedDateTime()}
               </div>
