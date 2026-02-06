@@ -19,6 +19,7 @@ interface Promotion {
   end_date: string | null;
   badge_text: string | null;
   icon: string | null;
+  value: number | null;
   created_at: string;
 }
 
