@@ -60,6 +60,7 @@ interface Promotion {
   description: string;
   badge_text: string | null;
   icon: string | null;
+  value: number | null;
 }
 interface RepairBundle {
   id: string;
