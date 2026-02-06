@@ -328,6 +328,18 @@ const PromotionsManagement = () => {
               />
             </div>
 
+            <div>
+              <label className="text-sm font-medium mb-1 block">שווי הטבה (₪)</label>
+              <Input
+                type="number"
+                min="0"
+                value={formData.value}
+                onChange={(e) => setFormData(prev => ({ ...prev, value: e.target.value }))}
+                placeholder="למשל: 49 - השווי שיוצג ללקוח"
+              />
+              <p className="text-xs text-muted-foreground mt-1">הלקוח יראה את השווי עם קו חוצה ולידו &quot;חינם!&quot;</p>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium mb-1 block">תג (אופציונלי)</label>
