@@ -109,6 +109,7 @@ const PromotionsManagement = () => {
             start_date: formData.start_date || null,
             end_date: formData.end_date || null,
             is_active: formData.is_active,
+            value: formData.value ? Number(formData.value) : 0,
           });
 
         if (error) throw error;
