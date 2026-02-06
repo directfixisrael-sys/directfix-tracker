@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import logo from '@/assets/logo.png';
 import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
 import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
+import SmartRepairInput from '@/components/SmartRepairInput';
 
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
@@ -260,6 +261,27 @@ const NewRepairOrder = () => {
     setSelectedModel(model);
     goToStep('repair');
   };
+
+  // Smart search handlers
+  const handleSmartModelAndRepair = (modelName: string, repairName: string) => {
+    const model = models.find(m => m.name === modelName);
+    const repair = repairTypes.find(r => r.name === repairName);
+    if (model && repair) {
+      setSelectedModel(model);
+      setSelectedRepair(repair);
+      // Skip straight to image upload option like normal flow
+      setPendingRepair(repair);
+      setShowImageUploadOption(true);
+    }
+  };
+
+  const handleSmartModelOnly = (modelName: string) => {
+    const model = models.find(m => m.name === modelName);
+    if (model) {
+      handleModelSelect(model);
+    }
+  };
+
   const handleRepairSelect = (repair: RepairType) => {
     if (repair.is_phone_only) {
       window.location.href = 'tel:0528692886';
@@ -808,6 +830,14 @@ const NewRepairOrder = () => {
                 בחרו את הדגם שלכם
               </p>
             </div>
+
+            {/* Smart AI Search */}
+            <SmartRepairInput
+              models={models}
+              repairTypes={repairTypes}
+              onModelAndRepairFound={handleSmartModelAndRepair}
+              onModelFound={handleSmartModelOnly}
+            />
 
             <div className="grid grid-cols-2 gap-4">
               {filteredModels.map((model, index) => {
