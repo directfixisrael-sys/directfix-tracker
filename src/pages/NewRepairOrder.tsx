@@ -60,6 +60,7 @@ interface Promotion {
   description: string;
   badge_text: string | null;
   icon: string | null;
+  value: number | null;
 }
 interface RepairBundle {
   id: string;
@@ -707,7 +708,14 @@ const NewRepairOrder = () => {
                     {activePromotion.description}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground">על כל תיקון</p>
+                {activePromotion.value && activePromotion.value > 0 && (
+                  <div className="flex items-center justify-center gap-2 mt-1">
+                    <span className="text-sm text-muted-foreground">שווי:</span>
+                    <span className="line-through text-sm text-muted-foreground">₪{activePromotion.value}</span>
+                    <span className="text-sm font-bold text-success">חינם! 🎉</span>
+                  </div>
+                )}
+                <p className="text-sm text-muted-foreground mt-1">על כל תיקון</p>
               </div>
             </div>
           </div>
@@ -812,9 +820,16 @@ const NewRepairOrder = () => {
               <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
                 <Gift className="w-5 h-5 text-white" />
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="font-bold text-amber-600 dark:text-amber-400 text-base">{activePromotion.title}</p>
                 <p className="text-xs font-medium text-secondary-foreground">{activePromotion.description}</p>
+                {activePromotion.value && activePromotion.value > 0 && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-muted-foreground">שווי:</span>
+                    <span className="line-through text-xs text-muted-foreground">₪{activePromotion.value}</span>
+                    <span className="text-xs font-bold text-success">חינם! 🎉</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>}
@@ -1085,11 +1100,22 @@ const NewRepairOrder = () => {
                 
                 {/* Active Promotion - Dynamic */}
                 {activePromotion && (
-                  <div className="flex justify-between items-center text-sm bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-2 -mx-1">
-                    <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
-                      {getPromotionIcon(activePromotion.icon)} {activePromotion.title}
-                    </span>
-                    <span className="font-semibold text-success">{activePromotion.description}</span>
+                  <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-3 -mx-1 space-y-1">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
+                        {getPromotionIcon(activePromotion.icon)} {activePromotion.title}
+                      </span>
+                      <span className="font-semibold text-success">{activePromotion.description}</span>
+                    </div>
+                    {activePromotion.value && activePromotion.value > 0 && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-muted-foreground text-xs">שווי הטבה</span>
+                        <div className="flex items-center gap-2">
+                          <span className="line-through text-xs text-muted-foreground">₪{activePromotion.value}</span>
+                          <span className="font-bold text-success">חינם! 🎉</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 
