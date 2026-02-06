@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import logo from '@/assets/logo.png';
 import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
 import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
+import SmartRepairInput from '@/components/SmartRepairInput';
 
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
