@@ -812,9 +812,16 @@ const NewRepairOrder = () => {
               <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
                 <Gift className="w-5 h-5 text-white" />
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="font-bold text-amber-600 dark:text-amber-400 text-base">{activePromotion.title}</p>
                 <p className="text-xs font-medium text-secondary-foreground">{activePromotion.description}</p>
+                {activePromotion.value && activePromotion.value > 0 && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-muted-foreground">שווי:</span>
+                    <span className="line-through text-xs text-muted-foreground">₪{activePromotion.value}</span>
+                    <span className="text-xs font-bold text-success">חינם! 🎉</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>}
