@@ -19,6 +19,7 @@ interface Promotion {
   end_date: string | null;
   badge_text: string | null;
   icon: string | null;
+  value: number | null;
   created_at: string;
 }
 
@@ -45,6 +46,7 @@ const PromotionsManagement = () => {
     start_date: '',
     end_date: '',
     is_active: true,
+    value: '',
   });
 
   const loadPromotions = async () => {
@@ -89,6 +91,7 @@ const PromotionsManagement = () => {
             start_date: formData.start_date || null,
             end_date: formData.end_date || null,
             is_active: formData.is_active,
+            value: formData.value ? Number(formData.value) : 0,
           })
           .eq('id', editingPromotion.id);
 
@@ -106,6 +109,7 @@ const PromotionsManagement = () => {
             start_date: formData.start_date || null,
             end_date: formData.end_date || null,
             is_active: formData.is_active,
+            value: formData.value ? Number(formData.value) : 0,
           });
 
         if (error) throw error;
@@ -168,6 +172,7 @@ const PromotionsManagement = () => {
       start_date: '',
       end_date: '',
       is_active: true,
+      value: '',
     });
     setEditingPromotion(null);
   };
@@ -182,6 +187,7 @@ const PromotionsManagement = () => {
       start_date: promotion.start_date || '',
       end_date: promotion.end_date || '',
       is_active: promotion.is_active,
+      value: promotion.value ? String(promotion.value) : '',
     });
     setIsDialogOpen(true);
   };
@@ -249,7 +255,10 @@ const PromotionsManagement = () => {
                       </span>
                     )}
                   </div>
-                  <p className="text-muted-foreground text-sm mb-2">{promotion.description}</p>
+                   <p className="text-muted-foreground text-sm mb-2">{promotion.description}</p>
+                   {promotion.value && promotion.value > 0 && (
+                     <p className="text-sm font-medium text-primary mb-2">שווי הטבה: ₪{promotion.value}</p>
+                   )}
                   {(promotion.start_date || promotion.end_date) && (
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Calendar className="w-3 h-3" />
@@ -317,6 +326,18 @@ const PromotionsManagement = () => {
                 placeholder="תיאור קצר של המבצע"
                 required
               />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-1 block">שווי הטבה (₪)</label>
+              <Input
+                type="number"
+                min="0"
+                value={formData.value}
+                onChange={(e) => setFormData(prev => ({ ...prev, value: e.target.value }))}
+                placeholder="למשל: 49 - השווי שיוצג ללקוח"
+              />
+              <p className="text-xs text-muted-foreground mt-1">הלקוח יראה את השווי עם קו חוצה ולידו &quot;חינם!&quot;</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

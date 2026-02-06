@@ -9,6 +9,7 @@ interface Promotion {
   description: string;
   badge_text: string | null;
   icon: string | null;
+  value: number | null;
 }
 
 interface OrderSummaryProps {
@@ -83,7 +84,7 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
             <div className="w-11 h-11 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
               <Gift className="w-5 h-5 text-white" />
             </div>
-            <div>
+            <div className="flex-1">
               <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
                 {getPromotionIcon(activePromotion.icon)} {activePromotion.title}
               </p>
@@ -91,6 +92,13 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
                 <Shield className="w-3.5 h-3.5 text-amber-500" />
                 <p className="font-semibold text-foreground">{activePromotion.description}</p>
               </div>
+              {activePromotion.value && activePromotion.value > 0 && (
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-muted-foreground">שווי:</span>
+                  <span className="line-through text-sm text-muted-foreground">₪{activePromotion.value}</span>
+                  <span className="text-sm font-bold text-success">חינם! 🎉</span>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -125,7 +133,12 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
               <Gift className="w-4 h-4" />
               {activePromotion.description} (מבצע)
             </span>
-            <span className="font-medium text-success text-lg">חינם!</span>
+            <div className="flex items-center gap-2">
+              {activePromotion.value && activePromotion.value > 0 && (
+                <span className="line-through text-muted-foreground text-sm">₪{activePromotion.value}</span>
+              )}
+              <span className="font-bold text-success text-lg">חינם! 🎉</span>
+            </div>
           </div>
         )}
 
