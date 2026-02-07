@@ -30,13 +30,23 @@
   <meta name="twitter:description" content="הזמנת תיקון ומעקב בזמן אמת - דיירקט פיקס מגיע אליכם לתקן את המכשיר">
   <link rel="icon" type="image/png" href="https://storage.googleapis.com/gpt-engineer-file-uploads/4fc7Jj71BFc38FhdKI1OLePhTei1/uploads/1770469840364-צילום_מסך_2026-02-07_ב-15.10.15.png">
 
-  <!-- Google Analytics 4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-B25Q56HSGP"></script>
+  <!-- Google Analytics 4 - Only on production domain -->
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-B25Q56HSGP');
+    (function() {
+      var host = window.location.hostname;
+      // Only load GA on the published domain, not on preview/dev
+      if (host === 'directfix-tracker.lovable.app' || host === 'www.directfix.co.il' || host === 'directfix.co.il') {
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-B25Q56HSGP';
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', 'G-B25Q56HSGP');
+      }
+    })();
   </script>
 </head>
 

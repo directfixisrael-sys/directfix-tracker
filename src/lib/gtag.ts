@@ -9,13 +9,22 @@ declare global {
   }
 }
 
-// Initialize Google Analytics - now loaded via index.html script tag
-// This function ensures the gtag reference is available for TypeScript
+// Check if we're on the production domain
+const isProductionDomain = () => {
+  if (typeof window === 'undefined') return false;
+  const host = window.location.hostname;
+  return host === 'directfix-tracker.lovable.app' 
+    || host === 'www.directfix.co.il' 
+    || host === 'directfix.co.il';
+};
+
+// Initialize Google Analytics - loaded via index.html on production only
 export const initGA = () => {
-  if (typeof window === 'undefined') return;
+  if (!isProductionDomain()) {
+    console.log('GA: Skipped (not production domain)');
+    return;
+  }
   
-  // gtag is already loaded via index.html script tag
-  // Just ensure the reference exists for TypeScript
   if (!window.gtag) {
     window.dataLayer = window.dataLayer || [];
     window.gtag = function (...args: any[]) {
@@ -23,7 +32,7 @@ export const initGA = () => {
     };
   }
   
-  console.log('GA: Ready (loaded via index.html)');
+  console.log('GA: Ready on production');
 };
 
 // Track page view
