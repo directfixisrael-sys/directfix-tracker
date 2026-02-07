@@ -668,7 +668,7 @@ const NewRepairOrder = () => {
 
             {/* Midrag */}
             <div className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3 py-1.5">
-              <img src={midragLogo} alt="מידרג" className="h-4 w-auto" />
+              <img src={midragLogo} alt="מידרג" className="h-6 w-6 rounded-full object-cover" />
               <span className="text-xs text-foreground">מידרג</span>
               <span className="text-xs font-bold text-foreground">9.92</span>
             </div>
