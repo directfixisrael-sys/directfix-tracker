@@ -9,9 +9,24 @@ declare global {
   }
 }
 
+// Check if we're on the production domain
+const isProductionDomain = () => {
+  if (typeof window === 'undefined') return false;
+  const host = window.location.hostname;
+  return host === 'directfix-tracker.lovable.app' 
+    || host === 'www.directfix.co.il' 
+    || host === 'directfix.co.il';
+};
+
 // Initialize Facebook Pixel (called once on app load)
 export const initFacebookPixel = () => {
   if (typeof window === 'undefined') return;
+  
+  // Only track on production
+  if (!isProductionDomain()) {
+    console.log('Facebook Pixel: Skipped (not production domain)');
+    return;
+  }
   
   // Avoid re-initialization
   if (window.fbq) {
