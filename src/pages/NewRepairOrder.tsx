@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logo from '@/assets/logo.png';
 import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
+import { gaSelectModel, gaSelectRepair, gaBundleDecision, gaConfirmPrice, gaSelectSchedule, gaFillDetails, gaConversion, gaCouponApplied, gaStartOrder } from '@/lib/gtag';
 import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
 import SmartRepairInput from '@/components/SmartRepairInput';
 
@@ -257,6 +258,7 @@ const NewRepairOrder = () => {
   };
   const handleModelSelect = (model: IphoneModel) => {
     setSelectedModel(model);
+    gaSelectModel(model.name);
     goToStep('repair');
   };
 
@@ -275,7 +277,7 @@ const NewRepairOrder = () => {
       let repairPrice = 0;
       if (isOriginalScreen) repairPrice = model.original_screen_price;else if (isCompatibleScreen) repairPrice = model.compatible_screen_price;else if (isBattery) repairPrice = model.battery_price;
       trackAddToCart(repair.name, repairPrice);
-
+      gaSelectRepair(repair.name, repairPrice);
       // Check bundle
       const isScreenRepair = repair.name.includes('מסך');
       const bundle = repairBundles.find(b => repair.name.includes(b.primary_repair_type));
@@ -309,6 +311,7 @@ const NewRepairOrder = () => {
       let repairPrice = 0;
       if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;else if (isBattery) repairPrice = selectedModel.battery_price;
       trackAddToCart(repair.name, repairPrice);
+      gaSelectRepair(repair.name, repairPrice);
     }
 
     // Check if there's a bundle offer for this repair type
@@ -324,9 +327,11 @@ const NewRepairOrder = () => {
   };
   const handleBundleDecision = (acceptBundle: boolean) => {
     setSelectedBundleAddon(acceptBundle);
+    if (currentBundle) gaBundleDecision(acceptBundle, currentBundle.name);
     goToStep('price');
   };
   const handlePriceConfirm = () => {
+    gaConfirmPrice(getTotalPrice());
     goToStep('schedule');
   };
   const handleScheduleConfirm = () => {
@@ -334,6 +339,8 @@ const NewRepairOrder = () => {
       toast.error('אנא בחר תאריך ושעה');
       return;
     }
+    gaSelectSchedule(selectedDate.toISOString().split('T')[0], selectedTimeSlot);
+    gaFillDetails();
     goToStep('details');
   };
   const formatPhone = (value: string) => {
@@ -393,6 +400,7 @@ const NewRepairOrder = () => {
         discount_value: data.discount_value
       });
       toast.success('הקופון הופעל בהצלחה!');
+      gaCouponApplied(data.code, data.discount_value);
     } catch (err) {
       toast.error('שגיאה באימות הקופון');
     } finally {
@@ -524,6 +532,8 @@ const NewRepairOrder = () => {
 
       // Track Facebook Pixel Purchase event
       trackPurchase(getFinalPrice());
+      // Track Google Analytics conversion
+      gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
       goToStep('success');
     } catch (error) {
       toast.error('אירעה שגיאה, נסה שוב');

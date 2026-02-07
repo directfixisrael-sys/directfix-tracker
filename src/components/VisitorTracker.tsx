@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { gaPageView } from '@/lib/gtag';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 // Generate a unique visitor ID for this session
@@ -78,6 +79,7 @@ export const VisitorTracker = () => {
     };
 
     updatePresence();
+    gaPageView(location.pathname);
   }, [location.pathname]);
 
   return null;
