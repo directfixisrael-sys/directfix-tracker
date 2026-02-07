@@ -275,9 +275,7 @@ const NewRepairOrder = () => {
       const isCompatibleScreen = repair.name.includes('מסך תואם');
       const isBattery = repair.name.includes('סוללה');
       let repairPrice = 0;
-      if (isOriginalScreen) repairPrice = model.original_screen_price;
-      else if (isCompatibleScreen) repairPrice = model.compatible_screen_price;
-      else if (isBattery) repairPrice = model.battery_price;
+      if (isOriginalScreen) repairPrice = model.original_screen_price;else if (isCompatibleScreen) repairPrice = model.compatible_screen_price;else if (isBattery) repairPrice = model.battery_price;
       trackAddToCart(repair.name, repairPrice);
 
       // Check bundle
@@ -319,9 +317,7 @@ const NewRepairOrder = () => {
       const isCompatibleScreen = repair.name.includes('מסך תואם');
       const isBattery = repair.name.includes('סוללה');
       let repairPrice = 0;
-      if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;
-      else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;
-      else if (isBattery) repairPrice = selectedModel.battery_price;
+      if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;else if (isBattery) repairPrice = selectedModel.battery_price;
       trackAddToCart(repair.name, repairPrice);
     }
 
@@ -684,8 +680,8 @@ const NewRepairOrder = () => {
                 <Gift className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <p className="font-bold text-amber-600 dark:text-amber-400 text-lg text-center">{activePromotion.title}</p>
-                <p className="text-xs font-medium text-secondary-foreground text-center">{activePromotion.description}</p>
+                <p className="font-bold text-amber-600 dark:text-amber-400 text-lg text-right">{activePromotion.title}</p>
+                <p className="text-xs font-medium text-secondary-foreground text-right">{activePromotion.description}</p>
                 {activePromotion.value && activePromotion.value > 0 && <div className="flex items-center gap-2 mt-1">
                     <span className="text-muted-foreground text-base text-center">שווי:</span>
                     <span className="line-through text-base text-primary text-center">₪{activePromotion.value}</span>
@@ -698,7 +694,7 @@ const NewRepairOrder = () => {
         {/* Step 1: Select Model - Enhanced Welcome */}
         {step === 'model' && <div className="space-y-8 animate-fade-in">
             {/* Hero Welcome Section - Apple style */}
-            <div className="text-center py-8">
+            <div className="text-center py-[11px]">
               <h1 className="text-5xl font-bold mb-4 tracking-tight">
                 הזמנת תיקון
               </h1>
