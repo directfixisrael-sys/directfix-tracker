@@ -153,17 +153,18 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
               </div>
             )}
 
-            {/* Static Benefits - Website Order Perks */}
+            {/* Free Home Visit */}
+            <div className="flex justify-between text-sm border-t border-border pt-3 mt-1">
+              <span className="text-foreground flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-primary" />
+                הגעה עד הבית ותיקון במקום
+              </span>
+              <span className="font-semibold text-success">חינם</span>
+            </div>
+
+            {/* Website Order Perks - Warranty */}
             <div className="border-t border-border pt-3 mt-1 space-y-2">
               <p className="text-xs font-semibold text-muted-foreground">🎁 הטבות למזמינים דרך האתר</p>
-              
-              <div className="flex justify-between text-sm">
-                <span className="text-foreground flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-primary" />
-                  הגעה ותיקון במקום
-                </span>
-                <span className="font-semibold text-success">₪0</span>
-              </div>
 
               <div className="flex justify-between text-sm">
                 <span className="text-foreground flex items-center gap-1">

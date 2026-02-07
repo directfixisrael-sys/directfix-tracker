@@ -269,9 +269,35 @@ const NewRepairOrder = () => {
     if (model && repair) {
       setSelectedModel(model);
       setSelectedRepair(repair);
-      // Skip straight to image upload option like normal flow
-      setPendingRepair(repair);
-      setShowImageUploadOption(true);
+
+      // Track AddToCart
+      const isOriginalScreen = repair.name.includes('מסך מקורי');
+      const isCompatibleScreen = repair.name.includes('מסך תואם');
+      const isBattery = repair.name.includes('סוללה');
+      let repairPrice = 0;
+      if (isOriginalScreen) repairPrice = model.original_screen_price;
+      else if (isCompatibleScreen) repairPrice = model.compatible_screen_price;
+      else if (isBattery) repairPrice = model.battery_price;
+      trackAddToCart(repair.name, repairPrice);
+
+      // Check bundle
+      const isScreenRepair = repair.name.includes('מסך');
+      const bundle = repairBundles.find(b => repair.name.includes(b.primary_repair_type));
+      if (bundle && isScreenRepair) {
+        setCurrentBundle(bundle);
+        setSelectedBundleAddon(false);
+        goToStep('bundle');
+      } else {
+        if (activePromotion) {
+          setShowGiftAnimation(true);
+          setTimeout(() => {
+            setShowGiftAnimation(false);
+            goToStep('price');
+          }, 2000);
+        } else {
+          goToStep('price');
+        }
+      }
     }
   };
   const handleSmartModelOnly = (modelName: string) => {
@@ -285,45 +311,36 @@ const NewRepairOrder = () => {
       window.location.href = 'tel:0528692886';
       return;
     }
-    // Show image upload option first
-    setPendingRepair(repair);
-    setShowImageUploadOption(true);
-  };
-  const continueAfterImageOption = (wantsToUpload: boolean) => {
-    setShowImageUploadOption(false);
-    if (wantsToUpload && fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-    if (pendingRepair) {
-      setSelectedRepair(pendingRepair);
+    setSelectedRepair(repair);
 
-      // Track AddToCart event for Facebook Pixel
-      if (selectedModel) {
-        const isOriginalScreen = pendingRepair.name.includes('מסך מקורי');
-        const isCompatibleScreen = pendingRepair.name.includes('מסך תואם');
-        const isBattery = pendingRepair.name.includes('סוללה');
-        let repairPrice = 0;
-        if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;else if (isBattery) repairPrice = selectedModel.battery_price;
-        trackAddToCart(pendingRepair.name, repairPrice);
-      }
-      // Check if there's a bundle offer for this repair type
-      const isScreenRepair = pendingRepair.name.includes('מסך');
-      const bundle = repairBundles.find(b => pendingRepair.name.includes(b.primary_repair_type));
-      if (bundle && isScreenRepair) {
-        setCurrentBundle(bundle);
-        setSelectedBundleAddon(false);
-        goToStep('bundle');
-      } else {
-        // Show gift animation only if there's no bundle step
-        if (activePromotion) {
-          setShowGiftAnimation(true);
-          setTimeout(() => {
-            setShowGiftAnimation(false);
-            goToStep('price');
-          }, 2500);
-        } else {
+    // Track AddToCart event for Facebook Pixel
+    if (selectedModel) {
+      const isOriginalScreen = repair.name.includes('מסך מקורי');
+      const isCompatibleScreen = repair.name.includes('מסך תואם');
+      const isBattery = repair.name.includes('סוללה');
+      let repairPrice = 0;
+      if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;
+      else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;
+      else if (isBattery) repairPrice = selectedModel.battery_price;
+      trackAddToCart(repair.name, repairPrice);
+    }
+
+    // Check if there's a bundle offer for this repair type
+    const isScreenRepair = repair.name.includes('מסך');
+    const bundle = repairBundles.find(b => repair.name.includes(b.primary_repair_type));
+    if (bundle && isScreenRepair) {
+      setCurrentBundle(bundle);
+      setSelectedBundleAddon(false);
+      goToStep('bundle');
+    } else {
+      if (activePromotion) {
+        setShowGiftAnimation(true);
+        setTimeout(() => {
+          setShowGiftAnimation(false);
           goToStep('price');
-        }
+        }, 2000);
+      } else {
+        goToStep('price');
       }
     }
   };
@@ -334,7 +351,7 @@ const NewRepairOrder = () => {
       setTimeout(() => {
         setShowGiftAnimation(false);
         goToStep('price');
-      }, 2500);
+      }, 2000);
     } else {
       goToStep('price');
     }
@@ -635,91 +652,24 @@ const NewRepairOrder = () => {
       </div>
 
       {/* Gift Animation Overlay - Dynamic from DB */}
-      {showGiftAnimation && activePromotion && <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm animate-fade-in">
-          <div className="text-center space-y-4">
-            <div className="relative animate-bounce">
-              <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-2xl mx-auto">
-                <Gift className="w-12 h-12 text-white animate-pulse" />
-              </div>
-              <div className="absolute -top-2 -right-2 text-3xl animate-spin-slow">✨</div>
-              <div className="absolute -bottom-2 -left-2 text-3xl animate-spin-slow" style={{
-            animationDelay: '200ms'
-          }}>{getPromotionIcon(activePromotion.icon)}</div>
+      {showGiftAnimation && activePromotion && <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in">
+          <div className="text-center space-y-4 animate-scale-in">
+            <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-2xl mx-auto">
+              <Gift className="w-10 h-10 text-white" />
             </div>
-            <div className="space-y-2 animate-scale-in" style={{
-          animationDelay: '300ms'
-        }}>
+            <div className="space-y-2">
               <h3 className="text-xl font-bold text-foreground">{getPromotionIcon(activePromotion.icon)} {activePromotion.title}</h3>
-              <div className="bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 rounded-xl p-4 border border-amber-500/30">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Shield className="w-6 h-6 text-amber-500" />
-                  <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
-                    {activePromotion.description}
-                  </span>
-                </div>
-                {activePromotion.value && activePromotion.value > 0 && <div className="flex items-center justify-center gap-2 mt-1">
-                    <span className="text-sm text-muted-foreground">שווי:</span>
-                    <span className="line-through text-sm text-muted-foreground">₪{activePromotion.value}</span>
-                    <span className="text-sm font-bold text-success">חינם! 🎉</span>
-                  </div>}
-                <p className="text-sm text-muted-foreground mt-1">על כל תיקון</p>
-              </div>
+              <p className="text-base text-muted-foreground">{activePromotion.description}</p>
+              {activePromotion.value && activePromotion.value > 0 && <div className="flex items-center justify-center gap-2">
+                  <span className="line-through text-sm text-muted-foreground">₪{activePromotion.value}</span>
+                  <span className="text-sm font-bold text-success">חינם! 🎉</span>
+                </div>}
             </div>
           </div>
         </div>}
 
-      {/* Image Upload Option Dialog */}
-      {showImageUploadOption && <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm animate-fade-in p-4">
-          <Card className="w-full max-w-sm p-6 space-y-5 animate-scale-in">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Camera className="w-8 h-8 text-primary" />
-              </div>
-              <h3 className="text-lg font-bold mb-2">רוצה להעלות תמונה?</h3>
-              <p className="text-muted-foreground text-sm">
-                אפשר להעלות תמונה של מצב המכשיר<br />
-                <span className="text-xs">(לא חובה)</span>
-              </p>
-            </div>
-            
-            {/* Uploaded images preview */}
-            {deviceImages.length > 0 && <div className="flex gap-2 justify-center flex-wrap">
-                {deviceImages.map((img, idx) => <div key={idx} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border">
-                    <img src={img} alt={`תמונה ${idx + 1}`} className="w-full h-full object-cover" />
-                    <button onClick={() => removeImage(idx)} className="absolute top-0 right-0 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center">
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>)}
-              </div>}
-            
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1" onClick={() => continueAfterImageOption(false)}>
-                דלג
-              </Button>
-              <Button className="flex-1 gap-2" onClick={() => {
-            if (fileInputRef.current) {
-              fileInputRef.current.click();
-            }
-          }} disabled={isUploadingImage || deviceImages.length >= 3}>
-                {isUploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <>
-                    <Image className="w-4 h-4" />
-                    העלה תמונה
-                  </>}
-              </Button>
-            </div>
-            
-            {deviceImages.length > 0 && <Button className="w-full" onClick={() => continueAfterImageOption(false)}>
-                המשך להזמנה
-              </Button>}
-            
-            <p className="text-center text-xs text-muted-foreground">
-              ניתן להעלות עד 3 תמונות
-            </p>
-          </Card>
-          
-          {/* Hidden file input */}
-          <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
-        </div>}
+      {/* Hidden file input for image upload */}
+      <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
 
       {/* Content */}
       <div className={`flex-1 p-4 pb-24 overflow-y-auto transition-all duration-200 ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
@@ -755,6 +705,39 @@ const NewRepairOrder = () => {
               <p className="text-2xl text-muted-foreground">
                 בחרו את הדגם שלכם
               </p>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="mt-4 text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5 mx-auto text-sm font-medium">
+                    <HelpCircle className="w-4 h-4" />
+                    איך השירות עובד?
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-sm">
+                  <DialogHeader>
+                    <DialogTitle className="text-right text-lg">איך זה עובד?</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 text-right">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm font-bold text-primary">1</span>
+                      </div>
+                      <p className="text-sm">בוחרים דגם וסוג תיקון וקובעים מועד שנוח לכם</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm font-bold text-primary">2</span>
+                      </div>
+                      <p className="text-sm">טכנאי מוסמך מגיע אליכם עד הבית במועד שנקבע</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm font-bold text-primary">3</span>
+                      </div>
+                      <p className="text-sm">התיקון מתבצע במקום תוך דקות — עם אחריות מלאה</p>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
 
             {/* Smart AI Search */}
@@ -975,17 +958,18 @@ const NewRepairOrder = () => {
                       </div>}
                   </div>}
 
-                {/* Static Benefits - Website Order Perks */}
+                {/* Free Home Visit - General */}
+                <div className="flex justify-between items-center text-sm border-t border-border pt-3 mt-2">
+                  <span className="text-foreground flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-primary" />
+                    הגעה עד הבית ותיקון במקום
+                  </span>
+                  <span className="font-semibold text-success">חינם</span>
+                </div>
+
+                {/* Website Order Perks - Warranty */}
                 <div className="border-t border-border pt-3 mt-2 space-y-2.5">
                   <p className="text-xs font-semibold text-muted-foreground mb-2">🎁 הטבות למזמינים דרך האתר</p>
-                  
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-foreground flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-primary" />
-                      הגעה ותיקון במקום — ללא עלות נוספת
-                    </span>
-                    <span className="font-semibold text-success">₪0</span>
-                  </div>
 
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-foreground flex items-center gap-1.5">
@@ -1006,6 +990,25 @@ const NewRepairOrder = () => {
                   <p className="text-[10px] text-muted-foreground mt-1">
                     * במקום 3 חודשי אחריות למסכים ו-12 חודשים לסוללות בהזמנה רגילה
                   </p>
+                </div>
+
+                {/* Image Upload - Inline */}
+                <div className="border-t border-border pt-3">
+                  <label className="block text-xs font-medium mb-2 text-muted-foreground">
+                    📸 רוצה לצרף תמונה של המכשיר? (לא חובה)
+                  </label>
+                  {deviceImages.length > 0 && <div className="flex gap-2 mb-2 flex-wrap">
+                      {deviceImages.map((img, idx) => <div key={idx} className="relative w-14 h-14 rounded-lg overflow-hidden border border-border">
+                          <img src={img} alt={`תמונה ${idx + 1}`} className="w-full h-full object-cover" />
+                          <button onClick={() => removeImage(idx)} className="absolute top-0 right-0 w-4 h-4 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center">
+                            <X className="w-2.5 h-2.5" />
+                          </button>
+                        </div>)}
+                    </div>}
+                  <Button variant="outline" size="sm" className="gap-2" onClick={() => fileInputRef.current?.click()} disabled={isUploadingImage || deviceImages.length >= 3}>
+                    {isUploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                    {deviceImages.length > 0 ? 'הוסף תמונה' : 'העלה תמונה'}
+                  </Button>
                 </div>
                 
                 {/* Coupon Section */}
@@ -1183,7 +1186,7 @@ const NewRepairOrder = () => {
 
               <div>
                 <label className="block text-base font-medium mb-2">מספר טלפון</label>
-                <Input placeholder="050-0000000" value={customerPhone} onChange={e => setCustomerPhone(formatPhone(e.target.value))} type="tel" className="h-14 text-lg rounded-xl text-left" dir="ltr" />
+                <Input placeholder="050-0000000" value={customerPhone} onChange={e => setCustomerPhone(formatPhone(e.target.value))} type="tel" className="h-14 text-lg rounded-xl text-right" dir="ltr" />
               </div>
 
               <div>
@@ -1231,7 +1234,7 @@ const NewRepairOrder = () => {
               <label className="flex items-start gap-3 cursor-pointer">
                 <Checkbox checked={acceptContact} onCheckedChange={checked => setAcceptContact(checked === true)} className="mt-1 w-5 h-5" />
                 <span className="text-base text-muted-foreground leading-relaxed">
-                  אני מסכים/ה לקבל עדכונים בוואטסאפ או בשיחת טלפון לגבי התיקון ולאחריו
+                  אני מאשר/ת יצירת קשר בוואטסאפ או בטלפון לתיאום ועדכונים בנוגע לתיקון בלבד
                 </span>
               </label>
             </div>
@@ -1271,7 +1274,7 @@ const NewRepairOrder = () => {
 
             <div>
               <h2 className="text-2xl font-bold mb-1 text-success">ההזמנה התקבלה!</h2>
-              <p className="text-muted-foreground text-sm">ניצור איתך קשר לאישור</p>
+              <p className="text-muted-foreground text-sm">ניצור איתך קשר לאישור המועד</p>
             </div>
 
             <Card className="p-4 bg-gradient-to-br from-card to-success/5">
@@ -1284,32 +1287,45 @@ const NewRepairOrder = () => {
                   <span className="text-muted-foreground">תיקון</span>
                   <span className="font-medium">{getRepairTypeName()}</span>
                 </div>
+                {selectedBundleAddon && currentBundle && <div className="flex justify-between">
+                    <span className="text-muted-foreground">החלפת סוללה (חבילה)</span>
+                    <span className="font-medium text-amber-500">₪{getBundleAddonPrice()}</span>
+                  </div>}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">מועד</span>
                   <span className="font-medium">{formatSelectedDateTime()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">מחיר</span>
-                  <span className="font-bold text-primary">₪{getPrice()}</span>
+                {activePromotion && <div className="flex justify-between items-center bg-amber-500/10 rounded-lg p-2 -mx-1">
+                    <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1 text-xs">
+                      <Gift className="w-3.5 h-3.5" />
+                      {activePromotion.description}
+                    </span>
+                    <span className="font-bold text-success text-xs">חינם! 🎉</span>
+                  </div>}
+                <div className="flex justify-between pt-2 border-t border-border">
+                  <span className="font-bold">סה״כ</span>
+                  <span className="font-bold text-primary text-lg">₪{getFinalPrice()}</span>
                 </div>
               </div>
             </Card>
 
-            <div className="space-y-2 pt-2">
+            <div className="bg-muted/50 rounded-xl p-4">
+              <p className="text-sm text-muted-foreground mb-3">תוכלו לעקוב אחרי סטטוס התיקון בזמן אמת</p>
               <Button onClick={handleTrackOrder} className="w-full h-12 text-base rounded-xl">
-                עקוב אחר ההזמנה
-              </Button>
-              <Button variant="outline" onClick={() => navigate('/')} className="w-full h-10 rounded-xl">
-                חזרה לדף הבית
+                📍 מעקב אחר ההזמנה שלי
               </Button>
             </div>
+            
+            <Button variant="outline" onClick={() => navigate('/')} className="w-full h-10 rounded-xl">
+              חזרה לדף הבית
+            </Button>
           </div>}
       </div>
 
       {/* Sticky Footer with Action Buttons */}
       {step !== 'success' && step !== 'model' && step !== 'repair' && <div className="sticky bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border p-4 safe-area-pb">
           {step === 'price' && <Button onClick={handlePriceConfirm} className="w-full h-12 text-base rounded-xl">
-              אישור והמשך
+              אישור ובחירת מועד לטכנאי
             </Button>}
           
           {step === 'schedule' && <Button onClick={handleScheduleConfirm} disabled={!selectedDate || !selectedTimeSlot} className="w-full h-12 text-base rounded-xl">
