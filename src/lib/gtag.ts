@@ -1,5 +1,5 @@
 // Google Analytics (gtag.js) Helper
-const GA_MEASUREMENT_ID = 'G-523625828';
+const GA_MEASUREMENT_ID = 'G-B25Q56HSGP';
 
 // Declare gtag for TypeScript
 declare global {
