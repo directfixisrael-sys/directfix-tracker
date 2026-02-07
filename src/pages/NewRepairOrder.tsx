@@ -98,8 +98,6 @@ const NewRepairOrder = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
 
-  // Gift animation
-  const [showGiftAnimation, setShowGiftAnimation] = useState(false);
 
   // Form fields
   const [customerName, setCustomerName] = useState('');
@@ -286,15 +284,7 @@ const NewRepairOrder = () => {
         setSelectedBundleAddon(false);
         goToStep('bundle');
       } else {
-        if (activePromotion) {
-          setShowGiftAnimation(true);
-          setTimeout(() => {
-            setShowGiftAnimation(false);
-            goToStep('price');
-          }, 2000);
-        } else {
-          goToStep('price');
-        }
+        goToStep('price');
       }
     }
   };
@@ -329,28 +319,12 @@ const NewRepairOrder = () => {
       setSelectedBundleAddon(false);
       goToStep('bundle');
     } else {
-      if (activePromotion) {
-        setShowGiftAnimation(true);
-        setTimeout(() => {
-          setShowGiftAnimation(false);
-          goToStep('price');
-        }, 2000);
-      } else {
-        goToStep('price');
-      }
+      goToStep('price');
     }
   };
   const handleBundleDecision = (acceptBundle: boolean) => {
     setSelectedBundleAddon(acceptBundle);
-    if (activePromotion) {
-      setShowGiftAnimation(true);
-      setTimeout(() => {
-        setShowGiftAnimation(false);
-        goToStep('price');
-      }, 2000);
-    } else {
-      goToStep('price');
-    }
+    goToStep('price');
   };
   const handlePriceConfirm = () => {
     goToStep('schedule');
@@ -647,22 +621,6 @@ const NewRepairOrder = () => {
           </div>}
       </div>
 
-      {/* Gift Animation Overlay - Dynamic from DB */}
-      {showGiftAnimation && activePromotion && <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in">
-          <div className="text-center space-y-4 animate-scale-in">
-            <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-2xl mx-auto">
-              <Gift className="w-10 h-10 text-white" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-xl font-bold text-foreground">{getPromotionIcon(activePromotion.icon)} {activePromotion.title}</h3>
-              <p className="text-base text-muted-foreground">{activePromotion.description}</p>
-              {activePromotion.value && activePromotion.value > 0 && <div className="flex items-center justify-center gap-2">
-                  <span className="line-through text-sm text-muted-foreground">₪{activePromotion.value}</span>
-                  <span className="text-sm font-bold text-success">חינם! 🎉</span>
-                </div>}
-            </div>
-          </div>
-        </div>}
 
       {/* Hidden file input for image upload */}
       <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
