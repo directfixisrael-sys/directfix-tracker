@@ -151,30 +151,6 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
           <span className="font-semibold text-success text-lg">חינם</span>
         </div>
 
-        {/* Website Order Perks - Warranty */}
-        <div className="border-t border-border pt-4 mt-2 space-y-3">
-          <p className="text-sm font-semibold text-muted-foreground">🎁 הטבות למזמינים דרך האתר</p>
-
-          <div className="flex justify-between text-base">
-            <span className="text-foreground flex items-center gap-1.5">
-              <Shield className="w-4 h-4 text-primary" />
-              אחריות מורחבת למסכים — 4 חודשים
-            </span>
-            <span className="font-semibold text-success text-lg">₪0</span>
-          </div>
-
-          <div className="flex justify-between text-base">
-            <span className="text-foreground flex items-center gap-1.5">
-              <Shield className="w-4 h-4 text-primary" />
-              אחריות מורחבת לסוללות — 13 חודשים
-            </span>
-            <span className="font-semibold text-success text-lg">₪0</span>
-          </div>
-
-          <p className="text-xs text-muted-foreground">
-            * במקום 3 חודשי אחריות למסכים ו-12 חודשים לסוללות בהזמנה רגילה
-          </p>
-        </div>
 
         <div className="flex justify-between pt-4 border-t border-border">
           <span className="font-bold text-foreground text-xl">סה״כ לתשלום</span>

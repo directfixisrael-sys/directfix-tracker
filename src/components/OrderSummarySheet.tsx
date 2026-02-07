@@ -162,30 +162,6 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
               <span className="font-semibold text-success">חינם</span>
             </div>
 
-            {/* Website Order Perks - Warranty */}
-            <div className="border-t border-border pt-3 mt-1 space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground">🎁 הטבות למזמינים דרך האתר</p>
-
-              <div className="flex justify-between text-sm">
-                <span className="text-foreground flex items-center gap-1">
-                  <Shield className="w-3 h-3 text-primary" />
-                  אחריות מסכים — 4 חודשים
-                </span>
-                <span className="font-semibold text-success">₪0</span>
-              </div>
-
-              <div className="flex justify-between text-sm">
-                <span className="text-foreground flex items-center gap-1">
-                  <Shield className="w-3 h-3 text-primary" />
-                  אחריות סוללות — 13 חודשים
-                </span>
-                <span className="font-semibold text-success">₪0</span>
-              </div>
-
-              <p className="text-[10px] text-muted-foreground">
-                * במקום 3 חודשים למסכים ו-12 חודשים לסוללות
-              </p>
-            </div>
 
             <div className="flex justify-between pt-3 border-t border-border">
               <span className="font-bold text-foreground">סה״כ לתשלום</span>
