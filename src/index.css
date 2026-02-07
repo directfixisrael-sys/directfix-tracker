@@ -2,6 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Ploni';
+  src: url('/fonts/PloniULight.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ploni';
+  src: url('/fonts/PloniLight.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ploni';
+  src: url('/fonts/PloniRegular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ploni';
+  src: url('/fonts/PloniMedium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ploni';
+  src: url('/fonts/PloniBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ploni';
+  src: url('/fonts/PloniDBold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ploni';
+  src: url('/fonts/PloniUBold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ploni';
+  src: url('/fonts/PloniBlack.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     --background: 210 20% 98%;
@@ -108,13 +172,13 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Ploni', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   
   * {
-    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Ploni', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   /* High Contrast Mode */
