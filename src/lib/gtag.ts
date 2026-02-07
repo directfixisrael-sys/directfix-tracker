@@ -9,29 +9,21 @@ declare global {
   }
 }
 
-// Initialize Google Analytics (called once on app load)
+// Initialize Google Analytics - now loaded via index.html script tag
+// This function ensures the gtag reference is available for TypeScript
 export const initGA = () => {
   if (typeof window === 'undefined') return;
-  if (window.gtag) {
-    console.log('GA: Already initialized');
-    return;
+  
+  // gtag is already loaded via index.html script tag
+  // Just ensure the reference exists for TypeScript
+  if (!window.gtag) {
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function (...args: any[]) {
+      window.dataLayer.push(arguments);
+    };
   }
-
-  console.log('GA: Initializing...');
-
-  // Load gtag.js script
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-  document.head.appendChild(script);
-
-  // Initialize dataLayer and gtag
-  window.dataLayer = window.dataLayer || [];
-  window.gtag = function (...args: any[]) {
-    window.dataLayer.push(arguments);
-  };
-  window.gtag('js', new Date());
-  window.gtag('config', GA_MEASUREMENT_ID);
+  
+  console.log('GA: Ready (loaded via index.html)');
 };
 
 // Track page view
