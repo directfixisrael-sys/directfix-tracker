@@ -2,70 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'Ploni';
-  src: url('/fonts/PloniULight.otf') format('opentype');
-  font-weight: 200;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Ploni';
-  src: url('/fonts/PloniLight.otf') format('opentype');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Ploni';
-  src: url('/fonts/PloniRegular.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Ploni';
-  src: url('/fonts/PloniMedium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Ploni';
-  src: url('/fonts/PloniBold.otf') format('opentype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Ploni';
-  src: url('/fonts/PloniDBold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Ploni';
-  src: url('/fonts/PloniUBold.otf') format('opentype');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Ploni';
-  src: url('/fonts/PloniBlack.otf') format('opentype');
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-
 @layer base {
   :root {
     --background: 210 20% 98%;
@@ -155,30 +91,30 @@
 
   html {
     direction: rtl;
-    font-size: 17.6px;
+    font-size: 16px;
   }
   
   @media (min-width: 640px) {
     html {
-      font-size: 18.7px;
+      font-size: 17px;
     }
   }
   
   @media (min-width: 1024px) {
     html {
-      font-size: 19.8px;
+      font-size: 18px;
     }
   }
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Ploni', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   
   * {
-    font-family: 'Ploni', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   /* High Contrast Mode */
