@@ -112,31 +112,31 @@ const handler = async (req: Request): Promise<Response> => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5; direction: rtl;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px; direction: rtl;">
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px 16px 0 0; padding: 30px; text-align: center;">
       <h1 style="color: white; margin: 0; font-size: 28px;">🎉 הזמנה חדשה!</h1>
       <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">התקבלה הזמנת תיקון חדשה</p>
     </div>
     
-    <div style="background: white; border-radius: 0 0 16px 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-      <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-        <h2 style="margin: 0 0 15px 0; color: #333; font-size: 18px;">👤 פרטי לקוח</h2>
-        <p style="margin: 8px 0; color: #555;"><strong>שם:</strong> ${orderData.customerName}</p>
-        <p style="margin: 8px 0; color: #555;"><strong>טלפון:</strong> <a href="tel:${orderData.customerPhone}" style="color: #667eea;">${orderData.customerPhone}</a></p>
-        <p style="margin: 8px 0; color: #555;"><strong>כתובת:</strong> ${orderData.customerAddress}</p>
+    <div style="background: white; border-radius: 0 0 16px 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: right;">
+      <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: right;">
+        <h2 style="margin: 0 0 15px 0; color: #333; font-size: 18px; text-align: right;">👤 פרטי לקוח</h2>
+        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>שם:</strong> ${orderData.customerName}</p>
+        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>טלפון:</strong> <a href="tel:${orderData.customerPhone}" style="color: #667eea;">${orderData.customerPhone}</a></p>
+        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>כתובת:</strong> ${orderData.customerAddress}</p>
       </div>
       
-      <div style="background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #667eea30;">
-        <h2 style="margin: 0 0 15px 0; color: #333; font-size: 18px;">📱 פרטי התיקון</h2>
-        <p style="margin: 8px 0; color: #555;"><strong>דגם:</strong> ${orderData.deviceType}</p>
-        <p style="margin: 8px 0; color: #555;"><strong>סוג תיקון:</strong> ${orderData.repairType}</p>
-        <p style="margin: 8px 0; color: #555;"><strong>מחיר:</strong> <span style="color: #667eea; font-weight: bold; font-size: 20px;">₪${orderData.repairPrice}</span></p>
+      <div style="background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #667eea30; text-align: right;">
+        <h2 style="margin: 0 0 15px 0; color: #333; font-size: 18px; text-align: right;">📱 פרטי התיקון</h2>
+        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>דגם:</strong> ${orderData.deviceType}</p>
+        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>סוג תיקון:</strong> ${orderData.repairType}</p>
+        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>מחיר:</strong> <span style="color: #667eea; font-weight: bold; font-size: 20px;">₪${orderData.repairPrice}</span></p>
       </div>
       
-      <div style="background: #fff3cd; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #ffc107;">
-        <h2 style="margin: 0 0 15px 0; color: #856404; font-size: 18px;">📅 מועד מבוקש</h2>
-        <p style="margin: 0; color: #856404; font-size: 16px; font-weight: 500;">${orderData.scheduledTime}</p>
+      <div style="background: #fff3cd; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #ffc107; text-align: right;">
+        <h2 style="margin: 0 0 15px 0; color: #856404; font-size: 18px; text-align: right;">📅 מועד מבוקש</h2>
+        <p style="margin: 0; color: #856404; font-size: 16px; font-weight: 500; text-align: right;">${orderData.scheduledTime}</p>
       </div>
 
       <!-- Add to Calendar Button -->
@@ -147,9 +147,9 @@ const handler = async (req: Request): Promise<Response> => {
       </div>
       
       ${orderData.notes ? `
-      <div style="background: #e8f4f8; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-        <h2 style="margin: 0 0 15px 0; color: #333; font-size: 18px;">📝 הערות</h2>
-        <p style="margin: 0; color: #555;">${orderData.notes}</p>
+      <div style="background: #e8f4f8; border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: right;">
+        <h2 style="margin: 0 0 15px 0; color: #333; font-size: 18px; text-align: right;">📝 הערות</h2>
+        <p style="margin: 0; color: #555; text-align: right;">${orderData.notes}</p>
       </div>
       ` : ''}
       
