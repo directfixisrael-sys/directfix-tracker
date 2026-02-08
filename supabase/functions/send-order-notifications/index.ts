@@ -31,6 +31,55 @@ async function sendEmail(apiKey: string, from: string, to: string[], subject: st
   return response.json();
 }
 
+// Build a Google Calendar link from the scheduled time string
+function buildCalendarLink(orderData: OrderData): string {
+  // Parse Hebrew scheduled time like "יום שני 10/2 בשעות 13:00-17:00"
+  // or simpler formats like "10/2 13:00-17:00"
+  const now = new Date();
+  const year = now.getFullYear();
+  
+  // Extract date part (DD/MM)
+  const dateMatch = orderData.scheduledTime.match(/(\d{1,2})\/(\d{1,2})/);
+  // Extract time range (HH:MM-HH:MM)
+  const timeMatch = orderData.scheduledTime.match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
+  
+  let startDate: string;
+  let endDate: string;
+  
+  if (dateMatch && timeMatch) {
+    const day = dateMatch[1].padStart(2, '0');
+    const month = dateMatch[2].padStart(2, '0');
+    const startTime = timeMatch[1].replace(':', '');
+    const endTime = timeMatch[2].replace(':', '');
+    
+    // Format: YYYYMMDDTHHMMSS (in local Israel time)
+    startDate = `${year}${month}${day}T${startTime}00`;
+    endDate = `${year}${month}${day}T${endTime}00`;
+  } else {
+    // Fallback - create an all-day event for today
+    const todayStr = `${year}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+    startDate = todayStr;
+    endDate = todayStr;
+  }
+  
+  const title = encodeURIComponent(`🔧 תיקון ${orderData.deviceType} - ${orderData.repairType}`);
+  const location = encodeURIComponent(orderData.customerAddress);
+  const details = encodeURIComponent(
+    `👤 לקוח: ${orderData.customerName}\n` +
+    `📞 טלפון: ${orderData.customerPhone}\n` +
+    `📱 דגם: ${orderData.deviceType}\n` +
+    `🔧 תיקון: ${orderData.repairType}\n` +
+    `💰 מחיר: ₪${orderData.repairPrice}\n` +
+    (orderData.notes ? `📝 הערות: ${orderData.notes}\n` : '') +
+    (orderData.promotionTitle ? `🎁 מבצע: ${orderData.promotionTitle}` : '')
+  );
+  
+  // Use Israel timezone
+  const timezone = encodeURIComponent('Asia/Jerusalem');
+  
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDate}/${endDate}&details=${details}&location=${location}&ctz=${timezone}`;
+}
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -50,6 +99,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Business owner phone number
     const businessPhone = "972528692886";
+
+    // Build Google Calendar link
+    const calendarLink = buildCalendarLink(orderData);
+    console.log("Calendar link generated:", calendarLink);
 
     // 1. Send email to business owner
     const businessEmailHtml = `
@@ -84,6 +137,13 @@ const handler = async (req: Request): Promise<Response> => {
       <div style="background: #fff3cd; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #ffc107;">
         <h2 style="margin: 0 0 15px 0; color: #856404; font-size: 18px;">📅 מועד מבוקש</h2>
         <p style="margin: 0; color: #856404; font-size: 16px; font-weight: 500;">${orderData.scheduledTime}</p>
+      </div>
+
+      <!-- Add to Calendar Button -->
+      <div style="text-align: center; margin-bottom: 20px;">
+        <a href="${calendarLink}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);">
+          📅 הוסף ליומן Google
+        </a>
       </div>
       
       ${orderData.notes ? `
