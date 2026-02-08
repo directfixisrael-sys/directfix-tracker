@@ -208,7 +208,7 @@ const NewRepairOrder = () => {
     return weekdaySlots; // Sunday-Thursday
   };
 
-  // Check if a time slot is available (at least 1 hour from now)
+  // Check if a time slot is available (at least 40 minutes from now)
   const isSlotAvailable = (date: Date, slot: string) => {
     const now = new Date();
     const slotStartHour = parseInt(slot.split(':')[0]);
@@ -217,9 +217,9 @@ const NewRepairOrder = () => {
     const slotDate = new Date(date);
     slotDate.setHours(slotStartHour, 0, 0, 0);
 
-    // Must be at least 1 hour from now
-    const oneHourFromNow = new Date(now.getTime() + 1 * 60 * 60 * 1000);
-    return slotDate > oneHourFromNow;
+    // Must be at least 40 minutes from now
+    const minTimeFromNow = new Date(now.getTime() + 40 * 60 * 1000);
+    return slotDate > minTimeFromNow;
   };
   const filteredModels = models.filter(model => model.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const getPrice = () => {
