@@ -7,8 +7,6 @@
     <meta name="description" content="הזמנת תיקון ומעקב בזמן אמת - דיירקט פיקס מגיע אליכם לתקן את המכשיר">
     <meta name="author" content="Direct Fix" />
 
-    
-    
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/og-technician.png">
     <meta property="og:image:width" content="1200" />
@@ -20,35 +18,33 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&subset=hebrew&display=swap" rel="stylesheet">
-    
-  
-  
-  
-  <meta property="og:title" content="דיירקט פיקס - הזמנה ומעקב תיקונים">
-  <meta name="twitter:title" content="דיירקט פיקס - הזמנה ומעקב תיקונים">
-  <meta property="og:description" content="הזמנת תיקון ומעקב בזמן אמת - דיירקט פיקס מגיע אליכם לתקן את המכשיר">
-  <meta name="twitter:description" content="הזמנת תיקון ומעקב בזמן אמת - דיירקט פיקס מגיע אליכם לתקן את המכשיר">
-  <link rel="icon" type="image/png" href="https://storage.googleapis.com/gpt-engineer-file-uploads/4fc7Jj71BFc38FhdKI1OLePhTei1/uploads/1770469840364-צילום_מסך_2026-02-07_ב-15.10.15.png">
 
-  <!-- Google Analytics 4 - Only on production domain -->
-  <script>
-    (function() {
-      var host = window.location.hostname;
-      // Only load GA on the published domain, not on preview/dev
-      if (host === 'directfix-tracker.lovable.app' || host === 'www.directfix.co.il' || host === 'directfix.co.il') {
-        var s = document.createElement('script');
-        s.async = true;
-        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-B25Q56HSGP';
-        document.head.appendChild(s);
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        window.gtag = gtag;
-        gtag('js', new Date());
-        gtag('config', 'G-B25Q56HSGP');
-      }
-    })();
-  </script>
-</head>
+    <meta property="og:title" content="דיירקט פיקס - הזמנה ומעקב תיקונים">
+    <meta name="twitter:title" content="דיירקט פיקס - הזמנה ומעקב תיקונים">
+    <meta property="og:description" content="הזמנת תיקון ומעקב בזמן אמת - דיירקט פיקס מגיע אליכם לתקן את המכשיר">
+    <meta name="twitter:description" content="הזמנת תיקון ומעקב בזמן אמת - דיירקט פיקס מגיע אליכם לתקן את המכשיר">
+    <link rel="icon" type="image/png" href="https://storage.googleapis.com/gpt-engineer-file-uploads/4fc7Jj71BFc38FhdKI1OLePhTei1/uploads/1770469840364-צילום_מסך_2026-02-07_ב-15.10.15.png">
+
+    <!-- Google Analytics 4 – production only -->
+    <script>
+      (function(){
+        var h = window.location.hostname;
+        if (h === 'directfix-tracker.lovable.app' || h === 'www.directfix.co.il' || h === 'directfix.co.il') {
+          // 1. Load gtag.js
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-B25Q56HSGP';
+          document.head.appendChild(s);
+          // 2. Init dataLayer & config
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){ dataLayer.push(arguments); }
+          window.gtag = gtag;
+          gtag('js', new Date());
+          gtag('config', 'G-B25Q56HSGP', { send_page_view: true });
+        }
+      })();
+    </script>
+  </head>
 
   <body>
     <div id="root"></div>
