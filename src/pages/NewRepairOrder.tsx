@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logo from '@/assets/directfix-logo.png';
 import midragLogo from '@/assets/midrag-logo.png';
+import easyLogo from '@/assets/easy-logo.png';
 import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
 import { gaSelectModel, gaSelectRepair, gaBundleDecision, gaConfirmPrice, gaSelectSchedule, gaFillDetails, gaConversion, gaCouponApplied, gaStartOrder } from '@/lib/gtag';
 import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
