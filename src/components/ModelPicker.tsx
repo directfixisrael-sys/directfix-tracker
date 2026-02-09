@@ -58,18 +58,23 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
               <button
                 onClick={() => setExpandedSeries(isExpanded ? null : series)}
                 className={cn(
-                  "w-full flex items-center justify-between px-3 py-3 rounded-xl border transition-all",
+                  "w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border-2 transition-all",
                   isExpanded
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/30 hover:bg-muted/30"
+                    ? "border-primary bg-primary/8 shadow-sm"
+                    : "border-border hover:border-primary/30 hover:bg-muted/40"
                 )}
               >
-                <div className="flex items-center gap-2">
-                  <Smartphone className="w-4 h-4 text-muted-foreground" />
-                  <span className="font-semibold text-sm">{series}</span>
+                <div className="flex items-center gap-2.5">
+                  <div className={cn(
+                    "w-8 h-8 rounded-xl flex items-center justify-center",
+                    isExpanded ? "bg-primary/15" : "bg-muted"
+                  )}>
+                    <Smartphone className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                  <span className="font-bold text-sm">{series}</span>
                 </div>
                 <ChevronDown className={cn(
-                  "w-3.5 h-3.5 text-muted-foreground transition-transform duration-200",
+                  "w-4 h-4 text-muted-foreground transition-transform duration-200",
                   isExpanded && "rotate-180"
                 )} />
               </button>
