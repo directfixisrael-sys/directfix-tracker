@@ -613,12 +613,6 @@ const NewRepairOrder = () => {
             <h1 className="text-base font-semibold hidden sm:block">הזמנת תיקון</h1>
           </div>
 
-          {/* Desktop: Inline smart search in header */}
-          {step === 'model' && (
-            <div className="hidden md:block flex-1 max-w-md mx-4">
-              <SmartRepairInput inline models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
-            </div>
-          )}
 
           <div className="flex items-center gap-1">
             <a href="tel:033106020" className="h-9 w-9 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center transition-colors" aria-label="התקשר 033106020">
@@ -760,10 +754,8 @@ const NewRepairOrder = () => {
             {/* Testimonials Slider */}
             <TestimonialsSlider />
 
-            {/* Smart AI Search - mobile only */}
-            <div className="md:hidden">
-              <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
-            </div>
+            {/* Smart AI Search */}
+            <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
 
             <ModelPicker
               models={filteredModels}
