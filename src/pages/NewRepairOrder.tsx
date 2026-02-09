@@ -972,14 +972,7 @@ const NewRepairOrder = () => {
                     הגעה עד הבית ותיקון במקום
                   </span>
                   <span className="font-semibold text-success">חינם</span>
-
-      {/* Disclaimer */}
-      {step === 'model' && <div className="text-center px-6 py-3">
-          <p className="text-[11px] text-muted-foreground/70 leading-relaxed">
-            * זמני ההגעה משתנים בהתאם לזמינות הטכנאים ולמיקום הלקוח.
-          </p>
-        </div>}
-      </div>
+                </div>
 
                 {/* Image Upload - Inline */}
                 <div className="border-t border-border pt-3">
