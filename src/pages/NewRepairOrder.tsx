@@ -1153,7 +1153,7 @@ const NewRepairOrder = () => {
               <p className="text-muted-foreground">מלאו את הפרטים ואנחנו בדרך</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 bg-card rounded-3xl p-5 border border-border/50 shadow-sm">
               <div>
                 <label className="block text-base font-medium mb-2">שם מלא</label>
                 <Input placeholder="הכנס שם מלא" value={customerName} onChange={e => setCustomerName(e.target.value)} className="h-14 text-lg rounded-xl" />
