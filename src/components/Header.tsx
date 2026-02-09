@@ -1,6 +1,7 @@
 import { ArrowRight, Moon, Sun, Phone, Accessibility } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/ThemeProvider';
+import { useNavigate } from 'react-router-dom';
 import logo from '@/assets/directfix-logo.png';
 
 interface HeaderProps {
@@ -10,6 +11,7 @@ interface HeaderProps {
 
 const Header = ({ showBackButton, onBack }: HeaderProps) => {
   const { resolvedTheme, setTheme } = useTheme();
+  const navigate = useNavigate();
 
   const toggleTheme = () => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
@@ -62,7 +64,8 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
           <img 
             src={logo} 
             alt="Direct Fix Logo" 
-            className="h-10 w-auto"
+            className="h-10 w-auto cursor-pointer"
+            onClick={() => navigate('/')}
           />
         </div>
       </div>
