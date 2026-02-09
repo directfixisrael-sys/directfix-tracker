@@ -1,6 +1,7 @@
 import { ArrowRight, Moon, Sun, Phone, Accessibility } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/ThemeProvider';
+import { useNavigate } from 'react-router-dom';
 import logo from '@/assets/directfix-logo.png';
 
 interface HeaderProps {
