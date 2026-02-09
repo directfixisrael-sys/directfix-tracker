@@ -1306,6 +1306,18 @@ ${trackingUrl}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-sidebar border-t border-sidebar-border z-50 px-2 py-2 safe-area-pb">
         <div className="flex justify-around items-center">
           <button 
+            onClick={() => setActiveTab('dashboard')}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
+              activeTab === 'dashboard' 
+                ? "bg-primary/10 text-primary" 
+                : "text-muted-foreground"
+            )}
+          >
+            <Activity className="w-5 h-5" />
+            <span className="text-[10px]">דשבורד</span>
+          </button>
+          <button 
             onClick={() => { setActiveTab('orders'); setSelectedOrder(null); }}
             className={cn(
               "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
