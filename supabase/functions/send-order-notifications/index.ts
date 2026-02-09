@@ -297,7 +297,7 @@ ${orderData.promotionTitle ? `🎁 *${orderData.promotionTitle}*\n` : ''}
 💰 *מחיר:* ₪${orderData.repairPrice}
 📅 *מועד:* ${orderData.scheduledTime}
 
-${orderData.notes ? `📝 *הערות:* ${orderData.notes}\n` : ''}${orderData.promotionTitle ? `🎁 *מבצע:* ${orderData.promotionTitle}` : ''}`;
+${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : ''}${orderData.notes ? `📝 *הערות:* ${orderData.notes}\n` : ''}${orderData.promotionTitle ? `🎁 *מבצע:* ${orderData.promotionTitle}` : ''}`;
 
         const businessWhatsappResponse = await fetch(twilioUrl, {
           method: 'POST',
