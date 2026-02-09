@@ -129,7 +129,7 @@ const NewRepairOrder = () => {
   const [showImageUploadOption, setShowImageUploadOption] = useState(false);
   const [pendingRepair, setPendingRepair] = useState<RepairType | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const contentRef = useRef<HTMLDivElement>(null);
   // Privacy consent
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
 
@@ -266,10 +266,11 @@ const NewRepairOrder = () => {
     setTimeout(() => {
       setStep(newStep);
       setIsAnimating(false);
-      // Scroll to top when changing steps - instant for immediate feedback
+      // Scroll to top using ref
+      if (contentRef.current) {
+        contentRef.current.scrollTop = 0;
+      }
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      // Also scroll the content container if it's the one scrolling
-      document.querySelector('.flex-1.overflow-y-auto')?.scrollTo({ top: 0, behavior: 'instant' });
     }, 200);
   };
   const handleModelSelect = (model: IphoneModel) => {
@@ -667,7 +668,7 @@ const NewRepairOrder = () => {
       <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
 
       {/* Content */}
-      <div className={`flex-1 p-5 pb-28 overflow-y-auto transition-all duration-300 max-w-2xl mx-auto w-full ${isAnimating ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'}`}>
+      <div ref={contentRef} className={`flex-1 p-5 pb-28 overflow-y-auto transition-all duration-300 max-w-2xl mx-auto w-full ${isAnimating ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'}`}>
         
         {/* Privacy Consent Modal */}
         <OrderPrivacyConsent open={showPrivacyConsent} onAccept={() => setShowPrivacyConsent(false)} />
