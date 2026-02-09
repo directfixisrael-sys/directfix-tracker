@@ -756,38 +756,12 @@ const NewRepairOrder = () => {
             {/* Smart AI Search */}
             <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
 
-            <div className="grid grid-cols-2 gap-4">
-              {filteredModels.map((model, index) => {
-            const isPro = model.name.includes('Pro');
-            const isSelected = selectedModel?.id === model.id && step === 'model';
-            return <Card key={model.id} onClick={() => {
-              if (isSelected) {
-                handleModelSelect(model);
-              } else {
-                setSelectedModel(model);
-              }
-            }} className={`p-6 cursor-pointer hover:bg-muted/50 border transition-all duration-300 active:scale-[0.98] rounded-2xl ${isSelected ? 'border-primary bg-primary/5 ring-2 ring-primary/30' : 'border-border hover:border-primary/40'}`} style={{
-              animationDelay: `${index * 40}ms`
-            }}>
-                    <div className="flex flex-col items-center text-center gap-3">
-                      {/* Simple iPhone icon */}
-                      <div className={`w-12 h-20 rounded-xl flex items-center justify-center ${isSelected ? 'bg-primary/10' : 'bg-muted'}`}>
-                        <Smartphone className={`w-8 h-8 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
-                      </div>
-                      
-                      {/* Model name */}
-                      <div>
-                        <span className="font-semibold text-lg block">{model.name}</span>
-                        {isPro && <span className="text-sm text-muted-foreground">Pro</span>}
-                      </div>
-
-                      {isSelected && (
-                        <span className="text-xs text-primary font-medium animate-fade-in">לחץ שוב לאישור ←</span>
-                      )}
-                    </div>
-                  </Card>;
-          })}
-            </div>
+            <ModelPicker
+              models={filteredModels}
+              selectedModel={selectedModel}
+              onSelect={(model) => setSelectedModel(model)}
+              onConfirm={(model) => handleModelSelect(model)}
+            />
           </div>}
 
         {/* Step 2: Select Repair Type */}
