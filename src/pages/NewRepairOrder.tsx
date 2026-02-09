@@ -266,6 +266,8 @@ const NewRepairOrder = () => {
     setTimeout(() => {
       setStep(newStep);
       setIsAnimating(false);
+      // Broadcast step change for live tracking
+      window.dispatchEvent(new CustomEvent('repair-step-change', { detail: { step: newStep } }));
       // Scroll to top using ref
       if (contentRef.current) {
         contentRef.current.scrollTop = 0;

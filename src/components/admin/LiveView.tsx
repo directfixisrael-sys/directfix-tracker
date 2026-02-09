@@ -36,6 +36,27 @@ const PAGE_NAMES: Record<string, string> = {
   '/devices': 'רכישת מכשיר',
 };
 
+const STEP_NAMES: Record<string, string> = {
+  model: '📱 בחירת דגם',
+  repair: '🔧 בחירת תיקון',
+  bundle: '📦 חבילת תיקון',
+  price: '💰 אישור מחיר',
+  schedule: '📅 קביעת תור',
+  details: '📝 פרטי לקוח',
+  success: '✅ הזמנה הושלמה!',
+};
+
+const FUNNEL_STEPS = ['model', 'repair', 'bundle', 'price', 'schedule', 'details', 'success'] as const;
+const FUNNEL_LABELS: Record<string, string> = {
+  model: 'בחירת דגם',
+  repair: 'בחירת תיקון',
+  bundle: 'חבילת תיקון',
+  price: 'אישור מחיר',
+  schedule: 'קביעת תור',
+  details: 'פרטי לקוח',
+  success: 'הזמנה הושלמה',
+};
+
 const getDeviceIcon = (ua?: string) => {
   if (!ua) return <Smartphone className="w-4 h-4" />;
   if (/tablet|ipad/i.test(ua)) return <Tablet className="w-4 h-4" />;
@@ -276,8 +297,12 @@ const LiveView = () => {
                       <span className="font-medium text-sm">מבקר #{i + 1}</span>
                       <span className="text-xs text-muted-foreground">{getDeviceName(v.userAgent)}</span>
                     </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-primary font-medium">{PAGE_NAMES[v.page] || v.page}</span>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      <span className="text-xs text-primary font-medium">
+                        {v.page === '/order' && v.step 
+                          ? STEP_NAMES[v.step] || PAGE_NAMES[v.page] 
+                          : PAGE_NAMES[v.page] || v.page}
+                      </span>
                       {v.leadSource && v.leadSource !== 'direct' && (
                         <>
                           <span className="text-muted-foreground">·</span>
@@ -361,6 +386,47 @@ const LiveView = () => {
           </Card>
         )}
       </div>
+
+      {/* ===== ORDER FUNNEL - Live ===== */}
+      <Card className="p-5">
+        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+          <ShoppingBag className="w-5 h-5 text-success" />
+          משפך הזמנות - כרגע באתר
+        </h3>
+        <div className="space-y-3">
+          {FUNNEL_STEPS.map((step, idx) => {
+            const count = visitors.filter(v => v.page === '/order' && v.step === step).length;
+            const maxCount = Math.max(1, visitors.filter(v => v.page === '/order').length);
+            const pct = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+            return (
+              <div key={step} className="flex items-center gap-3">
+                <span className="text-xs w-6 text-muted-foreground">{idx + 1}</span>
+                <span className="text-sm font-medium w-28 truncate">{FUNNEL_LABELS[step]}</span>
+                <div className="flex-1 bg-muted rounded-full h-4 overflow-hidden">
+                  <div 
+                    className={cn(
+                      "h-full rounded-full transition-all duration-500",
+                      step === 'success' 
+                        ? "bg-gradient-to-r from-success to-success/60" 
+                        : "bg-gradient-to-r from-primary to-primary/60"
+                    )}
+                    style={{ width: `${Math.max(count > 0 ? 8 : 0, pct)}%` }}
+                  />
+                </div>
+                <span className={cn(
+                  "text-sm font-bold w-6 text-left",
+                  count > 0 ? "text-primary" : "text-muted-foreground"
+                )}>
+                  {count}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        {visitors.filter(v => v.page === '/order').length === 0 && (
+          <p className="text-muted-foreground text-sm text-center mt-4">אין גולשים כרגע בתהליך ההזמנה</p>
+        )}
+      </Card>
 
       {/* ===== SOURCE BREAKDOWN ===== */}
       {Object.keys(visitorsBySource).length > 0 && (

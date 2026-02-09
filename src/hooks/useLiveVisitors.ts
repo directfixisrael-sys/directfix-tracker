@@ -5,6 +5,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 export interface Visitor {
   visitorId: string;
   page: string;
+  step?: string | null;
   enteredAt: string;
   userAgent?: string;
   leadSource?: string;
@@ -79,6 +80,7 @@ export const useLiveVisitors = () => {
           visitors.push({
             visitorId: presence.visitorId,
             page: presence.page,
+            step: presence.step || null,
             enteredAt: presence.enteredAt,
             userAgent: presence.userAgent,
             leadSource: presence.leadSource,

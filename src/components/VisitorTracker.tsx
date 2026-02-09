@@ -34,6 +34,32 @@ export const VisitorTracker = () => {
   const channelRef = useRef<RealtimeChannel | null>(null);
   const isSubscribedRef = useRef(false);
 
+  // Listen for step changes from NewRepairOrder
+  const stepRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const handleStepChange = (e: CustomEvent) => {
+      stepRef.current = e.detail?.step || null;
+      // Update presence with new step
+      if (channelRef.current && isSubscribedRef.current) {
+        const visitorId = getVisitorId();
+        const leadSource = getLeadSource();
+        channelRef.current.track({
+          visitorId,
+          page: location.pathname,
+          step: stepRef.current,
+          enteredAt: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          leadSource: leadSource.source,
+          language: navigator.language,
+        });
+      }
+    };
+
+    window.addEventListener('repair-step-change' as any, handleStepChange);
+    return () => window.removeEventListener('repair-step-change' as any, handleStepChange);
+  }, [location.pathname]);
+
   useEffect(() => {
     const visitorId = getVisitorId();
     const leadSource = getLeadSource();
@@ -57,6 +83,7 @@ export const VisitorTracker = () => {
         await channel.track({
           visitorId,
           page: location.pathname,
+          step: null,
           enteredAt: new Date().toISOString(),
           userAgent: navigator.userAgent,
           leadSource: leadSource.source,
@@ -74,6 +101,7 @@ export const VisitorTracker = () => {
 
   // Update presence when route changes + broadcast activity
   useEffect(() => {
+    stepRef.current = null; // Reset step on page change
     const updatePresence = async () => {
       if (channelRef.current && isSubscribedRef.current) {
         const visitorId = getVisitorId();
@@ -82,6 +110,7 @@ export const VisitorTracker = () => {
         await channelRef.current.track({
           visitorId,
           page: location.pathname,
+          step: null,
           enteredAt: new Date().toISOString(),
           userAgent: navigator.userAgent,
           leadSource: leadSource.source,
@@ -101,7 +130,6 @@ export const VisitorTracker = () => {
                 page: location.pathname,
               },
             });
-            // Cleanup after send
             setTimeout(() => supabase.removeChannel(activityChannel), 2000);
           }
         });
