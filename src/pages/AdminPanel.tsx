@@ -62,6 +62,7 @@ import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import PromotionsManagement from '@/components/admin/PromotionsManagement';
 import CouponManagement from '@/components/admin/CouponManagement';
 import BundleManagement from '@/components/admin/BundleManagement';
+import AdminDashboard from '@/components/admin/AdminDashboard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -355,6 +356,8 @@ ${trackingUrl}
   // Render content based on active tab
   const renderContent = () => {
     switch (activeTab) {
+      case 'dashboard':
+        return <AdminDashboard orders={orders} />;
       case 'messages':
         // Group messages by order for WhatsApp-style conversations
         const messagesByOrder = sortedMessages.reduce((acc, msg) => {
@@ -1303,6 +1306,18 @@ ${trackingUrl}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-sidebar border-t border-sidebar-border z-50 px-2 py-2 safe-area-pb">
         <div className="flex justify-around items-center">
           <button 
+            onClick={() => setActiveTab('dashboard')}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
+              activeTab === 'dashboard' 
+                ? "bg-primary/10 text-primary" 
+                : "text-muted-foreground"
+            )}
+          >
+            <Activity className="w-5 h-5" />
+            <span className="text-[10px]">דשבורד</span>
+          </button>
+          <button 
             onClick={() => { setActiveTab('orders'); setSelectedOrder(null); }}
             className={cn(
               "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
@@ -1406,6 +1421,18 @@ ${trackingUrl}
         </div>
 
         <nav className="flex-1 p-4 space-y-2">
+          <button 
+            onClick={() => setActiveTab('dashboard')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'dashboard' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <Activity className="w-5 h-5" />
+            <span>דשבורד</span>
+          </button>
           <button 
             onClick={() => setActiveTab('orders')}
             className={cn(
@@ -1573,6 +1600,7 @@ ${trackingUrl}
         <header className="bg-card border-b border-border px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
           <div>
             <h1 className="text-lg md:text-xl font-bold text-foreground">
+              {activeTab === 'dashboard' && 'דשבורד'}
               {activeTab === 'orders' && 'ניהול הזמנות'}
               {activeTab === 'customers' && 'לקוחות'}
               {activeTab === 'messages' && 'הודעות'}
