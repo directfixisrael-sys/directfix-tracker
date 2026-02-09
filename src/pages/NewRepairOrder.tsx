@@ -702,7 +702,7 @@ const NewRepairOrder = () => {
               <h1 className="text-4xl font-extrabold mb-3 tracking-tight">
                 מה נתקן היום?
               </h1>
-              <p className="text-muted-foreground text-base">בחרו דגם ונגיע אליכם תוך שעה</p>
+              <p className="text-muted-foreground text-base">בחרו דגם ונגיע אליכם תוך שעה*</p>
               <div className="flex items-center justify-center gap-4 mt-4">
                 <Dialog>
                   <DialogTrigger asChild>
