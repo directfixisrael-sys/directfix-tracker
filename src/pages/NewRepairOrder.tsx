@@ -639,7 +639,7 @@ const NewRepairOrder = () => {
             const currentIdx = allSteps.indexOf(step);
             const displayIdx = displaySteps.indexOf(s);
             const adjustedCurrentIdx = currentIdx >= 3 ? currentIdx - 1 : currentIdx === 2 ? 1.5 : currentIdx;
-            return <div key={s} className={`h-1 flex-1 rounded-full transition-all duration-500 ${adjustedCurrentIdx >= displayIdx ? 'bg-primary' : 'bg-muted'}`} />;
+            return <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${adjustedCurrentIdx >= displayIdx ? 'bg-gradient-to-r from-primary to-accent shadow-sm' : 'bg-muted'}`} />;
           })}
             </div>
           </div>}
