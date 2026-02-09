@@ -581,16 +581,18 @@ const NewRepairOrder = () => {
   // Loading state
   if (isLoading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-3" />
-          <p className="text-muted-foreground text-sm">טוען...</p>
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto animate-pulse">
+            <Wrench className="w-8 h-8 text-primary" />
+          </div>
+          <p className="text-muted-foreground text-sm font-medium">טוען...</p>
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/40 flex flex-col">
-      {/* Promotion Strip - E-commerce style */}
+  return <div className="min-h-screen bg-background flex flex-col">
+      {/* Promotion Strip */}
       {activePromotion && (
-        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground text-center py-2 text-xs font-medium shadow-sm">
+        <div className="bg-foreground text-background text-center py-2.5 text-xs font-semibold tracking-wide">
           <span>{getPromotionIcon(activePromotion.icon)} {activePromotion.title} — {activePromotion.description}</span>
           {activePromotion.value && activePromotion.value > 0 && (
             <span className="mr-1 font-bold"> | חינם! 🎉</span>
@@ -598,48 +600,51 @@ const NewRepairOrder = () => {
         </div>
       )}
 
-      {/* Header */}
-      <div className="sticky top-0 bg-card/90 backdrop-blur-lg border-b border-border/50 z-10 shadow-sm">
+      {/* Header - Clean & Minimal */}
+      <div className="sticky top-0 bg-background/80 backdrop-blur-xl border-b border-border/40 z-10">
         <div className="flex items-center justify-between p-3 max-w-5xl mx-auto">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => {
+          <div className="flex items-center gap-3">
+            <button onClick={() => {
             if (step === 'model') navigate('/');else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
               if (currentBundle) goToStep('bundle');else goToStep('repair');
             } else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
-          }} className="rounded-full h-9 w-9">
+          }} className="h-10 w-10 rounded-2xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors">
               <ArrowRight className="w-4 h-4" />
-            </Button>
+            </button>
             <img src={logo} alt="Logo" className="h-7 w-auto" />
-            <h1 className="text-base font-semibold hidden sm:block">הזמנת תיקון</h1>
           </div>
 
-
-          <div className="flex items-center gap-1">
-            <a href="tel:033106020" className="h-9 w-9 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center transition-colors" aria-label="התקשר 033106020">
+          <div className="flex items-center gap-1.5">
+            <a href="tel:033106020" className="h-9 w-9 rounded-2xl bg-accent text-accent-foreground flex items-center justify-center transition-colors" aria-label="התקשר 033106020">
               <Phone className="w-4 h-4" />
             </a>
             <Button variant="ghost" size="icon" onClick={() => {
             const event = new CustomEvent('open-accessibility-widget');
             window.dispatchEvent(event);
-          }} className="h-9 w-9 rounded-full bg-blue-500 text-white hover:bg-blue-600 hover:text-white">
+          }} className="h-9 w-9 rounded-2xl" aria-label="נגישות">
               <Accessibility className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-full">
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-2xl">
               {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
           </div>
         </div>
         
-        {/* Progress bar */}
-        {step !== 'success' && <div className="px-3 pb-2 max-w-5xl mx-auto">
-            <div className="flex gap-1.5">
+        {/* Step Indicator - Pill style */}
+        {step !== 'success' && <div className="px-4 pb-3 max-w-5xl mx-auto">
+            <div className="flex gap-2 items-center">
               {['model', 'repair', 'price', 'schedule', 'details'].map((s, i) => {
+            const labels = ['דגם', 'תיקון', 'מחיר', 'מועד', 'פרטים'];
             const allSteps = ['model', 'repair', 'bundle', 'price', 'schedule', 'details'];
             const displaySteps = ['model', 'repair', 'price', 'schedule', 'details'];
             const currentIdx = allSteps.indexOf(step);
             const displayIdx = displaySteps.indexOf(s);
             const adjustedCurrentIdx = currentIdx >= 3 ? currentIdx - 1 : currentIdx === 2 ? 1.5 : currentIdx;
-            return <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${adjustedCurrentIdx >= displayIdx ? 'bg-gradient-to-r from-primary to-accent shadow-sm' : 'bg-muted'}`} />;
+            const isActive = adjustedCurrentIdx >= displayIdx;
+            const isCurrent = Math.floor(adjustedCurrentIdx) === displayIdx;
+            return <div key={s} className={`flex-1 text-center py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${isCurrent ? 'bg-primary text-primary-foreground shadow-md' : isActive ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                  {labels[i]}
+                </div>;
           })}
             </div>
           </div>}
@@ -650,49 +655,48 @@ const NewRepairOrder = () => {
       <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
 
       {/* Content */}
-      <div className={`flex-1 p-4 pb-24 overflow-y-auto transition-all duration-200 ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
+      <div className={`flex-1 p-5 pb-28 overflow-y-auto transition-all duration-300 ${isAnimating ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'}`}>
         
         {/* Privacy Consent Modal */}
         <OrderPrivacyConsent open={showPrivacyConsent} onAccept={() => setShowPrivacyConsent(false)} />
 
-        {/* Trust Badges - Single row */}
-        {step === 'model' && <div className="flex items-center justify-center gap-2 mb-4 animate-fade-in">
-            {/* Google */}
-            <div className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3 py-1.5">
+        {/* Trust Badges */}
+        {step === 'model' && <div className="flex items-center justify-center gap-3 mb-6 animate-fade-in">
+            <div className="flex items-center gap-1.5 bg-card border border-border/60 rounded-2xl px-3 py-2 shadow-sm">
               <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
-              <span className="text-xs text-foreground">Google</span>
-              <span className="text-xs font-bold text-foreground">5.0</span>
+              <span className="text-xs font-bold">5.0</span>
             </div>
 
-            {/* Midrag */}
-            <div className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3 py-1.5">
-              <img src={midragLogo} alt="מידרג" className="h-6 w-6 rounded-full object-cover" />
-              <span className="text-xs text-foreground">מידרג</span>
-              <span className="text-xs font-bold text-foreground">9.92</span>
+            <div className="flex items-center gap-1.5 bg-card border border-border/60 rounded-2xl px-3 py-2 shadow-sm">
+              <img src={midragLogo} alt="מידרג" className="h-5 w-5 rounded-full object-cover" />
+              <span className="text-xs font-bold">9.92</span>
             </div>
 
-            {/* Facebook */}
-            <div className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3 py-1.5">
+            <div className="flex items-center gap-1.5 bg-card border border-border/60 rounded-2xl px-3 py-2 shadow-sm">
               <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0" fill="#1877F2">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
-              <span className="text-xs text-foreground">Facebook</span>
-              <span className="text-xs font-bold text-foreground">5.0</span>
+              <span className="text-xs font-bold">5.0</span>
             </div>
           </div>}
 
         {/* Step 1: Select Model - Enhanced Welcome */}
         {step === 'model' && <div className="space-y-8 animate-fade-in">
             {/* Hero Welcome Section */}
-            <div className="text-center py-[11px]">
-              <h1 className="text-5xl font-bold mb-4 tracking-tight bg-gradient-to-l from-primary via-foreground to-accent bg-clip-text text-transparent">
-                הזמנת תיקון
+            <div className="text-center py-4">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-semibold mb-4">
+                <Wrench className="w-4 h-4" />
+                תיקון עד הבית
+              </div>
+              <h1 className="text-4xl font-extrabold mb-3 tracking-tight">
+                מה נתקן היום?
               </h1>
+              <p className="text-muted-foreground text-base">בחרו דגם ונגיע אליכם תוך שעה</p>
               <div className="flex items-center justify-center gap-4 mt-4">
                 <Dialog>
                   <DialogTrigger asChild>
@@ -766,10 +770,13 @@ const NewRepairOrder = () => {
           </div>}
 
         {/* Step 2: Select Repair Type */}
-        {step === 'repair' && <div className="space-y-6 animate-fade-in">
-            <div className="text-center mb-6">
-              <p className="text-muted-foreground text-xl mb-2">{selectedModel?.name}</p>
-              <h2 className="text-4xl font-bold">מה צריך לתקן?</h2>
+        {step === 'repair' && <div className="space-y-5 animate-fade-in">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 bg-accent/10 text-accent rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
+                <Smartphone className="w-4 h-4" />
+                {selectedModel?.name}
+              </div>
+              <h2 className="text-3xl font-extrabold">מה צריך לתקן?</h2>
             </div>
 
             <div className="space-y-3">
@@ -897,21 +904,16 @@ const NewRepairOrder = () => {
 
         {/* Step 3: Price Confirmation */}
         {step === 'price' && <div className="space-y-5 animate-fade-in">
-            <div className="text-center mb-6">
-              <div className="flex justify-center mb-4">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-success/20 to-success/5 rounded-full flex items-center justify-center animate-pulse-slow">
-                    <div className="w-14 h-14 bg-success/20 rounded-full flex items-center justify-center">
-                      <Wrench className="w-7 h-7 text-success" />
-                    </div>
-                  </div>
-                  <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-base px-2 py-0.5 rounded-full font-bold shadow-lg">
-                    ₪{getTotalPrice()}
-                  </div>
-                </div>
+            <div className="text-center mb-5">
+              <div className="inline-flex items-center gap-2 bg-success/10 text-success rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
+                <CheckCircle2 className="w-4 h-4" />
+                סיכום
               </div>
-              <h2 className="font-bold mb-2 text-3xl">סיכום הזמנה</h2>
-              <p className="text-muted-foreground text-lg">אישור מחיר התיקון</p>
+              <h2 className="font-extrabold mb-1 text-3xl">סיכום הזמנה</h2>
+              <p className="text-muted-foreground">אישור מחיר התיקון</p>
+              <div className="mt-3 inline-flex items-center bg-primary text-primary-foreground text-xl font-bold px-5 py-2 rounded-2xl shadow-md">
+                ₪{getTotalPrice()}
+              </div>
             </div>
 
             <Card className="p-5 bg-gradient-to-br from-card via-card to-primary/5 border-2 border-primary/20 shadow-lg">
@@ -1087,20 +1089,19 @@ const NewRepairOrder = () => {
           </div>}
 
         {/* Step 4: Schedule */}
-        {step === 'schedule' && <div className="space-y-4 animate-fade-in">
+        {step === 'schedule' && <div className="space-y-5 animate-fade-in">
             <div className="text-center mb-4">
-              <div className="flex justify-center mb-3">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center">
-                  <Calendar className="w-10 h-10 text-primary" />
-                </div>
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
+                <Calendar className="w-4 h-4" />
+                קביעת מועד
               </div>
-              <h2 className="text-3xl font-bold mb-2">קביעת מועד</h2>
-              <p className="text-muted-foreground text-lg">מתי נוח שהטכנאי יגיע?</p>
+              <h2 className="text-3xl font-extrabold mb-1">מתי נגיע?</h2>
+              <p className="text-muted-foreground">בחרו יום ושעה שנוחים לכם</p>
             </div>
 
             {/* Date selection */}
             <div>
-              <label className="block text-base font-medium mb-3 text-muted-foreground">בחר יום</label>
+              <label className="block text-sm font-bold mb-3">בחר יום</label>
               <div className="grid grid-cols-4 gap-3">
                 {getAvailableDates().map((date, index) => {
               const dayName = hebrewDays[date.getDay()];
@@ -1110,9 +1111,9 @@ const NewRepairOrder = () => {
               return <button key={index} onClick={() => {
                 setSelectedDate(date);
                 setSelectedTimeSlot('');
-              }} disabled={!hasAvailableSlots} className={`p-3 rounded-xl border text-center transition-all ${isSelected ? 'border-primary bg-primary/10 text-primary' : hasAvailableSlots ? 'border-border hover:border-primary/50' : 'border-border/50 opacity-50 cursor-not-allowed'}`}>
-                      <div className="text-base font-semibold">{isToday ? 'היום' : dayName}</div>
-                      <div className="text-base text-muted-foreground">{date.getDate()}/{date.getMonth() + 1}</div>
+              }} disabled={!hasAvailableSlots} className={`p-3 rounded-2xl border-2 text-center transition-all ${isSelected ? 'border-primary bg-primary/10 text-primary shadow-sm' : hasAvailableSlots ? 'border-border hover:border-primary/40 hover:bg-muted/30' : 'border-border/50 opacity-40 cursor-not-allowed'}`}>
+                      <div className="text-sm font-bold">{isToday ? 'היום' : dayName}</div>
+                      <div className="text-sm text-muted-foreground">{date.getDate()}/{date.getMonth() + 1}</div>
                     </button>;
             })}
               </div>
@@ -1120,14 +1121,14 @@ const NewRepairOrder = () => {
 
             {/* Time slot selection */}
             {selectedDate && <div className="animate-fade-in">
-                <label className="block text-base font-medium mb-3 text-muted-foreground">בחר שעה</label>
+                <label className="block text-sm font-bold mb-3">בחר שעה</label>
                 <div className="grid grid-cols-2 gap-3">
                   {getTimeSlotsForDate(selectedDate).map(slot => {
               const isAvailable = isSlotAvailable(selectedDate, slot);
               const isSelected = selectedTimeSlot === slot;
-              return <button key={slot} onClick={() => setSelectedTimeSlot(slot)} disabled={!isAvailable} className={`p-4 rounded-xl border text-center transition-all flex items-center justify-center gap-2 ${isSelected ? 'border-primary bg-primary/10 text-primary' : isAvailable ? 'border-border hover:border-primary/50' : 'border-border/50 opacity-50 cursor-not-allowed'}`}>
-                        <Clock className="w-5 h-5" />
-                        <span className="text-lg font-medium">{slot}</span>
+              return <button key={slot} onClick={() => setSelectedTimeSlot(slot)} disabled={!isAvailable} className={`p-4 rounded-2xl border-2 text-center transition-all flex items-center justify-center gap-2 ${isSelected ? 'border-primary bg-primary/10 text-primary shadow-sm' : isAvailable ? 'border-border hover:border-primary/40 hover:bg-muted/30' : 'border-border/50 opacity-40 cursor-not-allowed'}`}>
+                        <Clock className="w-4 h-4" />
+                        <span className="text-base font-semibold">{slot}</span>
                       </button>;
             })}
                 </div>
@@ -1142,46 +1143,43 @@ const NewRepairOrder = () => {
           </div>}
 
         {/* Step 5: Customer Details */}
-        {step === 'details' && <div className="space-y-4 animate-fade-in">
-            <div className="text-center mb-6">
-              <div className="flex justify-center mb-3">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center">
-                  <MapPin className="w-10 h-10 text-primary" />
-                </div>
+        {step === 'details' && <div className="space-y-5 animate-fade-in">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 bg-accent/10 text-accent rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
+                <MapPin className="w-4 h-4" />
+                פרטים אחרונים
               </div>
-              <h2 className="text-3xl font-bold mb-2">פרטי הזמנה</h2>
-              <p className="text-muted-foreground text-lg">לאן לשלוח את הטכנאי?</p>
+              <h2 className="text-3xl font-extrabold mb-1">לאן נגיע?</h2>
+              <p className="text-muted-foreground">מלאו את הפרטים ואנחנו בדרך</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 bg-card rounded-3xl p-5 border border-border/50 shadow-sm">
               <div>
-                <label className="block text-base font-medium mb-2">שם מלא</label>
-                <Input placeholder="הכנס שם מלא" value={customerName} onChange={e => setCustomerName(e.target.value)} className="h-14 text-lg rounded-xl" />
+                <label className="block text-sm font-bold mb-1.5">שם מלא</label>
+                <Input placeholder="הכנס שם מלא" value={customerName} onChange={e => setCustomerName(e.target.value)} className="h-13 text-base rounded-2xl bg-muted/40 border-border/50 focus:bg-card" />
               </div>
 
               <div>
-                <label className="block text-base font-medium mb-2">מספר טלפון</label>
-                <Input placeholder="050-0000000" value={customerPhone} onChange={e => setCustomerPhone(formatPhone(e.target.value))} type="tel" className="h-14 text-lg rounded-xl text-right" dir="ltr" />
+                <label className="block text-sm font-bold mb-1.5">מספר טלפון</label>
+                <Input placeholder="050-0000000" value={customerPhone} onChange={e => setCustomerPhone(formatPhone(e.target.value))} type="tel" className="h-13 text-base rounded-2xl text-right bg-muted/40 border-border/50 focus:bg-card" dir="ltr" />
               </div>
 
               <div>
-                <label className="block text-base font-medium mb-2">כתובת (עיר, רחוב, מספר בית/דירה)</label>
-                <Input placeholder="למשל: הרצליה, סוקולוב 15, דירה 4" value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="h-14 text-lg rounded-xl" />
-                <div className="mt-2 p-3 bg-primary/10 border border-primary/20 rounded-lg flex items-center gap-2">
-                  <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-4 h-4 text-primary" />
-                  </div>
-                  <p className="text-sm text-foreground">
-                    <span className="font-medium">אזור השירות:</span> השרון, המרכז וגוש דן (ממודיעין ועד נתניה)
+                <label className="block text-sm font-bold mb-1.5">כתובת</label>
+                <Input placeholder="עיר, רחוב, מספר בית/דירה" value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="h-13 text-base rounded-2xl bg-muted/40 border-border/50 focus:bg-card" />
+                <div className="mt-2 p-3 bg-accent/8 border border-accent/15 rounded-2xl flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-accent flex-shrink-0" />
+                  <p className="text-xs text-muted-foreground">
+                    <span className="font-bold text-foreground">אזור שירות:</span> השרון, המרכז וגוש דן
                   </p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-base font-medium mb-2">
-                  הערות לטכנאי <span className="text-muted-foreground">(לא חובה)</span>
+                <label className="block text-sm font-bold mb-1.5">
+                  הערות <span className="text-muted-foreground font-normal">(לא חובה)</span>
                 </label>
-                <Textarea placeholder="למשל: קומה 3, יש אינטרקום, לחייג בהגעה..." value={customerNotes} onChange={e => setCustomerNotes(e.target.value)} className="text-lg rounded-xl resize-none" rows={2} />
+                <Textarea placeholder="קומה, אינטרקום, הערות..." value={customerNotes} onChange={e => setCustomerNotes(e.target.value)} className="text-base rounded-2xl resize-none bg-muted/40 border-border/50 focus:bg-card" rows={2} />
               </div>
 
               {/* Uploaded Images Display */}
