@@ -359,6 +359,8 @@ ${trackingUrl}
     switch (activeTab) {
       case 'dashboard':
         return <AdminDashboard orders={orders} />;
+      case 'live':
+        return <LiveView />;
       case 'messages':
         // Group messages by order for WhatsApp-style conversations
         const messagesByOrder = sortedMessages.reduce((acc, msg) => {
