@@ -1126,9 +1126,9 @@ const NewRepairOrder = () => {
                   {getTimeSlotsForDate(selectedDate).map(slot => {
               const isAvailable = isSlotAvailable(selectedDate, slot);
               const isSelected = selectedTimeSlot === slot;
-              return <button key={slot} onClick={() => setSelectedTimeSlot(slot)} disabled={!isAvailable} className={`p-4 rounded-xl border text-center transition-all flex items-center justify-center gap-2 ${isSelected ? 'border-primary bg-primary/10 text-primary' : isAvailable ? 'border-border hover:border-primary/50' : 'border-border/50 opacity-50 cursor-not-allowed'}`}>
-                        <Clock className="w-5 h-5" />
-                        <span className="text-lg font-medium">{slot}</span>
+              return <button key={slot} onClick={() => setSelectedTimeSlot(slot)} disabled={!isAvailable} className={`p-4 rounded-2xl border-2 text-center transition-all flex items-center justify-center gap-2 ${isSelected ? 'border-primary bg-primary/10 text-primary shadow-sm' : isAvailable ? 'border-border hover:border-primary/40 hover:bg-muted/30' : 'border-border/50 opacity-40 cursor-not-allowed'}`}>
+                        <Clock className="w-4 h-4" />
+                        <span className="text-base font-semibold">{slot}</span>
                       </button>;
             })}
                 </div>
