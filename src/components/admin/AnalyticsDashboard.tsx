@@ -176,7 +176,7 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
   const revenueData = useMemo(() => {
     const calculateOrderTotal = (order: RepairOrder) => {
       const accessoriesTotal = Array.isArray(order.accessories) 
-        ? order.accessories.reduce((sum: number, acc: any) => sum + (acc.price || 0), 0)
+        ? order.accessories.reduce((sum: number, acc: any) => sum + (acc.selected ? (acc.price || 0) : 0), 0)
         : 0;
       return (order.repairPrice || 0) + accessoriesTotal;
     };
