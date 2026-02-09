@@ -31,20 +31,9 @@ const seriesOrder = [
   'iPhone 12', 'iPhone 11', 'iPhone X', 'iPhone 8', 'Samsung', 'Other'
 ];
 
-const getShortName = (name: string): string => {
-  // Strip "iPhone XX " prefix to show just variant
-  return name
-    .replace(/^iPhone\s+\d+\s*/, '')
-    .replace(/^iPhone\s+X[SR]?\s*/, '')
-    .replace(/^iPhone\s+8\s*/, '')
-    .replace(/^סמסונג גלקסי\s*/, '')
-    .trim() || 'רגיל';
-};
-
 const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPickerProps) => {
   const [expandedSeries, setExpandedSeries] = useState<string | null>(null);
 
-  // Group models by series
   const grouped = models.reduce<Record<string, IphoneModel[]>>((acc, model) => {
     const key = getSeriesKey(model.name);
     if (!acc[key]) acc[key] = [];
@@ -56,68 +45,73 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
 
   return (
     <div className="space-y-2">
-      {sortedSeries.map((series) => {
-        const isExpanded = expandedSeries === series;
-        const seriesModels = grouped[series];
+      <div className="grid grid-cols-2 gap-2">
+        {sortedSeries.map((series) => {
+          const isExpanded = expandedSeries === series;
+          const seriesModels = grouped[series];
 
-        return (
-          <div key={series} className="border border-border rounded-2xl overflow-hidden transition-all">
-            {/* Series header */}
-            <button
-              onClick={() => setExpandedSeries(isExpanded ? null : series)}
-              className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+          return (
+            <div key={series} className={cn(
+              isExpanded && "col-span-2"
+            )}>
+              {/* Series header */}
+              <button
+                onClick={() => setExpandedSeries(isExpanded ? null : series)}
+                className={cn(
+                  "w-full flex items-center justify-between px-3 py-3 rounded-xl border transition-all",
+                  isExpanded
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/30 hover:bg-muted/30"
+                )}
+              >
+                <div className="flex items-center gap-2">
                   <Smartphone className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-semibold text-sm">{series}</span>
                 </div>
-                <span className="font-semibold text-base">{series}</span>
-                <span className="text-xs text-muted-foreground">({seriesModels.length})</span>
-              </div>
-              <ChevronDown className={cn(
-                "w-4 h-4 text-muted-foreground transition-transform duration-200",
-                isExpanded && "rotate-180"
-              )} />
-            </button>
+                <ChevronDown className={cn(
+                  "w-3.5 h-3.5 text-muted-foreground transition-transform duration-200",
+                  isExpanded && "rotate-180"
+                )} />
+              </button>
 
-            {/* Models */}
-            {isExpanded && (
-              <div className="px-3 pb-3 grid grid-cols-2 gap-2 animate-fade-in">
-                {seriesModels.map((model) => {
-                  const isSelected = selectedModel?.id === model.id;
-                  const shortName = getShortName(model.name);
+              {/* Expanded models */}
+              {isExpanded && (
+                <div className="grid grid-cols-2 gap-2 mt-2 animate-fade-in">
+                  {seriesModels.map((model) => {
+                    const isSelected = selectedModel?.id === model.id;
 
-                  return (
-                    <button
-                      key={model.id}
-                      onClick={() => {
-                        if (isSelected) {
-                          onConfirm(model);
-                        } else {
-                          onSelect(model);
-                        }
-                      }}
-                      className={cn(
-                        "py-3 px-3 rounded-xl text-center transition-all active:scale-[0.97] border",
-                        isSelected
-                          ? "border-primary bg-primary/5 ring-1 ring-primary/30"
-                          : "border-border hover:border-primary/30 hover:bg-muted/30"
-                      )}
-                    >
-                      <span className="font-medium text-sm block">{model.name}</span>
-                      {isSelected && (
-                        <span className="text-[11px] text-primary font-medium mt-1 block animate-fade-in">
-                          לחץ שוב לאישור ←
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        );
-      })}
+                    return (
+                      <button
+                        key={model.id}
+                        onClick={() => {
+                          if (isSelected) {
+                            onConfirm(model);
+                          } else {
+                            onSelect(model);
+                          }
+                        }}
+                        className={cn(
+                          "py-2.5 px-3 rounded-xl text-center transition-all active:scale-[0.97] border",
+                          isSelected
+                            ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                            : "border-border hover:border-primary/30 hover:bg-muted/30"
+                        )}
+                      >
+                        <span className="font-medium text-sm block">{model.name}</span>
+                        {isSelected && (
+                          <span className="text-[11px] text-primary font-medium mt-0.5 block animate-fade-in">
+                            לחץ שוב לאישור ←
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
