@@ -688,10 +688,15 @@ const NewRepairOrder = () => {
         {/* Step 1: Select Model - Enhanced Welcome */}
         {step === 'model' && <div className="space-y-8 animate-fade-in">
             {/* Hero Welcome Section */}
-            <div className="text-center py-[11px]">
-              <h1 className="text-5xl font-bold mb-4 tracking-tight bg-gradient-to-l from-primary via-foreground to-accent bg-clip-text text-transparent">
-                הזמנת תיקון
+            <div className="text-center py-4">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-semibold mb-4">
+                <Wrench className="w-4 h-4" />
+                תיקון עד הבית
+              </div>
+              <h1 className="text-4xl font-extrabold mb-3 tracking-tight">
+                מה נתקן היום?
               </h1>
+              <p className="text-muted-foreground text-base">בחרו דגם ונגיע אליכם תוך שעה</p>
               <div className="flex items-center justify-center gap-4 mt-4">
                 <Dialog>
                   <DialogTrigger asChild>
