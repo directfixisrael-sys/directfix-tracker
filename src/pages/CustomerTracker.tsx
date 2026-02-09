@@ -14,7 +14,7 @@ import OrderSummarySheet from '@/components/OrderSummarySheet';
 import StickyHeader from '@/components/StickyHeader';
 import PrivacyConsentModal from '@/components/PrivacyConsentModal';
 import { useRepairStore } from '@/store/repairStore';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/directfix-logo.png';
 import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
