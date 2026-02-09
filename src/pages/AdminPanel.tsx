@@ -1604,6 +1604,7 @@ ${trackingUrl}
           <div>
             <h1 className="text-lg md:text-xl font-bold text-foreground">
               {activeTab === 'dashboard' && 'דשבורד'}
+              {activeTab === 'live' && 'לייב'}
               {activeTab === 'orders' && 'ניהול הזמנות'}
               {activeTab === 'customers' && 'לקוחות'}
               {activeTab === 'messages' && 'הודעות'}
