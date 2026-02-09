@@ -1111,9 +1111,9 @@ const NewRepairOrder = () => {
               return <button key={index} onClick={() => {
                 setSelectedDate(date);
                 setSelectedTimeSlot('');
-              }} disabled={!hasAvailableSlots} className={`p-3 rounded-xl border text-center transition-all ${isSelected ? 'border-primary bg-primary/10 text-primary' : hasAvailableSlots ? 'border-border hover:border-primary/50' : 'border-border/50 opacity-50 cursor-not-allowed'}`}>
-                      <div className="text-base font-semibold">{isToday ? 'היום' : dayName}</div>
-                      <div className="text-base text-muted-foreground">{date.getDate()}/{date.getMonth() + 1}</div>
+              }} disabled={!hasAvailableSlots} className={`p-3 rounded-2xl border-2 text-center transition-all ${isSelected ? 'border-primary bg-primary/10 text-primary shadow-sm' : hasAvailableSlots ? 'border-border hover:border-primary/40 hover:bg-muted/30' : 'border-border/50 opacity-40 cursor-not-allowed'}`}>
+                      <div className="text-sm font-bold">{isToday ? 'היום' : dayName}</div>
+                      <div className="text-sm text-muted-foreground">{date.getDate()}/{date.getMonth() + 1}</div>
                     </button>;
             })}
               </div>
