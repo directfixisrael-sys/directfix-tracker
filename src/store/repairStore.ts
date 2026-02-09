@@ -91,7 +91,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
   orders: [],
   messages: [],
   currentOrder: null,
-  activeTab: 'orders',
+  activeTab: 'dashboard',
   isLoading: false,
 
   setActiveTab: (tab) => set({ activeTab: tab }),
