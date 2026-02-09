@@ -44,6 +44,11 @@ serve(async (req) => {
     console.log('Google API status:', data.status, 'predictions:', data.predictions?.length || 0);
     if (data.error_message) console.error('Google API error:', data.error_message);
 
+    const predictions = (data.predictions || []).map((p: any) => ({
+      description: p.description,
+      place_id: p.place_id,
+    }));
+
     return new Response(JSON.stringify({ predictions }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
