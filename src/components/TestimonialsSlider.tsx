@@ -35,6 +35,12 @@ const testimonials: Testimonial[] = [
     date: 'אוקטובר 2025',
     source: 'midrag',
   },
+  {
+    name: 'דני מ.',
+    text: 'שירות מעולה, הגיע מהר ותיקן במקום. מאוד מרוצה!',
+    date: 'ינואר 2026',
+    source: 'easy',
+  },
 ];
 
 const GoogleIcon = () => (
