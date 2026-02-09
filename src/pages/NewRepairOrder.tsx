@@ -1089,15 +1089,14 @@ const NewRepairOrder = () => {
           </div>}
 
         {/* Step 4: Schedule */}
-        {step === 'schedule' && <div className="space-y-4 animate-fade-in">
+        {step === 'schedule' && <div className="space-y-5 animate-fade-in">
             <div className="text-center mb-4">
-              <div className="flex justify-center mb-3">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center">
-                  <Calendar className="w-10 h-10 text-primary" />
-                </div>
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
+                <Calendar className="w-4 h-4" />
+                קביעת מועד
               </div>
-              <h2 className="text-3xl font-bold mb-2">קביעת מועד</h2>
-              <p className="text-muted-foreground text-lg">מתי נוח שהטכנאי יגיע?</p>
+              <h2 className="text-3xl font-extrabold mb-1">מתי נגיע?</h2>
+              <p className="text-muted-foreground">בחרו יום ושעה שנוחים לכם</p>
             </div>
 
             {/* Date selection */}
