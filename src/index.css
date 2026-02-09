@@ -91,27 +91,27 @@
 
   html {
     direction: rtl;
-    font-size: 20px;
+    font-size: 22px;
   }
   
   @media (min-width: 640px) {
     html {
-      font-size: 20px;
+      font-size: 22px;
     }
   }
   
   @media (min-width: 1024px) {
     html {
-      font-size: 21px;
+      font-size: 23px;
     }
   }
 
   /* Ensure minimum readable font sizes */
   .text-xs {
-    font-size: 0.875rem !important; /* ~17px minimum */
+    font-size: 0.875rem !important; /* ~19px */
   }
   .text-sm {
-    font-size: 1rem !important; /* 20px minimum */
+    font-size: 1rem !important; /* 22px */
   }
 
   body {
