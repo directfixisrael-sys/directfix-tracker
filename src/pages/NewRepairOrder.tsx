@@ -806,9 +806,6 @@ const NewRepairOrder = () => {
               </div>
             )}
 
-            {/* Testimonials Slider */}
-            <TestimonialsSlider />
-
             {/* Scroll hint */}
             <div className="flex flex-col items-center gap-1 py-2 animate-fade-in">
               <span className="text-xs text-muted-foreground font-medium">בחרו דגם ↓</span>
@@ -816,6 +813,9 @@ const NewRepairOrder = () => {
                 <div className="w-1.5 h-2.5 bg-muted-foreground/50 rounded-full animate-[bounce_1.5s_infinite]" />
               </div>
             </div>
+
+            {/* Testimonials Slider */}
+            <TestimonialsSlider />
 
             {/* Smart AI Search */}
             <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
