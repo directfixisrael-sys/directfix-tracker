@@ -73,6 +73,7 @@ const dbToOrder = (row: any): RepairOrder => ({
   invoiceLink: row.invoice_link,
   paymentLink: row.payment_link,
   paymentStatus: row.payment_status as PaymentStatus || 'none',
+  leadSource: row.lead_source || undefined,
 });
 
 // Convert database row to ChatMessage
