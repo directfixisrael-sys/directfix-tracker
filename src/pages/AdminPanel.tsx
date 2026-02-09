@@ -1576,6 +1576,7 @@ ${trackingUrl}
         <header className="bg-card border-b border-border px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
           <div>
             <h1 className="text-lg md:text-xl font-bold text-foreground">
+              {activeTab === 'dashboard' && 'דשבורד'}
               {activeTab === 'orders' && 'ניהול הזמנות'}
               {activeTab === 'customers' && 'לקוחות'}
               {activeTab === 'messages' && 'הודעות'}
