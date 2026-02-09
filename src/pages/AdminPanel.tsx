@@ -968,6 +968,12 @@ ${trackingUrl}
                         <p className="text-muted-foreground text-sm">מחיר תיקון</p>
                         <p className="font-medium text-foreground text-base">₪{selectedOrder.repairPrice}</p>
                       </div>
+                      {selectedOrder.leadSource && (
+                        <div className="col-span-2">
+                          <p className="text-muted-foreground text-sm">📊 מקור הליד</p>
+                          <p className="font-medium text-primary text-base">{selectedOrder.leadSource}</p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Selected accessories */}
