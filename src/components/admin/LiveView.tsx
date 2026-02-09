@@ -36,6 +36,27 @@ const PAGE_NAMES: Record<string, string> = {
   '/devices': 'רכישת מכשיר',
 };
 
+const STEP_NAMES: Record<string, string> = {
+  model: '📱 בחירת דגם',
+  repair: '🔧 בחירת תיקון',
+  bundle: '📦 חבילת תיקון',
+  price: '💰 אישור מחיר',
+  schedule: '📅 קביעת תור',
+  details: '📝 פרטי לקוח',
+  success: '✅ הזמנה הושלמה!',
+};
+
+const FUNNEL_STEPS = ['model', 'repair', 'bundle', 'price', 'schedule', 'details', 'success'] as const;
+const FUNNEL_LABELS: Record<string, string> = {
+  model: 'בחירת דגם',
+  repair: 'בחירת תיקון',
+  bundle: 'חבילת תיקון',
+  price: 'אישור מחיר',
+  schedule: 'קביעת תור',
+  details: 'פרטי לקוח',
+  success: 'הזמנה הושלמה',
+};
+
 const getDeviceIcon = (ua?: string) => {
   if (!ua) return <Smartphone className="w-4 h-4" />;
   if (/tablet|ipad/i.test(ua)) return <Tablet className="w-4 h-4" />;
