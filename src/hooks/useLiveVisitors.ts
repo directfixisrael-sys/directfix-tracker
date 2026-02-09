@@ -5,6 +5,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 export interface Visitor {
   visitorId: string;
   page: string;
+  step?: string | null;
   enteredAt: string;
   userAgent?: string;
   leadSource?: string;
