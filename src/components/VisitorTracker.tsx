@@ -72,7 +72,7 @@ export const VisitorTracker = () => {
     };
   }, []);
 
-  // Update presence when route changes
+  // Update presence when route changes + broadcast activity
   useEffect(() => {
     const updatePresence = async () => {
       if (channelRef.current && isSubscribedRef.current) {
@@ -86,6 +86,24 @@ export const VisitorTracker = () => {
           userAgent: navigator.userAgent,
           leadSource: leadSource.source,
           language: navigator.language,
+        });
+
+        // Broadcast activity event for live feed
+        const activityChannel = supabase.channel('live-activity-events');
+        activityChannel.subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            activityChannel.send({
+              type: 'broadcast',
+              event: 'activity',
+              payload: {
+                type: location.pathname === '/order' ? 'order_started' : 'page_view',
+                visitorId,
+                page: location.pathname,
+              },
+            });
+            // Cleanup after send
+            setTimeout(() => supabase.removeChannel(activityChannel), 2000);
+          }
         });
       }
     };

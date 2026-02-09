@@ -63,6 +63,7 @@ import PromotionsManagement from '@/components/admin/PromotionsManagement';
 import CouponManagement from '@/components/admin/CouponManagement';
 import BundleManagement from '@/components/admin/BundleManagement';
 import AdminDashboard from '@/components/admin/AdminDashboard';
+import LiveView from '@/components/admin/LiveView';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -358,6 +359,8 @@ ${trackingUrl}
     switch (activeTab) {
       case 'dashboard':
         return <AdminDashboard orders={orders} />;
+      case 'live':
+        return <LiveView />;
       case 'messages':
         // Group messages by order for WhatsApp-style conversations
         const messagesByOrder = sortedMessages.reduce((acc, msg) => {
@@ -1318,6 +1321,21 @@ ${trackingUrl}
             <span className="text-[10px]">דשבורד</span>
           </button>
           <button 
+            onClick={() => setActiveTab('live')}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px] relative",
+              activeTab === 'live' 
+                ? "bg-success/10 text-success" 
+                : "text-muted-foreground"
+            )}
+          >
+            <div className="relative">
+              <Eye className="w-5 h-5" />
+              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-success rounded-full animate-pulse" />
+            </div>
+            <span className="text-[10px]">לייב</span>
+          </button>
+          <button 
             onClick={() => { setActiveTab('orders'); setSelectedOrder(null); }}
             className={cn(
               "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
@@ -1432,6 +1450,21 @@ ${trackingUrl}
           >
             <Activity className="w-5 h-5" />
             <span>דשבורד</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('live')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'live' 
+                ? "bg-success/10 text-success" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <div className="relative">
+              <Eye className="w-5 h-5" />
+              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-success rounded-full animate-pulse" />
+            </div>
+            <span>לייב</span>
           </button>
           <button 
             onClick={() => setActiveTab('orders')}
@@ -1601,6 +1634,7 @@ ${trackingUrl}
           <div>
             <h1 className="text-lg md:text-xl font-bold text-foreground">
               {activeTab === 'dashboard' && 'דשבורד'}
+              {activeTab === 'live' && 'לייב'}
               {activeTab === 'orders' && 'ניהול הזמנות'}
               {activeTab === 'customers' && 'לקוחות'}
               {activeTab === 'messages' && 'הודעות'}
