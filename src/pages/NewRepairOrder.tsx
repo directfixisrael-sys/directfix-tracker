@@ -587,10 +587,10 @@ const NewRepairOrder = () => {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-background flex flex-col">
+  return <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/40 flex flex-col">
       {/* Promotion Strip - E-commerce style */}
       {activePromotion && (
-        <div className="bg-primary text-primary-foreground text-center py-1.5 text-xs font-medium">
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground text-center py-2 text-xs font-medium shadow-sm">
           <span>{getPromotionIcon(activePromotion.icon)} {activePromotion.title} — {activePromotion.description}</span>
           {activePromotion.value && activePromotion.value > 0 && (
             <span className="mr-1 font-bold"> | חינם! 🎉</span>
@@ -599,7 +599,7 @@ const NewRepairOrder = () => {
       )}
 
       {/* Header */}
-      <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border z-10">
+      <div className="sticky top-0 bg-card/90 backdrop-blur-lg border-b border-border/50 z-10 shadow-sm">
         <div className="flex items-center justify-between p-3 max-w-5xl mx-auto">
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={() => {
@@ -639,7 +639,7 @@ const NewRepairOrder = () => {
             const currentIdx = allSteps.indexOf(step);
             const displayIdx = displaySteps.indexOf(s);
             const adjustedCurrentIdx = currentIdx >= 3 ? currentIdx - 1 : currentIdx === 2 ? 1.5 : currentIdx;
-            return <div key={s} className={`h-1 flex-1 rounded-full transition-all duration-500 ${adjustedCurrentIdx >= displayIdx ? 'bg-primary' : 'bg-muted'}`} />;
+            return <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${adjustedCurrentIdx >= displayIdx ? 'bg-gradient-to-r from-primary to-accent shadow-sm' : 'bg-muted'}`} />;
           })}
             </div>
           </div>}
@@ -688,9 +688,9 @@ const NewRepairOrder = () => {
 
         {/* Step 1: Select Model - Enhanced Welcome */}
         {step === 'model' && <div className="space-y-8 animate-fade-in">
-            {/* Hero Welcome Section - Apple style */}
+            {/* Hero Welcome Section */}
             <div className="text-center py-[11px]">
-              <h1 className="text-5xl font-bold mb-4 tracking-tight">
+              <h1 className="text-5xl font-bold mb-4 tracking-tight bg-gradient-to-l from-primary via-foreground to-accent bg-clip-text text-transparent">
                 הזמנת תיקון
               </h1>
               <div className="flex items-center justify-center gap-4 mt-4">
@@ -790,7 +790,7 @@ const NewRepairOrder = () => {
               return Phone;
             };
             const IconComponent = getIcon();
-            return <Card key={repair.id} onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border ${isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-border hover:border-primary/40 hover:bg-muted/30'}`}>
+            return <Card key={repair.id} onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 shadow-sm hover:shadow-md ${isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-border hover:border-primary/40 hover:bg-primary/5'}`}>
                     <div className="flex items-center gap-4">
                       {/* Simple Icon */}
                       <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center">
@@ -914,7 +914,7 @@ const NewRepairOrder = () => {
               <p className="text-muted-foreground text-lg">אישור מחיר התיקון</p>
             </div>
 
-            <Card className="p-4 bg-gradient-to-br from-card to-muted/30">
+            <Card className="p-5 bg-gradient-to-br from-card via-card to-primary/5 border-2 border-primary/20 shadow-lg">
               <div className="space-y-3">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">דגם</span>
@@ -1027,7 +1027,7 @@ const NewRepairOrder = () => {
             </Card>
 
             {/* Payment Info with Icons */}
-            <div className="bg-muted/50 rounded-xl p-4">
+            <div className="bg-gradient-to-br from-muted/60 to-accent/5 rounded-2xl p-4 border border-border/50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1298,16 +1298,16 @@ const NewRepairOrder = () => {
       </div>
 
       {/* Sticky Footer with Action Buttons */}
-      {step !== 'success' && step !== 'model' && step !== 'repair' && <div className="sticky bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border p-4 safe-area-pb">
-          {step === 'price' && <Button onClick={handlePriceConfirm} className="w-full h-12 text-base rounded-xl">
+      {step !== 'success' && step !== 'model' && step !== 'repair' && <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border/50 p-4 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+          {step === 'price' && <Button onClick={handlePriceConfirm} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl bg-gradient-to-r from-primary to-primary/90">
               אישור ובחירת מועד לטכנאי
             </Button>}
           
-          {step === 'schedule' && <Button onClick={handleScheduleConfirm} disabled={!selectedDate || !selectedTimeSlot} className="w-full h-12 text-base rounded-xl">
+          {step === 'schedule' && <Button onClick={handleScheduleConfirm} disabled={!selectedDate || !selectedTimeSlot} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl bg-gradient-to-r from-primary to-primary/90">
               המשך לפרטים
             </Button>}
           
-          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact} className="w-full h-12 text-base rounded-xl">
+          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl bg-gradient-to-r from-primary to-accent">
               {isSubmitting ? <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   שולח...
