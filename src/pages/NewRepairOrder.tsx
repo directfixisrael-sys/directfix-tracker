@@ -1297,15 +1297,15 @@ const NewRepairOrder = () => {
 
       {/* Sticky Footer with Action Buttons */}
       {step !== 'success' && step !== 'model' && step !== 'repair' && <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border/50 p-4 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-          {step === 'price' && <Button onClick={handlePriceConfirm} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl bg-gradient-to-r from-primary to-primary/90">
+          {step === 'price' && <Button onClick={handlePriceConfirm} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
               אישור ובחירת מועד לטכנאי
             </Button>}
           
-          {step === 'schedule' && <Button onClick={handleScheduleConfirm} disabled={!selectedDate || !selectedTimeSlot} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl bg-gradient-to-r from-primary to-primary/90">
+          {step === 'schedule' && <Button onClick={handleScheduleConfirm} disabled={!selectedDate || !selectedTimeSlot} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
               המשך לפרטים
             </Button>}
           
-          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl bg-gradient-to-r from-primary to-accent">
+          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
               {isSubmitting ? <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   שולח...
