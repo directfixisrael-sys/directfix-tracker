@@ -16,6 +16,15 @@ interface OrderData {
   notes: string;
   customerEmail?: string;
   promotionTitle?: string;
+  leadSource?: string;
+  leadSourceDetails?: {
+    gclid?: string;
+    fbclid?: string;
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+    referrer?: string;
+  };
 }
 
 // Simple Resend API call
