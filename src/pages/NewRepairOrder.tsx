@@ -753,6 +753,9 @@ const NewRepairOrder = () => {
                   </Card>;
           })}
             </div>
+
+            {/* Testimonials Slider */}
+            <TestimonialsSlider />
           </div>}
 
         {/* Step 2: Select Repair Type */}
