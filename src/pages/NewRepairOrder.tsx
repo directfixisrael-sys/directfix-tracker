@@ -904,21 +904,16 @@ const NewRepairOrder = () => {
 
         {/* Step 3: Price Confirmation */}
         {step === 'price' && <div className="space-y-5 animate-fade-in">
-            <div className="text-center mb-6">
-              <div className="flex justify-center mb-4">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-success/20 to-success/5 rounded-full flex items-center justify-center animate-pulse-slow">
-                    <div className="w-14 h-14 bg-success/20 rounded-full flex items-center justify-center">
-                      <Wrench className="w-7 h-7 text-success" />
-                    </div>
-                  </div>
-                  <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-base px-2 py-0.5 rounded-full font-bold shadow-lg">
-                    ₪{getTotalPrice()}
-                  </div>
-                </div>
+            <div className="text-center mb-5">
+              <div className="inline-flex items-center gap-2 bg-success/10 text-success rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
+                <CheckCircle2 className="w-4 h-4" />
+                סיכום
               </div>
-              <h2 className="font-bold mb-2 text-3xl">סיכום הזמנה</h2>
-              <p className="text-muted-foreground text-lg">אישור מחיר התיקון</p>
+              <h2 className="font-extrabold mb-1 text-3xl">סיכום הזמנה</h2>
+              <p className="text-muted-foreground">אישור מחיר התיקון</p>
+              <div className="mt-3 inline-flex items-center bg-primary text-primary-foreground text-xl font-bold px-5 py-2 rounded-2xl shadow-md">
+                ₪{getTotalPrice()}
+              </div>
             </div>
 
             <Card className="p-5 bg-gradient-to-br from-card via-card to-primary/5 border-2 border-primary/20 shadow-lg">
