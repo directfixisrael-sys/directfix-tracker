@@ -7,7 +7,7 @@ interface Testimonial {
   name: string;
   text: string;
   date: string;
-  source: 'google' | 'midrag';
+  source: 'google' | 'midrag' | 'easy';
 }
 
 const testimonials: Testimonial[] = [
