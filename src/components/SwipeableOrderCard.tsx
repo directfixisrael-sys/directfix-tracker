@@ -96,7 +96,14 @@ const SwipeableOrderCard = ({ order, isSelected, onClick, onDelete, getStatusCol
           <span className="font-medium text-foreground text-base">{order.customerName}</span>
         </div>
         <p className="text-muted-foreground mb-1">{order.deviceType}</p>
-        <p className="text-sm text-muted-foreground">{order.customerPhone}</p>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">{order.customerPhone}</p>
+          {order.leadSource && (
+            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+              {order.leadSource}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
