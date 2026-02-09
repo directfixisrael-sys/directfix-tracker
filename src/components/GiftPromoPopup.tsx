@@ -105,7 +105,7 @@ const GiftPromoPopup = ({ promotionTitle, promotionDescription, promotionIcon, o
       {/* Backdrop */}
       <div
         className={cn(
-          "fixed inset-0 z-50 flex items-center justify-center px-6 transition-all duration-400",
+          "fixed inset-0 z-[100] flex items-start justify-center px-6 pt-[15vh] overflow-y-auto transition-all duration-400",
           phase === 'entering' ? "bg-black/0" : phase === 'exiting' ? "bg-black/0" : "bg-black/50"
         )}
         onClick={phase === 'visible' ? handleDismiss : undefined}
