@@ -600,7 +600,7 @@ const NewRepairOrder = () => {
 
       {/* Header */}
       <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border z-10">
-        <div className="flex items-center justify-between p-3">
+        <div className="flex items-center justify-between p-3 max-w-5xl mx-auto">
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={() => {
             if (step === 'model') navigate('/');else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
@@ -610,8 +610,16 @@ const NewRepairOrder = () => {
               <ArrowRight className="w-4 h-4" />
             </Button>
             <img src={logo} alt="Logo" className="h-7 w-auto" />
-            <h1 className="text-base font-semibold">הזמנת תיקון</h1>
+            <h1 className="text-base font-semibold hidden sm:block">הזמנת תיקון</h1>
           </div>
+
+          {/* Desktop: Smart search in header */}
+          {step === 'model' && (
+            <div className="hidden md:block flex-1 max-w-sm mx-4">
+              <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
+            </div>
+          )}
+
           <div className="flex items-center gap-1">
             <a href="tel:033106020" className="h-9 w-9 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center transition-colors" aria-label="התקשר 033106020">
               <Phone className="w-4 h-4" />
@@ -629,14 +637,13 @@ const NewRepairOrder = () => {
         </div>
         
         {/* Progress bar */}
-        {step !== 'success' && <div className="px-3 pb-2">
+        {step !== 'success' && <div className="px-3 pb-2 max-w-5xl mx-auto">
             <div className="flex gap-1.5">
               {['model', 'repair', 'price', 'schedule', 'details'].map((s, i) => {
             const allSteps = ['model', 'repair', 'bundle', 'price', 'schedule', 'details'];
             const displaySteps = ['model', 'repair', 'price', 'schedule', 'details'];
             const currentIdx = allSteps.indexOf(step);
             const displayIdx = displaySteps.indexOf(s);
-            // Map bundle to be between repair (1) and price (2)
             const adjustedCurrentIdx = currentIdx >= 3 ? currentIdx - 1 : currentIdx === 2 ? 1.5 : currentIdx;
             return <div key={s} className={`h-1 flex-1 rounded-full transition-all duration-500 ${adjustedCurrentIdx >= displayIdx ? 'bg-primary' : 'bg-muted'}`} />;
           })}
@@ -753,8 +760,10 @@ const NewRepairOrder = () => {
             {/* Testimonials Slider */}
             <TestimonialsSlider />
 
-            {/* Smart AI Search */}
-            <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
+            {/* Smart AI Search - mobile only */}
+            <div className="md:hidden">
+              <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
+            </div>
 
             <ModelPicker
               models={filteredModels}
