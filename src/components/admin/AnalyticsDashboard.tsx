@@ -11,7 +11,8 @@ import {
   Activity,
   RefreshCw,
   DollarSign,
-  BarChart3
+  BarChart3,
+  Target
 } from 'lucide-react';
 import { RepairOrder } from '@/types/repair';
 import { cn } from '@/lib/utils';
@@ -52,52 +53,97 @@ const PAGE_NAMES: Record<string, string> = {
   '/purchase': 'רכישת מכשיר',
 };
 
-// Live Visitors Card Component
+// Shopify-style Live Visitors Card
 const LiveVisitorsCard = ({ activeViewers }: { activeViewers: any[] }) => {
-  const { totalVisitors, visitorsByPage, visitors } = useLiveVisitors();
+  const { totalVisitors, visitorsByPage, visitorsBySource, visitors } = useLiveVisitors();
+  
+  // Determine device type from userAgent
+  const getDevice = (ua?: string) => {
+    if (!ua) return 'לא ידוע';
+    if (/mobile|android|iphone/i.test(ua)) return '📱 נייד';
+    if (/tablet|ipad/i.test(ua)) return '📱 טאבלט';
+    return '🖥️ מחשב';
+  };
   
   return (
-    <Card className="p-4 bg-gradient-to-br from-success/10 to-success/5 border-success/20">
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center animate-pulse">
-          <Activity className="w-6 h-6 text-success" />
-        </div>
-        <div>
-          <p className="text-sm text-muted-foreground">מבקרים כרגע באתר</p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-success">{totalVisitors}</span>
-            <span className="text-sm text-success">בזמן אמת</span>
+    <Card className="p-5 border-success/30 bg-card">
+      {/* Header - big green number */}
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="w-4 h-4 bg-success rounded-full animate-pulse" />
+            <div className="absolute inset-0 w-4 h-4 bg-success rounded-full animate-ping opacity-30" />
+          </div>
+          <div>
+            <span className="text-4xl font-bold text-success">{totalVisitors}</span>
+            <p className="text-muted-foreground">גולשים כרגע באתר</p>
           </div>
         </div>
       </div>
-      
-      {/* Visitors by page */}
-      {totalVisitors > 0 && (
-        <div className="mt-4 pt-4 border-t border-success/20">
-          <p className="text-xs text-muted-foreground mb-2">לפי עמוד:</p>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(visitorsByPage).map(([page, count]) => (
-              <span 
-                key={page} 
-                className="text-xs bg-success/20 text-success px-2 py-1 rounded-full flex items-center gap-1"
-              >
-                <Eye className="w-3 h-3" />
-                {PAGE_NAMES[page] || page}: {count}
-              </span>
+
+      {/* Visitor list - Shopify style */}
+      {visitors.length > 0 && (
+        <div className="border border-border rounded-xl overflow-hidden mb-4">
+          <div className="bg-muted/50 px-4 py-2 border-b border-border">
+            <div className="grid grid-cols-4 text-xs font-medium text-muted-foreground">
+              <span>מבקר</span>
+              <span>עמוד</span>
+              <span>מקור</span>
+              <span>מכשיר</span>
+            </div>
+          </div>
+          <div className="divide-y divide-border max-h-48 overflow-y-auto">
+            {visitors.map((v, i) => (
+              <div key={v.visitorId} className="px-4 py-3 grid grid-cols-4 items-center text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-success" />
+                  <span className="text-muted-foreground">מבקר {i + 1}</span>
+                </div>
+                <span className="truncate">{PAGE_NAMES[v.page] || v.page}</span>
+                <span className="text-xs truncate text-primary font-medium">{v.leadSource || 'ישיר'}</span>
+                <span className="text-xs text-muted-foreground">{getDevice(v.userAgent)}</span>
+              </div>
             ))}
           </div>
         </div>
       )}
+
+      {/* Sources breakdown */}
+      {Object.keys(visitorsBySource).length > 0 && (
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {Object.entries(visitorsBySource).map(([source, count]) => (
+            <div key={source} className="flex items-center justify-between bg-muted/50 px-3 py-2 rounded-lg">
+              <span className="text-sm truncate">{source}</span>
+              <span className="font-bold text-primary">{count}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Pages breakdown */}
+      {Object.keys(visitorsByPage).length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {Object.entries(visitorsByPage).map(([page, count]) => (
+            <span 
+              key={page} 
+              className="text-xs bg-success/10 text-success px-3 py-1.5 rounded-full flex items-center gap-1.5 font-medium"
+            >
+              <Eye className="w-3 h-3" />
+              {PAGE_NAMES[page] || page}: {count}
+            </span>
+          ))}
+        </div>
+      )}
       
-      {/* Order viewers (existing functionality) */}
+      {/* Order viewers */}
       {activeViewers.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-success/20">
-          <p className="text-xs text-muted-foreground mb-2">לקוחות צופים בהזמנות:</p>
+        <div className="mt-4 pt-4 border-t border-border">
+          <p className="text-xs text-muted-foreground mb-2">👁️ לקוחות צופים בהזמנות:</p>
           <div className="flex flex-wrap gap-2">
             {activeViewers.map(viewer => (
               <span 
                 key={viewer.id} 
-                className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full"
+                className="text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-full font-medium"
               >
                 {viewer.customerName}
               </span>
@@ -300,6 +346,90 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
 
       {/* Real-time Visitors Section */}
       <LiveVisitorsCard activeViewers={activeViewers} />
+
+      {/* Lead Source Stats */}
+      {filteredOrders.some(o => o.leadSource) && (
+        <Card className="p-4">
+          <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+            <Target className="w-5 h-5 text-primary" />
+            מקורות לידים ({dateRange.label})
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={(() => {
+                      const sources: Record<string, number> = {};
+                      filteredOrders.forEach(o => {
+                        const src = o.leadSource || 'לא ידוע';
+                        sources[src] = (sources[src] || 0) + 1;
+                      });
+                      return Object.entries(sources)
+                        .map(([name, value]) => ({ name, value }))
+                        .sort((a, b) => b.value - a.value);
+                    })()}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={40}
+                    outerRadius={75}
+                    paddingAngle={2}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                    labelLine={false}
+                  >
+                    {(() => {
+                      const sources: Record<string, number> = {};
+                      filteredOrders.forEach(o => {
+                        const src = o.leadSource || 'לא ידוע';
+                        sources[src] = (sources[src] || 0) + 1;
+                      });
+                      return Object.keys(sources).map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ));
+                    })()}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="space-y-3">
+              {(() => {
+                const sources: Record<string, number> = {};
+                filteredOrders.forEach(o => {
+                  const src = o.leadSource || 'לא ידוע';
+                  sources[src] = (sources[src] || 0) + 1;
+                });
+                return Object.entries(sources)
+                  .sort(([, a], [, b]) => b - a)
+                  .map(([source, count], index) => (
+                    <div key={source} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                        />
+                        <span className="text-sm">{source}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold">{count}</span>
+                        <span className="text-xs text-muted-foreground">
+                          ({((count / filteredOrders.length) * 100).toFixed(0)}%)
+                        </span>
+                      </div>
+                    </div>
+                  ));
+              })()}
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Revenue Report Section */}
       <Card className="p-4 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
