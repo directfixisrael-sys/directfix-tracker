@@ -96,10 +96,10 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
                           }
                         }}
                         className={cn(
-                          "py-2.5 px-3 rounded-xl text-center transition-all active:scale-[0.97] border",
+                          "py-3 px-3 rounded-2xl text-center transition-all active:scale-[0.97] border-2",
                           isSelected
-                            ? "border-primary bg-primary/5 ring-1 ring-primary/30"
-                            : "border-border hover:border-primary/30 hover:bg-muted/30"
+                            ? "border-primary bg-primary/8 ring-1 ring-primary/20 shadow-sm"
+                            : "border-border hover:border-primary/30 hover:bg-muted/40"
                         )}
                       >
                         <span className="font-medium text-sm block">{model.name}</span>
