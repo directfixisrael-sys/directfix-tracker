@@ -64,7 +64,8 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
           <img 
             src={logo} 
             alt="Direct Fix Logo" 
-            className="h-10 w-auto"
+            className="h-10 w-auto cursor-pointer"
+            onClick={() => navigate('/')}
           />
         </div>
       </div>
