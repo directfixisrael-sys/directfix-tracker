@@ -1428,7 +1428,6 @@ ${trackingUrl}
               <img src={logo} alt="Logo" className="h-8 w-auto" />
               <span className="font-bold text-sidebar-foreground">דיירקט פיקס</span>
             </a>
-            </div>
             <button
               onClick={handleManualRefresh}
               className="w-8 h-8 flex items-center justify-center text-sidebar-foreground hover:bg-sidebar-accent rounded-lg transition-colors"
