@@ -716,6 +716,17 @@ const NewRepairOrder = () => {
             </div>
           </div>}
 
+        {/* Gift Secured Badge */}
+        {step === 'model' && giftClaimed && activePromotion && (
+          <div className="flex items-center justify-center animate-fade-in mb-4">
+            <div className="inline-flex items-center gap-2 bg-success/10 border border-success/20 text-success rounded-full px-4 py-2 text-sm font-semibold shadow-sm">
+              <Gift className="w-4 h-4" />
+              <span>🎁 {activePromotion.title} — מובטח לך!</span>
+              <Check className="w-4 h-4" />
+            </div>
+          </div>
+        )}
+
         {/* Step 1: Select Model - Enhanced Welcome */}
         {step === 'model' && <div className="space-y-8 animate-fade-in">
             {/* Hero Welcome Section */}
