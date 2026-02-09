@@ -1299,6 +1299,13 @@ const NewRepairOrder = () => {
           </div>}
       </div>
 
+      {/* Disclaimer */}
+      {step === 'model' && <div className="text-center px-6 py-3">
+          <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+            * זמני ההגעה עשויים להשתנות בהתאם לזמינות הטכנאים ולמיקום הלקוח.
+          </p>
+        </div>}
+
       {/* Sticky Footer with Action Buttons */}
       {step !== 'success' && step !== 'model' && step !== 'repair' && <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border/50 p-4 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
           {step === 'price' && <Button onClick={handlePriceConfirm} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
