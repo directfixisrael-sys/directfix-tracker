@@ -721,10 +721,6 @@ const NewRepairOrder = () => {
         {step === 'model' && <div className="space-y-8 animate-fade-in">
             {/* Hero Welcome Section */}
             <div className="text-center py-4">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-semibold mb-4">
-                <Wrench className="w-4 h-4" />
-                תיקון עד הבית
-              </div>
               <h1 className="text-4xl font-extrabold mb-3 tracking-tight">
                 מה נתקן היום?
               </h1>
