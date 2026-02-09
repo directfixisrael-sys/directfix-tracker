@@ -129,7 +129,7 @@ const NewRepairOrder = () => {
   const [showImageUploadOption, setShowImageUploadOption] = useState(false);
   const [pendingRepair, setPendingRepair] = useState<RepairType | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const contentRef = useRef<HTMLDivElement>(null);
   // Privacy consent
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
 
