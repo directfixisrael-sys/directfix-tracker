@@ -516,6 +516,7 @@ const NewRepairOrder = () => {
       if (deviceImages.length > 0) {
         notes.push(`תמונות מכשיר: ${deviceImages.length} תמונות צורפו`);
       }
+      const leadSource = getLeadSource();
       await addOrder({
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
@@ -526,8 +527,9 @@ const NewRepairOrder = () => {
         status: 'pending',
         accessories: [],
         notes,
-        wantsPromotions: false
-      });
+        wantsPromotions: false,
+        leadSource: leadSource.source,
+      } as any);
 
       // Send notifications (email + WhatsApp)
       try {

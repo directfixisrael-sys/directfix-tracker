@@ -1,0 +1,1 @@
+ALTER TABLE public.orders ADD COLUMN lead_source text DEFAULT NULL;

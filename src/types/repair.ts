@@ -34,6 +34,7 @@ export interface RepairOrder {
   invoiceLink?: string;
   paymentLink?: string;
   paymentStatus?: PaymentStatus;
+  leadSource?: string;
 }
 
 export interface Accessory {
