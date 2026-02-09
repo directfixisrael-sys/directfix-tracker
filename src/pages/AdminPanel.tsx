@@ -1422,6 +1422,18 @@ ${trackingUrl}
 
         <nav className="flex-1 p-4 space-y-2">
           <button 
+            onClick={() => setActiveTab('dashboard')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'dashboard' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <Activity className="w-5 h-5" />
+            <span>דשבורד</span>
+          </button>
+          <button 
             onClick={() => setActiveTab('orders')}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
