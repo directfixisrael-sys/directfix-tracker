@@ -581,16 +581,18 @@ const NewRepairOrder = () => {
   // Loading state
   if (isLoading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-3" />
-          <p className="text-muted-foreground text-sm">טוען...</p>
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto animate-pulse">
+            <Wrench className="w-8 h-8 text-primary" />
+          </div>
+          <p className="text-muted-foreground text-sm font-medium">טוען...</p>
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/40 flex flex-col">
-      {/* Promotion Strip - E-commerce style */}
+  return <div className="min-h-screen bg-background flex flex-col">
+      {/* Promotion Strip */}
       {activePromotion && (
-        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground text-center py-2 text-xs font-medium shadow-sm">
+        <div className="bg-foreground text-background text-center py-2.5 text-xs font-semibold tracking-wide">
           <span>{getPromotionIcon(activePromotion.icon)} {activePromotion.title} — {activePromotion.description}</span>
           {activePromotion.value && activePromotion.value > 0 && (
             <span className="mr-1 font-bold"> | חינם! 🎉</span>
@@ -598,48 +600,51 @@ const NewRepairOrder = () => {
         </div>
       )}
 
-      {/* Header */}
-      <div className="sticky top-0 bg-card/90 backdrop-blur-lg border-b border-border/50 z-10 shadow-sm">
+      {/* Header - Clean & Minimal */}
+      <div className="sticky top-0 bg-background/80 backdrop-blur-xl border-b border-border/40 z-10">
         <div className="flex items-center justify-between p-3 max-w-5xl mx-auto">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => {
+          <div className="flex items-center gap-3">
+            <button onClick={() => {
             if (step === 'model') navigate('/');else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
               if (currentBundle) goToStep('bundle');else goToStep('repair');
             } else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
-          }} className="rounded-full h-9 w-9">
+          }} className="h-10 w-10 rounded-2xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors">
               <ArrowRight className="w-4 h-4" />
-            </Button>
+            </button>
             <img src={logo} alt="Logo" className="h-7 w-auto" />
-            <h1 className="text-base font-semibold hidden sm:block">הזמנת תיקון</h1>
           </div>
 
-
-          <div className="flex items-center gap-1">
-            <a href="tel:033106020" className="h-9 w-9 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center transition-colors" aria-label="התקשר 033106020">
+          <div className="flex items-center gap-1.5">
+            <a href="tel:033106020" className="h-9 w-9 rounded-2xl bg-accent text-accent-foreground flex items-center justify-center transition-colors" aria-label="התקשר 033106020">
               <Phone className="w-4 h-4" />
             </a>
             <Button variant="ghost" size="icon" onClick={() => {
             const event = new CustomEvent('open-accessibility-widget');
             window.dispatchEvent(event);
-          }} className="h-9 w-9 rounded-full bg-blue-500 text-white hover:bg-blue-600 hover:text-white">
+          }} className="h-9 w-9 rounded-2xl" aria-label="נגישות">
               <Accessibility className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-full">
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-2xl">
               {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
           </div>
         </div>
         
-        {/* Progress bar */}
-        {step !== 'success' && <div className="px-3 pb-2 max-w-5xl mx-auto">
-            <div className="flex gap-1.5">
+        {/* Step Indicator - Pill style */}
+        {step !== 'success' && <div className="px-4 pb-3 max-w-5xl mx-auto">
+            <div className="flex gap-2 items-center">
               {['model', 'repair', 'price', 'schedule', 'details'].map((s, i) => {
+            const labels = ['דגם', 'תיקון', 'מחיר', 'מועד', 'פרטים'];
             const allSteps = ['model', 'repair', 'bundle', 'price', 'schedule', 'details'];
             const displaySteps = ['model', 'repair', 'price', 'schedule', 'details'];
             const currentIdx = allSteps.indexOf(step);
             const displayIdx = displaySteps.indexOf(s);
             const adjustedCurrentIdx = currentIdx >= 3 ? currentIdx - 1 : currentIdx === 2 ? 1.5 : currentIdx;
-            return <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${adjustedCurrentIdx >= displayIdx ? 'bg-gradient-to-r from-primary to-accent shadow-sm' : 'bg-muted'}`} />;
+            const isActive = adjustedCurrentIdx >= displayIdx;
+            const isCurrent = Math.floor(adjustedCurrentIdx) === displayIdx;
+            return <div key={s} className={`flex-1 text-center py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${isCurrent ? 'bg-primary text-primary-foreground shadow-md' : isActive ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                  {labels[i]}
+                </div>;
           })}
             </div>
           </div>}
