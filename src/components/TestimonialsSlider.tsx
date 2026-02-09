@@ -1,12 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
 import { Star, CheckCircle2 } from 'lucide-react';
 import midragLogo from '@/assets/midrag-logo.png';
+import easyLogo from '@/assets/easy-logo.png';
 
 interface Testimonial {
   name: string;
   text: string;
   date: string;
-  source: 'google' | 'midrag';
+  source: 'google' | 'midrag' | 'easy';
 }
 
 const testimonials: Testimonial[] = [
@@ -33,6 +34,12 @@ const testimonials: Testimonial[] = [
     text: 'הגיע עד הבית, הוגן ומקסים. תקתק את העבודה.',
     date: 'אוקטובר 2025',
     source: 'midrag',
+  },
+  {
+    name: 'דני מ.',
+    text: 'שירות מעולה, הגיע מהר ותיקן במקום. מאוד מרוצה!',
+    date: 'ינואר 2026',
+    source: 'easy',
   },
 ];
 
@@ -101,6 +108,11 @@ const TestimonialsSlider = () => {
                   <>
                     <GoogleIcon />
                     <span className="text-[10px] text-muted-foreground">Google</span>
+                  </>
+                ) : t.source === 'easy' ? (
+                  <>
+                    <img src={easyLogo} alt="Easy" className="h-3.5 w-3.5 rounded-full object-cover" />
+                    <span className="text-[10px] text-muted-foreground">Easy</span>
                   </>
                 ) : (
                   <>
