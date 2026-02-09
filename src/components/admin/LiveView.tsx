@@ -442,7 +442,7 @@ const LiveView = () => {
                 const pct = totalVisitors > 0 ? Math.round((count / totalVisitors) * 100) : 0;
                 return (
                   <div key={source} className="flex items-center gap-3">
-                    <span className="text-sm font-medium w-24 truncate">{source}</span>
+                    <span className="text-sm font-medium min-w-[100px] max-w-[160px]">{source}</span>
                     <div className="flex-1 bg-muted rounded-full h-3 overflow-hidden">
                       <div 
                         className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full transition-all duration-500"

@@ -33,32 +33,56 @@ export const VisitorTracker = () => {
   const location = useLocation();
   const channelRef = useRef<RealtimeChannel | null>(null);
   const isSubscribedRef = useRef(false);
+  const stepRef = useRef<string | null>(null);
+  const pathnameRef = useRef(location.pathname);
+
+  // Keep pathname ref in sync
+  useEffect(() => {
+    pathnameRef.current = location.pathname;
+  }, [location.pathname]);
 
   // Listen for step changes from NewRepairOrder
-  const stepRef = useRef<string | null>(null);
-
   useEffect(() => {
-    const handleStepChange = (e: CustomEvent) => {
-      stepRef.current = e.detail?.step || null;
+    const handleStepChange = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      stepRef.current = detail?.step || null;
       // Update presence with new step
       if (channelRef.current && isSubscribedRef.current) {
         const visitorId = getVisitorId();
         const leadSource = getLeadSource();
         channelRef.current.track({
           visitorId,
-          page: location.pathname,
+          page: pathnameRef.current,
           step: stepRef.current,
           enteredAt: new Date().toISOString(),
           userAgent: navigator.userAgent,
           leadSource: leadSource.source,
           language: navigator.language,
         });
+
+        // Also broadcast step activity
+        const activityChannel = supabase.channel(`step-activity-${Date.now()}`);
+        activityChannel.subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            activityChannel.send({
+              type: 'broadcast',
+              event: 'activity',
+              payload: {
+                type: stepRef.current === 'success' ? 'order_completed' : 'model_selected',
+                visitorId,
+                page: pathnameRef.current,
+                detail: stepRef.current,
+              },
+            });
+            setTimeout(() => supabase.removeChannel(activityChannel), 2000);
+          }
+        });
       }
     };
 
-    window.addEventListener('repair-step-change' as any, handleStepChange);
-    return () => window.removeEventListener('repair-step-change' as any, handleStepChange);
-  }, [location.pathname]);
+    window.addEventListener('repair-step-change', handleStepChange);
+    return () => window.removeEventListener('repair-step-change', handleStepChange);
+  }, []);
 
   useEffect(() => {
     const visitorId = getVisitorId();
