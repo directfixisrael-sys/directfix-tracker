@@ -651,13 +651,6 @@ const NewRepairOrder = () => {
           </div>}
       </div>
 
-      {/* Disclaimer */}
-      {step === 'model' && <div className="text-center px-6 py-3">
-          <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
-            * זמני ההגעה עשויים להשתנות בהתאם לזמינות הטכנאים ולמיקום הלקוח.
-          </p>
-        </div>}
-
       {/* Hidden file input for image upload */}
       <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
 
