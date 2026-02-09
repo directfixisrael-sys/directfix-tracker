@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Star, CheckCircle2 } from 'lucide-react';
 import midragLogo from '@/assets/midrag-logo.png';
+import easyLogo from '@/assets/easy-logo.png';
 
 interface Testimonial {
   name: string;
