@@ -66,7 +66,7 @@ export const gaSelectSchedule = (dateStr: string, timeSlot: string) =>
 export const gaFillDetails = () =>
   gaEvent('fill_details', { event_category: 'repair_funnel', funnel_step: 5 });
 
-export const gaConversion = (value: number, modelName: string, repairType: string) => {
+export const gaConversion = (value: number, modelName: string, repairType: string, orderId?: string) => {
   gaEvent('purchase', {
     currency: 'ILS',
     value,
@@ -77,6 +77,13 @@ export const gaConversion = (value: number, modelName: string, repairType: strin
     event_label: `${modelName} - ${repairType}`,
     value,
     currency: 'ILS',
+  });
+  // Google Ads conversion
+  gtag('event', 'conversion', {
+    send_to: 'AW-11096876695/MrY6CJDclJsYEJfNs6sp',
+    value,
+    currency: 'ILS',
+    transaction_id: orderId || '',
   });
 };
 
