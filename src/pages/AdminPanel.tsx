@@ -356,6 +356,8 @@ ${trackingUrl}
   // Render content based on active tab
   const renderContent = () => {
     switch (activeTab) {
+      case 'dashboard':
+        return <AdminDashboard orders={orders} />;
       case 'messages':
         // Group messages by order for WhatsApp-style conversations
         const messagesByOrder = sortedMessages.reduce((acc, msg) => {
