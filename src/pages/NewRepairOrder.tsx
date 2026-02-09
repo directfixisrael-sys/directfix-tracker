@@ -914,7 +914,7 @@ const NewRepairOrder = () => {
               <p className="text-muted-foreground text-lg">אישור מחיר התיקון</p>
             </div>
 
-            <Card className="p-4 bg-gradient-to-br from-card to-muted/30">
+            <Card className="p-5 bg-gradient-to-br from-card via-card to-primary/5 border-2 border-primary/20 shadow-lg">
               <div className="space-y-3">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">דגם</span>
