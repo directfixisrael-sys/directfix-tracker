@@ -80,6 +80,7 @@ export const useLiveVisitors = () => {
           visitors.push({
             visitorId: presence.visitorId,
             page: presence.page,
+            step: presence.step || null,
             enteredAt: presence.enteredAt,
             userAgent: presence.userAgent,
             leadSource: presence.leadSource,
