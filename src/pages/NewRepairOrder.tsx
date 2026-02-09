@@ -1303,7 +1303,7 @@ const NewRepairOrder = () => {
               אישור ובחירת מועד לטכנאי
             </Button>}
           
-          {step === 'schedule' && <Button onClick={handleScheduleConfirm} disabled={!selectedDate || !selectedTimeSlot} className="w-full h-12 text-base rounded-xl">
+          {step === 'schedule' && <Button onClick={handleScheduleConfirm} disabled={!selectedDate || !selectedTimeSlot} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl bg-gradient-to-r from-primary to-primary/90">
               המשך לפרטים
             </Button>}
           
