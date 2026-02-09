@@ -11,6 +11,7 @@ interface HeaderProps {
 
 const Header = ({ showBackButton, onBack }: HeaderProps) => {
   const { resolvedTheme, setTheme } = useTheme();
+  const navigate = useNavigate();
 
   const toggleTheme = () => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
