@@ -1143,15 +1143,14 @@ const NewRepairOrder = () => {
           </div>}
 
         {/* Step 5: Customer Details */}
-        {step === 'details' && <div className="space-y-4 animate-fade-in">
-            <div className="text-center mb-6">
-              <div className="flex justify-center mb-3">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center">
-                  <MapPin className="w-10 h-10 text-primary" />
-                </div>
+        {step === 'details' && <div className="space-y-5 animate-fade-in">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 bg-accent/10 text-accent rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
+                <MapPin className="w-4 h-4" />
+                פרטים אחרונים
               </div>
-              <h2 className="text-3xl font-bold mb-2">פרטי הזמנה</h2>
-              <p className="text-muted-foreground text-lg">לאן לשלוח את הטכנאי?</p>
+              <h2 className="text-3xl font-extrabold mb-1">לאן נגיע?</h2>
+              <p className="text-muted-foreground">מלאו את הפרטים ואנחנו בדרך</p>
             </div>
 
             <div className="space-y-4">
