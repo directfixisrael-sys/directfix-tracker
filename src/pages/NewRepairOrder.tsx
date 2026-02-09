@@ -22,6 +22,7 @@ import TestimonialsSlider from '@/components/TestimonialsSlider';
 import ModelPicker from '@/components/ModelPicker';
 import GiftPromoPopup from '@/components/GiftPromoPopup';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
+import { getLeadSource } from '@/lib/leadSource';
 
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
