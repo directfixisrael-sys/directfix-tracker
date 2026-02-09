@@ -691,9 +691,6 @@ const NewRepairOrder = () => {
               <h1 className="text-5xl font-bold mb-4 tracking-tight">
                 הזמנת תיקון
               </h1>
-              <p className="text-2xl text-muted-foreground">
-                בחרו את הדגם שלכם
-              </p>
               <div className="flex items-center justify-center gap-4 mt-4">
                 <Dialog>
                   <DialogTrigger asChild>
