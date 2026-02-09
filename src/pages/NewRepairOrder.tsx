@@ -181,6 +181,13 @@ const NewRepairOrder = () => {
         } = await supabase.from('promotions').select('*').eq('is_active', true).limit(1).maybeSingle();
         if (promotionData) {
           setActivePromotion(promotionData);
+          // Show gift popup if not already claimed this session
+          const alreadyClaimed = sessionStorage.getItem('gift_promo_claimed');
+          if (!alreadyClaimed) {
+            setTimeout(() => setShowGiftPopup(true), 800);
+          } else {
+            setGiftClaimed(true);
+          }
         }
       } catch (error) {
         console.error('Error loading data:', error);
