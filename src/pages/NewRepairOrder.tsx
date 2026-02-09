@@ -20,6 +20,7 @@ import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
 import SmartRepairInput from '@/components/SmartRepairInput';
 import TestimonialsSlider from '@/components/TestimonialsSlider';
 import ModelPicker from '@/components/ModelPicker';
+import GiftPromoPopup from '@/components/GiftPromoPopup';
 
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
