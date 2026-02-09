@@ -1452,6 +1452,21 @@ ${trackingUrl}
             <span>דשבורד</span>
           </button>
           <button 
+            onClick={() => setActiveTab('live')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'live' 
+                ? "bg-success/10 text-success" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <div className="relative">
+              <Eye className="w-5 h-5" />
+              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-success rounded-full animate-pulse" />
+            </div>
+            <span>לייב</span>
+          </button>
+          <button 
             onClick={() => setActiveTab('orders')}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
