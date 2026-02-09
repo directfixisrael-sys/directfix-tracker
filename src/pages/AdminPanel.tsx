@@ -63,6 +63,7 @@ import PromotionsManagement from '@/components/admin/PromotionsManagement';
 import CouponManagement from '@/components/admin/CouponManagement';
 import BundleManagement from '@/components/admin/BundleManagement';
 import AdminDashboard from '@/components/admin/AdminDashboard';
+import LiveView from '@/components/admin/LiveView';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
