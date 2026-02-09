@@ -694,40 +694,66 @@ const NewRepairOrder = () => {
               <p className="text-2xl text-muted-foreground">
                 בחרו את הדגם שלכם
               </p>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <button className="mt-4 text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5 mx-auto text-sm font-medium">
-                    <HelpCircle className="w-4 h-4" />
-                    איך השירות עובד?
-                  </button>
-                </DialogTrigger>
-                <DialogContent className="max-w-sm">
-                  <DialogHeader>
-                    <DialogTitle className="text-right text-lg">איך זה עובד?</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 text-right">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-sm font-bold text-primary">1</span>
+              <div className="flex items-center justify-center gap-4 mt-4">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5 text-sm font-medium">
+                      <HelpCircle className="w-4 h-4" />
+                      איך השירות עובד?
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-sm">
+                    <DialogHeader>
+                      <DialogTitle className="text-right text-lg">איך זה עובד?</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 text-right">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-primary">1</span>
+                        </div>
+                        <p className="text-sm">בוחרים דגם וסוג תיקון וקובעים מועד שנוח לכם</p>
                       </div>
-                      <p className="text-sm">בוחרים דגם וסוג תיקון וקובעים מועד שנוח לכם</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-sm font-bold text-primary">2</span>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-primary">2</span>
+                        </div>
+                        <p className="text-sm">טכנאי מוסמך מגיע אליכם עד הבית במועד שנקבע</p>
                       </div>
-                      <p className="text-sm">טכנאי מוסמך מגיע אליכם עד הבית במועד שנקבע</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-sm font-bold text-primary">3</span>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-primary">3</span>
+                        </div>
+                        <p className="text-sm">התיקון מתבצע במקום תוך דקות — עם אחריות מלאה</p>
                       </div>
-                      <p className="text-sm">התיקון מתבצע במקום תוך דקות — עם אחריות מלאה</p>
                     </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                  </DialogContent>
+                </Dialog>
+
+                <span className="text-muted-foreground/40">|</span>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5 text-sm font-medium">
+                      <HelpCircle className="w-4 h-4" />
+                      מי אנחנו?
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-sm">
+                    <DialogHeader>
+                      <DialogTitle className="text-right text-lg">מי אנחנו?</DialogTitle>
+                    </DialogHeader>
+                    <div className="text-right space-y-3">
+                      <p className="text-sm leading-relaxed">
+                        דיירקט פיקס הינה חברה שמציעה שירותי תיקון מכשירי אייפון עד הבית. חברתינו מתמחה בתיקוני מסכים וסוללות, ופעילה כבר מעל 13 שנים.
+                      </p>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
+
+            {/* Testimonials Slider */}
+            <TestimonialsSlider />
 
             {/* Smart AI Search */}
             <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
@@ -753,9 +779,6 @@ const NewRepairOrder = () => {
                   </Card>;
           })}
             </div>
-
-            {/* Testimonials Slider */}
-            <TestimonialsSlider />
           </div>}
 
         {/* Step 2: Select Repair Type */}
