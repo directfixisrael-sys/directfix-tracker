@@ -11,6 +11,7 @@ import AdminPanel from "./pages/AdminPanel";
 import NewRepairOrder from "./pages/NewRepairOrder";
 import DevicePurchase from "./pages/DevicePurchase";
 import NotFound from "./pages/NotFound";
+import MinimalFooter from "./components/MinimalFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { VisitorTracker } from "./components/VisitorTracker";
 
