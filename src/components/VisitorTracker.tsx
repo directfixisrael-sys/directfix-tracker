@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { gaPageView } from '@/lib/gtag';
+import { getLeadSource } from '@/lib/leadSource';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 // Generate a unique visitor ID for this session
@@ -14,6 +15,20 @@ const getVisitorId = () => {
   return visitorId;
 };
 
+// Store visit timestamp for 30-min history
+const recordVisitTimestamp = () => {
+  const key = 'visit_timestamps';
+  const now = Date.now();
+  try {
+    const stored = JSON.parse(localStorage.getItem(key) || '[]') as number[];
+    // Keep only last 30 minutes
+    const thirtyMinAgo = now - 30 * 60 * 1000;
+    const filtered = stored.filter(t => t > thirtyMinAgo);
+    filtered.push(now);
+    localStorage.setItem(key, JSON.stringify(filtered));
+  } catch { /* ignore */ }
+};
+
 export const VisitorTracker = () => {
   const location = useLocation();
   const channelRef = useRef<RealtimeChannel | null>(null);
@@ -21,10 +36,10 @@ export const VisitorTracker = () => {
 
   useEffect(() => {
     const visitorId = getVisitorId();
+    const leadSource = getLeadSource();
     
-    console.log('[VisitorTracker] Initializing for visitor:', visitorId);
+    recordVisitTimestamp();
 
-    // Create channel with visitor ID as the presence key
     const channel = supabase.channel('live-visitors-presence', {
       config: {
         presence: {
@@ -36,44 +51,41 @@ export const VisitorTracker = () => {
     channelRef.current = channel;
 
     channel.subscribe(async (status) => {
-      console.log('[VisitorTracker] Subscription status:', status);
-      
       if (status === 'SUBSCRIBED') {
         isSubscribedRef.current = true;
         
-        // Track presence
-        const trackResult = await channel.track({
+        await channel.track({
           visitorId,
           page: location.pathname,
           enteredAt: new Date().toISOString(),
           userAgent: navigator.userAgent,
+          leadSource: leadSource.source,
+          language: navigator.language,
         });
-        
-        console.log('[VisitorTracker] Track result:', trackResult);
       }
     });
 
     return () => {
-      console.log('[VisitorTracker] Cleaning up channel');
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
       }
     };
-  }, []); // Only run once on mount
+  }, []);
 
   // Update presence when route changes
   useEffect(() => {
     const updatePresence = async () => {
       if (channelRef.current && isSubscribedRef.current) {
         const visitorId = getVisitorId();
-        
-        console.log('[VisitorTracker] Updating presence for page:', location.pathname);
+        const leadSource = getLeadSource();
         
         await channelRef.current.track({
           visitorId,
           page: location.pathname,
           enteredAt: new Date().toISOString(),
           userAgent: navigator.userAgent,
+          leadSource: leadSource.source,
+          language: navigator.language,
         });
       }
     };
