@@ -297,8 +297,12 @@ const LiveView = () => {
                       <span className="font-medium text-sm">מבקר #{i + 1}</span>
                       <span className="text-xs text-muted-foreground">{getDeviceName(v.userAgent)}</span>
                     </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-primary font-medium">{PAGE_NAMES[v.page] || v.page}</span>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      <span className="text-xs text-primary font-medium">
+                        {v.page === '/order' && v.step 
+                          ? STEP_NAMES[v.step] || PAGE_NAMES[v.page] 
+                          : PAGE_NAMES[v.page] || v.page}
+                      </span>
                       {v.leadSource && v.leadSource !== 'direct' && (
                         <>
                           <span className="text-muted-foreground">·</span>
