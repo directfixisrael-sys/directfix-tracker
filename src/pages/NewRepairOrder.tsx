@@ -17,6 +17,7 @@ import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
 import { gaSelectModel, gaSelectRepair, gaBundleDecision, gaConfirmPrice, gaSelectSchedule, gaFillDetails, gaConversion, gaCouponApplied, gaStartOrder } from '@/lib/gtag';
 import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
 import SmartRepairInput from '@/components/SmartRepairInput';
+import TestimonialsSlider from '@/components/TestimonialsSlider';
 
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
