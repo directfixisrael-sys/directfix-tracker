@@ -1160,8 +1160,8 @@ const NewRepairOrder = () => {
               </div>
 
               <div>
-                <label className="block text-base font-medium mb-2">מספר טלפון</label>
-                <Input placeholder="050-0000000" value={customerPhone} onChange={e => setCustomerPhone(formatPhone(e.target.value))} type="tel" className="h-14 text-lg rounded-xl text-right" dir="ltr" />
+                <label className="block text-sm font-bold mb-1.5">מספר טלפון</label>
+                <Input placeholder="050-0000000" value={customerPhone} onChange={e => setCustomerPhone(formatPhone(e.target.value))} type="tel" className="h-13 text-base rounded-2xl text-right bg-muted/40 border-border/50 focus:bg-card" dir="ltr" />
               </div>
 
               <div>
