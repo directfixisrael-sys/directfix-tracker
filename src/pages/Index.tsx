@@ -41,7 +41,7 @@ const Index = () => {
           <div className="space-y-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
             <Button 
               size="lg" 
-              className="w-full h-16 text-lg font-bold rounded-2xl gap-3 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group"
+              className="w-full h-16 text-lg font-bold rounded-2xl gap-3 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group bg-gradient-to-r from-primary to-primary/85"
               onClick={() => navigate('/order')}
             >
               <div className="w-10 h-10 bg-primary-foreground/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
