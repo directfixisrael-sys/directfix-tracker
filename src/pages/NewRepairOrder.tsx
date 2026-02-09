@@ -1165,8 +1165,8 @@ const NewRepairOrder = () => {
               </div>
 
               <div>
-                <label className="block text-base font-medium mb-2">כתובת (עיר, רחוב, מספר בית/דירה)</label>
-                <Input placeholder="למשל: הרצליה, סוקולוב 15, דירה 4" value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="h-14 text-lg rounded-xl" />
+                <label className="block text-sm font-bold mb-1.5">כתובת</label>
+                <Input placeholder="עיר, רחוב, מספר בית/דירה" value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="h-13 text-base rounded-2xl bg-muted/40 border-border/50 focus:bg-card" />
                 <div className="mt-2 p-3 bg-primary/10 border border-primary/20 rounded-lg flex items-center gap-2">
                   <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-4 h-4 text-primary" />
