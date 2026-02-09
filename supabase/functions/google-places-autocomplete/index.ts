@@ -36,16 +36,13 @@ serve(async (req) => {
       params.set('sessiontoken', sessionToken);
     }
 
-    const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/autocomplete/json?${params}`
-    );
+    const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?${params}`;
+    console.log('Fetching:', url.replace(apiKey, 'REDACTED'));
 
+    const response = await fetch(url);
     const data = await response.json();
-
-    const predictions = (data.predictions || []).map((p: any) => ({
-      description: p.description,
-      place_id: p.place_id,
-    }));
+    console.log('Google API status:', data.status, 'predictions:', data.predictions?.length || 0);
+    if (data.error_message) console.error('Google API error:', data.error_message);
 
     return new Response(JSON.stringify({ predictions }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
