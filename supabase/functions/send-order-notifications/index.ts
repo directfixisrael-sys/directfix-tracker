@@ -163,10 +163,22 @@ const handler = async (req: Request): Promise<Response> => {
       ` : ''}
       
       ${orderData.promotionTitle ? `
-      <div style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border-radius: 12px; padding: 15px; text-align: center;">
+      <div style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px;">
         <p style="margin: 0; color: white; font-weight: bold;">🎁 ${orderData.promotionTitle}</p>
       </div>
       ` : ''}
+
+      ${orderData.leadSource ? `
+      <div style="background: #e0f2fe; border-radius: 12px; padding: 20px; border: 1px solid #38bdf8; text-align: right;">
+        <h2 style="margin: 0 0 15px 0; color: #0369a1; font-size: 18px; text-align: right;">📊 מקור הליד</h2>
+        <p style="margin: 8px 0; color: #0c4a6e; font-size: 16px; font-weight: 600; text-align: right;">${orderData.leadSource}</p>
+        ${orderData.leadSourceDetails?.utm_campaign ? `<p style="margin: 4px 0; color: #555; font-size: 14px; text-align: right;">קמפיין: ${orderData.leadSourceDetails.utm_campaign}</p>` : ''}
+        ${orderData.leadSourceDetails?.gclid ? `<p style="margin: 4px 0; color: #888; font-size: 12px; text-align: right;">gclid: ${orderData.leadSourceDetails.gclid.substring(0, 20)}...</p>` : ''}
+        ${orderData.leadSourceDetails?.fbclid ? `<p style="margin: 4px 0; color: #888; font-size: 12px; text-align: right;">fbclid: ${orderData.leadSourceDetails.fbclid.substring(0, 20)}...</p>` : ''}
+        ${orderData.leadSourceDetails?.referrer ? `<p style="margin: 4px 0; color: #888; font-size: 12px; text-align: right;">referrer: ${orderData.leadSourceDetails.referrer}</p>` : ''}
+      </div>
+      ` : ''}
+
     </div>
     
     <p style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
