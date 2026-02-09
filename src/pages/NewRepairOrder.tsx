@@ -613,10 +613,10 @@ const NewRepairOrder = () => {
             <h1 className="text-base font-semibold hidden sm:block">הזמנת תיקון</h1>
           </div>
 
-          {/* Desktop: Smart search in header */}
+          {/* Desktop: Inline smart search in header */}
           {step === 'model' && (
-            <div className="hidden md:block flex-1 max-w-sm mx-4">
-              <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
+            <div className="hidden md:block flex-1 max-w-md mx-4">
+              <SmartRepairInput inline models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
             </div>
           )}
 
