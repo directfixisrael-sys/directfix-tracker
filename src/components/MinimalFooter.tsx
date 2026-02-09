@@ -1,4 +1,6 @@
-import { ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { X } from 'lucide-react';
 
 const footerLinks = [
   { label: 'מדיניות פרטיות', href: 'https://directfix.co.il/privacy-policy/' },
@@ -8,25 +10,41 @@ const footerLinks = [
 ];
 
 const MinimalFooter = () => {
+  const [openLink, setOpenLink] = useState<{ label: string; href: string } | null>(null);
+
   return (
-    <footer className="border-t border-border py-4 px-4">
-      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-        {footerLinks.map((link, i) => (
-          <a
-            key={i}
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {link.label}
-          </a>
-        ))}
-      </div>
-      <p className="text-[10px] text-muted-foreground/50 text-center mt-2">
-        © {new Date().getFullYear()} DirectFix
-      </p>
-    </footer>
+    <>
+      <footer className="border-t border-border py-4 px-4">
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+          {footerLinks.map((link, i) => (
+            <button
+              key={i}
+              onClick={() => setOpenLink(link)}
+              className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {link.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-[10px] text-muted-foreground/50 text-center mt-2">
+          © {new Date().getFullYear()} DirectFix
+        </p>
+      </footer>
+
+      <Dialog open={!!openLink} onOpenChange={(open) => !open && setOpenLink(null)}>
+        <DialogContent className="max-w-lg h-[80vh] p-0 overflow-hidden">
+          <DialogHeader className="px-4 pt-4 pb-2 border-b border-border">
+            <DialogTitle className="text-right text-base">{openLink?.label}</DialogTitle>
+          </DialogHeader>
+          <iframe
+            src={openLink?.href}
+            className="w-full flex-1 border-0"
+            style={{ height: 'calc(80vh - 60px)' }}
+            title={openLink?.label}
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
