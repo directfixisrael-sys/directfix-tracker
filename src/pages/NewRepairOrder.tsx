@@ -1121,7 +1121,7 @@ const NewRepairOrder = () => {
 
             {/* Time slot selection */}
             {selectedDate && <div className="animate-fade-in">
-                <label className="block text-base font-medium mb-3 text-muted-foreground">בחר שעה</label>
+                <label className="block text-sm font-bold mb-3">בחר שעה</label>
                 <div className="grid grid-cols-2 gap-3">
                   {getTimeSlotsForDate(selectedDate).map(slot => {
               const isAvailable = isSlotAvailable(selectedDate, slot);
