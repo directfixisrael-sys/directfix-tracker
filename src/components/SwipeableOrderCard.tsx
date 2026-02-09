@@ -96,6 +96,9 @@ const SwipeableOrderCard = ({ order, isSelected, onClick, onDelete, getStatusCol
           <span className="font-medium text-foreground text-base">{order.customerName}</span>
         </div>
         <p className="text-muted-foreground mb-1">{order.deviceType}</p>
+        <p className="text-xs text-muted-foreground/70 mb-1">
+          {order.createdAt.toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+        </p>
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">{order.customerPhone}</p>
           {order.leadSource && (
