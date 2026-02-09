@@ -770,10 +770,13 @@ const NewRepairOrder = () => {
           </div>}
 
         {/* Step 2: Select Repair Type */}
-        {step === 'repair' && <div className="space-y-6 animate-fade-in">
-            <div className="text-center mb-6">
-              <p className="text-muted-foreground text-xl mb-2">{selectedModel?.name}</p>
-              <h2 className="text-4xl font-bold">מה צריך לתקן?</h2>
+        {step === 'repair' && <div className="space-y-5 animate-fade-in">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 bg-accent/10 text-accent rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
+                <Smartphone className="w-4 h-4" />
+                {selectedModel?.name}
+              </div>
+              <h2 className="text-3xl font-extrabold">מה צריך לתקן?</h2>
             </div>
 
             <div className="space-y-3">
