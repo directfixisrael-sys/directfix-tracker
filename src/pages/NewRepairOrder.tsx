@@ -688,9 +688,9 @@ const NewRepairOrder = () => {
 
         {/* Step 1: Select Model - Enhanced Welcome */}
         {step === 'model' && <div className="space-y-8 animate-fade-in">
-            {/* Hero Welcome Section - Apple style */}
+            {/* Hero Welcome Section */}
             <div className="text-center py-[11px]">
-              <h1 className="text-5xl font-bold mb-4 tracking-tight">
+              <h1 className="text-5xl font-bold mb-4 tracking-tight bg-gradient-to-l from-primary via-foreground to-accent bg-clip-text text-transparent">
                 הזמנת תיקון
               </h1>
               <div className="flex items-center justify-center gap-4 mt-4">
