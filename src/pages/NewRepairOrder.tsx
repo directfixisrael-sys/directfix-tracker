@@ -790,7 +790,7 @@ const NewRepairOrder = () => {
               return Phone;
             };
             const IconComponent = getIcon();
-            return <Card key={repair.id} onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border ${isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-border hover:border-primary/40 hover:bg-muted/30'}`}>
+            return <Card key={repair.id} onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 shadow-sm hover:shadow-md ${isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-border hover:border-primary/40 hover:bg-primary/5'}`}>
                     <div className="flex items-center gap-4">
                       {/* Simple Icon */}
                       <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center">
