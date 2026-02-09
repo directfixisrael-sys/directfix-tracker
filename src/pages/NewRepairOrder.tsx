@@ -684,6 +684,11 @@ const NewRepairOrder = () => {
               </svg>
               <span className="text-xs font-bold">5.0</span>
             </div>
+
+            <div className="flex items-center gap-1.5 bg-card border border-border/60 rounded-2xl px-3 py-2 shadow-sm">
+              <img src={easyLogo} alt="Easy" className="h-5 w-5 rounded-full object-cover" />
+              <span className="text-xs font-bold">9.94</span>
+            </div>
           </div>}
 
         {/* Step 1: Select Model - Enhanced Welcome */}
