@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +20,7 @@ import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
 import SmartRepairInput from '@/components/SmartRepairInput';
 import TestimonialsSlider from '@/components/TestimonialsSlider';
 import ModelPicker from '@/components/ModelPicker';
+import GiftPromoPopup from '@/components/GiftPromoPopup';
 
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
@@ -131,6 +132,10 @@ const NewRepairOrder = () => {
   // Privacy consent
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
 
+  // Gift promo popup
+  const [showGiftPopup, setShowGiftPopup] = useState(false);
+  const [giftClaimed, setGiftClaimed] = useState(false);
+
   // Check privacy consent on mount
   useEffect(() => {
     const hasAcceptedPrivacy = localStorage.getItem('order_privacy_consent') === 'true';
@@ -176,6 +181,13 @@ const NewRepairOrder = () => {
         } = await supabase.from('promotions').select('*').eq('is_active', true).limit(1).maybeSingle();
         if (promotionData) {
           setActivePromotion(promotionData);
+          // Show gift popup if not already claimed this session
+          const alreadyClaimed = sessionStorage.getItem('gift_promo_claimed');
+          if (!alreadyClaimed) {
+            setTimeout(() => setShowGiftPopup(true), 800);
+          } else {
+            setGiftClaimed(true);
+          }
         }
       } catch (error) {
         console.error('Error loading data:', error);
@@ -660,6 +672,20 @@ const NewRepairOrder = () => {
         {/* Privacy Consent Modal */}
         <OrderPrivacyConsent open={showPrivacyConsent} onAccept={() => setShowPrivacyConsent(false)} />
 
+        {/* Gift Promo Popup */}
+        {showGiftPopup && activePromotion && (
+          <GiftPromoPopup
+            promotionTitle={activePromotion.title}
+            promotionDescription={activePromotion.description}
+            promotionIcon={activePromotion.icon || undefined}
+            onClaimed={() => {
+              setShowGiftPopup(false);
+              setGiftClaimed(true);
+              sessionStorage.setItem('gift_promo_claimed', 'true');
+            }}
+          />
+        )}
+
         {/* Trust Badges */}
         {step === 'model' && <div className="flex items-center justify-center gap-3 mb-6 animate-fade-in">
             <div className="flex items-center gap-1.5 bg-card border border-border/60 rounded-2xl px-3 py-2 shadow-sm">
@@ -689,6 +715,17 @@ const NewRepairOrder = () => {
               <span className="text-xs font-bold">9.94</span>
             </div>
           </div>}
+
+        {/* Gift Secured Badge */}
+        {step === 'model' && giftClaimed && activePromotion && (
+          <div className="flex items-center justify-center animate-fade-in mb-4">
+            <div className="inline-flex items-center gap-2 bg-success/10 border border-success/20 text-success rounded-full px-4 py-2 text-sm font-semibold shadow-sm">
+              <Gift className="w-4 h-4" />
+              <span>🎁 {activePromotion.title} — מובטח לך!</span>
+              <Check className="w-4 h-4" />
+            </div>
+          </div>
+        )}
 
         {/* Step 1: Select Model - Enhanced Welcome */}
         {step === 'model' && <div className="space-y-8 animate-fade-in">
