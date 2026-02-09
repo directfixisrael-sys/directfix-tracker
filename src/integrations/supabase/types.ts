@@ -178,6 +178,7 @@ export type Database = {
           is_viewing: boolean | null
           issue_description: string
           last_viewed_at: string | null
+          lead_source: string | null
           notes: string[]
           payment_link: string | null
           payment_status: string | null
@@ -210,6 +211,7 @@ export type Database = {
           is_viewing?: boolean | null
           issue_description?: string
           last_viewed_at?: string | null
+          lead_source?: string | null
           notes?: string[]
           payment_link?: string | null
           payment_status?: string | null
@@ -242,6 +244,7 @@ export type Database = {
           is_viewing?: boolean | null
           issue_description?: string
           last_viewed_at?: string | null
+          lead_source?: string | null
           notes?: string[]
           payment_link?: string | null
           payment_status?: string | null

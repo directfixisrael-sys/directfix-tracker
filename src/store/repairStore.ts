@@ -272,6 +272,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
         accessories: defaultAccessories as unknown as any,
         notes: orderData.notes || [],
         wants_promotions: orderData.wantsPromotions,
+        lead_source: (orderData as any).leadSource || null,
       })
       .select()
       .single();
