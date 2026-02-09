@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Smartphone, Wrench, ChevronLeft, Star, Shield, Clock, MapPin } from 'lucide-react';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/directfix-logo.png';
 
 const Index = () => {
   const navigate = useNavigate();
