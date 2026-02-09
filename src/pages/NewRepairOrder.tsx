@@ -18,6 +18,7 @@ import { gaSelectModel, gaSelectRepair, gaBundleDecision, gaConfirmPrice, gaSele
 import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
 import SmartRepairInput from '@/components/SmartRepairInput';
 import TestimonialsSlider from '@/components/TestimonialsSlider';
+import ModelPicker from '@/components/ModelPicker';
 
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
