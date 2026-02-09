@@ -532,6 +532,7 @@ const NewRepairOrder = () => {
       // Send notifications (email + WhatsApp)
       try {
         const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${getRepairTypeName()} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : getRepairTypeName();
+        const leadSource = getLeadSource();
         await supabase.functions.invoke('send-order-notifications', {
           body: {
             customerName: customerName.trim(),
@@ -542,7 +543,9 @@ const NewRepairOrder = () => {
             repairPrice: getFinalPrice(),
             scheduledTime: scheduleNote,
             notes: customerNotes.trim(),
-            promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined
+            promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
+            leadSource: leadSource.source,
+            leadSourceDetails: leadSource,
           }
         });
         console.log('Notifications sent successfully');
