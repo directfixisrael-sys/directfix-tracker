@@ -347,6 +347,90 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
       {/* Real-time Visitors Section */}
       <LiveVisitorsCard activeViewers={activeViewers} />
 
+      {/* Lead Source Stats */}
+      {filteredOrders.some(o => o.leadSource) && (
+        <Card className="p-4">
+          <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+            <Target className="w-5 h-5 text-primary" />
+            מקורות לידים ({dateRange.label})
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={(() => {
+                      const sources: Record<string, number> = {};
+                      filteredOrders.forEach(o => {
+                        const src = o.leadSource || 'לא ידוע';
+                        sources[src] = (sources[src] || 0) + 1;
+                      });
+                      return Object.entries(sources)
+                        .map(([name, value]) => ({ name, value }))
+                        .sort((a, b) => b.value - a.value);
+                    })()}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={40}
+                    outerRadius={75}
+                    paddingAngle={2}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                    labelLine={false}
+                  >
+                    {(() => {
+                      const sources: Record<string, number> = {};
+                      filteredOrders.forEach(o => {
+                        const src = o.leadSource || 'לא ידוע';
+                        sources[src] = (sources[src] || 0) + 1;
+                      });
+                      return Object.keys(sources).map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ));
+                    })()}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="space-y-3">
+              {(() => {
+                const sources: Record<string, number> = {};
+                filteredOrders.forEach(o => {
+                  const src = o.leadSource || 'לא ידוע';
+                  sources[src] = (sources[src] || 0) + 1;
+                });
+                return Object.entries(sources)
+                  .sort(([, a], [, b]) => b - a)
+                  .map(([source, count], index) => (
+                    <div key={source} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                        />
+                        <span className="text-sm">{source}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold">{count}</span>
+                        <span className="text-xs text-muted-foreground">
+                          ({((count / filteredOrders.length) * 100).toFixed(0)}%)
+                        </span>
+                      </div>
+                    </div>
+                  ));
+              })()}
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Revenue Report Section */}
       <Card className="p-4 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
         <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
