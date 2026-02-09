@@ -22,6 +22,7 @@ interface SmartRepairInputProps {
   }>;
   onModelAndRepairFound: (modelName: string, repairName: string) => void;
   onModelFound: (modelName: string) => void;
+  inline?: boolean;
 }
 
 interface AIResult {
@@ -31,13 +32,10 @@ interface AIResult {
   suggestion: string;
 }
 
-const SmartRepairInput = ({
-  models,
-  repairTypes,
-  onModelAndRepairFound,
-  onModelFound
-}: SmartRepairInputProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+const useSmartSearch = (
+  models: SmartRepairInputProps['models'],
+  repairTypes: SmartRepairInputProps['repairTypes'],
+) => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<AIResult | null>(null);
@@ -70,6 +68,105 @@ const SmartRepairInput = ({
     }
   };
 
+  const clearResults = () => {
+    setShowResults(false);
+    setResult(null);
+  };
+
+  const matchedModel = result?.model_name ? models.find(m => m.name === result.model_name) : null;
+  const matchedRepairs = result?.repair_names?.map(name => repairTypes.find(r => r.name === name)).filter(Boolean) || [];
+
+  return { query, setQuery, isLoading, result, showResults, handleSmartSearch, clearResults, matchedModel, matchedRepairs };
+};
+
+const ResultsCard = ({
+  result,
+  matchedModel,
+  matchedRepairs,
+  onSelectOption,
+  onSelectModelOnly,
+}: {
+  result: AIResult;
+  matchedModel: SmartRepairInputProps['models'][0] | undefined;
+  matchedRepairs: Array<SmartRepairInputProps['repairTypes'][0] | undefined>;
+  onSelectOption: (name: string) => void;
+  onSelectModelOnly: () => void;
+}) => (
+  <Card className="p-3 animate-fade-in border-primary/20 bg-primary/5">
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <Sparkles className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+        <p className="text-sm font-medium text-foreground">{result.suggestion}</p>
+      </div>
+
+      {matchedModel && (
+        <div className="flex items-center gap-2 text-sm">
+          <CheckCircle2 className="w-3.5 h-3.5 text-success flex-shrink-0" />
+          <span className="text-muted-foreground">דגם:</span>
+          <span className="font-semibold">{matchedModel.name}</span>
+        </div>
+      )}
+
+      {matchedRepairs.length > 0 ? (
+        <div className="space-y-1.5">
+          {matchedRepairs.map(repair => {
+            if (!repair) return null;
+            let price = 0;
+            if (matchedModel) {
+              if (repair.name.includes('מסך מקורי')) price = matchedModel.original_screen_price;
+              else if (repair.name.includes('מסך תואם')) price = matchedModel.compatible_screen_price;
+              else if (repair.name.includes('סוללה')) price = matchedModel.battery_price;
+            }
+            return (
+              <Button
+                key={repair.id}
+                variant="outline"
+                className="w-full justify-between h-auto py-2.5 px-3 rounded-xl"
+                onClick={() => onSelectOption(repair.name)}
+              >
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                  <span className="font-medium text-sm">{repair.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {price > 0 && <span className="text-primary font-bold text-sm">₪{price}</span>}
+                  <ArrowLeft className="w-3.5 h-3.5 text-muted-foreground" />
+                </div>
+              </Button>
+            );
+          })}
+        </div>
+      ) : matchedModel ? (
+        <Button
+          variant="outline"
+          className="w-full justify-center h-auto py-2.5 rounded-xl"
+          onClick={onSelectModelOnly}
+        >
+          <span>בחר תיקון ל-{matchedModel.name}</span>
+          <ArrowLeft className="w-3.5 h-3.5 mr-2" />
+        </Button>
+      ) : null}
+
+      {!matchedModel && !matchedRepairs.length && (
+        <p className="text-xs text-muted-foreground text-center">
+          לא מצאתי התאמה, בחר ידנית מהרשימה 👇
+        </p>
+      )}
+    </div>
+  </Card>
+);
+
+const SmartRepairInput = ({
+  models,
+  repairTypes,
+  onModelAndRepairFound,
+  onModelFound,
+  inline = false,
+}: SmartRepairInputProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const { query, setQuery, isLoading, result, showResults, handleSmartSearch, clearResults, matchedModel, matchedRepairs } =
+    useSmartSearch(models, repairTypes);
+
   const handleSelectOption = (repairName: string) => {
     if (result?.model_name) {
       onModelAndRepairFound(result.model_name, repairName);
@@ -84,9 +181,54 @@ const SmartRepairInput = ({
     }
   };
 
-  const matchedModel = result?.model_name ? models.find(m => m.name === result.model_name) : null;
-  const matchedRepairs = result?.repair_names?.map(name => repairTypes.find(r => r.name === name)).filter(Boolean) || [];
+  // Inline mode for desktop header
+  if (inline) {
+    return (
+      <div className="relative">
+        <div className="flex gap-1.5">
+          <div className="relative flex-1">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={e => {
+                setQuery(e.target.value);
+                if (showResults) clearResults();
+              }}
+              onKeyDown={e => { if (e.key === 'Enter') handleSmartSearch(); }}
+              placeholder='חיפוש חכם: "מסך לאייפון 14"...'
+              className="pr-9 text-right h-9 text-sm rounded-lg bg-muted/50 border-border"
+              dir="rtl"
+              disabled={isLoading}
+            />
+          </div>
+          <Button
+            size="sm"
+            onClick={handleSmartSearch}
+            disabled={isLoading || !query.trim()}
+            className="h-9 px-3 rounded-lg gap-1.5"
+          >
+            {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+            <span className="text-xs">חפש</span>
+          </Button>
+        </div>
 
+        {/* Dropdown results */}
+        {showResults && result && (
+          <div className="absolute top-full mt-2 left-0 right-0 z-50">
+            <ResultsCard
+              result={result}
+              matchedModel={matchedModel}
+              matchedRepairs={matchedRepairs}
+              onSelectOption={handleSelectOption}
+              onSelectModelOnly={handleSelectModelOnly}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Mobile: button that opens dialog
   return (
     <>
       <Button
@@ -115,10 +257,7 @@ const SmartRepairInput = ({
                   value={query}
                   onChange={e => {
                     setQuery(e.target.value);
-                    if (showResults) {
-                      setShowResults(false);
-                      setResult(null);
-                    }
+                    if (showResults) clearResults();
                   }}
                   onKeyDown={e => { if (e.key === 'Enter') handleSmartSearch(); }}
                   placeholder='למשל: "מסך לאייפון 14"'
@@ -133,70 +272,14 @@ const SmartRepairInput = ({
               </Button>
             </div>
 
-            {/* AI Results */}
             {showResults && result && (
-              <Card className="p-3 animate-fade-in border-primary/20 bg-primary/5">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                    <p className="text-sm font-medium text-foreground">{result.suggestion}</p>
-                  </div>
-
-                  {matchedModel && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-success flex-shrink-0" />
-                      <span className="text-muted-foreground">דגם:</span>
-                      <span className="font-semibold">{matchedModel.name}</span>
-                    </div>
-                  )}
-
-                  {matchedRepairs.length > 0 ? (
-                    <div className="space-y-1.5">
-                      {matchedRepairs.map(repair => {
-                        if (!repair) return null;
-                        let price = 0;
-                        if (matchedModel) {
-                          if (repair.name.includes('מסך מקורי')) price = matchedModel.original_screen_price;
-                          else if (repair.name.includes('מסך תואם')) price = matchedModel.compatible_screen_price;
-                          else if (repair.name.includes('סוללה')) price = matchedModel.battery_price;
-                        }
-                        return (
-                          <Button
-                            key={repair.id}
-                            variant="outline"
-                            className="w-full justify-between h-auto py-2.5 px-3 rounded-xl"
-                            onClick={() => handleSelectOption(repair.name)}
-                          >
-                            <div className="flex items-center gap-2">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                              <span className="font-medium text-sm">{repair.name}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {price > 0 && <span className="text-primary font-bold text-sm">₪{price}</span>}
-                              <ArrowLeft className="w-3.5 h-3.5 text-muted-foreground" />
-                            </div>
-                          </Button>
-                        );
-                      })}
-                    </div>
-                  ) : matchedModel ? (
-                    <Button
-                      variant="outline"
-                      className="w-full justify-center h-auto py-2.5 rounded-xl"
-                      onClick={handleSelectModelOnly}
-                    >
-                      <span>בחר תיקון ל-{matchedModel.name}</span>
-                      <ArrowLeft className="w-3.5 h-3.5 mr-2" />
-                    </Button>
-                  ) : null}
-
-                  {!matchedModel && !matchedRepairs.length && (
-                    <p className="text-xs text-muted-foreground text-center">
-                      לא מצאתי התאמה, בחר ידנית מהרשימה 👇
-                    </p>
-                  )}
-                </div>
-              </Card>
+              <ResultsCard
+                result={result}
+                matchedModel={matchedModel}
+                matchedRepairs={matchedRepairs}
+                onSelectOption={handleSelectOption}
+                onSelectModelOnly={handleSelectModelOnly}
+              />
             )}
 
             <p className="text-xs text-muted-foreground text-center">
