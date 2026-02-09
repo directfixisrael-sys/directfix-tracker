@@ -11,7 +11,8 @@ import {
   Activity,
   RefreshCw,
   DollarSign,
-  BarChart3
+  BarChart3,
+  Target
 } from 'lucide-react';
 import { RepairOrder } from '@/types/repair';
 import { cn } from '@/lib/utils';
