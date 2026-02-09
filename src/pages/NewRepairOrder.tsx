@@ -672,6 +672,20 @@ const NewRepairOrder = () => {
         {/* Privacy Consent Modal */}
         <OrderPrivacyConsent open={showPrivacyConsent} onAccept={() => setShowPrivacyConsent(false)} />
 
+        {/* Gift Promo Popup */}
+        {showGiftPopup && activePromotion && (
+          <GiftPromoPopup
+            promotionTitle={activePromotion.title}
+            promotionDescription={activePromotion.description}
+            promotionIcon={activePromotion.icon || undefined}
+            onClaimed={() => {
+              setShowGiftPopup(false);
+              setGiftClaimed(true);
+              sessionStorage.setItem('gift_promo_claimed', 'true');
+            }}
+          />
+        )}
+
         {/* Trust Badges */}
         {step === 'model' && <div className="flex items-center justify-center gap-3 mb-6 animate-fade-in">
             <div className="flex items-center gap-1.5 bg-card border border-border/60 rounded-2xl px-3 py-2 shadow-sm">
