@@ -137,6 +137,11 @@ const NewRepairOrder = () => {
   const [showGiftPopup, setShowGiftPopup] = useState(false);
   const [giftClaimed, setGiftClaimed] = useState(false);
 
+  // Broadcast initial step on mount
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('repair-step-change', { detail: { step: 'model' } }));
+  }, []);
+
   // Check privacy consent on mount
   useEffect(() => {
     const hasAcceptedPrivacy = localStorage.getItem('order_privacy_consent') === 'true';
