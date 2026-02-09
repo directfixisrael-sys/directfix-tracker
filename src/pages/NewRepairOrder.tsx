@@ -651,7 +651,6 @@ const NewRepairOrder = () => {
           </div>}
       </div>
 
-
       {/* Hidden file input for image upload */}
       <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
 
@@ -702,7 +701,7 @@ const NewRepairOrder = () => {
               <h1 className="text-4xl font-extrabold mb-3 tracking-tight">
                 מה נתקן היום?
               </h1>
-              <p className="text-muted-foreground text-base">בחרו דגם ונגיע אליכם תוך שעה</p>
+              <p className="text-muted-foreground text-base">בחרו דגם ונגיע אליכם תוך שעה*</p>
               <div className="flex items-center justify-center gap-4 mt-4">
                 <Dialog>
                   <DialogTrigger asChild>
@@ -973,7 +972,6 @@ const NewRepairOrder = () => {
                   </span>
                   <span className="font-semibold text-success">חינם</span>
                 </div>
-
 
                 {/* Image Upload - Inline */}
                 <div className="border-t border-border pt-3">
@@ -1300,6 +1298,13 @@ const NewRepairOrder = () => {
             </Button>
           </div>}
       </div>
+
+      {/* Disclaimer */}
+      {step === 'model' && <div className="text-center px-6 py-3">
+          <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+            * זמני ההגעה עשויים להשתנות בהתאם לזמינות הטכנאים ולמיקום הלקוח.
+          </p>
+        </div>}
 
       {/* Sticky Footer with Action Buttons */}
       {step !== 'success' && step !== 'model' && step !== 'repair' && <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border/50 p-4 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
