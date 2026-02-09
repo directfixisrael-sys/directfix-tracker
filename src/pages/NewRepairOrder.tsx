@@ -599,7 +599,7 @@ const NewRepairOrder = () => {
       )}
 
       {/* Header */}
-      <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border z-10">
+      <div className="sticky top-0 bg-card/90 backdrop-blur-lg border-b border-border/50 z-10 shadow-sm">
         <div className="flex items-center justify-between p-3 max-w-5xl mx-auto">
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={() => {
