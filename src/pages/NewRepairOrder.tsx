@@ -587,10 +587,10 @@ const NewRepairOrder = () => {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-background flex flex-col">
+  return <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/40 flex flex-col">
       {/* Promotion Strip - E-commerce style */}
       {activePromotion && (
-        <div className="bg-primary text-primary-foreground text-center py-1.5 text-xs font-medium">
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground text-center py-2 text-xs font-medium shadow-sm">
           <span>{getPromotionIcon(activePromotion.icon)} {activePromotion.title} — {activePromotion.description}</span>
           {activePromotion.value && activePromotion.value > 0 && (
             <span className="mr-1 font-bold"> | חינם! 🎉</span>
