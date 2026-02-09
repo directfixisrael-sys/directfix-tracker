@@ -17,7 +17,7 @@ const Index = () => {
             <img 
               src={logo} 
               alt="Direct Fix Logo" 
-              className="h-20 w-auto mx-auto mb-6 drop-shadow-lg"
+              className="h-28 w-auto mx-auto mb-6 drop-shadow-lg"
             />
             <h1 className="text-3xl font-bold text-foreground tracking-tight">דיירקט פיקס</h1>
             <p className="text-muted-foreground mt-2">תיקוני סלולר מקצועיים עד הבית</p>
