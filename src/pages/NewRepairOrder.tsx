@@ -266,10 +266,12 @@ const NewRepairOrder = () => {
     setTimeout(() => {
       setStep(newStep);
       setIsAnimating(false);
-      // Scroll to top when changing steps - instant for immediate feedback
+      // Scroll to top - target both window and the scroll container
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      // Also scroll the content container if it's the one scrolling
       document.querySelector('.flex-1.overflow-y-auto')?.scrollTo({ top: 0, behavior: 'instant' });
+      // Also try scrolling the main content container by ref-like selector
+      const contentEl = document.querySelector('[class*="flex-1"][class*="overflow-y-auto"]');
+      if (contentEl) contentEl.scrollTop = 0;
     }, 200);
   };
   const handleModelSelect = (model: IphoneModel) => {
