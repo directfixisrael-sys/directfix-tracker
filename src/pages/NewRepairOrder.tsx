@@ -754,10 +754,8 @@ const NewRepairOrder = () => {
             {/* Testimonials Slider */}
             <TestimonialsSlider />
 
-            {/* Smart AI Search - mobile only */}
-            <div className="md:hidden">
-              <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
-            </div>
+            {/* Smart AI Search */}
+            <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
 
             <ModelPicker
               models={filteredModels}
