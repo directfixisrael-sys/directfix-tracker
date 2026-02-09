@@ -266,12 +266,11 @@ const NewRepairOrder = () => {
     setTimeout(() => {
       setStep(newStep);
       setIsAnimating(false);
-      // Scroll to top - target both window and the scroll container
+      // Scroll to top using ref
+      if (contentRef.current) {
+        contentRef.current.scrollTop = 0;
+      }
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      document.querySelector('.flex-1.overflow-y-auto')?.scrollTo({ top: 0, behavior: 'instant' });
-      // Also try scrolling the main content container by ref-like selector
-      const contentEl = document.querySelector('[class*="flex-1"][class*="overflow-y-auto"]');
-      if (contentEl) contentEl.scrollTop = 0;
     }, 200);
   };
   const handleModelSelect = (model: IphoneModel) => {
