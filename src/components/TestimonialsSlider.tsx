@@ -109,6 +109,11 @@ const TestimonialsSlider = () => {
                     <GoogleIcon />
                     <span className="text-[10px] text-muted-foreground">Google</span>
                   </>
+                ) : t.source === 'easy' ? (
+                  <>
+                    <img src={easyLogo} alt="Easy" className="h-3.5 w-3.5 rounded-full object-cover" />
+                    <span className="text-[10px] text-muted-foreground">Easy</span>
+                  </>
                 ) : (
                   <>
                     <img src={midragLogo} alt="מידרג" className="h-3.5 w-3.5 rounded-full object-cover" />
