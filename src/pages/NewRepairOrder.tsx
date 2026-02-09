@@ -787,6 +787,29 @@ const NewRepairOrder = () => {
               </div>
             </div>
 
+            {/* Gift Secured Badge */}
+            {giftClaimed && activePromotion && (
+              <div className="animate-fade-in px-1">
+                <div
+                  className="relative flex items-center gap-3 bg-success/8 border border-success/20 rounded-2xl px-4 py-3 shadow-sm cursor-pointer hover:bg-success/12 transition-colors group"
+                  onClick={() => setShowGiftPopup(true)}
+                >
+                  <div className="w-8 h-8 bg-success/15 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Check className="w-4 h-4 text-success" strokeWidth={3} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-foreground leading-snug">
+                      🎁 {activePromotion.title} — מובטח לך!
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">לחץ לפרטים</p>
+                  </div>
+                  <div className="w-8 h-8 bg-success/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Gift className="w-4 h-4 text-success" />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Testimonials Slider */}
             <TestimonialsSlider />
 
