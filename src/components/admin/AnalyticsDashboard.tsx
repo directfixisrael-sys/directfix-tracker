@@ -289,10 +289,16 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
       { path: '/', count: 10 },
       { path: '/admin', count: 1 },
     ],
-    topSources: [
-      { source: 'Direct', count: 22 },
-      { source: 'directfix.co.il', count: 5 },
-    ],
+    topSources: (() => {
+      const sources: Record<string, number> = {};
+      filteredOrders.forEach(o => {
+        const src = o.leadSource || 'ישיר';
+        sources[src] = (sources[src] || 0) + 1;
+      });
+      return Object.entries(sources)
+        .map(([source, count]) => ({ source, count }))
+        .sort((a, b) => b.count - a.count);
+    })(),
     devices: [
       { device: 'mobile', count: 17 },
       { device: 'desktop', count: 7 },
