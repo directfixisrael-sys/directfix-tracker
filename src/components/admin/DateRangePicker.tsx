@@ -20,6 +20,13 @@ interface DateRangePickerProps {
 
 const presetRanges = [
   {
+    label: 'היום',
+    getValue: () => ({
+      from: startOfDay(new Date()),
+      to: endOfDay(new Date()),
+    }),
+  },
+  {
     label: 'אתמול',
     getValue: () => ({
       from: startOfDay(subDays(new Date(), 1)),
