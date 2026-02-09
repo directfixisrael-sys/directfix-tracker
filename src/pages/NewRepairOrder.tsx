@@ -1027,7 +1027,7 @@ const NewRepairOrder = () => {
             </Card>
 
             {/* Payment Info with Icons */}
-            <div className="bg-muted/50 rounded-xl p-4">
+            <div className="bg-gradient-to-br from-muted/60 to-accent/5 rounded-2xl p-4 border border-border/50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
