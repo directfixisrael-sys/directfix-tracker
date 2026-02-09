@@ -132,6 +132,10 @@ const NewRepairOrder = () => {
   // Privacy consent
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
 
+  // Gift promo popup
+  const [showGiftPopup, setShowGiftPopup] = useState(false);
+  const [giftClaimed, setGiftClaimed] = useState(false);
+
   // Check privacy consent on mount
   useEffect(() => {
     const hasAcceptedPrivacy = localStorage.getItem('order_privacy_consent') === 'true';
