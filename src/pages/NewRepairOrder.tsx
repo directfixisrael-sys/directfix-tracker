@@ -1176,10 +1176,10 @@ const NewRepairOrder = () => {
               </div>
 
               <div>
-                <label className="block text-base font-medium mb-2">
-                  הערות לטכנאי <span className="text-muted-foreground">(לא חובה)</span>
+                <label className="block text-sm font-bold mb-1.5">
+                  הערות <span className="text-muted-foreground font-normal">(לא חובה)</span>
                 </label>
-                <Textarea placeholder="למשל: קומה 3, יש אינטרקום, לחייג בהגעה..." value={customerNotes} onChange={e => setCustomerNotes(e.target.value)} className="text-lg rounded-xl resize-none" rows={2} />
+                <Textarea placeholder="קומה, אינטרקום, הערות..." value={customerNotes} onChange={e => setCustomerNotes(e.target.value)} className="text-base rounded-2xl resize-none bg-muted/40 border-border/50 focus:bg-card" rows={2} />
               </div>
 
               {/* Uploaded Images Display */}
