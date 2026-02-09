@@ -1101,7 +1101,7 @@ const NewRepairOrder = () => {
 
             {/* Date selection */}
             <div>
-              <label className="block text-base font-medium mb-3 text-muted-foreground">בחר יום</label>
+              <label className="block text-sm font-bold mb-3">בחר יום</label>
               <div className="grid grid-cols-4 gap-3">
                 {getAvailableDates().map((date, index) => {
               const dayName = hebrewDays[date.getDay()];
