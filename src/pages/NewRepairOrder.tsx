@@ -54,6 +54,7 @@ interface IphoneModel {
   original_screen_price: number;
   compatible_screen_price: number;
   battery_price: number;
+  back_glass_price: number;
 }
 interface RepairType {
   id: string;
@@ -248,9 +249,11 @@ const NewRepairOrder = () => {
     const isOriginalScreen = selectedRepair.name.includes('מסך מקורי');
     const isCompatibleScreen = selectedRepair.name.includes('מסך תואם');
     const isBattery = selectedRepair.name.includes('סוללה');
+    const isBackGlass = selectedRepair.name.includes('גב');
     if (isOriginalScreen) return selectedModel.original_screen_price;
     if (isCompatibleScreen) return selectedModel.compatible_screen_price;
     if (isBattery) return selectedModel.battery_price;
+    if (isBackGlass) return selectedModel.back_glass_price;
     return 0;
   };
   const getBundleAddonPrice = () => {
@@ -302,8 +305,9 @@ const NewRepairOrder = () => {
       const isOriginalScreen = repair.name.includes('מסך מקורי');
       const isCompatibleScreen = repair.name.includes('מסך תואם');
       const isBattery = repair.name.includes('סוללה');
+      const isBackGlass = repair.name.includes('גב');
       let repairPrice = 0;
-      if (isOriginalScreen) repairPrice = model.original_screen_price;else if (isCompatibleScreen) repairPrice = model.compatible_screen_price;else if (isBattery) repairPrice = model.battery_price;
+      if (isOriginalScreen) repairPrice = model.original_screen_price;else if (isCompatibleScreen) repairPrice = model.compatible_screen_price;else if (isBattery) repairPrice = model.battery_price;else if (isBackGlass) repairPrice = model.back_glass_price;
       trackAddToCart(repair.name, repairPrice);
       gaSelectRepair(repair.name, repairPrice);
       // Check bundle
@@ -336,8 +340,9 @@ const NewRepairOrder = () => {
       const isOriginalScreen = repair.name.includes('מסך מקורי');
       const isCompatibleScreen = repair.name.includes('מסך תואם');
       const isBattery = repair.name.includes('סוללה');
+      const isBackGlass = repair.name.includes('גב');
       let repairPrice = 0;
-      if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;else if (isBattery) repairPrice = selectedModel.battery_price;
+      if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;else if (isBattery) repairPrice = selectedModel.battery_price;else if (isBackGlass) repairPrice = selectedModel.back_glass_price;
       trackAddToCart(repair.name, repairPrice);
       gaSelectRepair(repair.name, repairPrice);
     }
@@ -825,7 +830,8 @@ const NewRepairOrder = () => {
             const isBattery = repair.name.includes('סוללה');
             let price = 0;
             if (selectedModel) {
-              if (isOriginalScreen) price = selectedModel.original_screen_price;else if (isCompatibleScreen) price = selectedModel.compatible_screen_price;else if (isBattery) price = selectedModel.battery_price;
+              const isBackGlass = repair.name.includes('גב');
+              if (isOriginalScreen) price = selectedModel.original_screen_price;else if (isCompatibleScreen) price = selectedModel.compatible_screen_price;else if (isBattery) price = selectedModel.battery_price;else if (isBackGlass) price = selectedModel.back_glass_price;
             }
             const infoKey = isOriginalScreen ? 'מסך מקורי' : isCompatibleScreen ? 'מסך תואם' : isBattery ? 'סוללה מקורית' : null;
             const info = infoKey ? repairInfoDescriptions[infoKey] : null;

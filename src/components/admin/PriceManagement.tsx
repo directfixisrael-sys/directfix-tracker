@@ -40,6 +40,7 @@ interface IphoneModel {
   original_screen_price: number;
   compatible_screen_price: number;
   battery_price: number;
+  back_glass_price: number;
   is_active: boolean;
   sort_order: number;
 }
@@ -71,6 +72,7 @@ const PriceManagement = () => {
     original_screen_price: 0,
     compatible_screen_price: 0,
     battery_price: 0,
+    back_glass_price: 0,
     is_active: true,
   });
   
@@ -121,6 +123,7 @@ const PriceManagement = () => {
         original_screen_price: model.original_screen_price,
         compatible_screen_price: model.compatible_screen_price,
         battery_price: model.battery_price,
+        back_glass_price: model.back_glass_price,
         is_active: model.is_active,
       });
     } else {
@@ -130,6 +133,7 @@ const PriceManagement = () => {
         original_screen_price: 0,
         compatible_screen_price: 0,
         battery_price: 0,
+        back_glass_price: 0,
         is_active: true,
       });
     }
@@ -151,6 +155,7 @@ const PriceManagement = () => {
             original_screen_price: modelForm.original_screen_price,
             compatible_screen_price: modelForm.compatible_screen_price,
             battery_price: modelForm.battery_price,
+            back_glass_price: modelForm.back_glass_price,
             is_active: modelForm.is_active,
           })
           .eq('id', editingModel.id);
@@ -166,6 +171,7 @@ const PriceManagement = () => {
             original_screen_price: modelForm.original_screen_price,
             compatible_screen_price: modelForm.compatible_screen_price,
             battery_price: modelForm.battery_price,
+            back_glass_price: modelForm.back_glass_price,
             is_active: modelForm.is_active,
             sort_order: maxOrder + 1,
           });
@@ -427,6 +433,7 @@ const PriceManagement = () => {
                       <span>מסך מקורי: ₪{model.original_screen_price}</span>
                       <span>מסך תואם: ₪{model.compatible_screen_price}</span>
                       <span>סוללה: ₪{model.battery_price}</span>
+                      {model.back_glass_price > 0 && <span>גב: ₪{model.back_glass_price}</span>}
                     </div>
                   </div>
 
@@ -558,13 +565,23 @@ const PriceManagement = () => {
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">סוללה מקורית (₪)</label>
-              <Input
-                type="number"
-                value={modelForm.battery_price}
-                onChange={(e) => setModelForm({ ...modelForm, battery_price: Number(e.target.value) })}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">סוללה מקורית (₪)</label>
+                <Input
+                  type="number"
+                  value={modelForm.battery_price}
+                  onChange={(e) => setModelForm({ ...modelForm, battery_price: Number(e.target.value) })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">גב מקורי (₪)</label>
+                <Input
+                  type="number"
+                  value={modelForm.back_glass_price}
+                  onChange={(e) => setModelForm({ ...modelForm, back_glass_price: Number(e.target.value) })}
+                />
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">הצג ללקוחות</span>
