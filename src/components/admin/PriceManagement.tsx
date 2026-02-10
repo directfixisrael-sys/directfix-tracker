@@ -155,6 +155,7 @@ const PriceManagement = () => {
             original_screen_price: modelForm.original_screen_price,
             compatible_screen_price: modelForm.compatible_screen_price,
             battery_price: modelForm.battery_price,
+            back_glass_price: modelForm.back_glass_price,
             is_active: modelForm.is_active,
           })
           .eq('id', editingModel.id);
