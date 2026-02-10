@@ -14,6 +14,7 @@ interface SmartRepairInputProps {
     original_screen_price: number;
     compatible_screen_price: number;
     battery_price: number;
+    back_glass_price: number;
   }>;
   repairTypes: Array<{
     id: string;
