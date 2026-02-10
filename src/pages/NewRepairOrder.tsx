@@ -823,7 +823,11 @@ const NewRepairOrder = () => {
             </div>
 
             <div className="space-y-3">
-              {repairTypes.map((repair, index) => {
+              {repairTypes.filter(repair => {
+                // Hide back glass repair for models with no back glass price
+                if (repair.name.includes('גב') && selectedModel && selectedModel.back_glass_price <= 0) return false;
+                return true;
+              }).map((repair, index) => {
             const isPhoneOnly = repair.is_phone_only;
             const isOriginalScreen = repair.name.includes('מסך מקורי');
             const isCompatibleScreen = repair.name.includes('מסך תואם');
