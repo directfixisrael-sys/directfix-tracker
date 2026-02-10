@@ -8,6 +8,7 @@ interface IphoneModel {
   original_screen_price: number;
   compatible_screen_price: number;
   battery_price: number;
+  back_glass_price: number;
 }
 
 interface ModelPickerProps {

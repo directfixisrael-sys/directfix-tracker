@@ -565,13 +565,23 @@ const PriceManagement = () => {
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">סוללה מקורית (₪)</label>
-              <Input
-                type="number"
-                value={modelForm.battery_price}
-                onChange={(e) => setModelForm({ ...modelForm, battery_price: Number(e.target.value) })}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">סוללה מקורית (₪)</label>
+                <Input
+                  type="number"
+                  value={modelForm.battery_price}
+                  onChange={(e) => setModelForm({ ...modelForm, battery_price: Number(e.target.value) })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">גב מקורי (₪)</label>
+                <Input
+                  type="number"
+                  value={modelForm.back_glass_price}
+                  onChange={(e) => setModelForm({ ...modelForm, back_glass_price: Number(e.target.value) })}
+                />
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">הצג ללקוחות</span>
