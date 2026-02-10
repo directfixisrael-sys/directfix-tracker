@@ -305,8 +305,9 @@ const NewRepairOrder = () => {
       const isOriginalScreen = repair.name.includes('מסך מקורי');
       const isCompatibleScreen = repair.name.includes('מסך תואם');
       const isBattery = repair.name.includes('סוללה');
+      const isBackGlass = repair.name.includes('גב');
       let repairPrice = 0;
-      if (isOriginalScreen) repairPrice = model.original_screen_price;else if (isCompatibleScreen) repairPrice = model.compatible_screen_price;else if (isBattery) repairPrice = model.battery_price;
+      if (isOriginalScreen) repairPrice = model.original_screen_price;else if (isCompatibleScreen) repairPrice = model.compatible_screen_price;else if (isBattery) repairPrice = model.battery_price;else if (isBackGlass) repairPrice = model.back_glass_price;
       trackAddToCart(repair.name, repairPrice);
       gaSelectRepair(repair.name, repairPrice);
       // Check bundle
