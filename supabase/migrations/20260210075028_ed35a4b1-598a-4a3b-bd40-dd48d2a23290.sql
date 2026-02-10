@@ -1,0 +1,1 @@
+ALTER TABLE public.iphone_models ADD COLUMN back_glass_price numeric NOT NULL DEFAULT 0;
