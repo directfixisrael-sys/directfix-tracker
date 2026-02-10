@@ -40,6 +40,7 @@ interface IphoneModel {
   original_screen_price: number;
   compatible_screen_price: number;
   battery_price: number;
+  back_glass_price: number;
   is_active: boolean;
   sort_order: number;
 }
