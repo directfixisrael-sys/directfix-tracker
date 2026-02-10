@@ -249,9 +249,11 @@ const NewRepairOrder = () => {
     const isOriginalScreen = selectedRepair.name.includes('מסך מקורי');
     const isCompatibleScreen = selectedRepair.name.includes('מסך תואם');
     const isBattery = selectedRepair.name.includes('סוללה');
+    const isBackGlass = selectedRepair.name.includes('גב');
     if (isOriginalScreen) return selectedModel.original_screen_price;
     if (isCompatibleScreen) return selectedModel.compatible_screen_price;
     if (isBattery) return selectedModel.battery_price;
+    if (isBackGlass) return selectedModel.back_glass_price;
     return 0;
   };
   const getBundleAddonPrice = () => {
