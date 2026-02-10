@@ -123,6 +123,7 @@ const PriceManagement = () => {
         original_screen_price: model.original_screen_price,
         compatible_screen_price: model.compatible_screen_price,
         battery_price: model.battery_price,
+        back_glass_price: model.back_glass_price,
         is_active: model.is_active,
       });
     } else {
