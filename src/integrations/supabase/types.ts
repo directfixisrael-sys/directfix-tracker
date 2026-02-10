@@ -85,6 +85,7 @@ export type Database = {
       }
       iphone_models: {
         Row: {
+          back_glass_price: number
           battery_price: number
           compatible_screen_price: number
           created_at: string
@@ -96,6 +97,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          back_glass_price?: number
           battery_price?: number
           compatible_screen_price?: number
           created_at?: string
@@ -107,6 +109,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          back_glass_price?: number
           battery_price?: number
           compatible_screen_price?: number
           created_at?: string
