@@ -433,6 +433,7 @@ const PriceManagement = () => {
                       <span>מסך מקורי: ₪{model.original_screen_price}</span>
                       <span>מסך תואם: ₪{model.compatible_screen_price}</span>
                       <span>סוללה: ₪{model.battery_price}</span>
+                      {model.back_glass_price > 0 && <span>גב: ₪{model.back_glass_price}</span>}
                     </div>
                   </div>
 
