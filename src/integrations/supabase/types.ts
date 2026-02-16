@@ -184,6 +184,7 @@ export type Database = {
           last_viewed_at: string | null
           lead_source: string | null
           notes: string[]
+          order_number: number
           payment_link: string | null
           payment_status: string | null
           rating: number | null
@@ -218,6 +219,7 @@ export type Database = {
           last_viewed_at?: string | null
           lead_source?: string | null
           notes?: string[]
+          order_number?: number
           payment_link?: string | null
           payment_status?: string | null
           rating?: number | null
@@ -252,6 +254,7 @@ export type Database = {
           last_viewed_at?: string | null
           lead_source?: string | null
           notes?: string[]
+          order_number?: number
           payment_link?: string | null
           payment_status?: string | null
           rating?: number | null
