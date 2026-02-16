@@ -14,7 +14,7 @@ import OrderSummarySheet from '@/components/OrderSummarySheet';
 import StickyHeader from '@/components/StickyHeader';
 import PrivacyConsentModal from '@/components/PrivacyConsentModal';
 import { useRepairStore } from '@/store/repairStore';
-import logo from '@/assets/directfix-logo.png';
+import Logo from '@/components/Logo';
 import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -165,7 +165,7 @@ const CustomerTracker = () => {
         <Header />
         <main className="container py-8 px-4">
           <div className="max-w-sm mx-auto text-center mb-8 animate-slide-down">
-            <img src={logo} alt="Direct Fix" className="h-14 mx-auto mb-4" />
+            <Logo size="md" clickable={false} className="justify-center mb-4" />
             <p className="text-muted-foreground text-sm">מעקב אחר התיקון שלכם בזמן אמת</p>
           </div>
           <PhoneInput 

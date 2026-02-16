@@ -11,7 +11,7 @@ import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import logo from '@/assets/directfix-logo.png';
+import Logo from '@/components/Logo';
 import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
 import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
@@ -860,7 +860,7 @@ const NewRepairOrder = () => {
           }} className="h-10 w-10 rounded-2xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors">
               <ArrowRight className="w-4 h-4" />
             </button>
-            <img src={logo} alt="Logo" className="h-7 w-auto" />
+            <Logo size="sm" />
           </div>
 
           <div className="flex items-center gap-1.5">

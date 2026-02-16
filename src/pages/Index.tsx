@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Smartphone, Wrench, ChevronLeft, Star, Shield, Clock, MapPin } from 'lucide-react';
-import logo from '@/assets/directfix-logo.png';
+import Logo from '@/components/Logo';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -13,12 +13,8 @@ const Index = () => {
         <div className="text-center max-w-sm w-full">
           
           {/* Logo */}
-          <div className="mb-8 animate-fade-in">
-            <img 
-              src={logo} 
-              alt="Direct Fix Logo" 
-              className="h-28 w-auto mx-auto mb-6 drop-shadow-lg"
-            />
+          <div className="mb-8 animate-fade-in flex flex-col items-center">
+            <Logo size="lg" clickable={false} className="mb-6" />
             <h1 className="text-3xl font-bold text-foreground tracking-tight">דיירקט פיקס</h1>
             <p className="text-muted-foreground mt-2">תיקוני סלולר מקצועיים עד הבית</p>
           </div>
