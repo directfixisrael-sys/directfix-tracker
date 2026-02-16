@@ -18,12 +18,13 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
   };
 
   return (
-    <header className="bg-card/80 backdrop-blur-lg border-b border-border/50 sticky top-0 z-50 pt-[env(safe-area-inset-top)]">
-      <div className="container flex items-center justify-between h-14 px-4">
+    <header className="bg-card/80 backdrop-blur-lg border-b border-border/50 sticky top-0 z-50 pt-[env(safe-area-inset-top)]" role="banner" aria-label="כותרת עליונה">
+      <nav className="container flex items-center justify-between h-14 px-4" aria-label="ניווט ראשי">
         {showBackButton ? (
           <button 
             onClick={onBack}
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
+            aria-label="חזור לדף הקודם"
           >
             <ArrowRight className="w-4 h-4" />
             חזור
@@ -41,16 +42,16 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
         )}
 
         {/* Desktop actions */}
-        <div className="hidden sm:flex items-center gap-2">
+        <div className="hidden sm:flex items-center gap-2" role="toolbar" aria-label="פעולות מהירות">
           <a
             href="tel:033106020"
             className="h-9 w-9 rounded-full bg-success hover:bg-success/90 text-success-foreground flex items-center justify-center transition-colors"
-            aria-label="התקשר 033106020"
+            aria-label="התקשר אלינו 033106020"
           >
-            <Phone className="w-4 h-4" />
+            <Phone className="w-4 h-4" aria-hidden="true" />
           </a>
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-full">
-            {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-full" aria-label={resolvedTheme === 'dark' ? 'עבור למצב בהיר' : 'עבור למצב כהה'}>
+            {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
           </Button>
           <Button
             variant="ghost"
@@ -64,7 +65,7 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
         </div>
 
         <Logo size="sm" />
-      </div>
+      </nav>
 
       {/* Mobile menu dropdown */}
       {menuOpen && (

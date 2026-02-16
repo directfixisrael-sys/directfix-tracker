@@ -7,9 +7,13 @@ const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 flex flex-col max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 flex flex-col max-w-2xl mx-auto" lang="he">
+      {/* Skip to content */}
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-lg">
+        דלג לתוכן הראשי
+      </a>
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+      <main id="main-content" className="flex-1 flex flex-col items-center justify-center px-6 py-12" role="main" aria-label="דף הבית - דיירקט פיקס">
         <div className="text-center max-w-sm w-full">
           
           {/* Logo */}
@@ -59,26 +63,26 @@ const Index = () => {
           </div>
 
           {/* Features - Minimal */}
-          <div className="mt-12 grid grid-cols-3 gap-4 animate-fade-in" style={{ animationDelay: '300ms' }}>
-            <div className="text-center">
+          <section aria-label="יתרונות השירות" className="mt-12 grid grid-cols-3 gap-4 animate-fade-in" style={{ animationDelay: '300ms' }}>
+            <div className="text-center" role="img" aria-label="מגיעים אליך - שירות עד הבית">
               <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-2">
-                <MapPin className="w-5 h-5 text-primary" />
+                <MapPin className="w-5 h-5 text-primary" aria-hidden="true" />
               </div>
               <p className="text-xs font-medium">מגיעים אליך</p>
             </div>
-            <div className="text-center">
+            <div className="text-center" role="img" aria-label="תיקון מהיר - תוך דקות">
               <div className="w-12 h-12 bg-success/10 rounded-2xl flex items-center justify-center mx-auto mb-2">
-                <Clock className="w-5 h-5 text-success" />
+                <Clock className="w-5 h-5 text-success" aria-hidden="true" />
               </div>
               <p className="text-xs font-medium">תיקון מהיר</p>
             </div>
-            <div className="text-center">
+            <div className="text-center" role="img" aria-label="אחריות מלאה על כל תיקון">
               <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-2">
-                <Shield className="w-5 h-5 text-amber-500" />
+                <Shield className="w-5 h-5 text-amber-500" aria-hidden="true" />
               </div>
               <p className="text-xs font-medium">אחריות מלאה</p>
             </div>
-          </div>
+          </section>
 
           {/* Payment Methods - Compact */}
           <div className="mt-10 animate-fade-in" style={{ animationDelay: '400ms' }}>
@@ -105,10 +109,10 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Footer - Minimal */}
-      <footer className="text-center py-4 text-xs text-muted-foreground/60">
+      <footer className="text-center py-4 text-xs text-muted-foreground/60" role="contentinfo">
         <p>© {new Date().getFullYear()} דיירקט פיקס</p>
       </footer>
     </div>
