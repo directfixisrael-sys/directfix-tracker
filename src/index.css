@@ -82,6 +82,76 @@
     --input: 240 15% 17%;
     --ring: 12 85% 60%;
   }
+
+  /* Gift Mode - Warm & Loving theme */
+  .gift-mode {
+    --background: 20 30% 97%;
+    --foreground: 350 25% 18%;
+
+    --card: 15 35% 100%;
+    --card-foreground: 350 25% 18%;
+
+    --popover: 15 35% 100%;
+    --popover-foreground: 350 25% 18%;
+
+    --primary: 340 65% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 20 30% 92%;
+    --secondary-foreground: 350 20% 25%;
+
+    --muted: 20 25% 93%;
+    --muted-foreground: 350 12% 46%;
+
+    --accent: 340 65% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --success: 160 55% 42%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 30 90% 52%;
+    --warning-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 52%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 20 20% 87%;
+    --input: 20 20% 87%;
+    --ring: 340 65% 55%;
+  }
+
+  .gift-mode.dark {
+    --background: 350 20% 6%;
+    --foreground: 20 30% 96%;
+
+    --card: 350 18% 10%;
+    --card-foreground: 20 30% 96%;
+
+    --popover: 350 18% 10%;
+    --popover-foreground: 20 30% 96%;
+
+    --primary: 340 65% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 350 15% 15%;
+    --secondary-foreground: 20 30% 96%;
+
+    --muted: 350 15% 15%;
+    --muted-foreground: 350 10% 55%;
+
+    --accent: 340 65% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --success: 160 50% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 65% 48%;
+    --destructive-foreground: 20 30% 96%;
+
+    --border: 350 15% 17%;
+    --input: 350 15% 17%;
+    --ring: 340 65% 60%;
+  }
 }
 
 @layer base {
