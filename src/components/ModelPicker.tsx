@@ -48,6 +48,12 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
 
   return (
     <div className="space-y-3">
+      {!activeSeries && (
+        <p className="text-center text-muted-foreground text-sm">
+          בחרו סדרה ☝️
+        </p>
+      )}
+
       {/* Series chips */}
       <div className="flex flex-wrap gap-2 justify-center">
         {sortedSeries.map(series => (
@@ -66,25 +72,19 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
         ))}
       </div>
 
-          {/* Models list for active series */}
-          {activeSeries && grouped[activeSeries] && (
-            <div className="space-y-1.5 animate-fade-in pt-1">
-              {grouped[activeSeries].map(model => (
-                <ModelButton
-                  key={model.id}
-                  model={model}
-                  isSelected={selectedModel?.id === model.id}
-                  onSelect={onSelect}
-                  onConfirm={onConfirm}
-                />
-              ))}
-            </div>
-          )}
-
-      {!activeSeries && (
-        <p className="text-center text-muted-foreground text-sm py-4">
-          בחרו סדרה ☝️
-        </p>
+      {/* Models list for active series */}
+      {activeSeries && grouped[activeSeries] && (
+        <div className="space-y-1.5 animate-fade-in pt-1">
+          {grouped[activeSeries].map(model => (
+            <ModelButton
+              key={model.id}
+              model={model}
+              isSelected={selectedModel?.id === model.id}
+              onSelect={onSelect}
+              onConfirm={onConfirm}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
