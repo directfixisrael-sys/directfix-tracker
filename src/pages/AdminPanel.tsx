@@ -1308,115 +1308,87 @@ ${trackingUrl}
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-sidebar border-t border-sidebar-border z-50 px-2 py-2 safe-area-pb">
         <div className="flex justify-around items-center">
+          {/* Dashboard */}
           <button 
             onClick={() => setActiveTab('dashboard')}
             className={cn(
-              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
-              activeTab === 'dashboard' 
-                ? "bg-primary/10 text-primary" 
-                : "text-muted-foreground"
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
+              activeTab === 'dashboard' ? "bg-primary/10 text-primary" : "text-muted-foreground"
             )}
           >
             <Activity className="w-5 h-5" />
             <span className="text-[10px]">דשבורד</span>
           </button>
-          <button 
-            onClick={() => setActiveTab('live')}
-            className={cn(
-              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px] relative",
-              activeTab === 'live' 
-                ? "bg-success/10 text-success" 
-                : "text-muted-foreground"
-            )}
-          >
-            <div className="relative">
-              <Eye className="w-5 h-5" />
-              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-success rounded-full animate-pulse" />
-            </div>
-            <span className="text-[10px]">לייב</span>
-          </button>
+          {/* Orders */}
           <button 
             onClick={() => { setActiveTab('orders'); setSelectedOrder(null); }}
             className={cn(
-              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
-              activeTab === 'orders' 
-                ? "bg-primary/10 text-primary" 
-                : "text-muted-foreground"
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px] relative",
+              activeTab === 'orders' ? "bg-primary/10 text-primary" : "text-muted-foreground"
             )}
           >
             <Smartphone className="w-5 h-5" />
             <span className="text-[10px]">הזמנות</span>
             {orders.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute top-0 right-1 bg-primary text-primary-foreground text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
                 {orders.length}
               </span>
             )}
           </button>
+          {/* Messages */}
           <button 
             onClick={() => setActiveTab('messages')}
             className={cn(
-              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors relative min-w-[60px]",
-              activeTab === 'messages' 
-                ? "bg-primary/10 text-primary" 
-                : "text-muted-foreground"
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors relative min-w-[56px]",
+              activeTab === 'messages' ? "bg-primary/10 text-primary" : "text-muted-foreground"
             )}
           >
             <MessageSquare className="w-5 h-5" />
             <span className="text-[10px]">הודעות</span>
             {unreadCount > 0 && (
-              <span className="absolute top-0 right-2 bg-warning text-warning-foreground text-[9px] w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+              <span className="absolute top-0 right-1 bg-warning text-warning-foreground text-[9px] w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
                 {unreadCount}
               </span>
             )}
           </button>
-          <button 
-            onClick={() => setActiveTab('analytics')}
-            className={cn(
-              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
-              activeTab === 'analytics' 
-                ? "bg-primary/10 text-primary" 
-                : "text-muted-foreground"
-            )}
-          >
-            <Activity className="w-5 h-5" />
-            <span className="text-[10px]">אנליטיקס</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('feedback')}
-            className={cn(
-              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
-              activeTab === 'feedback' 
-                ? "bg-primary/10 text-primary" 
-                : "text-muted-foreground"
-            )}
-          >
-            <Star className="w-5 h-5" />
-            <span className="text-[10px]">משוב</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('promotions')}
-            className={cn(
-              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
-              activeTab === 'promotions' 
-                ? "bg-primary/10 text-primary" 
-                : "text-muted-foreground"
-            )}
-          >
-            <Gift className="w-5 h-5" />
-            <span className="text-[10px]">מבצעים</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('settings')}
-            className={cn(
-              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[60px]",
-              activeTab === 'settings' 
-                ? "bg-primary/10 text-primary" 
-                : "text-muted-foreground"
-            )}
-          >
-            <Settings className="w-5 h-5" />
-            <span className="text-[10px]">הגדרות</span>
-          </button>
+          {/* More menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button 
+                className={cn(
+                  "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
+                  ['live', 'analytics', 'feedback', 'promotions', 'settings'].includes(activeTab)
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground"
+                )}
+              >
+                <Plus className="w-5 h-5" />
+                <span className="text-[10px]">עוד</span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="end" className="w-48 bg-popover z-[60] mb-2">
+              <DropdownMenuItem onClick={() => setActiveTab('live')} className={cn("gap-3 py-3", activeTab === 'live' && "text-success font-medium")}>
+                <Eye className="w-4 h-4" />
+                <span>לייב</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('analytics')} className={cn("gap-3 py-3", activeTab === 'analytics' && "text-primary font-medium")}>
+                <Activity className="w-4 h-4" />
+                <span>אנליטיקס</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('feedback')} className={cn("gap-3 py-3", activeTab === 'feedback' && "text-primary font-medium")}>
+                <Star className="w-4 h-4" />
+                <span>משוב</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('promotions')} className={cn("gap-3 py-3", activeTab === 'promotions' && "text-primary font-medium")}>
+                <Gift className="w-4 h-4" />
+                <span>מבצעים</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('settings')} className={cn("gap-3 py-3", activeTab === 'settings' && "text-primary font-medium")}>
+                <Settings className="w-4 h-4" />
+                <span>הגדרות</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </nav>
 
