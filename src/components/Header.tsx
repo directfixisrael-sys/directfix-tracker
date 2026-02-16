@@ -1,4 +1,5 @@
-import { ArrowRight, Moon, Sun, Phone, Accessibility } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, Moon, Sun, Phone, Accessibility, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/ThemeProvider';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +13,7 @@ interface HeaderProps {
 const Header = ({ showBackButton, onBack }: HeaderProps) => {
   const { resolvedTheme, setTheme } = useTheme();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleTheme = () => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
@@ -29,28 +31,28 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
             חזור
           </button>
         ) : (
-          <div />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10 rounded-full sm:hidden"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="תפריט"
+          >
+            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </Button>
         )}
-        
-        <div className="flex items-center gap-2">
+
+        {/* Desktop actions */}
+        <div className="hidden sm:flex items-center gap-2">
           <a
             href="tel:033106020"
-            className="h-9 w-9 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center transition-colors"
+            className="h-9 w-9 rounded-full bg-success hover:bg-success/90 text-success-foreground flex items-center justify-center transition-colors"
             aria-label="התקשר 033106020"
           >
             <Phone className="w-4 h-4" />
           </a>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="h-9 w-9 rounded-full"
-          >
-            {resolvedTheme === 'dark' ? (
-              <Sun className="w-4 h-4" />
-            ) : (
-              <Moon className="w-4 h-4" />
-            )}
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-full">
+            {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </Button>
           <Button
             variant="ghost"
@@ -61,14 +63,49 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
           >
             <Accessibility className="w-4 h-4" />
           </Button>
-          <img 
-            src={logo} 
-            alt="Direct Fix Logo" 
-            className="h-10 w-auto cursor-pointer"
-            onClick={() => navigate('/')}
-          />
         </div>
+
+        {/* Logo - always visible */}
+        <img 
+          src={logo} 
+          alt="Direct Fix Logo" 
+          className="h-10 w-auto cursor-pointer"
+          onClick={() => navigate('/')}
+        />
       </div>
+
+      {/* Mobile menu dropdown */}
+      {menuOpen && (
+        <div className="sm:hidden bg-card border-t border-border/50 animate-slide-down">
+          <div className="flex items-center justify-center gap-4 py-3 px-4">
+            <a
+              href="tel:033106020"
+              className="h-12 w-12 rounded-full bg-success hover:bg-success/90 text-success-foreground flex items-center justify-center transition-colors"
+              aria-label="התקשר 033106020"
+              onClick={() => setMenuOpen(false)}
+            >
+              <Phone className="w-5 h-5" />
+            </a>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => { toggleTheme(); setMenuOpen(false); }}
+              className="h-12 w-12 rounded-full"
+            >
+              {resolvedTheme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => { window.dispatchEvent(new CustomEvent('open-accessibility-widget')); setMenuOpen(false); }}
+              className="h-12 w-12 rounded-full"
+              aria-label="נגישות"
+            >
+              <Accessibility className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
