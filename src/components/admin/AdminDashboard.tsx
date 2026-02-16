@@ -100,8 +100,8 @@ const AdminDashboard = ({ orders }: AdminDashboardProps) => {
               <div className="absolute inset-0 w-4 h-4 bg-success rounded-full animate-ping opacity-30" />
             </div>
             <div>
-              <span className="text-4xl font-bold text-success">{totalVisitors}</span>
-              <p className="text-muted-foreground">גולשים כרגע באתר</p>
+            <span className="text-4xl font-bold text-success">{totalVisitors}</span>
+            <p className="text-muted-foreground">מבקרים ב-30 דקות אחרונות</p>
             </div>
           </div>
         </div>
@@ -322,25 +322,12 @@ const AdminDashboard = ({ orders }: AdminDashboardProps) => {
       {/* ===== RECENT ORDERS ===== */}
       <Card className="p-4">
         <h3 className="font-bold text-lg mb-4">הזמנות אחרונות</h3>
-        <div className="border border-border rounded-xl overflow-hidden">
-          <div className="bg-muted/50 px-4 py-2 border-b border-border">
-            <div className="grid grid-cols-5 text-xs font-medium text-muted-foreground">
-              <span>לקוח</span>
-              <span>מכשיר</span>
-              <span>תקלה</span>
-              <span>מחיר</span>
-              <span>סטטוס</span>
-            </div>
-          </div>
-          <div className="divide-y divide-border max-h-64 overflow-y-auto">
-            {orders.slice(0, 10).map((order) => (
-              <div key={order.id} className="px-4 py-3 grid grid-cols-5 items-center text-sm">
-                <span className="font-medium truncate">{order.customerName}</span>
-                <span className="truncate text-muted-foreground">{order.deviceType}</span>
-                <span className="truncate text-muted-foreground">{order.issueDescription}</span>
-                <span className="font-bold text-primary">₪{order.repairPrice}</span>
+        <div className="space-y-3">
+          {orders.slice(0, 10).map((order) => (
+            <div key={order.id} className="p-3 bg-muted/30 rounded-xl space-y-1">
+              <div className="flex items-center justify-between">
                 <span className={cn(
-                  "text-xs px-2 py-1 rounded-full text-center font-medium",
+                  "text-xs px-2 py-1 rounded-full font-medium",
                   order.status === 'pending' && "bg-warning/10 text-warning",
                   order.status === 'completed' && "bg-success/10 text-success",
                   !['pending', 'completed'].includes(order.status) && "bg-primary/10 text-primary",
@@ -348,9 +335,16 @@ const AdminDashboard = ({ orders }: AdminDashboardProps) => {
                   {order.status === 'pending' ? 'ממתין' : 
                    order.status === 'completed' ? 'הושלם' : 'בתהליך'}
                 </span>
+                <span className="font-medium text-foreground">{order.customerName}</span>
               </div>
-            ))}
-          </div>
+              <p className="text-sm text-muted-foreground">{order.deviceType}</p>
+              <p className="text-sm text-muted-foreground break-words">{order.issueDescription}</p>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-primary text-sm">₪{order.repairPrice}</span>
+                <span className="text-xs text-muted-foreground">#{(order as any).orderNumber || ''}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </Card>
     </div>

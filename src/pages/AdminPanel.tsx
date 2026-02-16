@@ -100,6 +100,8 @@ const AdminPanel = () => {
   const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
   const [customerSearch, setCustomerSearch] = useState('');
   const [customerSortBy, setCustomerSortBy] = useState<'name' | 'orders' | 'recent'>('recent');
+  const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set());
+  const [bulkStatusDialogOpen, setBulkStatusDialogOpen] = useState(false);
 
   const { 
     orders, 
@@ -286,6 +288,30 @@ const AdminPanel = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const toggleOrderSelection = (orderId: string) => {
+    setSelectedOrderIds(prev => {
+      const next = new Set(prev);
+      if (next.has(orderId)) next.delete(orderId);
+      else next.add(orderId);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = () => {
+    const count = selectedOrderIds.size;
+    selectedOrderIds.forEach(id => deleteOrder(id));
+    setSelectedOrderIds(new Set());
+    setSelectedOrder(null);
+    toast({ title: `${count} הזמנות נמחקו`, variant: "destructive" });
+  };
+
+  const handleBulkStatusChange = (status: RepairStatus) => {
+    selectedOrderIds.forEach(id => updateOrderStatus(id, status));
+    setSelectedOrderIds(new Set());
+    setBulkStatusDialogOpen(false);
+    toast({ title: `סטטוס עודכן` });
   };
 
   const copyTrackingLink = (phone: string) => {
@@ -872,8 +898,28 @@ ${trackingUrl}
         return <AnalyticsDashboard orders={orders} />;
 
       default: // orders
+        const isSelectionMode = selectedOrderIds.size > 0;
+
         const ordersList = (
           <>
+            {/* Bulk actions bar */}
+            {isSelectionMode && (
+              <div className="sticky top-0 z-10 bg-primary/10 border-b border-primary/20 p-3 flex items-center justify-between gap-2">
+                <span className="text-sm font-medium text-primary">{selectedOrderIds.size} נבחרו</span>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setBulkStatusDialogOpen(true)} className="text-xs">
+                    שנה סטטוס
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={handleBulkDelete} className="text-xs">
+                    <Trash2 className="w-3 h-3 ml-1" />
+                    מחק
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setSelectedOrderIds(new Set())} className="text-xs">
+                    ביטול
+                  </Button>
+                </div>
+              </div>
+            )}
             {orders.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
                 <Smartphone className="w-12 h-12 mx-auto mb-3 opacity-30" />
@@ -882,14 +928,28 @@ ${trackingUrl}
               </div>
             ) : (
               orders.map((order) => (
-                <SwipeableOrderCard
-                  key={order.id}
-                  order={order}
-                  isSelected={selectedOrder?.id === order.id}
-                  onClick={() => setSelectedOrder(order)}
-                  onDelete={() => handleDeleteOrder(order.id)}
-                  getStatusColor={getStatusColor}
-                />
+                <div key={order.id} className="flex items-stretch">
+                  <div 
+                    className="flex items-center px-2 cursor-pointer hover:bg-muted/50"
+                    onClick={(e) => { e.stopPropagation(); toggleOrderSelection(order.id); }}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={selectedOrderIds.has(order.id)}
+                      onChange={() => toggleOrderSelection(order.id)}
+                      className="w-4 h-4 accent-primary rounded"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <SwipeableOrderCard
+                      order={order}
+                      isSelected={selectedOrder?.id === order.id}
+                      onClick={() => setSelectedOrder(order)}
+                      onDelete={() => handleDeleteOrder(order.id)}
+                      getStatusColor={getStatusColor}
+                    />
+                  </div>
+                </div>
               ))
             )}
           </>
@@ -1802,6 +1862,27 @@ ${trackingUrl}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {/* Bulk Status Change Dialog */}
+      <Dialog open={bulkStatusDialogOpen} onOpenChange={setBulkStatusDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>שנה סטטוס ל-{selectedOrderIds.size} הזמנות</DialogTitle>
+            <DialogDescription>בחר את הסטטוס החדש</DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 gap-2">
+            {Object.entries(statusLabels).map(([value, label]) => (
+              <Button
+                key={value}
+                variant="outline"
+                className="justify-start"
+                onClick={() => handleBulkStatusChange(value as RepairStatus)}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -11,6 +11,7 @@ export type PaymentStatus = 'none' | 'pending' | 'paid';
 
 export interface RepairOrder {
   id: string;
+  orderNumber?: number;
   customerPhone: string;
   customerName: string;
   customerAddress: string;

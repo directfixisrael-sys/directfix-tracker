@@ -10,6 +10,7 @@ export interface Visitor {
   userAgent?: string;
   leadSource?: string;
   language?: string;
+  lastSeenAt?: number; // timestamp for 30-min retention
 }
 
 interface LiveVisitorsState {
@@ -54,6 +55,8 @@ const releaseChannel = () => {
   }
 };
 
+const THIRTY_MINUTES = 30 * 60 * 1000;
+
 export const useLiveVisitors = () => {
   const [state, setState] = useState<LiveVisitorsState>({
     totalVisitors: 0,
@@ -62,22 +65,51 @@ export const useLiveVisitors = () => {
     visitors: [],
   });
   const channelRef = useRef<RealtimeChannel | null>(null);
+  const recentVisitorsRef = useRef<Map<string, Visitor>>(new Map());
 
   useEffect(() => {
     const visitorId = getVisitorId();
     const channel = getOrCreateChannel(visitorId);
     channelRef.current = channel;
 
-    channel.on('presence', { event: 'sync' }, () => {
-      const presenceState = channel.presenceState();
-      
+    const computeState = () => {
+      const now = Date.now();
       const visitors: Visitor[] = [];
       const visitorsByPage: Record<string, number> = {};
       const visitorsBySource: Record<string, number> = {};
 
+      // Clean up visitors older than 30 minutes
+      recentVisitorsRef.current.forEach((v, key) => {
+        if (now - (v.lastSeenAt || 0) > THIRTY_MINUTES) {
+          recentVisitorsRef.current.delete(key);
+        }
+      });
+
+      recentVisitorsRef.current.forEach((v) => {
+        visitors.push(v);
+        visitorsByPage[v.page] = (visitorsByPage[v.page] || 0) + 1;
+        const src = v.leadSource || 'ישיר';
+        visitorsBySource[src] = (visitorsBySource[src] || 0) + 1;
+      });
+
+      setState({
+        totalVisitors: visitors.length,
+        visitorsByPage,
+        visitorsBySource,
+        visitors,
+      });
+    };
+
+    channel.on('presence', { event: 'sync' }, () => {
+      const presenceState = channel.presenceState();
+      const now = Date.now();
+
+      // Mark all current presence visitors as active
+      const activeIds = new Set<string>();
       Object.values(presenceState).forEach((presences: any[]) => {
         presences.forEach((presence) => {
-          visitors.push({
+          activeIds.add(presence.visitorId);
+          recentVisitorsRef.current.set(presence.visitorId, {
             visitorId: presence.visitorId,
             page: presence.page,
             step: presence.step || null,
@@ -85,21 +117,12 @@ export const useLiveVisitors = () => {
             userAgent: presence.userAgent,
             leadSource: presence.leadSource,
             language: presence.language,
+            lastSeenAt: now,
           });
-          
-          visitorsByPage[presence.page] = (visitorsByPage[presence.page] || 0) + 1;
-          
-          const src = presence.leadSource || 'ישיר';
-          visitorsBySource[src] = (visitorsBySource[src] || 0) + 1;
         });
       });
-      
-      setState({
-        totalVisitors: visitors.length,
-        visitorsByPage,
-        visitorsBySource,
-        visitors,
-      });
+
+      computeState();
     });
 
     channel.on('presence', { event: 'join' }, () => {});
@@ -107,7 +130,11 @@ export const useLiveVisitors = () => {
 
     channel.subscribe();
 
+    // Periodic cleanup every 60 seconds
+    const cleanupInterval = setInterval(computeState, 60000);
+
     return () => {
+      clearInterval(cleanupInterval);
       releaseChannel();
     };
   }, []);
