@@ -292,6 +292,7 @@ const NewRepairOrder = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [completedOrderNumber, setCompletedOrderNumber] = useState<number | null>(null);
 
   // Schedule fields
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -747,7 +748,7 @@ const NewRepairOrder = () => {
         notes.push(`תמונות מכשיר: ${deviceImages.length} תמונות צורפו`);
       }
       const leadSource = getLeadSource();
-      const orderResult = await addOrder({
+      const orderResult: any = await addOrder({
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
         customerAddress: customerAddress.trim(),
@@ -794,6 +795,7 @@ const NewRepairOrder = () => {
       trackPurchase(getFinalPrice());
       // Track Google Analytics conversion
       gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
+      setCompletedOrderNumber(orderResult?.order_number || null);
       goToStep('success');
     } catch (error) {
       toast.error('אירעה שגיאה, נסה שוב');
@@ -1499,7 +1501,7 @@ const NewRepairOrder = () => {
 
               <div>
                 <label className="block text-sm font-bold mb-1.5">
-                  אימייל <span className="text-muted-foreground font-normal">(לא חובה - לקבלת אישור הזמנה)</span>
+                  כתובת אימייל
                 </label>
                 <Input placeholder="example@email.com" value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} type="email" className="h-13 text-base rounded-2xl bg-muted/40 border-border/50 focus:bg-card" dir="ltr" />
               </div>
@@ -1576,6 +1578,7 @@ const NewRepairOrder = () => {
 
             <div>
               <h2 className="text-2xl font-bold mb-1 text-success">ההזמנה התקבלה!</h2>
+              {completedOrderNumber && <p className="text-sm font-semibold text-foreground mb-1">הזמנה #{completedOrderNumber}</p>}
               <p className="text-muted-foreground text-sm">ניצור איתך קשר לאישור המועד</p>
             </div>
 
@@ -1617,6 +1620,11 @@ const NewRepairOrder = () => {
                 📍 מעקב אחר ההזמנה שלי
               </Button>
             </div>
+
+            {customerEmail && <div className="bg-primary/5 border border-primary/20 rounded-xl p-3">
+              <p className="text-sm text-foreground">📧 פרטי ההזמנה נשלחו לאימייל <span className="font-semibold" dir="ltr">{customerEmail}</span></p>
+              <p className="text-xs text-muted-foreground mt-1">מומלץ לבדוק גם בתיבת הספאם</p>
+            </div>}
             
             <Button variant="outline" onClick={() => navigate('/')} className="w-full h-10 rounded-xl">
               חזרה לדף הבית
