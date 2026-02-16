@@ -14,8 +14,8 @@ const MinimalFooter = () => {
 
   return (
     <>
-      <footer className="border-t border-border py-4 px-4">
-        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+      <footer className="border-t border-border py-4 px-4" role="contentinfo" aria-label="תחתית העמוד">
+        <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1" aria-label="קישורים שימושיים">
           {footerLinks.map((link, i) => (
             <button
               key={i}
@@ -25,7 +25,7 @@ const MinimalFooter = () => {
               {link.label}
             </button>
           ))}
-        </div>
+        </nav>
         <p className="text-[10px] text-muted-foreground/50 text-center mt-2">
           © {new Date().getFullYear()} DirectFix
         </p>

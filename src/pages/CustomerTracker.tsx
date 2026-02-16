@@ -161,9 +161,9 @@ const CustomerTracker = () => {
   // Phone input screen
   if (!currentOrder) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background" lang="he">
         <Header />
-        <main className="container py-8 px-4">
+        <main className="container py-8 px-4" role="main" aria-label="מעקב הזמנות - חיפוש">
           <div className="max-w-sm mx-auto text-center mb-8 animate-slide-down">
             <Logo size="md" clickable={false} className="justify-center mb-4" />
             <p className="text-muted-foreground text-sm">מעקב אחר התיקון שלכם בזמן אמת</p>
@@ -184,7 +184,7 @@ const CustomerTracker = () => {
   const showRating = currentOrder.status === 'completed';
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="min-h-screen bg-background pb-28" lang="he">
       <Header showBackButton onBack={handleBack} />
       
       {/* Privacy Consent Modal */}
@@ -206,7 +206,7 @@ const CustomerTracker = () => {
       {/* Receipt icon sheet */}
       <OrderSummarySheet order={currentOrder} />
       
-      <main className="container py-5 px-4 space-y-5 max-w-lg mx-auto">
+      <main className="container py-5 px-4 space-y-5 max-w-lg mx-auto" role="main" aria-label="מעקב הזמנת תיקון">
         {/* Welcome */}
         <div className="animate-slide-down text-center pt-2 pb-3">
           <p className="text-muted-foreground text-sm">שלום,</p>

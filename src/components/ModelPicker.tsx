@@ -47,18 +47,21 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
   const sortedSeries = seriesOrder.filter(s => grouped[s]?.length);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" role="region" aria-label="בחירת דגם מכשיר">
       {!activeSeries && (
-        <p className="text-center text-muted-foreground text-sm">
+        <p className="text-center text-muted-foreground text-sm" id="model-picker-hint">
           בחרו סדרה ☝️
         </p>
       )}
 
       {/* Series chips */}
-      <div className="flex flex-wrap gap-2 justify-center">
+      <div className="flex flex-wrap gap-2 justify-center" role="tablist" aria-label="סדרות מכשירים">
         {sortedSeries.map(series => (
           <button
             key={series}
+            role="tab"
+            aria-selected={activeSeries === series}
+            aria-controls={`models-${series.replace(/\s/g, '-')}`}
             onClick={() => setActiveSeries(activeSeries === series ? null : series)}
             className={cn(
               "px-4 py-2.5 rounded-full text-sm font-semibold transition-all",
@@ -74,7 +77,7 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
 
       {/* Models list for active series */}
       {activeSeries && grouped[activeSeries] && (
-        <div className="space-y-1.5 animate-fade-in pt-1">
+        <div id={`models-${activeSeries.replace(/\s/g, '-')}`} role="tabpanel" aria-label={`דגמי ${activeSeries}`} className="space-y-1.5 animate-fade-in pt-1">
           {grouped[activeSeries].map(model => (
             <ModelButton
               key={model.id}
@@ -103,6 +106,8 @@ const ModelButton = ({
 }) => (
   <button
     onClick={() => isSelected ? onConfirm(model) : onSelect(model)}
+    aria-label={isSelected ? `אישור בחירת ${model.name}` : `בחר דגם ${model.name}`}
+    aria-pressed={isSelected}
     className={cn(
       "w-full flex items-center justify-between px-5 py-4 rounded-2xl transition-all active:scale-[0.98]",
       isSelected

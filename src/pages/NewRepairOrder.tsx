@@ -910,7 +910,9 @@ const NewRepairOrder = () => {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-background flex flex-col">
+  return <div className="min-h-screen bg-background flex flex-col" lang="he">
+      {/* Skip to content */}
+      <a href="#order-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-lg">דלג לתוכן הראשי</a>
       {/* Promotion Strip */}
       {activePromotion && <div className="bg-foreground text-background text-center py-2.5 text-xs font-semibold tracking-wide">
           <span>{getPromotionIcon(activePromotion.icon)} {activePromotion.title} — {activePromotion.description}</span>
@@ -918,14 +920,14 @@ const NewRepairOrder = () => {
         </div>}
 
       {/* Header - Clean & Minimal */}
-      <div className="sticky top-0 bg-background/80 backdrop-blur-xl border-b border-border/40 z-10">
-        <div className="flex items-center justify-between p-3 max-w-5xl mx-auto">
+      <header className="sticky top-0 bg-background/80 backdrop-blur-xl border-b border-border/40 z-10" role="banner">
+        <nav className="flex items-center justify-between p-3 max-w-5xl mx-auto" aria-label="ניווט הזמנה">
           <div className="flex items-center gap-3">
             <button onClick={() => {
             if (step === 'model') navigate('/');else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
               if (currentBundle) goToStep('bundle');else goToStep('repair');
             } else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
-          }} className="h-10 w-10 rounded-2xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors">
+          }} className="h-10 w-10 rounded-2xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors" aria-label="חזור לשלב הקודם">
               <ArrowRight className="w-4 h-4" />
             </button>
             <Logo size="sm" />
@@ -941,15 +943,15 @@ const NewRepairOrder = () => {
           }} className="h-9 w-9 rounded-2xl" aria-label="נגישות">
               <Accessibility className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-2xl">
-              {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-2xl" aria-label={resolvedTheme === 'dark' ? 'עבור למצב בהיר' : 'עבור למצב כהה'}>
+              {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
             </Button>
           </div>
-        </div>
+        </nav>
         
         {/* Step Indicator - Pill style */}
-        {step !== 'success' && <div className="px-4 pb-3 max-w-5xl mx-auto">
-            <div className="flex gap-2 items-center">
+        {step !== 'success' && <div className="px-4 pb-3 max-w-5xl mx-auto" role="navigation" aria-label="שלבי ההזמנה">
+            <div className="flex gap-2 items-center" role="progressbar" aria-valuenow={['model','repair','bundle','price','schedule','details'].indexOf(step) + 1} aria-valuemin={1} aria-valuemax={5} aria-label={`שלב ${['model','repair','bundle','price','schedule','details'].indexOf(step) + 1} מתוך 5`}>
               {['model', 'repair', 'price', 'schedule', 'details'].map((s, i) => {
             const labels = ['דגם', 'תיקון', 'מחיר', 'מועד', 'פרטים'];
             const allSteps = ['model', 'repair', 'bundle', 'price', 'schedule', 'details'];
@@ -959,19 +961,19 @@ const NewRepairOrder = () => {
             const adjustedCurrentIdx = currentIdx >= 3 ? currentIdx - 1 : currentIdx === 2 ? 1.5 : currentIdx;
             const isActive = adjustedCurrentIdx >= displayIdx;
             const isCurrent = Math.floor(adjustedCurrentIdx) === displayIdx;
-            return <div key={s} className={`flex-1 text-center py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${isCurrent ? 'bg-primary text-primary-foreground shadow-md' : isActive ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'}`}>
+            return <div key={s} className={`flex-1 text-center py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${isCurrent ? 'bg-primary text-primary-foreground shadow-md' : isActive ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'}`} aria-current={isCurrent ? 'step' : undefined}>
                   {labels[i]}
                 </div>;
           })}
             </div>
           </div>}
-      </div>
+      </header>
 
       {/* Hidden file input for image upload */}
-      <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
+      <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" aria-label="העלאת תמונות מכשיר" />
 
       {/* Content */}
-      <div ref={contentRef} className={`flex-1 p-5 pb-28 overflow-y-auto transition-all duration-300 max-w-2xl mx-auto w-full ${isAnimating ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'}`}>
+      <main id="order-content" ref={contentRef} role="main" aria-label="טופס הזמנת תיקון" className={`flex-1 p-5 pb-28 overflow-y-auto transition-all duration-300 max-w-2xl mx-auto w-full ${isAnimating ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'}`}>
         
         {/* Privacy Consent Modal */}
         <OrderPrivacyConsent open={showPrivacyConsent} onAccept={() => setShowPrivacyConsent(false)} />
@@ -1742,7 +1744,7 @@ const NewRepairOrder = () => {
               חזרה לדף הבית
             </Button>
           </div>}
-      </div>
+      </main>
 
       {/* Disclaimer */}
       {step === 'model' && <div className="text-center px-6 py-3">
