@@ -170,6 +170,7 @@ export type Database = {
           coupon_discount: number | null
           created_at: string
           customer_address: string
+          customer_email: string | null
           customer_name: string
           customer_phone: string
           device_images: string[] | null
@@ -203,6 +204,7 @@ export type Database = {
           coupon_discount?: number | null
           created_at?: string
           customer_address?: string
+          customer_email?: string | null
           customer_name: string
           customer_phone: string
           device_images?: string[] | null
@@ -236,6 +238,7 @@ export type Database = {
           coupon_discount?: number | null
           created_at?: string
           customer_address?: string
+          customer_email?: string | null
           customer_name?: string
           customer_phone?: string
           device_images?: string[] | null

@@ -302,6 +302,7 @@ const NewRepairOrder = () => {
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
   const [customerNotes, setCustomerNotes] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptContact, setAcceptContact] = useState(false);
 
@@ -758,6 +759,7 @@ const NewRepairOrder = () => {
         notes,
         wantsPromotions: false,
         leadSource: leadSource.source,
+        customerEmail: customerEmail.trim() || undefined,
       } as any);
 
       // Send notifications (email + WhatsApp)
@@ -775,6 +777,7 @@ const NewRepairOrder = () => {
             repairPrice: getFinalPrice(),
             scheduledTime: scheduleNote,
             notes: customerNotes.trim(),
+            customerEmail: customerEmail.trim() || undefined,
             promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
             leadSource: leadSource.source,
             leadSourceDetails: leadSource,
@@ -1491,6 +1494,13 @@ const NewRepairOrder = () => {
                     <span className="font-bold text-foreground">אזור שירות:</span> השרון, המרכז וגוש דן
                   </p>
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-1.5">
+                  אימייל <span className="text-muted-foreground font-normal">(לא חובה - לקבלת אישור הזמנה)</span>
+                </label>
+                <Input placeholder="example@email.com" value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} type="email" className="h-13 text-base rounded-2xl bg-muted/40 border-border/50 focus:bg-card" dir="ltr" />
               </div>
 
               <div>
