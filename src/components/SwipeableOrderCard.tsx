@@ -93,7 +93,10 @@ const SwipeableOrderCard = ({ order, isSelected, onClick, onDelete, getStatusCol
           <span className={cn("status-badge text-sm", getStatusColor(order.status))}>
             {statusLabels[order.status]}
           </span>
-          <span className="font-medium text-foreground text-base">{order.customerName}</span>
+          <div className="text-right">
+            <span className="font-medium text-foreground text-base">{order.customerName}</span>
+            <span className="text-xs text-muted-foreground mr-2">#{(order as any).orderNumber || ''}</span>
+          </div>
         </div>
         <p className="text-muted-foreground mb-1">{order.deviceType}</p>
         <p className="text-xs text-muted-foreground/70 mb-1">

@@ -50,6 +50,7 @@ const defaultAccessories: Accessory[] = [
 // Convert database row to RepairOrder
 const dbToOrder = (row: any): RepairOrder => ({
   id: row.id,
+  orderNumber: row.order_number,
   customerPhone: row.customer_phone,
   customerName: row.customer_name,
   customerAddress: row.customer_address || '',

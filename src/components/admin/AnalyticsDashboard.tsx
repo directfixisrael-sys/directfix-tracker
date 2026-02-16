@@ -76,7 +76,7 @@ const LiveVisitorsCard = ({ activeViewers }: { activeViewers: any[] }) => {
           </div>
           <div>
             <span className="text-4xl font-bold text-success">{totalVisitors}</span>
-            <p className="text-muted-foreground">גולשים כרגע באתר</p>
+            <p className="text-muted-foreground">מבקרים ב-30 דקות אחרונות</p>
           </div>
         </div>
       </div>

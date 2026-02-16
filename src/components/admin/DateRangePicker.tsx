@@ -94,10 +94,10 @@ const DateRangePicker = ({ value, onChange }: DateRangePickerProps) => {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="gap-2 min-w-[160px]">
-          <CalendarIcon className="w-4 h-4" />
-          <span>{value.label}</span>
-          <ChevronDown className="w-4 h-4 opacity-50" />
+        <Button variant="outline" className="gap-1.5 min-w-[120px] text-xs sm:text-sm">
+          <CalendarIcon className="w-4 h-4 shrink-0" />
+          <span className="truncate">{value.label}</span>
+          <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50 shrink-0" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="end">
