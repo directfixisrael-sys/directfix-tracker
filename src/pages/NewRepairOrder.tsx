@@ -1064,85 +1064,93 @@ const NewRepairOrder = () => {
               return Phone;
             };
             const IconComponent = getIcon();
-            return <Card key={repair.id} onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 shadow-sm hover:shadow-md ${isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-border hover:border-primary/40 hover:bg-primary/5'}`}>
-                    <div className="flex items-center gap-4">
-                      {/* Simple Icon */}
-                      <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center">
-                        <IconComponent className="w-7 h-7 text-foreground/70" />
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-xl">{repair.name}</h3>
-                          {!isPhoneOnly && info && <Dialog>
-                              <DialogTrigger asChild>
-                                <button type="button" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-primary transition-colors p-1">
-                                  <HelpCircle className="w-5 h-5" />
-                                </button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-sm" onClick={e => e.stopPropagation()}>
-                                <DialogHeader>
-                                  <DialogTitle className="text-right">{info.title}</DialogTitle>
-                                </DialogHeader>
-                                <p className="text-base text-muted-foreground text-right leading-relaxed">
-                                  {info.description}
-                                </p>
-                              </DialogContent>
-                            </Dialog>}
+            return <div key={repair.id}>
+                    <Card onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 shadow-sm hover:shadow-md ${
+                      showBackColorPicker && isBackGlass 
+                        ? 'border-primary bg-primary/5' 
+                        : isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-border hover:border-primary/40 hover:bg-primary/5'
+                    }`}>
+                      <div className="flex items-center gap-4">
+                        {/* Simple Icon */}
+                        <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center">
+                          <IconComponent className="w-7 h-7 text-foreground/70" />
                         </div>
-                        {repair.description && <p className="text-muted-foreground text-base mt-1">{repair.description}</p>}
-                        {!isPhoneOnly && selectedModel && <p className="text-2xl font-bold text-primary mt-2">₪{price}</p>}
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-xl">{repair.name}</h3>
+                            {!isPhoneOnly && info && <Dialog>
+                                <DialogTrigger asChild>
+                                  <button type="button" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-primary transition-colors p-1">
+                                    <HelpCircle className="w-5 h-5" />
+                                  </button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-sm" onClick={e => e.stopPropagation()}>
+                                  <DialogHeader>
+                                    <DialogTitle className="text-right">{info.title}</DialogTitle>
+                                  </DialogHeader>
+                                  <p className="text-base text-muted-foreground text-right leading-relaxed">
+                                    {info.description}
+                                  </p>
+                                </DialogContent>
+                              </Dialog>}
+                          </div>
+                          {repair.description && <p className="text-muted-foreground text-base mt-1">{repair.description}</p>}
+                          {!isPhoneOnly && selectedModel && <p className="text-2xl font-bold text-primary mt-2">₪{price}</p>}
+                        </div>
+                        
+                        {!isPhoneOnly && <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />}
                       </div>
-                      
-                      {!isPhoneOnly && <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />}
-                    </div>
-                  </Card>;
+                    </Card>
+
+                    {/* Inline Color Picker - slides open under the back glass card */}
+                    {isBackGlass && showBackColorPicker && selectedModel && (() => {
+                      const colors = iphoneBackColors[selectedModel.name] || [];
+                      return colors.length > 0 ? (
+                        <div className="overflow-hidden animate-fade-in">
+                          <div className="pt-3 pb-1 px-1 space-y-4">
+                            <div className="text-center">
+                              <h3 className="text-lg font-bold">באיזה צבע הגב של המכשיר?</h3>
+                              <p className="text-sm text-muted-foreground">בחרו את הצבע כדי שנביא את החלק המתאים</p>
+                            </div>
+                            <div className="grid grid-cols-3 gap-3">
+                              {colors.map((color) => (
+                                <button
+                                  key={color.name}
+                                  onClick={() => setSelectedBackColor(color.name)}
+                                  className={`flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all duration-200 ${
+                                    selectedBackColor === color.name
+                                      ? 'border-primary bg-primary/5 shadow-md'
+                                      : 'border-border hover:border-primary/40'
+                                  }`}
+                                >
+                                  <div
+                                    className={`w-10 h-10 rounded-full border-2 shadow-inner ${
+                                      selectedBackColor === color.name ? 'border-primary ring-2 ring-primary/30' : 'border-border'
+                                    }`}
+                                    style={{ backgroundColor: color.hex }}
+                                  />
+                                  <span className="text-xs font-medium text-center leading-tight">{color.name}</span>
+                                  {selectedBackColor === color.name && (
+                                    <Check className="w-4 h-4 text-primary" />
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                            <Button
+                              onClick={handleBackColorConfirm}
+                              disabled={!selectedBackColor}
+                              className="w-full h-12 text-base font-bold rounded-xl"
+                            >
+                              המשך עם {selectedBackColor || '...'}
+                            </Button>
+                          </div>
+                        </div>
+                      ) : null;
+                    })()}
+                  </div>;
             })}
             </div>
-
-            {/* Back Glass Color Picker */}
-            {showBackColorPicker && selectedModel && selectedRepair && (() => {
-              const colors = iphoneBackColors[selectedModel.name] || [];
-              return colors.length > 0 ? (
-                <div className="space-y-4 animate-fade-in mt-4">
-                  <div className="text-center">
-                    <h3 className="text-lg font-bold">באיזה צבע הגב של המכשיר?</h3>
-                    <p className="text-sm text-muted-foreground">בחרו את הצבע כדי שנביא את החלק המתאים</p>
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    {colors.map((color) => (
-                      <button
-                        key={color.name}
-                        onClick={() => setSelectedBackColor(color.name)}
-                        className={`flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all duration-200 ${
-                          selectedBackColor === color.name
-                            ? 'border-primary bg-primary/5 shadow-md'
-                            : 'border-border hover:border-primary/40'
-                        }`}
-                      >
-                        <div
-                          className={`w-10 h-10 rounded-full border-2 shadow-inner ${
-                            selectedBackColor === color.name ? 'border-primary ring-2 ring-primary/30' : 'border-border'
-                          }`}
-                          style={{ backgroundColor: color.hex }}
-                        />
-                        <span className="text-xs font-medium text-center leading-tight">{color.name}</span>
-                        {selectedBackColor === color.name && (
-                          <Check className="w-4 h-4 text-primary" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                  <Button
-                    onClick={handleBackColorConfirm}
-                    disabled={!selectedBackColor}
-                    className="w-full h-12 text-base font-bold rounded-xl"
-                  >
-                    המשך עם {selectedBackColor || '...'}
-                  </Button>
-                </div>
-              ) : null;
-            })()}
           </div>}
 
         {/* Step 2.5: Bundle Offer */}
