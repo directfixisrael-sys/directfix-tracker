@@ -6,12 +6,14 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Calendar, Plus, Trash2, Loader2, CalendarRange } from 'lucide-react';
+import { Calendar, Plus, Trash2, Loader2, CalendarRange, Clock } from 'lucide-react';
 
 interface BlockedDate {
   id: string;
   date: string;
   reason: string | null;
+  start_time: string | null;
+  end_time: string | null;
   created_at: string;
 }
 
@@ -23,6 +25,9 @@ const VacationManagement = () => {
   const [newReason, setNewReason] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [isDateRange, setIsDateRange] = useState(false);
+  const [isTimeBlock, setIsTimeBlock] = useState(false);
+  const [newStartTime, setNewStartTime] = useState('');
+  const [newEndTime, setNewEndTime] = useState('');
 
   useEffect(() => {
     loadBlockedDates();
@@ -36,7 +41,7 @@ const VacationManagement = () => {
         .order('date', { ascending: true });
 
       if (error) throw error;
-      setBlockedDates(data || []);
+      setBlockedDates((data as BlockedDate[]) || []);
     } catch (error) {
       console.error('Error loading blocked dates:', error);
       toast.error('שגיאה בטעינת התאריכים החסומים');
@@ -61,11 +66,24 @@ const VacationManagement = () => {
       return;
     }
 
+    if (isTimeBlock && (!newStartTime || !newEndTime)) {
+      toast.error('אנא בחר שעת התחלה ושעת סיום');
+      return;
+    }
+
+    if (isTimeBlock && newStartTime >= newEndTime) {
+      toast.error('שעת הסיום חייבת להיות אחרי שעת ההתחלה');
+      return;
+    }
+
     setIsAdding(true);
     try {
+      const timeData = isTimeBlock
+        ? { start_time: newStartTime, end_time: newEndTime }
+        : { start_time: null, end_time: null };
+
       if (isDateRange) {
-        // Generate all dates in range
-        const dates: { date: string; reason: string | null }[] = [];
+        const dates: { date: string; reason: string | null; start_time: string | null; end_time: string | null }[] = [];
         const start = new Date(newDate);
         const end = new Date(newEndDate);
         
@@ -73,6 +91,7 @@ const VacationManagement = () => {
           dates.push({
             date: d.toISOString().split('T')[0],
             reason: newReason || null,
+            ...timeData,
           });
         }
 
@@ -88,6 +107,7 @@ const VacationManagement = () => {
           .insert({
             date: newDate,
             reason: newReason || null,
+            ...timeData,
           });
 
         if (error) throw error;
@@ -97,6 +117,8 @@ const VacationManagement = () => {
       setNewDate('');
       setNewEndDate('');
       setNewReason('');
+      setNewStartTime('');
+      setNewEndTime('');
       loadBlockedDates();
     } catch (error) {
       console.error('Error adding blocked date:', error);
@@ -133,6 +155,10 @@ const VacationManagement = () => {
     });
   };
 
+  const formatTime = (timeStr: string) => {
+    return timeStr.slice(0, 5); // "HH:MM"
+  };
+
   const isPastDate = (dateStr: string) => {
     const date = new Date(dateStr);
     const today = new Date();
@@ -160,17 +186,30 @@ const VacationManagement = () => {
           הוסף תאריך חסום / חופשה
         </h3>
         
-        {/* Toggle for date range */}
-        <div className="flex items-center gap-3 mb-4 p-3 bg-muted/50 rounded-lg">
-          <CalendarRange className="w-4 h-4 text-muted-foreground" />
-          <Label htmlFor="date-range" className="text-sm cursor-pointer flex-1">
-            טווח תאריכים (מתאריך עד תאריך)
-          </Label>
-          <Switch
-            id="date-range"
-            checked={isDateRange}
-            onCheckedChange={setIsDateRange}
-          />
+        {/* Toggles */}
+        <div className="space-y-2 mb-4">
+          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+            <CalendarRange className="w-4 h-4 text-muted-foreground" />
+            <Label htmlFor="date-range" className="text-sm cursor-pointer flex-1">
+              טווח תאריכים (מתאריך עד תאריך)
+            </Label>
+            <Switch
+              id="date-range"
+              checked={isDateRange}
+              onCheckedChange={setIsDateRange}
+            />
+          </div>
+          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+            <Clock className="w-4 h-4 text-muted-foreground" />
+            <Label htmlFor="time-block" className="text-sm cursor-pointer flex-1">
+              חסום שעות מסוימות בלבד (לא כל היום)
+            </Label>
+            <Switch
+              id="time-block"
+              checked={isTimeBlock}
+              onCheckedChange={setIsTimeBlock}
+            />
+          </div>
         </div>
 
         <div className="space-y-3">
@@ -198,6 +237,29 @@ const VacationManagement = () => {
               </div>
             )}
           </div>
+
+          {/* Time inputs */}
+          {isTimeBlock && (
+            <div className="grid grid-cols-2 gap-3 p-3 bg-accent/30 rounded-lg border border-accent">
+              <div>
+                <label className="text-sm text-muted-foreground mb-1 block">משעה</label>
+                <Input
+                  type="time"
+                  value={newStartTime}
+                  onChange={(e) => setNewStartTime(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground mb-1 block">עד שעה</label>
+                <Input
+                  type="time"
+                  value={newEndTime}
+                  onChange={(e) => setNewEndTime(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="text-sm text-muted-foreground mb-1 block">סיבה (לא חובה)</label>
             <Input
@@ -208,7 +270,7 @@ const VacationManagement = () => {
           </div>
           <Button 
             onClick={handleAddBlockedDate}
-            disabled={isAdding || !newDate || (isDateRange && !newEndDate)}
+            disabled={isAdding || !newDate || (isDateRange && !newEndDate) || (isTimeBlock && (!newStartTime || !newEndTime))}
             className="w-full md:w-auto"
           >
             {isAdding ? (
@@ -216,7 +278,7 @@ const VacationManagement = () => {
             ) : (
               <Plus className="w-4 h-4 ml-2" />
             )}
-            {isDateRange ? 'הוסף טווח תאריכים' : 'הוסף תאריך חסום'}
+            {isTimeBlock ? 'הוסף חסימת שעות' : isDateRange ? 'הוסף טווח תאריכים' : 'הוסף תאריך חסום'}
           </Button>
         </div>
       </Card>
@@ -229,11 +291,23 @@ const VacationManagement = () => {
             {futureDates.map((blockedDate) => (
               <Card key={blockedDate.id} className="p-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-destructive/10 rounded-full flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-destructive" />
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${blockedDate.start_time ? 'bg-orange-100' : 'bg-destructive/10'}`}>
+                    {blockedDate.start_time ? (
+                      <Clock className="w-5 h-5 text-orange-600" />
+                    ) : (
+                      <Calendar className="w-5 h-5 text-destructive" />
+                    )}
                   </div>
                   <div>
                     <p className="font-medium">{formatDate(blockedDate.date)}</p>
+                    {blockedDate.start_time && blockedDate.end_time && (
+                      <p className="text-sm text-orange-600 font-medium">
+                        🕐 {formatTime(blockedDate.start_time)} - {formatTime(blockedDate.end_time)}
+                      </p>
+                    )}
+                    {!blockedDate.start_time && (
+                      <p className="text-xs text-muted-foreground">כל היום</p>
+                    )}
                     {blockedDate.reason && (
                       <p className="text-sm text-muted-foreground">{blockedDate.reason}</p>
                     )}
@@ -261,7 +335,7 @@ const VacationManagement = () => {
         </Card>
       )}
 
-      {/* Past blocked dates (collapsed) */}
+      {/* Past blocked dates */}
       {pastDates.length > 0 && (
         <div className="opacity-60">
           <h3 className="font-medium mb-2 text-sm text-muted-foreground">
@@ -271,6 +345,9 @@ const VacationManagement = () => {
             {pastDates.slice(0, 5).map((blockedDate) => (
               <div key={blockedDate.id} className="text-sm text-muted-foreground flex items-center gap-2">
                 <span>{formatDate(blockedDate.date)}</span>
+                {blockedDate.start_time && blockedDate.end_time && (
+                  <span>({formatTime(blockedDate.start_time)}-{formatTime(blockedDate.end_time)})</span>
+                )}
                 {blockedDate.reason && <span>• {blockedDate.reason}</span>}
               </div>
             ))}
