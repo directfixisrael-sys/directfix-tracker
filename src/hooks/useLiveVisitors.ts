@@ -57,6 +57,9 @@ const releaseChannel = () => {
 
 const THIRTY_MINUTES = 30 * 60 * 1000;
 
+// Module-level map so visitor history survives component remounts
+const recentVisitorsMap = new Map<string, Visitor>();
+
 export const useLiveVisitors = () => {
   const [state, setState] = useState<LiveVisitorsState>({
     totalVisitors: 0,
@@ -65,7 +68,6 @@ export const useLiveVisitors = () => {
     visitors: [],
   });
   const channelRef = useRef<RealtimeChannel | null>(null);
-  const recentVisitorsRef = useRef<Map<string, Visitor>>(new Map());
 
   useEffect(() => {
     const visitorId = getVisitorId();
@@ -79,13 +81,13 @@ export const useLiveVisitors = () => {
       const visitorsBySource: Record<string, number> = {};
 
       // Clean up visitors older than 30 minutes
-      recentVisitorsRef.current.forEach((v, key) => {
+      recentVisitorsMap.forEach((v, key) => {
         if (now - (v.lastSeenAt || 0) > THIRTY_MINUTES) {
-          recentVisitorsRef.current.delete(key);
+          recentVisitorsMap.delete(key);
         }
       });
 
-      recentVisitorsRef.current.forEach((v) => {
+      recentVisitorsMap.forEach((v) => {
         visitors.push(v);
         visitorsByPage[v.page] = (visitorsByPage[v.page] || 0) + 1;
         const src = v.leadSource || 'ישיר';
@@ -109,7 +111,7 @@ export const useLiveVisitors = () => {
       Object.values(presenceState).forEach((presences: any[]) => {
         presences.forEach((presence) => {
           activeIds.add(presence.visitorId);
-          recentVisitorsRef.current.set(presence.visitorId, {
+          recentVisitorsMap.set(presence.visitorId, {
             visitorId: presence.visitorId,
             page: presence.page,
             step: presence.step || null,
