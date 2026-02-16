@@ -15,6 +15,7 @@ interface OrderData {
   scheduledTime: string;
   notes: string;
   customerEmail?: string;
+  orderNumber?: number;
   promotionTitle?: string;
   leadSource?: string;
   leadSourceDetails?: {
@@ -125,7 +126,7 @@ const handler = async (req: Request): Promise<Response> => {
   <div style="max-width: 600px; margin: 0 auto; padding: 20px; direction: rtl;">
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px 16px 0 0; padding: 30px; text-align: center;">
       <h1 style="color: white; margin: 0; font-size: 28px;">🎉 הזמנה חדשה!</h1>
-      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">התקבלה הזמנת תיקון חדשה</p>
+      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">התקבלה הזמנת תיקון חדשה${orderData.orderNumber ? ` (#${orderData.orderNumber})` : ''}</p>
     </div>
     
     <div style="background: white; border-radius: 0 0 16px 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: right;">
@@ -195,7 +196,7 @@ const handler = async (req: Request): Promise<Response> => {
           resendApiKey,
           "iPhix <onboarding@resend.dev>",
           ["directfixisrael@gmail.com"],
-          `התקבלה הזמנה לתיקון חדש 🎉 - ${orderData.customerName} - ${orderData.deviceType}`,
+          `התקבלה הזמנה לתיקון חדש 🎉${orderData.orderNumber ? ` #${orderData.orderNumber}` : ''} - ${orderData.customerName} - ${orderData.deviceType}`,
           businessEmailHtml
         );
         results.email = businessEmail;
@@ -342,6 +343,7 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
     <div style="background: linear-gradient(135deg, #0d64f4 0%, #0a4dbf 100%); border-radius: 16px 16px 0 0; padding: 30px; text-align: center;">
       <div style="font-size: 50px; margin-bottom: 10px;">✅</div>
       <h1 style="color: white; margin: 0; font-size: 24px;">ההזמנה התקבלה בהצלחה!</h1>
+      ${orderData.orderNumber ? `<p style="color: rgba(255,255,255,0.8); margin: 8px 0 0 0; font-size: 14px;">הזמנה #${orderData.orderNumber}</p>` : ''}
       <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">תודה שבחרת ב-DirectFix, ${orderData.customerName}!</p>
     </div>
     

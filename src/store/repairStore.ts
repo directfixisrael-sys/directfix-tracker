@@ -27,7 +27,7 @@ interface RepairStore {
   setViewingStatus: (orderId: string, isViewing: boolean) => Promise<void>;
   
   // Admin actions
-  addOrder: (order: Omit<RepairOrder, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  addOrder: (order: Omit<RepairOrder, 'id' | 'createdAt' | 'updatedAt'>) => Promise<any>;
   updateOrderStatus: (orderId: string, status: RepairStatus, note?: string) => Promise<void>;
   updateEstimatedArrival: (orderId: string, eta: string) => Promise<void>;
   updateWazeLink: (orderId: string, wazeLink: string) => Promise<void>;
@@ -273,15 +273,17 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
         notes: orderData.notes || [],
         wants_promotions: orderData.wantsPromotions,
         lead_source: (orderData as any).leadSource || null,
+        customer_email: (orderData as any).customerEmail || null,
       })
       .select()
       .single();
 
     if (error) {
       console.error('Error adding order:', error);
+      return null;
     } else {
       console.log('Order added successfully:', data);
-      // Note: WhatsApp notifications are now sent from NewRepairOrder via send-order-notifications
+      return data;
     }
   },
 

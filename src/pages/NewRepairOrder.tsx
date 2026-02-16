@@ -747,7 +747,7 @@ const NewRepairOrder = () => {
         notes.push(`תמונות מכשיר: ${deviceImages.length} תמונות צורפו`);
       }
       const leadSource = getLeadSource();
-      await addOrder({
+      const orderResult = await addOrder({
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
         customerAddress: customerAddress.trim(),
@@ -778,6 +778,7 @@ const NewRepairOrder = () => {
             scheduledTime: scheduleNote,
             notes: customerNotes.trim(),
             customerEmail: customerEmail.trim() || undefined,
+            orderNumber: orderResult?.order_number || undefined,
             promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
             leadSource: leadSource.source,
             leadSourceDetails: leadSource,
