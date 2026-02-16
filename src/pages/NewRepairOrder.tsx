@@ -370,10 +370,10 @@ const NewRepairOrder = () => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [modelsRes, repairsRes, blockedRes, bundlesRes] = await Promise.all([supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), supabase.from('blocked_dates').select('date'), supabase.from('repair_bundles').select('*').eq('is_active', true)]);
+        const [modelsRes, repairsRes, blockedRes, bundlesRes] = await Promise.all([supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), supabase.from('blocked_dates').select('date, start_time'), supabase.from('repair_bundles').select('*').eq('is_active', true)]);
         if (modelsRes.data) setModels(modelsRes.data);
         if (repairsRes.data) setRepairTypes(repairsRes.data);
-        if (blockedRes.data) setBlockedDates(blockedRes.data.map(d => d.date));
+        if (blockedRes.data) setBlockedDates(blockedRes.data.filter(d => !d.start_time).map(d => d.date));
         if (bundlesRes.data) setRepairBundles(bundlesRes.data);
 
         // Load promotion separately to avoid error if none exists
