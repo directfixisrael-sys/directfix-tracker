@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +23,7 @@ import ModelPicker from '@/components/ModelPicker';
 import GiftPromoPopup from '@/components/GiftPromoPopup';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { getLeadSource } from '@/lib/leadSource';
+import GiftOrderToggle from '@/components/GiftOrderToggle';
 
 // iPhone back glass colors per model family
 const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
@@ -329,8 +330,26 @@ const NewRepairOrder = () => {
   // Privacy consent
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
 
+  // Gift order mode
+  const [isGiftOrder, setIsGiftOrder] = useState(false);
+  const [giftSenderName, setGiftSenderName] = useState('');
+  const [giftSenderPhone, setGiftSenderPhone] = useState('');
+  const [giftMessage, setGiftMessage] = useState('');
+
   // Gift promo popup
   const [showGiftPopup, setShowGiftPopup] = useState(false);
+
+  // Apply/remove gift-mode class on html element
+  useEffect(() => {
+    if (isGiftOrder) {
+      document.documentElement.classList.add('gift-mode');
+    } else {
+      document.documentElement.classList.remove('gift-mode');
+    }
+    return () => {
+      document.documentElement.classList.remove('gift-mode');
+    };
+  }, [isGiftOrder]);
   const [giftClaimed, setGiftClaimed] = useState(false);
 
   // Broadcast initial step on mount
@@ -746,6 +765,14 @@ const NewRepairOrder = () => {
       toast.error('מספר טלפון לא תקין');
       return;
     }
+    if (isGiftOrder && (!giftSenderName.trim() || !giftSenderPhone.trim())) {
+      toast.error('אנא מלאו את פרטי השולח');
+      return;
+    }
+    if (isGiftOrder && giftSenderPhone.length < 9) {
+      toast.error('מספר טלפון של השולח לא תקין');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const scheduleNote = formatSelectedDateTime();
@@ -774,6 +801,13 @@ const NewRepairOrder = () => {
       }
       if (deviceImages.length > 0) {
         notes.push(`תמונות מכשיר: ${deviceImages.length} תמונות צורפו`);
+      }
+      if (isGiftOrder) {
+        notes.push(`🎁 הזמנת מתנה — שולח: ${giftSenderName.trim()}, טלפון שולח: ${giftSenderPhone.trim()}`);
+        if (giftMessage.trim()) {
+          notes.push(`ברכה: ${giftMessage.trim()}`);
+        }
+        notes.push('⚠️ דורש תשלום מראש מהשולח לפני תיאום הגעה');
       }
       const leadSource = getLeadSource();
       const orderResult: any = await addOrder({
@@ -1057,6 +1091,9 @@ const NewRepairOrder = () => {
 
             {/* Testimonials Slider */}
             <TestimonialsSlider />
+
+            {/* Gift Order Toggle */}
+            <GiftOrderToggle isGift={isGiftOrder} onToggle={setIsGiftOrder} />
 
             {/* Smart AI Search */}
             <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
@@ -1388,9 +1425,9 @@ const NewRepairOrder = () => {
                     <CheckCircle2 className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm">תשלום בסיום התיקון בלבד</p>
+                    <p className="font-semibold text-sm">{isGiftOrder ? 'תשלום מראש מהשולח' : 'תשלום בסיום התיקון בלבד'}</p>
                     <p className="text-muted-foreground text-xs mt-0.5">
-                      מזומן, אשראי או ביט
+                      {isGiftOrder ? 'נציג ייצור קשר לגביית התשלום לפני ההגעה' : 'מזומן, אשראי או ביט'}
                     </p>
                   </div>
                 </div>
@@ -1497,18 +1534,59 @@ const NewRepairOrder = () => {
         {/* Step 5: Customer Details */}
         {step === 'details' && <div className="space-y-5 animate-fade-in">
             <div className="text-center mb-4">
-              <div className="inline-flex items-center gap-2 bg-accent/10 text-accent rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
-                <MapPin className="w-4 h-4" />
-                פרטים אחרונים
+              <div className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold mb-3 ${
+                isGiftOrder ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
+              }`}>
+                {isGiftOrder ? <Gift className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
+                {isGiftOrder ? 'תיקון במתנה 🎁' : 'פרטים אחרונים'}
               </div>
-              <h2 className="text-3xl font-extrabold mb-1">לאן נגיע?</h2>
-              <p className="text-muted-foreground">מלאו את הפרטים ואנחנו בדרך</p>
+              <h2 className="text-3xl font-extrabold mb-1">{isGiftOrder ? 'פרטי המתנה' : 'לאן נגיע?'}</h2>
+              <p className="text-muted-foreground">{isGiftOrder ? 'מלאו את פרטי השולח ומקבל המתנה' : 'מלאו את הפרטים ואנחנו בדרך'}</p>
             </div>
 
+            {/* Gift sender details */}
+            {isGiftOrder && (
+              <div className="space-y-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl p-5 border border-primary/20 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <Heart className="w-5 h-5 text-primary fill-primary" />
+                  <h3 className="font-bold text-lg">פרטי השולח (שלכם)</h3>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-1.5">שם השולח</label>
+                  <Input placeholder="השם שלכם" value={giftSenderName} onChange={e => setGiftSenderName(e.target.value)} className="h-13 text-base rounded-2xl bg-card border-border/50 focus:bg-card" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-1.5">טלפון השולח</label>
+                  <Input placeholder="050-0000000" value={giftSenderPhone} onChange={e => setGiftSenderPhone(formatPhone(e.target.value))} type="tel" className="h-13 text-base rounded-2xl text-right bg-card border-border/50 focus:bg-card" dir="ltr" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-1.5">
+                    ברכה למקבל המתנה <span className="text-muted-foreground font-normal">(לא חובה)</span>
+                  </label>
+                  <Textarea placeholder="כמה מילים חמות למקבל המתנה..." value={giftMessage} onChange={e => setGiftMessage(e.target.value)} className="text-base rounded-2xl resize-none bg-card border-border/50 focus:bg-card" rows={2} />
+                </div>
+                
+                <div className="bg-card/80 rounded-xl p-3 border border-border/50">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-primary flex-shrink-0" />
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-semibold text-foreground">שימו לב:</span> נציג שלנו ייצור איתכם קשר לגביית התשלום לפני תיאום ההגעה
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-4 bg-card rounded-3xl p-5 border border-border/50 shadow-sm">
+              {isGiftOrder && (
+                <div className="flex items-center gap-2 mb-2">
+                  <Gift className="w-5 h-5 text-primary" />
+                  <h3 className="font-bold text-lg">פרטי מקבל המתנה</h3>
+                </div>
+              )}
               <div>
-                <label className="block text-sm font-bold mb-1.5">שם מלא</label>
-                <Input placeholder="הכנס שם מלא" value={customerName} onChange={e => setCustomerName(e.target.value)} className="h-13 text-base rounded-2xl bg-muted/40 border-border/50 focus:bg-card" />
+                <label className="block text-sm font-bold mb-1.5">{isGiftOrder ? 'שם מקבל המתנה' : 'שם מלא'}</label>
+                <Input placeholder={isGiftOrder ? 'שם מקבל המתנה' : 'הכנס שם מלא'} value={customerName} onChange={e => setCustomerName(e.target.value)} className="h-13 text-base rounded-2xl bg-muted/40 border-border/50 focus:bg-card" />
               </div>
 
               <div>
@@ -1605,9 +1683,15 @@ const NewRepairOrder = () => {
             </div>
 
             <div>
-              <h2 className="text-2xl font-bold mb-1 text-success">ההזמנה התקבלה!</h2>
+              <h2 className="text-2xl font-bold mb-1 text-success">
+                {isGiftOrder ? '🎁 הזמנת המתנה התקבלה!' : 'ההזמנה התקבלה!'}
+              </h2>
               {completedOrderNumber && <p className="text-sm font-semibold text-foreground mb-1">הזמנה #{completedOrderNumber}</p>}
-              <p className="text-muted-foreground text-sm">ניצור איתך קשר לאישור המועד</p>
+              <p className="text-muted-foreground text-sm">
+                {isGiftOrder 
+                  ? 'נציג שלנו ייצור איתכם קשר בהקדם לגביית התשלום ותיאום ההגעה'
+                  : 'ניצור איתך קשר לאישור המועד'}
+              </p>
             </div>
 
             <Card className="p-4 bg-gradient-to-br from-card to-success/5">
