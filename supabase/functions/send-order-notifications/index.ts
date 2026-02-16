@@ -405,7 +405,7 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
     </div>
     
     <p style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
-      לשאלות ובירורים: <a href="tel:0528692886" style="color: #0d64f4;">052-8692886</a>
+      לשאלות ובירורים: <a href="tel:033106020" style="color: #0d64f4;">03-3106020</a>
     </p>
     <p style="text-align: center; color: #bbb; font-size: 11px;">
       DirectFix - תיקוני סלולר מקצועיים עד הבית
