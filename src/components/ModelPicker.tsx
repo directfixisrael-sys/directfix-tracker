@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
-import { Search, ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Input } from '@/components/ui/input';
 
 interface IphoneModel {
   id: string;
@@ -34,7 +33,6 @@ const seriesOrder = [
 ];
 
 const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPickerProps) => {
-  const [search, setSearch] = useState('');
   const [activeSeries, setActiveSeries] = useState<string | null>(null);
 
   const grouped = useMemo(() => {
@@ -48,65 +46,25 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
 
   const sortedSeries = seriesOrder.filter(s => grouped[s]?.length);
 
-  // If searching, show flat filtered list
-  const filteredModels = useMemo(() => {
-    if (!search.trim()) return null;
-    return models.filter(m => 
-      m.name.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [models, search]);
-
   return (
-    <div className="space-y-4">
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="חפש דגם..."
-          className="pr-10 h-12 rounded-2xl bg-muted/50 border-border text-right"
-          dir="rtl"
-        />
+    <div className="space-y-3">
+      {/* Series chips */}
+      <div className="flex flex-wrap gap-2 justify-center">
+        {sortedSeries.map(series => (
+          <button
+            key={series}
+            onClick={() => setActiveSeries(activeSeries === series ? null : series)}
+            className={cn(
+              "px-4 py-2.5 rounded-full text-sm font-semibold transition-all",
+              activeSeries === series
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "bg-muted hover:bg-muted/80 text-foreground"
+            )}
+          >
+            {series}
+          </button>
+        ))}
       </div>
-
-      {/* Search results */}
-      {filteredModels ? (
-        <div className="space-y-1.5">
-          {filteredModels.length === 0 ? (
-            <p className="text-center text-muted-foreground text-sm py-6">לא נמצאו דגמים</p>
-          ) : (
-            filteredModels.map(model => (
-              <ModelButton
-                key={model.id}
-                model={model}
-                isSelected={selectedModel?.id === model.id}
-                onSelect={onSelect}
-                onConfirm={onConfirm}
-              />
-            ))
-          )}
-        </div>
-      ) : (
-        /* Series chips + expanded list */
-        <div className="space-y-3">
-          {/* Series chips */}
-          <div className="flex flex-wrap gap-2 justify-center">
-            {sortedSeries.map(series => (
-              <button
-                key={series}
-                onClick={() => setActiveSeries(activeSeries === series ? null : series)}
-                className={cn(
-                  "px-4 py-2.5 rounded-full text-sm font-semibold transition-all",
-                  activeSeries === series
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "bg-muted hover:bg-muted/80 text-foreground"
-                )}
-              >
-                {series}
-              </button>
-            ))}
-          </div>
 
           {/* Models list for active series */}
           {activeSeries && grouped[activeSeries] && (
@@ -123,12 +81,10 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
             </div>
           )}
 
-          {!activeSeries && (
-            <p className="text-center text-muted-foreground text-sm py-4">
-              בחרו סדרה או חפשו דגם ☝️
-            </p>
-          )}
-        </div>
+      {!activeSeries && (
+        <p className="text-center text-muted-foreground text-sm py-4">
+          בחרו סדרה ☝️
+        </p>
       )}
     </div>
   );
