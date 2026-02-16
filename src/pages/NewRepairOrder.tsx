@@ -282,6 +282,7 @@ const NewRepairOrder = () => {
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
+  const [hourlyBlocks, setHourlyBlocks] = useState<{ date: string; start_time: string; end_time: string }[]>([]);
   const [activePromotion, setActivePromotion] = useState<Promotion | null>(null);
   const [repairBundles, setRepairBundles] = useState<RepairBundle[]>([]);
   const [selectedBundleAddon, setSelectedBundleAddon] = useState<boolean>(false);
@@ -370,10 +371,17 @@ const NewRepairOrder = () => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [modelsRes, repairsRes, blockedRes, bundlesRes] = await Promise.all([supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), supabase.from('blocked_dates').select('date, start_time'), supabase.from('repair_bundles').select('*').eq('is_active', true)]);
+        const [modelsRes, repairsRes, blockedRes, bundlesRes] = await Promise.all([supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), supabase.from('blocked_dates').select('date, start_time, end_time'), supabase.from('repair_bundles').select('*').eq('is_active', true)]);
         if (modelsRes.data) setModels(modelsRes.data);
         if (repairsRes.data) setRepairTypes(repairsRes.data);
-        if (blockedRes.data) setBlockedDates(blockedRes.data.filter(d => !d.start_time).map(d => d.date));
+        if (blockedRes.data) {
+          setBlockedDates(blockedRes.data.filter(d => !d.start_time).map(d => d.date));
+          setHourlyBlocks(
+            blockedRes.data
+              .filter(d => d.start_time && d.end_time)
+              .map(d => ({ date: d.date, start_time: d.start_time!, end_time: d.end_time! }))
+          );
+        }
         if (bundlesRes.data) setRepairBundles(bundlesRes.data);
 
         // Load promotion separately to avoid error if none exists
@@ -424,18 +432,38 @@ const NewRepairOrder = () => {
     return weekdaySlots; // Sunday-Thursday
   };
 
-  // Check if a time slot is available (at least 40 minutes from now)
+  // Check if a time slot is available (at least 40 minutes from now, and not blocked)
   const isSlotAvailable = (date: Date, slot: string) => {
     const now = new Date();
-    const slotStartHour = parseInt(slot.split(':')[0]);
+    const [slotStart, slotEnd] = slot.split('-');
+    const slotStartHour = parseInt(slotStart.split(':')[0]);
+    const slotStartMin = parseInt(slotStart.split(':')[1] || '0');
+    const slotEndHour = parseInt(slotEnd.split(':')[0]);
+    const slotEndMin = parseInt(slotEnd.split(':')[1] || '0');
 
     // Create date with slot start time
     const slotDate = new Date(date);
-    slotDate.setHours(slotStartHour, 0, 0, 0);
+    slotDate.setHours(slotStartHour, slotStartMin, 0, 0);
 
     // Must be at least 40 minutes from now
     const minTimeFromNow = new Date(now.getTime() + 40 * 60 * 1000);
-    return slotDate > minTimeFromNow;
+    if (slotDate <= minTimeFromNow) return false;
+
+    // Check hourly blocks for this date
+    const dateStr = date.toISOString().split('T')[0];
+    const blocksForDate = hourlyBlocks.filter(b => b.date === dateStr);
+    for (const block of blocksForDate) {
+      const blockStartMin = parseInt(block.start_time.split(':')[0]) * 60 + parseInt(block.start_time.split(':')[1]);
+      const blockEndMin = parseInt(block.end_time.split(':')[0]) * 60 + parseInt(block.end_time.split(':')[1]);
+      const slotStartTotalMin = slotStartHour * 60 + slotStartMin;
+      const slotEndTotalMin = slotEndHour * 60 + slotEndMin;
+      // Check overlap
+      if (slotStartTotalMin < blockEndMin && slotEndTotalMin > blockStartMin) {
+        return false;
+      }
+    }
+
+    return true;
   };
   const filteredModels = models.filter(model => model.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const getPrice = () => {
