@@ -234,13 +234,12 @@ const SmartRepairInput = ({
   return (
     <>
       <Button
-        variant="outline"
         onClick={() => setIsOpen(true)}
-        className="w-full h-11 rounded-xl gap-2 text-muted-foreground justify-center border-dashed"
+        className="w-full h-12 rounded-xl gap-2.5 justify-center text-base font-semibold shadow-md"
       >
-        <Search className="w-4 h-4" />
-        <span className="text-sm">חיפוש חכם עם AI</span>
-        <Sparkles className="w-3.5 h-3.5 text-primary" />
+        <Sparkles className="w-5 h-5" />
+        <span>חיפוש חכם עם AI</span>
+        <Search className="w-4 h-4 opacity-70" />
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
