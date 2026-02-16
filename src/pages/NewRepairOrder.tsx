@@ -24,6 +24,196 @@ import GiftPromoPopup from '@/components/GiftPromoPopup';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { getLeadSource } from '@/lib/leadSource';
 
+// iPhone back glass colors per model family
+const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
+  'iPhone 16 Pro Max': [
+    { name: 'טיטניום מדברי', hex: '#C4A882' },
+    { name: 'טיטניום טבעי', hex: '#D4CFC7' },
+    { name: 'טיטניום שחור', hex: '#3C3C3C' },
+    { name: 'טיטניום לבן', hex: '#F0EDE8' },
+  ],
+  'iPhone 16 Pro': [
+    { name: 'טיטניום מדברי', hex: '#C4A882' },
+    { name: 'טיטניום טבעי', hex: '#D4CFC7' },
+    { name: 'טיטניום שחור', hex: '#3C3C3C' },
+    { name: 'טיטניום לבן', hex: '#F0EDE8' },
+  ],
+  'iPhone 16 Plus': [
+    { name: 'כחול אולטרמרין', hex: '#5B6FAE' },
+    { name: 'טיל', hex: '#4B8C8C' },
+    { name: 'ורוד', hex: '#F2C6CF' },
+    { name: 'לבן', hex: '#F5F5F0' },
+    { name: 'שחור', hex: '#2C2C2C' },
+  ],
+  'iPhone 16': [
+    { name: 'כחול אולטרמרין', hex: '#5B6FAE' },
+    { name: 'טיל', hex: '#4B8C8C' },
+    { name: 'ורוד', hex: '#F2C6CF' },
+    { name: 'לבן', hex: '#F5F5F0' },
+    { name: 'שחור', hex: '#2C2C2C' },
+  ],
+  'iPhone 15 Pro Max': [
+    { name: 'טיטניום טבעי', hex: '#C2BEB6' },
+    { name: 'טיטניום כחול', hex: '#3E4F5E' },
+    { name: 'טיטניום לבן', hex: '#E8E4DF' },
+    { name: 'טיטניום שחור', hex: '#3A3A3C' },
+  ],
+  'iPhone 15 Pro': [
+    { name: 'טיטניום טבעי', hex: '#C2BEB6' },
+    { name: 'טיטניום כחול', hex: '#3E4F5E' },
+    { name: 'טיטניום לבן', hex: '#E8E4DF' },
+    { name: 'טיטניום שחור', hex: '#3A3A3C' },
+  ],
+  'iPhone 15 Plus': [
+    { name: 'שחור', hex: '#3A3A3C' },
+    { name: 'כחול', hex: '#7C96AB' },
+    { name: 'ירוק', hex: '#CAD5B2' },
+    { name: 'צהוב', hex: '#F3E5B0' },
+    { name: 'ורוד', hex: '#F2C6CF' },
+  ],
+  'iPhone 15': [
+    { name: 'שחור', hex: '#3A3A3C' },
+    { name: 'כחול', hex: '#7C96AB' },
+    { name: 'ירוק', hex: '#CAD5B2' },
+    { name: 'צהוב', hex: '#F3E5B0' },
+    { name: 'ורוד', hex: '#F2C6CF' },
+  ],
+  'iPhone 14 Pro Max': [
+    { name: 'סגול עמוק', hex: '#5B4A6E' },
+    { name: 'זהב', hex: '#F4E8CE' },
+    { name: 'כסוף', hex: '#E5E5E0' },
+    { name: 'שחור חלל', hex: '#3A3A3C' },
+  ],
+  'iPhone 14 Pro': [
+    { name: 'סגול עמוק', hex: '#5B4A6E' },
+    { name: 'זהב', hex: '#F4E8CE' },
+    { name: 'כסוף', hex: '#E5E5E0' },
+    { name: 'שחור חלל', hex: '#3A3A3C' },
+  ],
+  'iPhone 14 Plus': [
+    { name: 'כחול', hex: '#A0B4C8' },
+    { name: 'סגול', hex: '#C7B8D6' },
+    { name: 'חצות', hex: '#2C3E50' },
+    { name: 'אור כוכבים', hex: '#FAF6F2' },
+    { name: 'אדום', hex: '#C0392B' },
+    { name: 'צהוב', hex: '#F7E96E' },
+  ],
+  'iPhone 14': [
+    { name: 'כחול', hex: '#A0B4C8' },
+    { name: 'סגול', hex: '#C7B8D6' },
+    { name: 'חצות', hex: '#2C3E50' },
+    { name: 'אור כוכבים', hex: '#FAF6F2' },
+    { name: 'אדום', hex: '#C0392B' },
+    { name: 'צהוב', hex: '#F7E96E' },
+  ],
+  'iPhone 13 Pro Max': [
+    { name: 'ירוק אלפיני', hex: '#505F4E' },
+    { name: 'כסוף', hex: '#E5E5E0' },
+    { name: 'זהב', hex: '#FAE7CF' },
+    { name: 'גרפיט', hex: '#54524F' },
+    { name: 'כחול סיירה', hex: '#9BB5CE' },
+  ],
+  'iPhone 13 Pro': [
+    { name: 'ירוק אלפיני', hex: '#505F4E' },
+    { name: 'כסוף', hex: '#E5E5E0' },
+    { name: 'זהב', hex: '#FAE7CF' },
+    { name: 'גרפיט', hex: '#54524F' },
+    { name: 'כחול סיירה', hex: '#9BB5CE' },
+  ],
+  'iPhone 13': [
+    { name: 'ירוק', hex: '#394C38' },
+    { name: 'ורוד', hex: '#FADDD7' },
+    { name: 'כחול', hex: '#276787' },
+    { name: 'חצות', hex: '#232A31' },
+    { name: 'אור כוכבים', hex: '#FAF6F2' },
+    { name: 'אדום', hex: '#C0392B' },
+  ],
+  'iPhone 13 Mini': [
+    { name: 'ירוק', hex: '#394C38' },
+    { name: 'ורוד', hex: '#FADDD7' },
+    { name: 'כחול', hex: '#276787' },
+    { name: 'חצות', hex: '#232A31' },
+    { name: 'אור כוכבים', hex: '#FAF6F2' },
+    { name: 'אדום', hex: '#C0392B' },
+  ],
+  'iPhone 12 Pro Max': [
+    { name: 'כחול פסיפי', hex: '#2D4E6F' },
+    { name: 'זהב', hex: '#FAE7CF' },
+    { name: 'גרפיט', hex: '#54524F' },
+    { name: 'כסוף', hex: '#E5E5E0' },
+  ],
+  'iPhone 12 Pro': [
+    { name: 'כחול פסיפי', hex: '#2D4E6F' },
+    { name: 'זהב', hex: '#FAE7CF' },
+    { name: 'גרפיט', hex: '#54524F' },
+    { name: 'כסוף', hex: '#E5E5E0' },
+  ],
+  'iPhone 12': [
+    { name: 'שחור', hex: '#2C2C2C' },
+    { name: 'לבן', hex: '#F5F5F0' },
+    { name: 'כחול', hex: '#023C69' },
+    { name: 'ירוק', hex: '#D8E8D2' },
+    { name: 'אדום', hex: '#C0392B' },
+    { name: 'סגול', hex: '#B6A5C9' },
+  ],
+  'iPhone 12 Mini': [
+    { name: 'שחור', hex: '#2C2C2C' },
+    { name: 'לבן', hex: '#F5F5F0' },
+    { name: 'כחול', hex: '#023C69' },
+    { name: 'ירוק', hex: '#D8E8D2' },
+    { name: 'אדום', hex: '#C0392B' },
+    { name: 'סגול', hex: '#B6A5C9' },
+  ],
+  'iPhone 11 Pro Max': [
+    { name: 'ירוק חצות', hex: '#4E5851' },
+    { name: 'כסוף', hex: '#EBEBE3' },
+    { name: 'אפור חלל', hex: '#535150' },
+    { name: 'זהב', hex: '#FAD7BD' },
+  ],
+  'iPhone 11 Pro': [
+    { name: 'ירוק חצות', hex: '#4E5851' },
+    { name: 'כסוף', hex: '#EBEBE3' },
+    { name: 'אפור חלל', hex: '#535150' },
+    { name: 'זהב', hex: '#FAD7BD' },
+  ],
+  'iPhone 11': [
+    { name: 'שחור', hex: '#2C2C2C' },
+    { name: 'ירוק', hex: '#AED1A0' },
+    { name: 'צהוב', hex: '#FFE681' },
+    { name: 'סגול', hex: '#D1CDDA' },
+    { name: 'אדום', hex: '#C0392B' },
+    { name: 'לבן', hex: '#F5F5F0' },
+  ],
+  'iPhone XR': [
+    { name: 'שחור', hex: '#2C2C2C' },
+    { name: 'לבן', hex: '#F5F5F0' },
+    { name: 'כחול', hex: '#5EB0E5' },
+    { name: 'צהוב', hex: '#F9D045' },
+    { name: 'קורל', hex: '#FF6E54' },
+    { name: 'אדום', hex: '#C0392B' },
+  ],
+  'iPhone XS Max': [
+    { name: 'זהב', hex: '#F4E8CE' },
+    { name: 'כסוף', hex: '#E5E5E0' },
+    { name: 'אפור חלל', hex: '#535150' },
+  ],
+  'iPhone XS': [
+    { name: 'זהב', hex: '#F4E8CE' },
+    { name: 'כסוף', hex: '#E5E5E0' },
+    { name: 'אפור חלל', hex: '#535150' },
+  ],
+  'iPhone X': [
+    { name: 'כסוף', hex: '#E5E5E0' },
+    { name: 'אפור חלל', hex: '#535150' },
+  ],
+  'iPhone 8': [
+    { name: 'זהב', hex: '#F4E8CE' },
+    { name: 'כסוף', hex: '#E5E5E0' },
+    { name: 'אפור חלל', hex: '#535150' },
+    { name: 'אדום', hex: '#C0392B' },
+  ],
+};
+
 // Info descriptions for repair types (more professional)
 const repairInfoDescriptions: Record<string, {
   title: string;
@@ -129,6 +319,8 @@ const NewRepairOrder = () => {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [showImageUploadOption, setShowImageUploadOption] = useState(false);
   const [pendingRepair, setPendingRepair] = useState<RepairType | null>(null);
+  const [selectedBackColor, setSelectedBackColor] = useState<string>('');
+  const [showBackColorPicker, setShowBackColorPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   // Privacy consent
@@ -333,16 +525,27 @@ const NewRepairOrder = () => {
       window.location.href = 'tel:0528692886';
       return;
     }
+    
+    const isBackGlass = repair.name.includes('גב');
+    
+    // If back glass, show color picker instead of proceeding
+    if (isBackGlass && selectedModel) {
+      setSelectedRepair(repair);
+      setSelectedBackColor('');
+      setShowBackColorPicker(true);
+      return;
+    }
+    
     setSelectedRepair(repair);
+    setShowBackColorPicker(false);
 
     // Track AddToCart event for Facebook Pixel
     if (selectedModel) {
       const isOriginalScreen = repair.name.includes('מסך מקורי');
       const isCompatibleScreen = repair.name.includes('מסך תואם');
       const isBattery = repair.name.includes('סוללה');
-      const isBackGlass = repair.name.includes('גב');
       let repairPrice = 0;
-      if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;else if (isBattery) repairPrice = selectedModel.battery_price;else if (isBackGlass) repairPrice = selectedModel.back_glass_price;
+      if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;else if (isBattery) repairPrice = selectedModel.battery_price;
       trackAddToCart(repair.name, repairPrice);
       gaSelectRepair(repair.name, repairPrice);
     }
@@ -357,6 +560,17 @@ const NewRepairOrder = () => {
     } else {
       goToStep('price');
     }
+  };
+  
+  const handleBackColorConfirm = () => {
+    if (!selectedBackColor || !selectedRepair || !selectedModel) return;
+    
+    // Track
+    trackAddToCart(selectedRepair.name, selectedModel.back_glass_price);
+    gaSelectRepair(selectedRepair.name, selectedModel.back_glass_price);
+    
+    setShowBackColorPicker(false);
+    goToStep('price');
   };
   const handleBundleDecision = (acceptBundle: boolean) => {
     setSelectedBundleAddon(acceptBundle);
@@ -510,6 +724,9 @@ const NewRepairOrder = () => {
       if (selectedBundleAddon && currentBundle && selectedModel) {
         notes.push(`חבילת תיקון: ${currentBundle.name} - סוללה ב-${currentBundle.discount_percent}% הנחה (₪${getBundleAddonPrice()} במקום ₪${selectedModel.battery_price})`);
       }
+      if (selectedBackColor) {
+        notes.push(`צבע גב מכשיר: ${selectedBackColor}`);
+      }
       if (customerNotes.trim()) {
         notes.push(`הערות לקוח: ${customerNotes.trim()}`);
       }
@@ -546,6 +763,7 @@ const NewRepairOrder = () => {
       // Send notifications (email + WhatsApp)
       try {
         const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${getRepairTypeName()} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : getRepairTypeName();
+        const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
         const leadSource = getLeadSource();
         await supabase.functions.invoke('send-order-notifications', {
           body: {
@@ -553,7 +771,7 @@ const NewRepairOrder = () => {
             customerPhone: customerPhone.trim(),
             customerAddress: customerAddress.trim(),
             deviceType: selectedModel?.name || '',
-            repairType: repairTypeForNotification,
+            repairType: repairTypeForNotification + colorNote,
             repairPrice: getFinalPrice(),
             scheduledTime: scheduleNote,
             notes: customerNotes.trim(),
@@ -879,8 +1097,52 @@ const NewRepairOrder = () => {
                       {!isPhoneOnly && <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />}
                     </div>
                   </Card>;
-          })}
+            })}
             </div>
+
+            {/* Back Glass Color Picker */}
+            {showBackColorPicker && selectedModel && selectedRepair && (() => {
+              const colors = iphoneBackColors[selectedModel.name] || [];
+              return colors.length > 0 ? (
+                <div className="space-y-4 animate-fade-in mt-4">
+                  <div className="text-center">
+                    <h3 className="text-lg font-bold">באיזה צבע הגב של המכשיר?</h3>
+                    <p className="text-sm text-muted-foreground">בחרו את הצבע כדי שנביא את החלק המתאים</p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {colors.map((color) => (
+                      <button
+                        key={color.name}
+                        onClick={() => setSelectedBackColor(color.name)}
+                        className={`flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all duration-200 ${
+                          selectedBackColor === color.name
+                            ? 'border-primary bg-primary/5 shadow-md'
+                            : 'border-border hover:border-primary/40'
+                        }`}
+                      >
+                        <div
+                          className={`w-10 h-10 rounded-full border-2 shadow-inner ${
+                            selectedBackColor === color.name ? 'border-primary ring-2 ring-primary/30' : 'border-border'
+                          }`}
+                          style={{ backgroundColor: color.hex }}
+                        />
+                        <span className="text-xs font-medium text-center leading-tight">{color.name}</span>
+                        {selectedBackColor === color.name && (
+                          <Check className="w-4 h-4 text-primary" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  <Button
+                    onClick={handleBackColorConfirm}
+                    disabled={!selectedBackColor}
+                    className="w-full h-12 text-base font-bold rounded-xl"
+                  >
+                    המשך עם {selectedBackColor || '...'}
+                  </Button>
+                </div>
+              ) : null;
+            })()}
           </div>}
 
         {/* Step 2.5: Bundle Offer */}
