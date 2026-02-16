@@ -1503,7 +1503,7 @@ const NewRepairOrder = () => {
                 <label className="block text-sm font-bold mb-1.5">
                   כתובת אימייל
                 </label>
-                <Input placeholder="example@email.com" value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} type="email" className="h-13 text-base rounded-2xl bg-muted/40 border-border/50 focus:bg-card" dir="ltr" />
+                <Input placeholder="example@email.com" value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} type="email" className="h-13 text-base rounded-2xl bg-muted/40 border-border/50 focus:bg-card text-right" dir="rtl" />
               </div>
 
               <div>
