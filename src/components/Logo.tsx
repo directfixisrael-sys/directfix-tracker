@@ -49,7 +49,7 @@ const Logo = ({ size = 'md', clickable = true, className }: LogoProps) => {
           "font-extrabold tracking-tight text-foreground",
           sizeClasses[size]
         )}
-        style={{ fontFamily: "'Rubik', sans-serif" }}
+        style={{ fontFamily: "'Ploni', sans-serif" }}
         >
           direct<span className="text-primary">fix</span>
         </span>
