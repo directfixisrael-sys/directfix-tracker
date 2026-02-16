@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { ArrowRight, Moon, Sun, Phone, Accessibility, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/ThemeProvider';
-import { useNavigate } from 'react-router-dom';
-import logo from '@/assets/directfix-logo.png';
+import Logo from '@/components/Logo';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -12,7 +11,6 @@ interface HeaderProps {
 
 const Header = ({ showBackButton, onBack }: HeaderProps) => {
   const { resolvedTheme, setTheme } = useTheme();
-  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleTheme = () => {
@@ -65,13 +63,7 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
           </Button>
         </div>
 
-        {/* Logo - always visible */}
-        <img 
-          src={logo} 
-          alt="Direct Fix Logo" 
-          className="h-10 w-auto cursor-pointer"
-          onClick={() => navigate('/')}
-        />
+        <Logo size="sm" />
       </div>
 
       {/* Mobile menu dropdown */}

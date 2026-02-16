@@ -50,7 +50,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import logo from '@/assets/directfix-logo.png';
+import Logo from '@/components/Logo';
 import PushNotificationToggle from '@/components/PushNotificationToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import SwipeableOrderCard from '@/components/SwipeableOrderCard';
@@ -1396,10 +1396,7 @@ ${trackingUrl}
       <aside className="hidden md:flex w-64 bg-sidebar border-l border-sidebar-border flex-col fixed right-0 top-0 h-screen z-40">
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center justify-between">
-            <a href="/" className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
-              <img src={logo} alt="Logo" className="h-8 w-auto" />
-              <span className="font-bold text-sidebar-foreground">דיירקט פיקס</span>
-            </a>
+            <Logo size="sm" />
             <button
               onClick={handleManualRefresh}
               className="w-8 h-8 flex items-center justify-center text-sidebar-foreground hover:bg-sidebar-accent rounded-lg transition-colors"
