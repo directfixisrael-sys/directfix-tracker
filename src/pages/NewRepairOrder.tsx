@@ -1092,13 +1092,13 @@ const NewRepairOrder = () => {
             {/* Testimonials Slider */}
             <TestimonialsSlider />
 
-            {/* Gift Order Toggle */}
-            <GiftOrderToggle isGift={isGiftOrder} onToggle={setIsGiftOrder} />
-
             {/* Smart AI Search */}
             <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
 
             <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => setSelectedModel(model)} onConfirm={model => handleModelSelect(model)} />
+
+            {/* Gift Order Toggle - below model picker */}
+            <GiftOrderToggle isGift={isGiftOrder} onToggle={setIsGiftOrder} />
           </div>}
 
         {/* Step 2: Select Repair Type */}
