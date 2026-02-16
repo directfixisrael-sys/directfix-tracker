@@ -327,6 +327,9 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
 
     // 3. Send confirmation email to customer (if email provided)
     if (orderData.customerEmail && resendApiKey) {
+      const customerCalendarLink = buildCalendarLink(orderData);
+      const trackingUrl = `https://directfix-tracker.lovable.app/track?phone=${encodeURIComponent(orderData.customerPhone)}`;
+      
       const customerEmailHtml = `
 <!DOCTYPE html>
 <html dir="rtl" lang="he">
@@ -334,38 +337,38 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 16px 16px 0 0; padding: 30px; text-align: center;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5; direction: rtl;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px; direction: rtl;">
+    <div style="background: linear-gradient(135deg, #0d64f4 0%, #0a4dbf 100%); border-radius: 16px 16px 0 0; padding: 30px; text-align: center;">
       <div style="font-size: 50px; margin-bottom: 10px;">✅</div>
-      <h1 style="color: white; margin: 0; font-size: 24px;">ההזמנה התקבלה!</h1>
-      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">תודה שבחרת בנו, ${orderData.customerName}!</p>
+      <h1 style="color: white; margin: 0; font-size: 24px;">ההזמנה התקבלה בהצלחה!</h1>
+      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">תודה שבחרת ב-DirectFix, ${orderData.customerName}!</p>
     </div>
     
-    <div style="background: white; border-radius: 0 0 16px 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+    <div style="background: white; border-radius: 0 0 16px 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: right;">
       <h2 style="margin: 0 0 20px 0; color: #333; font-size: 18px; text-align: center;">📋 סיכום ההזמנה</h2>
       
       <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-        <table style="width: 100%; border-collapse: collapse;">
+        <table style="width: 100%; border-collapse: collapse;" dir="rtl">
           <tr>
-            <td style="padding: 8px 0; color: #888;">דגם</td>
-            <td style="padding: 8px 0; color: #333; font-weight: 500; text-align: left;">${orderData.deviceType}</td>
+            <td style="padding: 10px 0; color: #888; text-align: right;">📱 דגם</td>
+            <td style="padding: 10px 0; color: #333; font-weight: 600; text-align: left;">${orderData.deviceType}</td>
           </tr>
           <tr>
-            <td style="padding: 8px 0; color: #888;">סוג תיקון</td>
-            <td style="padding: 8px 0; color: #333; font-weight: 500; text-align: left;">${orderData.repairType}</td>
+            <td style="padding: 10px 0; color: #888; text-align: right;">🔧 סוג תיקון</td>
+            <td style="padding: 10px 0; color: #333; font-weight: 600; text-align: left;">${orderData.repairType}</td>
           </tr>
           <tr>
-            <td style="padding: 8px 0; color: #888;">מועד</td>
-            <td style="padding: 8px 0; color: #333; font-weight: 500; text-align: left;">${orderData.scheduledTime}</td>
+            <td style="padding: 10px 0; color: #888; text-align: right;">📅 מועד</td>
+            <td style="padding: 10px 0; color: #333; font-weight: 600; text-align: left;">${orderData.scheduledTime}</td>
           </tr>
           <tr>
-            <td style="padding: 8px 0; color: #888;">כתובת</td>
-            <td style="padding: 8px 0; color: #333; font-weight: 500; text-align: left;">${orderData.customerAddress}</td>
+            <td style="padding: 10px 0; color: #888; text-align: right;">📍 כתובת</td>
+            <td style="padding: 10px 0; color: #333; font-weight: 600; text-align: left;">${orderData.customerAddress}</td>
           </tr>
           <tr style="border-top: 2px solid #e5e7eb;">
-            <td style="padding: 15px 0 8px 0; color: #333; font-weight: bold; font-size: 16px;">סה"כ לתשלום</td>
-            <td style="padding: 15px 0 8px 0; color: #10b981; font-weight: bold; font-size: 20px; text-align: left;">₪${orderData.repairPrice}</td>
+            <td style="padding: 15px 0 8px 0; color: #333; font-weight: bold; font-size: 16px; text-align: right;">💰 סה"כ לתשלום</td>
+            <td style="padding: 15px 0 8px 0; color: #0d64f4; font-weight: bold; font-size: 22px; text-align: left;">₪${orderData.repairPrice}</td>
           </tr>
         </table>
       </div>
@@ -375,15 +378,35 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
         <p style="margin: 0; color: white; font-weight: bold;">🎁 ${orderData.promotionTitle}</p>
       </div>
       ` : ''}
+
+      <!-- Action Buttons -->
+      <div style="text-align: center; margin-bottom: 20px;">
+        <a href="${trackingUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #0d64f4 0%, #0a4dbf 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(13, 100, 244, 0.3); margin-bottom: 10px;">
+          📍 עקוב אחר התיקון שלך
+        </a>
+      </div>
       
-      <div style="background: #e8f5e9; border-radius: 12px; padding: 20px; text-align: center;">
-        <p style="margin: 0 0 10px 0; color: #2e7d32; font-weight: 500;">💳 תשלום בסיום התיקון בלבד</p>
-        <p style="margin: 0; color: #4caf50; font-size: 14px;">ניצור איתך קשר לאישור המועד</p>
+      <div style="text-align: center; margin-bottom: 20px;">
+        <a href="${customerCalendarLink}" target="_blank" style="display: inline-block; background: white; color: #333; text-decoration: none; padding: 12px 28px; border-radius: 12px; font-size: 14px; font-weight: 600; border: 2px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+          📅 הוסף ליומן שלי
+        </a>
+      </div>
+      
+      <div style="background: #eff6ff; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 15px;">
+        <p style="margin: 0 0 8px 0; color: #1e40af; font-weight: 600;">💳 תשלום בסיום התיקון בלבד</p>
+        <p style="margin: 0; color: #3b82f6; font-size: 14px;">ניצור איתך קשר לאישור המועד</p>
+      </div>
+
+      <div style="background: #f0fdf4; border-radius: 12px; padding: 15px; text-align: center;">
+        <p style="margin: 0; color: #166534; font-size: 14px;">🛡️ כל התיקונים שלנו כוללים אחריות מלאה</p>
       </div>
     </div>
     
     <p style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
-      לשאלות ובירורים: 052-8692886
+      לשאלות ובירורים: <a href="tel:0528692886" style="color: #0d64f4;">052-8692886</a>
+    </p>
+    <p style="text-align: center; color: #bbb; font-size: 11px;">
+      DirectFix - תיקוני סלולר מקצועיים עד הבית
     </p>
   </div>
 </body>
