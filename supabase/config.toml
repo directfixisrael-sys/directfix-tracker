@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.google-places-autocomplete]
 verify_jwt = false
+
+[functions.create-payment-link]
+verify_jwt = false
+
+[functions.payplus-webhook]
+verify_jwt = false

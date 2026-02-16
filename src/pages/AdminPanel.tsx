@@ -50,6 +50,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
 import PushNotificationToggle from '@/components/PushNotificationToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -102,6 +103,7 @@ const AdminPanel = () => {
   const [customerSortBy, setCustomerSortBy] = useState<'name' | 'orders' | 'recent'>('recent');
   const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set());
   const [bulkStatusDialogOpen, setBulkStatusDialogOpen] = useState(false);
+  const [isGeneratingPayment, setIsGeneratingPayment] = useState(false);
 
   const { 
     orders, 
@@ -1234,42 +1236,121 @@ ${trackingUrl}
                     )}
                   </div>
 
-                  {/* Payment link */}
+                  {/* Payment link - PayPlus */}
                   <div className="glass-card rounded-xl p-6">
                     <h3 className="font-semibold text-foreground mb-4 text-lg flex items-center gap-2">
                       <CreditCard className="w-5 h-5" />
-                      קישור לתשלום
+                      תשלום - PayPlus
                     </h3>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="הכנס קישור לתשלום..."
-                        value={paymentLink}
-                        onChange={(e) => setPaymentLink(e.target.value)}
-                        className="flex-1"
-                        dir="ltr"
-                      />
-                      <Button onClick={() => {
-                        if (selectedOrder && paymentLink) {
-                          updatePaymentLink(selectedOrder.id, paymentLink);
-                          toast({ title: "קישור תשלום עודכן", description: "הלקוח יראה התראה על תשלום ממתין" });
-                          setPaymentLink('');
-                        }
-                      }}>
-                        שמור
-                      </Button>
-                    </div>
+
+                    {/* Generate PayPlus link button */}
+                    {!selectedOrder.paymentLink && (
+                      <div className="space-y-3">
+                        <Button
+                          className="w-full gap-2"
+                          disabled={isGeneratingPayment || !selectedOrder.repairPrice}
+                          onClick={async () => {
+                            setIsGeneratingPayment(true);
+                            try {
+                              const totalPrice = selectedOrder.repairPrice + 
+                                selectedOrder.accessories.filter(a => a.selected).reduce((sum, a) => sum + a.price, 0);
+                              
+                              const { data, error } = await supabase.functions.invoke('create-payment-link', {
+                                body: {
+                                  orderId: selectedOrder.id,
+                                  amount: totalPrice,
+                                  customerName: selectedOrder.customerName,
+                                  customerPhone: selectedOrder.customerPhone,
+                                  description: `תיקון ${selectedOrder.deviceType} - ${selectedOrder.issueDescription}`,
+                                },
+                              });
+
+                              if (error) throw error;
+                              if (!data?.success) throw new Error(data?.error || 'Failed to generate link');
+
+                              toast({ 
+                                title: "לינק תשלום נוצר בהצלחה! ✓",
+                                description: "הלקוח יראה כפתור תשלום בעמוד המעקב",
+                              });
+                            } catch (err: any) {
+                              console.error('PayPlus error:', err);
+                              toast({ 
+                                title: "שגיאה ביצירת לינק תשלום",
+                                description: err?.message || 'נסה שוב',
+                                variant: "destructive",
+                              });
+                            } finally {
+                              setIsGeneratingPayment(false);
+                            }
+                          }}
+                        >
+                          {isGeneratingPayment ? (
+                            <>
+                              <RefreshCw className="w-4 h-4 animate-spin" />
+                              יוצר לינק תשלום...
+                            </>
+                          ) : (
+                            <>
+                              <CreditCard className="w-4 h-4" />
+                              צור לינק תשלום PayPlus (₪{selectedOrder.repairPrice + selectedOrder.accessories.filter(a => a.selected).reduce((sum, a) => sum + a.price, 0)})
+                            </>
+                          )}
+                        </Button>
+                        
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t border-border" />
+                          </div>
+                          <div className="relative flex justify-center text-xs">
+                            <span className="bg-card px-2 text-muted-foreground">או הזן לינק ידנית</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="הכנס קישור לתשלום..."
+                            value={paymentLink}
+                            onChange={(e) => setPaymentLink(e.target.value)}
+                            className="flex-1"
+                            dir="ltr"
+                          />
+                          <Button variant="outline" onClick={() => {
+                            if (selectedOrder && paymentLink) {
+                              updatePaymentLink(selectedOrder.id, paymentLink);
+                              toast({ title: "קישור תשלום עודכן" });
+                              setPaymentLink('');
+                            }
+                          }}>
+                            שמור
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
                     {selectedOrder.paymentLink && (
-                      <div className="mt-3 space-y-2">
-                        <div className="p-2 bg-warning/10 rounded-lg flex items-center justify-between">
+                      <div className="space-y-2">
+                        <div className={cn(
+                          "p-3 rounded-lg flex items-center justify-between",
+                          selectedOrder.paymentStatus === 'paid' ? "bg-success/10" : "bg-warning/10"
+                        )}>
                           <div>
-                            <p className="text-sm text-warning font-medium flex items-center gap-2">
+                            <p className={cn(
+                              "text-sm font-medium flex items-center gap-2",
+                              selectedOrder.paymentStatus === 'paid' ? "text-success" : "text-warning"
+                            )}>
                               <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warning opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-warning"></span>
+                                <span className={cn(
+                                  "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
+                                  selectedOrder.paymentStatus === 'paid' ? "bg-success" : "bg-warning"
+                                )}></span>
+                                <span className={cn(
+                                  "relative inline-flex rounded-full h-2 w-2",
+                                  selectedOrder.paymentStatus === 'paid' ? "bg-success" : "bg-warning"
+                                )}></span>
                               </span>
-                              {selectedOrder.paymentStatus === 'paid' ? 'שולם ✓' : 'ממתין לתשלום'}
+                              {selectedOrder.paymentStatus === 'paid' ? '✓ שולם בהצלחה' : 'ממתין לתשלום'}
                             </p>
-                            <p className="text-xs text-muted-foreground mt-1 truncate" dir="ltr">
+                            <p className="text-xs text-muted-foreground mt-1 truncate max-w-[200px]" dir="ltr">
                               {selectedOrder.paymentLink}
                             </p>
                           </div>
@@ -1279,10 +1360,10 @@ ${trackingUrl}
                               variant="outline"
                               onClick={() => {
                                 updatePaymentStatus(selectedOrder.id, 'paid');
-                                toast({ title: "סומן כשולם" });
+                                toast({ title: "סומן כשולם ✓" });
                               }}
                             >
-                              <DollarSign className="w-4 h-4 mr-1" />
+                              <DollarSign className="w-4 h-4 ml-1" />
                               סמן כשולם
                             </Button>
                           )}
@@ -1293,11 +1374,12 @@ ${trackingUrl}
                             size="sm"
                             className="flex-1"
                             onClick={() => {
-                              setPaymentLink(selectedOrder.paymentLink || '');
+                              navigator.clipboard.writeText(selectedOrder.paymentLink || '');
+                              toast({ title: "קישור תשלום הועתק!" });
                             }}
                           >
-                            <Edit className="w-4 h-4 mr-1" />
-                            ערוך
+                            <Copy className="w-4 h-4 ml-1" />
+                            העתק
                           </Button>
                           <Button 
                             variant="destructive" 
@@ -1308,7 +1390,7 @@ ${trackingUrl}
                               toast({ title: "קישור תשלום הוסר" });
                             }}
                           >
-                            <Trash2 className="w-4 h-4 mr-1" />
+                            <Trash2 className="w-4 h-4 ml-1" />
                             הסר
                           </Button>
                         </div>
