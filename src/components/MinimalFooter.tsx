@@ -14,20 +14,20 @@ const MinimalFooter = () => {
 
   return (
     <>
-      <footer className="border-t border-border py-4 px-4" role="contentinfo" aria-label="תחתית העמוד">
-        <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1" aria-label="קישורים שימושיים">
+      <footer className="border-t border-border py-6 px-6" role="contentinfo" aria-label="תחתית העמוד">
+        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2" aria-label="קישורים שימושיים">
           {footerLinks.map((link, i) => (
             <button
               key={i}
               onClick={() => setOpenLink(link)}
-              className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               {link.label}
             </button>
           ))}
         </nav>
-        <p className="text-[10px] text-muted-foreground/50 text-center mt-2">
-          © {new Date().getFullYear()} DirectFix
+        <p className="text-xs text-muted-foreground/60 text-center mt-3">
+          © {new Date().getFullYear()} DirectFix — תיקוני אייפון עד הבית
         </p>
       </footer>
 

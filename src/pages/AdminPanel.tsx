@@ -50,6 +50,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
 import PushNotificationToggle from '@/components/PushNotificationToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -89,10 +90,13 @@ const AdminPanel = () => {
     customerPhone: '',
     customerName: '',
     customerAddress: '',
+    customerEmail: '',
     deviceType: '',
     issueDescription: '',
     repairPrice: 0,
     technicianName: '',
+    scheduledDate: '',
+    scheduledTime: '',
   });
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [conversationInput, setConversationInput] = useState('');
@@ -196,27 +200,60 @@ const AdminPanel = () => {
     );
   }
 
-  const handleCreateOrder = () => {
+  const handleCreateOrder = async () => {
     console.log('Creating order:', newOrder);
-    // No mandatory fields - create order with whatever data is provided
-    addOrder({
+    const scheduledNote = newOrder.scheduledDate && newOrder.scheduledTime 
+      ? `מועד מבוקש: ${newOrder.scheduledDate} בשעות ${newOrder.scheduledTime}` 
+      : '';
+    const notes = scheduledNote ? [scheduledNote] : [];
+    
+    const orderResult: any = await addOrder({
       ...newOrder,
       customerPhone: newOrder.customerPhone || 'לא צוין',
       customerName: newOrder.customerName || 'לקוח חדש',
       status: 'pending',
       accessories: [],
-      notes: [],
+      notes,
       wantsPromotions: false,
-    });
+      customerEmail: newOrder.customerEmail || undefined,
+    } as any);
+    
+    // Send email notification (same as customer order)
+    if (orderResult) {
+      try {
+        await supabase.functions.invoke('send-order-notifications', {
+          body: {
+            customerName: newOrder.customerName || 'לקוח חדש',
+            customerPhone: newOrder.customerPhone || 'לא צוין',
+            customerAddress: newOrder.customerAddress || '',
+            deviceType: newOrder.deviceType || '',
+            repairType: newOrder.issueDescription || 'לא צוין',
+            repairPrice: newOrder.repairPrice || 0,
+            scheduledTime: scheduledNote || 'לא נקבע',
+            notes: '',
+            customerEmail: newOrder.customerEmail || undefined,
+            orderNumber: orderResult?.order_number || undefined,
+            leadSource: 'הזמנה ידנית (אדמין)',
+          }
+        });
+        console.log('Admin order notifications sent');
+      } catch (notificationError) {
+        console.error('Error sending admin order notifications:', notificationError);
+      }
+    }
+    
     console.log('Order added, current orders:', orders.length + 1);
     setNewOrder({
       customerPhone: '',
       customerName: '',
       customerAddress: '',
+      customerEmail: '',
       deviceType: '',
       issueDescription: '',
       repairPrice: 0,
       technicianName: '',
+      scheduledDate: '',
+      scheduledTime: '',
     });
     setIsNewOrderOpen(false);
     toast({
@@ -323,9 +360,30 @@ const AdminPanel = () => {
     });
   };
 
-  const sendWhatsAppManually = (order: RepairOrder) => {
+  const getWhatsAppMessage = (order: RepairOrder) => {
     const trackingUrl = `${window.location.origin}/track?phone=${encodeURIComponent(order.customerPhone)}`;
     
+    switch (order.status) {
+      case 'pending':
+        return `שלום ${order.customerName}! 👋\n\nהזמנתך התקבלה בהצלחה ✅\n📱 ${order.deviceType}\n🔧 ${order.issueDescription}\n\n🔗 עקבו בזמן אמת:\n${trackingUrl}\n\nתודה שבחרתם בנו! 🙏`;
+      case 'confirmed':
+        return `שלום ${order.customerName}! 👋\n\nההזמנה שלך אושרה ✅\n📱 ${order.deviceType} - ${order.issueDescription}\n\nניצור איתך קשר בקרוב לתיאום הגעה.\n\n🔗 מעקב: ${trackingUrl}`;
+      case 'technician_assigned':
+        return `שלום ${order.customerName}! 👋\n\nטכנאי שובץ להזמנה שלך 👨‍🔧\n${order.technicianName ? `שם הטכנאי: ${order.technicianName}` : ''}\n📱 ${order.deviceType}\n\n🔗 מעקב בזמן אמת: ${trackingUrl}`;
+      case 'on_the_way':
+        return `שלום ${order.customerName}! 🏍️\n\nהטכנאי בדרך אליך! 🚀\n${order.estimatedArrival ? `⏰ זמן הגעה משוער: ${order.estimatedArrival}` : ''}\n📱 ${order.deviceType} - ${order.issueDescription}\n\n🔗 עקבו בזמן אמת: ${trackingUrl}`;
+      case 'arrived':
+        return `שלום ${order.customerName}! 📍\n\nהטכנאי הגיע! ✅\nאנא פתחו את הדלת 🚪\n\n📱 ${order.deviceType} - ${order.issueDescription}`;
+      case 'in_progress':
+        return `שלום ${order.customerName}! 🔧\n\nהתיקון בעיצומו! ⚡\n📱 ${order.deviceType} - ${order.issueDescription}\n\nנעדכן אותך ברגע שנסיים 👌`;
+      case 'completed':
+        return `שלום ${order.customerName}! 🎉\n\nהתיקון הושלם בהצלחה! ✅\n📱 ${order.deviceType} - ${order.issueDescription}\n💰 סה"כ: ₪${order.repairPrice}\n\n${order.invoiceLink ? `📄 חשבונית: ${order.invoiceLink}\n` : ''}תודה שבחרתם ב-DirectFix! ⭐\nנשמח לדירוג: ${trackingUrl}`;
+      default:
+        return `שלום ${order.customerName}! 👋\n\n🔗 מעקב אחרי ההזמנה: ${trackingUrl}\n\nתודה שבחרתם בנו! 🙏`;
+    }
+  };
+
+  const sendWhatsAppManually = (order: RepairOrder) => {
     // Format phone number for WhatsApp (remove leading 0, add 972)
     let phone = order.customerPhone.replace(/\D/g, '');
     if (phone.startsWith('0')) {
@@ -334,15 +392,7 @@ const AdminPanel = () => {
       phone = '972' + phone;
     }
     
-    const message = `שלום ${order.customerName}! 👋
-
-הזמנתך התקבלה בהצלחה ✅
-
-🔗 עקבו בזמן אמת אחרי הטכנאי:
-${trackingUrl}
-
-תודה שבחרתם בנו! 🙏`;
-
+    const message = getWhatsAppMessage(order);
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     
@@ -1701,10 +1751,13 @@ ${trackingUrl}
                         customerPhone: '',
                         customerName: '',
                         customerAddress: '',
+                        customerEmail: '',
                         deviceType: '',
                         issueDescription: '',
                         repairPrice: 0,
                         technicianName: '',
+                        scheduledDate: '',
+                        scheduledTime: '',
                       });
                       setIsNewOrderOpen(true);
                     }}
@@ -1748,10 +1801,13 @@ ${trackingUrl}
                             customerPhone: order.customerPhone,
                             customerName: order.customerName,
                             customerAddress: order.customerAddress,
+                            customerEmail: '',
                             deviceType: order.deviceType,
                             issueDescription: order.issueDescription,
                             repairPrice: order.repairPrice,
                             technicianName: order.technicianName || '',
+                            scheduledDate: '',
+                            scheduledTime: '',
                           });
                         }
                       }}>
@@ -1807,6 +1863,30 @@ ${trackingUrl}
                           value={newOrder.technicianName}
                           onChange={(e) => setNewOrder({ ...newOrder, technicianName: e.target.value })}
                         />
+                        <Input
+                          type="email"
+                          placeholder="אימייל הלקוח (לשליחת אישור)"
+                          value={newOrder.customerEmail}
+                          onChange={(e) => setNewOrder({ ...newOrder, customerEmail: e.target.value })}
+                          dir="ltr"
+                        />
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-foreground">תאריך ושעה</label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              type="date"
+                              value={newOrder.scheduledDate}
+                              onChange={(e) => setNewOrder({ ...newOrder, scheduledDate: e.target.value })}
+                              dir="ltr"
+                            />
+                            <Input
+                              type="time"
+                              value={newOrder.scheduledTime}
+                              onChange={(e) => setNewOrder({ ...newOrder, scheduledTime: e.target.value })}
+                              dir="ltr"
+                            />
+                          </div>
+                        </div>
                         <Button 
                           onClick={() => {
                             if (isEditMode && editingOrderId) {
