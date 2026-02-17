@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -325,6 +325,7 @@ const NewRepairOrder = () => {
   const [pendingRepair, setPendingRepair] = useState<RepairType | null>(null);
   const [selectedBackColor, setSelectedBackColor] = useState<string>('');
   const [showBackColorPicker, setShowBackColorPicker] = useState(false);
+  const [otherRepairDescription, setOtherRepairDescription] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   // Privacy consent
@@ -575,6 +576,14 @@ const NewRepairOrder = () => {
       return;
     }
     
+    // "תיקון אחר" - just select it, stay on same step to show text input
+    if (repair.name.includes('תיקון אחר')) {
+      setSelectedRepair(repair);
+      setShowBackColorPicker(false);
+      setOtherRepairDescription('');
+      return; // Don't navigate - the inline form will appear
+    }
+    
     const isBackGlass = repair.name.includes('גב');
     
     // If back glass, show color picker instead of proceeding
@@ -608,6 +617,47 @@ const NewRepairOrder = () => {
       goToStep('bundle');
     } else {
       goToStep('price');
+    }
+  };
+  
+  const handleOtherRepairSubmit = async () => {
+    if (!customerName.trim() || !customerPhone.trim()) {
+      toast.error('אנא מלאו שם וטלפון');
+      return;
+    }
+    if (customerPhone.length < 9) {
+      toast.error('מספר טלפון לא תקין');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const notes = [
+        `הזמנה מהאתר - תיקון אחר`,
+        `תיאור התקלה: ${otherRepairDescription}`,
+        `⚠️ נדרש חזרה ללקוח לתיאום`,
+      ];
+      const leadSource = getLeadSource();
+      await addOrder({
+        customerName: customerName.trim(),
+        customerPhone: customerPhone.trim(),
+        customerAddress: '',
+        deviceType: selectedModel?.name || '',
+        issueDescription: `תיקון אחר: ${otherRepairDescription}`,
+        repairPrice: 0,
+        status: 'pending',
+        accessories: [],
+        notes,
+        wantsPromotions: false,
+        leadSource: leadSource.source,
+        customerEmail: customerEmail.trim() || undefined,
+      } as any);
+      
+      goToStep('success');
+      setCompletedOrderNumber(null);
+    } catch (error) {
+      toast.error('אירעה שגיאה, נסה שוב');
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -1224,6 +1274,66 @@ const NewRepairOrder = () => {
                   </div>;
             })}
             </div>
+
+            {/* Other Repair Inline Form */}
+            {selectedRepair?.name.includes('תיקון אחר') && (
+              <div className="animate-fade-in space-y-4 mt-4">
+                <Card className="p-5 border-2 border-primary/30 bg-primary/5 rounded-2xl">
+                  <h3 className="font-bold text-lg mb-2">ספרו לנו מה צריך לתקן</h3>
+                  <Textarea
+                    placeholder="תארו את התקלה או סוג התיקון שאתם צריכים..."
+                    value={otherRepairDescription}
+                    onChange={(e) => setOtherRepairDescription(e.target.value)}
+                    className="min-h-[100px] text-base"
+                  />
+                  
+                  <div className="mt-4 space-y-3">
+                    <Input
+                      placeholder="שם מלא *"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                    />
+                    <Input
+                      placeholder="מספר טלפון *"
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(formatPhone(e.target.value))}
+                      type="tel"
+                      dir="ltr"
+                      className="text-right"
+                    />
+                    <Input
+                      type="email"
+                      placeholder="אימייל (לא חובה)"
+                      value={customerEmail}
+                      onChange={(e) => setCustomerEmail(e.target.value)}
+                      dir="ltr"
+                      className="text-right"
+                    />
+                  </div>
+
+                  <div className="mt-4 p-3 bg-muted/60 rounded-xl">
+                    <p className="text-sm text-muted-foreground text-center">
+                      📞 נקבל את הפרטים ונחזור אליכם בהקדם לתיאום וסיכום מחיר
+                    </p>
+                  </div>
+
+                  <Button
+                    onClick={handleOtherRepairSubmit}
+                    disabled={isSubmitting || !otherRepairDescription.trim() || !customerName.trim() || !customerPhone.trim()}
+                    className="w-full h-14 text-base font-bold rounded-xl mt-4"
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        <Send className="w-5 h-5 ml-2" />
+                        שלחו לנו ונחזור אליכם
+                      </>
+                    )}
+                  </Button>
+                </Card>
+              </div>
+            )}
           </div>}
 
         {/* Step 2.5: Bundle Offer */}
