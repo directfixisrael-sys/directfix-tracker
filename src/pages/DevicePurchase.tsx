@@ -423,20 +423,6 @@ const DevicePurchase = () => {
                 </div>
               ))}
             </div>
-
-            {/* CTA */}
-            <Button
-              size="lg"
-              className="w-full h-14 text-lg font-bold rounded-2xl gap-2 shadow-lg shadow-primary/25"
-              onClick={() => goToStep('model')}
-            >
-              בואו נתחיל
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-
-            <p className="text-center text-xs text-muted-foreground">
-              החל מ-₪3,899 · תשלום מקדמה בלבד
-            </p>
           </div>
         )}
 
@@ -577,13 +563,6 @@ const DevicePurchase = () => {
                 </button>
               ))}
             </div>
-
-            {selectedColor && (
-              <Button className="w-full h-12 text-lg rounded-2xl gap-2 animate-fade-in" onClick={() => goToStep('schedule')}>
-                המשך
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            )}
           </div>
         )}
 
@@ -664,10 +643,6 @@ const DevicePurchase = () => {
                     <span className="font-semibold">{formatSelectedDateTime()}</span>
                   </p>
                 </Card>
-                <Button className="w-full h-12 text-lg rounded-2xl gap-2" onClick={() => goToStep('details')}>
-                  המשך לפרטים
-                  <ArrowLeft className="w-5 h-5" />
-                </Button>
               </div>
             )}
           </div>
@@ -740,15 +715,6 @@ const DevicePurchase = () => {
                 <Input placeholder="email@example.com" value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} type="email" className="h-13 text-base rounded-2xl" dir="ltr" />
               </div>
             </div>
-
-            <Button
-              className="w-full h-12 text-lg rounded-2xl gap-2"
-              onClick={() => goToStep('payment')}
-              disabled={!customerName || !customerPhone || !customerAddress}
-            >
-              לסיכום ותשלום
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
           </div>
         )}
 
@@ -806,32 +772,58 @@ const DevicePurchase = () => {
               </div>
             </Card>
 
-            {/* CTA */}
-            <Button
-              size="lg"
-              className="w-full h-14 text-lg font-bold rounded-2xl gap-2 shadow-lg shadow-primary/25"
-              onClick={handleSubmitOrder}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="animate-spin">⏳</span>
-                  שולח הזמנה...
-                </>
-              ) : (
-                <>
-                  שלם מקדמה ₪500
-                  <ArrowLeft className="w-5 h-5" />
-                </>
-              )}
-            </Button>
-
             <p className="text-center text-xs text-muted-foreground">
               🔒 תשלום מאובטח · נציג ייצור איתכם קשר תוך שעה
             </p>
           </div>
         )}
       </main>
+
+      {/* ═══ Sticky Bottom CTA ═══ */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-lg border-t border-border/50 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+        <div className="max-w-lg mx-auto">
+          {step === 'hero' && (
+            <div className="space-y-1">
+              <Button size="lg" className="w-full h-14 text-lg font-bold rounded-2xl gap-2 shadow-lg shadow-primary/25" onClick={() => goToStep('model')}>
+                בואו נתחיל
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <p className="text-center text-xs text-muted-foreground">החל מ-₪3,899 · תשלום מקדמה בלבד</p>
+            </div>
+          )}
+
+          {step === 'color' && selectedColor && (
+            <Button className="w-full h-14 text-lg font-bold rounded-2xl gap-2 shadow-lg shadow-primary/25" onClick={() => goToStep('schedule')}>
+              המשך
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          )}
+
+          {step === 'schedule' && selectedDate && selectedTimeSlot && (
+            <Button className="w-full h-14 text-lg font-bold rounded-2xl gap-2 shadow-lg shadow-primary/25" onClick={() => goToStep('details')}>
+              המשך לפרטים
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          )}
+
+          {step === 'details' && (
+            <Button className="w-full h-14 text-lg font-bold rounded-2xl gap-2 shadow-lg shadow-primary/25" onClick={() => goToStep('payment')} disabled={!customerName || !customerPhone || !customerAddress}>
+              לסיכום ותשלום
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          )}
+
+          {step === 'payment' && (
+            <Button size="lg" className="w-full h-14 text-lg font-bold rounded-2xl gap-2 shadow-lg shadow-primary/25" onClick={handleSubmitOrder} disabled={isSubmitting}>
+              {isSubmitting ? (
+                <><span className="animate-spin">⏳</span> שולח הזמנה...</>
+              ) : (
+                <>שלם מקדמה ₪500 <ArrowLeft className="w-5 h-5" /></>
+              )}
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
