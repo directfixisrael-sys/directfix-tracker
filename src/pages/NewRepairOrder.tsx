@@ -994,7 +994,11 @@ const NewRepairOrder = () => {
         <nav className="flex items-center justify-between p-3 max-w-5xl mx-auto" aria-label="ניווט הזמנה">
           <div className="flex items-center gap-3">
             <button onClick={() => {
-            if (step === 'model') navigate('/');else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
+            if (step === 'model') navigate('/');else if (step === 'repair') {
+              // If we have additional repairs, go back to price (don't allow model change)
+              if (additionalRepairs.length > 0) goToStep('price');
+              else goToStep('model');
+            } else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
               if (currentBundle) goToStep('bundle');else goToStep('repair');
             } else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
           }} className="h-10 w-10 rounded-2xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors" aria-label="חזור לשלב הקודם">
@@ -1180,13 +1184,28 @@ const NewRepairOrder = () => {
                 <Smartphone className="w-4 h-4" />
                 {selectedModel?.name}
               </div>
-              <h2 className="text-3xl font-extrabold">מה צריך לתקן?</h2>
+              <h2 className="text-3xl font-extrabold">{additionalRepairs.length > 0 ? 'הוסף תיקון נוסף' : 'מה צריך לתקן?'}</h2>
             </div>
+
+            {/* Show already added repairs */}
+            {additionalRepairs.length > 0 && (
+              <div className="bg-muted/50 rounded-2xl p-4 space-y-2">
+                <p className="text-xs font-semibold text-muted-foreground mb-1">תיקונים שנבחרו:</p>
+                {additionalRepairs.map((ar, idx) => (
+                  <div key={idx} className="flex justify-between items-center text-sm">
+                    <span className="font-medium">{ar.repair.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
+                    <span className="font-semibold">₪{ar.price}</span>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div className="space-y-3">
               {repairTypes.filter(repair => {
                 // Hide back glass repair for models with no back glass price
                 if (repair.name.includes('גב') && selectedModel && selectedModel.back_glass_price <= 0) return false;
+                // Hide already selected repairs
+                if (additionalRepairs.some(ar => ar.repair.id === repair.id)) return false;
                 return true;
               }).map((repair, index) => {
             const isPhoneOnly = repair.is_phone_only;
