@@ -130,10 +130,10 @@ const packageFeatures = [
 ];
 
 const heroTestimonials = [
-  { name: 'דניאל כ.', text: 'הזמנתי iPhone 17 Pro Max - הגיעו הביתה, העבירו נתונים, שמו כיסוי ומגן. שירות מדהים!' },
-  { name: 'מיכל ש.', text: 'קניתי מכשיר חדש ותוך שעתיים כבר היה אצלי בבית עם הכל מותקן. מושלם!' },
-  { name: 'אור ל.', text: 'מחיר הוגן, שירות עד הבית, הכל כלול. לא הייתי מאמין שזה יהיה כל כך פשוט' },
-  { name: 'נועה ר.', text: 'העבירו לי את הכל מהאייפון הישן, כולל תמונות ואפליקציות. חוויה מעולה!' },
+  { name: 'דניאל כ.', text: 'הגיעו הביתה, העבירו נתונים, שמו כיסוי ומגן. מדהים!' },
+  { name: 'מיכל ש.', text: 'תוך שעתיים המכשיר היה אצלי עם הכל מותקן!' },
+  { name: 'אור ל.', text: 'מחיר הוגן, שירות עד הבית, הכל כלול. פשוט!' },
+  { name: 'נועה ר.', text: 'העבירו הכל מהאייפון הישן, כולל תמונות. מעולה!' },
 ];
 
 const cyclingMessages = [
@@ -368,27 +368,25 @@ const DevicePurchase = () => {
             </div>
 
             {/* Running testimonials */}
-            <div className="relative h-20 overflow-hidden rounded-2xl bg-primary/5 border border-primary/15">
+            <div className="relative h-24 overflow-hidden rounded-2xl bg-primary/5 border border-primary/15">
               {heroTestimonials.map((t, i) => (
                 <div
                   key={i}
                   className={cn(
-                    "absolute inset-0 flex items-center px-5 gap-3 transition-all duration-700 ease-in-out",
+                    "absolute inset-0 flex flex-col items-center justify-center px-5 text-center transition-all duration-700 ease-in-out",
                     i === testimonialIdx ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                   )}
                 >
-                  <div className="flex-shrink-0 flex gap-0.5">
+                  <div className="flex gap-0.5 mb-1.5">
                     {[...Array(5)].map((_, j) => (
-                      <Star key={j} className="w-3 h-3 text-warning fill-warning" />
+                      <Star key={j} className="w-3.5 h-3.5 text-warning fill-warning" />
                     ))}
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm text-foreground font-medium truncate">"{t.text}"</p>
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <span className="text-[11px] font-semibold text-foreground">{t.name}</span>
-                      <CheckCircle2 className="w-3 h-3 text-primary" />
-                      <span className="text-[10px] text-muted-foreground">מאומת</span>
-                    </div>
+                  <p className="text-sm text-foreground font-medium leading-snug">"{t.text}"</p>
+                  <div className="flex items-center gap-1 mt-1">
+                    <span className="text-[11px] font-semibold text-foreground">{t.name}</span>
+                    <CheckCircle2 className="w-3 h-3 text-primary" />
+                    <span className="text-[10px] text-muted-foreground">מאומת</span>
                   </div>
                 </div>
               ))}
