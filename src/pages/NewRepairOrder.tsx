@@ -326,7 +326,7 @@ const NewRepairOrder = () => {
   const [selectedBackColor, setSelectedBackColor] = useState<string>('');
   const [showBackColorPicker, setShowBackColorPicker] = useState(false);
   const [otherRepairDescription, setOtherRepairDescription] = useState('');
-  const [additionalRepairs, setAdditionalRepairs] = useState<{ repair: RepairType; price: number; backColor?: string }[]>([]);
+  const [additionalRepairs, setAdditionalRepairs] = useState<{ repair: RepairType; price: number; backColor?: string; model: IphoneModel }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   // Privacy consent
@@ -849,7 +849,8 @@ const NewRepairOrder = () => {
       }
       // Add back color notes for all repairs
       additionalRepairs.forEach(ar => {
-        if (ar.backColor) notes.push(`צבע גב מכשיר (${ar.repair.name}): ${ar.backColor}`);
+        notes.push(`תיקון נוסף: ${ar.repair.name} ל-${ar.model.name} — ₪${ar.price}`);
+        if (ar.backColor) notes.push(`צבע גב מכשיר (${ar.repair.name} - ${ar.model.name}): ${ar.backColor}`);
       });
       if (selectedBackColor) {
         notes.push(`צבע גב מכשיר: ${selectedBackColor}`);
@@ -994,11 +995,10 @@ const NewRepairOrder = () => {
         <nav className="flex items-center justify-between p-3 max-w-5xl mx-auto" aria-label="ניווט הזמנה">
           <div className="flex items-center gap-3">
             <button onClick={() => {
-            if (step === 'model') navigate('/');else if (step === 'repair') {
-              // If we have additional repairs, go back to price (don't allow model change)
+            if (step === 'model') {
               if (additionalRepairs.length > 0) goToStep('price');
-              else goToStep('model');
-            } else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
+              else navigate('/');
+            } else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
               if (currentBundle) goToStep('bundle');else goToStep('repair');
             } else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
           }} className="h-10 w-10 rounded-2xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors" aria-label="חזור לשלב הקודם">
@@ -1193,7 +1193,7 @@ const NewRepairOrder = () => {
                 <p className="text-xs font-semibold text-muted-foreground mb-1">תיקונים שנבחרו:</p>
                 {additionalRepairs.map((ar, idx) => (
                   <div key={idx} className="flex justify-between items-center text-sm">
-                    <span className="font-medium">{ar.repair.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
+                    <span className="font-medium">{ar.repair.name} — {ar.model.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
                     <span className="font-semibold">₪{ar.price}</span>
                   </div>
                 ))}
@@ -1204,8 +1204,6 @@ const NewRepairOrder = () => {
               {repairTypes.filter(repair => {
                 // Hide back glass repair for models with no back glass price
                 if (repair.name.includes('גב') && selectedModel && selectedModel.back_glass_price <= 0) return false;
-                // Hide already selected repairs
-                if (additionalRepairs.some(ar => ar.repair.id === repair.id)) return false;
                 return true;
               }).map((repair, index) => {
             const isPhoneOnly = repair.is_phone_only;
@@ -1466,7 +1464,7 @@ const NewRepairOrder = () => {
                 {/* Previously added repairs */}
                 {additionalRepairs.map((ar, idx) => (
                   <div key={idx} className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">{ar.repair.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
+                    <span className="text-muted-foreground">{ar.repair.name} — {ar.model.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
                     <span className="font-semibold">₪{ar.price}</span>
                   </div>
                 ))}
@@ -1918,12 +1916,13 @@ const NewRepairOrder = () => {
               <Button 
                 variant="outline" 
                 onClick={() => {
-                  // Save current repair before going back
+                  // Save current repair before going back to model selection
                   if (selectedRepair && selectedModel) {
                     setAdditionalRepairs(prev => [...prev, { 
                       repair: selectedRepair, 
                       price: getRepairPrice(selectedRepair),
-                      backColor: selectedBackColor || undefined 
+                      backColor: selectedBackColor || undefined,
+                      model: selectedModel
                     }]);
                   }
                   if (selectedBundleAddon && currentBundle && selectedModel) {
@@ -1931,15 +1930,17 @@ const NewRepairOrder = () => {
                     if (batteryRepair) {
                       setAdditionalRepairs(prev => [...prev, { 
                         repair: batteryRepair, 
-                        price: getBundleAddonPrice() 
+                        price: getBundleAddonPrice(),
+                        model: selectedModel
                       }]);
                     }
                     setSelectedBundleAddon(false);
                     setCurrentBundle(null);
                   }
                   setSelectedRepair(null);
+                  setSelectedModel(null);
                   setSelectedBackColor('');
-                  setStep('repair');
+                  goToStep('model');
                 }}
                 className="w-full h-11 text-sm rounded-2xl gap-2"
               >
