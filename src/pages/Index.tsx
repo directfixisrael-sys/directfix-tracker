@@ -42,29 +42,15 @@ const Index = () => {
 
           {/* Main CTAs */}
           <div className="space-y-3 animate-fade-in" style={{ animationDelay: '200ms' }}>
-            {/* Row 1: Repair + Device */}
-            <div className="flex gap-3">
-              <Button 
-                size="lg" 
-                className="flex-1 h-14 text-base font-bold rounded-2xl gap-2 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group bg-gradient-to-r from-primary to-primary/85"
-                onClick={() => navigate('/order')}
-              >
-                <Wrench className="w-5 h-5" />
-                <span>הזמן תיקון</span>
-              </Button>
+            <Button 
+              size="lg" 
+              className="w-full h-14 text-base font-bold rounded-2xl gap-2 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group bg-gradient-to-r from-primary to-primary/85"
+              onClick={() => navigate('/order')}
+            >
+              <Wrench className="w-5 h-5" />
+              <span>הזמן תיקון</span>
+            </Button>
 
-              <Button 
-                variant="outline"
-                size="lg" 
-                className="h-14 px-4 text-sm font-semibold rounded-2xl gap-2 border-2 border-primary/30 bg-primary/10 hover:bg-primary/20 text-foreground transition-all duration-300 group"
-                onClick={() => navigate('/devices')}
-              >
-                <span className="text-base">📱</span>
-                <span>קנה מכשיר</span>
-              </Button>
-            </div>
-
-            {/* Row 2: Track */}
             <Button 
               variant="outline"
               size="lg" 
