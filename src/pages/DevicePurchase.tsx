@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Smartphone, Shield, Battery, Zap, Package, Truck, Check, Gift, Star,
   Phone, User, MapPin, ArrowLeft, ArrowRight, Calendar, Clock, Heart,
-  CreditCard, ChevronDown, Sparkles, Monitor, RefreshCw, Send
+  CreditCard, ChevronDown, Sparkles, Monitor, RefreshCw, Send, CheckCircle2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -18,11 +18,20 @@ import AddressAutocomplete from '@/components/AddressAutocomplete';
 import GiftOrderToggle from '@/components/GiftOrderToggle';
 
 import iphone17ProMaxImg from '@/assets/iphone-17-pro-max.png';
+import iphone17ProMaxOrange from '@/assets/iphone-17-pro-max-orange.png';
+import iphone17ProMaxBlue from '@/assets/iphone-17-pro-max-blue.png';
+import iphone17ProMaxSilver from '@/assets/iphone-17-pro-max-silver.png';
 import iphone17ProImg from '@/assets/iphone-17-pro.png';
 import iphone17Img from '@/assets/iphone-17.png';
 import iphone17AirImg from '@/assets/iphone-17-air.png';
 
 // ─── Data ──────────────────────────────────────────────
+
+interface PhoneColor {
+  name: string;
+  hex: string;
+  image?: string;
+}
 
 interface PhoneModel {
   id: string;
@@ -30,7 +39,7 @@ interface PhoneModel {
   subtitle: string;
   image: string;
   storage: { size: string; price: number }[];
-  colors: { name: string; hex: string }[];
+  colors: PhoneColor[];
   isNew?: boolean;
   isPro?: boolean;
   badge?: string;
@@ -41,14 +50,14 @@ const phoneModels: PhoneModel[] = [
     id: 'iphone-17-pro-max',
     name: 'iPhone 17 Pro Max',
     subtitle: 'הכי חזק. הכי גדול.',
-    image: iphone17ProMaxImg,
+    image: iphone17ProMaxOrange,
     isPro: true,
     isNew: true,
     badge: 'הפופולרי ביותר',
     colors: [
-      { name: 'כסוף', hex: '#E5E5E0' },
-      { name: 'כתום קוסמי', hex: '#D4723C' },
-      { name: 'כחול עמוק', hex: '#2C4A6E' },
+      { name: 'כסוף', hex: '#E5E5E0', image: iphone17ProMaxSilver },
+      { name: 'כתום קוסמי', hex: '#D4723C', image: iphone17ProMaxOrange },
+      { name: 'כחול עמוק', hex: '#2C4A6E', image: iphone17ProMaxBlue },
     ],
     storage: [
       { size: '256GB', price: 6299 },
@@ -118,11 +127,25 @@ const phoneModels: PhoneModel[] = [
 ];
 
 const packageFeatures = [
-  { icon: Shield, title: 'מגן מסך פרימיום', desc: 'הגנה מלאה' },
-  { icon: Package, title: 'כיסוי איכותי', desc: 'מעוצב לבחירתך' },
-  { icon: Zap, title: 'מטען מהיר 20W', desc: 'טעינה מהירה' },
-  { icon: RefreshCw, title: 'העברת נתונים', desc: 'מהמכשיר הישן' },
-  { icon: Truck, title: 'משלוח עד הבית', desc: 'חינם!' },
+  { icon: Shield, title: 'מגן מסך פרימיום' },
+  { icon: Package, title: 'כיסוי איכותי' },
+  { icon: Zap, title: 'מטען מהיר 20W' },
+  { icon: RefreshCw, title: 'העברת נתונים' },
+  { icon: Truck, title: 'משלוח חינם עד הבית' },
+];
+
+const heroTestimonials = [
+  { name: 'דניאל כ.', text: 'הזמנתי iPhone 17 Pro Max - הגיעו הביתה, העבירו נתונים, שמו כיסוי ומגן. שירות מדהים!' },
+  { name: 'מיכל ש.', text: 'קניתי מכשיר חדש ותוך שעתיים כבר היה אצלי בבית עם הכל מותקן. מושלם!' },
+  { name: 'אור ל.', text: 'מחיר הוגן, שירות עד הבית, הכל כלול. לא הייתי מאמין שזה יהיה כל כך פשוט' },
+  { name: 'נועה ר.', text: 'העבירו לי את הכל מהאייפון הישן, כולל תמונות ואפליקציות. חוויה מעולה!' },
+];
+
+const cyclingMessages = [
+  'חוויית רכישה שלמה',
+  'הכל כלול במחיר אחד',
+  'שירות VIP עד הבית',
+  'מכשיר חדש + אביזרים',
 ];
 
 // Schedule
@@ -143,8 +166,22 @@ const DevicePurchase = () => {
   const [step, setStep] = useState<Step>('hero');
   const [selectedModel, setSelectedModel] = useState<PhoneModel | null>(null);
   const [selectedStorage, setSelectedStorage] = useState<string>('');
-  const [selectedColor, setSelectedColor] = useState<{ name: string; hex: string } | null>(null);
+  const [selectedColor, setSelectedColor] = useState<PhoneColor | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  // Hero cycling message
+  const [cycleIdx, setCycleIdx] = useState(0);
+  const [testimonialIdx, setTestimonialIdx] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCycleIdx(i => (i + 1) % cyclingMessages.length), 3000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => setTestimonialIdx(i => (i + 1) % heroTestimonials.length), 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Schedule
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
@@ -187,7 +224,7 @@ const DevicePurchase = () => {
   const getAvailableDates = () => {
     const dates: Date[] = [];
     const today = new Date();
-    for (let i = 1; i <= 14; i++) { // future only (starts from tomorrow)
+    for (let i = 1; i <= 14; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
       const dateStr = date.toISOString().split('T')[0];
@@ -223,6 +260,11 @@ const DevicePurchase = () => {
   };
 
   const getPrice = () => selectedModel?.storage.find(s => s.size === selectedStorage)?.price || 0;
+
+  const getColorImage = () => {
+    if (selectedColor?.image) return selectedColor.image;
+    return selectedModel?.image || '';
+  };
 
   const formatSelectedDateTime = () => {
     if (!selectedDate || !selectedTimeSlot) return '';
@@ -284,20 +326,22 @@ const DevicePurchase = () => {
     <div className="min-h-screen bg-background" ref={contentRef}>
       <Header showBackButton onBack={() => step === 'hero' ? navigate('/') : goToStep(steps[currentStepIndex - 1])} />
 
-      {/* Progress bar */}
+      {/* Progress bar + scrolling marquee */}
       {step !== 'hero' && (
         <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-lg border-b border-border/50">
           <div className="h-1 bg-muted">
             <div className="h-full bg-primary transition-all duration-500 ease-out" style={{ width: `${progressPercent}%` }} />
           </div>
-          {/* Package features ticker */}
-          <div className="flex items-center justify-center gap-4 py-2 overflow-hidden">
-            {packageFeatures.map((f, i) => (
-              <div key={i} className="flex items-center gap-1.5 text-xs text-muted-foreground whitespace-nowrap">
-                <f.icon className="w-3.5 h-3.5 text-primary" />
-                <span>{f.title}</span>
-              </div>
-            ))}
+          {/* Scrolling marquee */}
+          <div className="overflow-hidden py-2">
+            <div className="flex animate-marquee gap-8 whitespace-nowrap">
+              {[...packageFeatures, ...packageFeatures].map((f, i) => (
+                <div key={i} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <f.icon className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                  <span>{f.title}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -309,9 +353,12 @@ const DevicePurchase = () => {
           <div className="space-y-8 animate-fade-in">
             {/* Hero */}
             <div className="text-center pt-8 pb-4">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-semibold mb-6 animate-pulse">
-                <Sparkles className="w-4 h-4" />
-                חוויית רכישה שלמה
+              {/* Cycling badge */}
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-semibold mb-6 h-8 overflow-hidden relative">
+                <Sparkles className="w-4 h-4 flex-shrink-0" />
+                <span key={cycleIdx} className="animate-fade-in">
+                  {cyclingMessages[cycleIdx]}
+                </span>
               </div>
               <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
                 מכשיר חדש?
@@ -321,12 +368,40 @@ const DevicePurchase = () => {
                 </span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-sm mx-auto leading-relaxed">
-                מכשיר חדש באריזה + אביזרים + העברת נתונים + משלוח עד הבית. הכל בשירות אחד.
+                הכל בשירות אחד.
               </p>
             </div>
 
-            {/* Value cards with stagger animation */}
+            {/* Running testimonials */}
+            <div className="relative h-20 overflow-hidden rounded-2xl bg-primary/5 border border-primary/15">
+              {heroTestimonials.map((t, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "absolute inset-0 flex items-center px-5 gap-3 transition-all duration-700 ease-in-out",
+                    i === testimonialIdx ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                  )}
+                >
+                  <div className="flex-shrink-0 flex gap-0.5">
+                    {[...Array(5)].map((_, j) => (
+                      <Star key={j} className="w-3 h-3 text-warning fill-warning" />
+                    ))}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm text-foreground font-medium truncate">"{t.text}"</p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <span className="text-[11px] font-semibold text-foreground">{t.name}</span>
+                      <CheckCircle2 className="w-3 h-3 text-primary" />
+                      <span className="text-[10px] text-muted-foreground">מאומת</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Value cards */}
             <div className="space-y-3">
+              <p className="text-sm font-bold text-center text-muted-foreground mb-1">מכשיר חדש באריזה + הכל כלול:</p>
               {[
                 { icon: Smartphone, title: 'מכשיר חדש באריזה', desc: 'iPhone 17 כל הדגמים זמינים', gradient: 'from-blue-500/10 to-indigo-500/10', iconColor: 'text-blue-500' },
                 { icon: Package, title: 'חבילת אביזרים מלאה', desc: 'כיסוי + מגן מסך + מטען מהיר', gradient: 'from-purple-500/10 to-pink-500/10', iconColor: 'text-purple-500' },
@@ -353,19 +428,6 @@ const DevicePurchase = () => {
                 </div>
               ))}
             </div>
-
-            {/* Testimonial */}
-            <Card className="p-5 bg-primary/5 border-primary/20">
-              <div className="flex items-center gap-2 mb-2">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 text-warning fill-warning" />
-                ))}
-              </div>
-              <p className="text-sm text-muted-foreground italic leading-relaxed">
-                "הזמנתי iPhone 17 Pro Max - הגיעו הביתה, העבירו את כל הנתונים, שמו כיסוי ומגן מסך. שירות מדהים!"
-              </p>
-              <p className="text-xs text-muted-foreground mt-2 font-medium">— דניאל, ראשון לציון</p>
-            </Card>
 
             {/* CTA */}
             <Button
@@ -486,7 +548,11 @@ const DevicePurchase = () => {
         {step === 'color' && selectedModel && (
           <div className="space-y-6 animate-fade-in">
             <div className="text-center">
-              <img src={selectedModel.image} alt={selectedModel.name} className="w-28 h-28 object-contain mx-auto mb-4" />
+              <img 
+                src={selectedColor?.image || selectedModel.image} 
+                alt={selectedModel.name} 
+                className="w-36 h-36 object-contain mx-auto mb-4 transition-all duration-300" 
+              />
               <h2 className="text-3xl font-extrabold mb-1">בחרו צבע</h2>
               <p className="text-muted-foreground">{selectedModel.name} · {selectedStorage}</p>
             </div>
@@ -497,7 +563,6 @@ const DevicePurchase = () => {
                   key={color.name}
                   onClick={() => {
                     setSelectedColor(color);
-                    goToStep('schedule');
                   }}
                   className={cn(
                     "flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all active:scale-[0.98]",
@@ -506,14 +571,25 @@ const DevicePurchase = () => {
                       : "border-border hover:border-primary/40 bg-card"
                   )}
                 >
-                  <div
-                    className="w-16 h-16 rounded-full border-4 border-background shadow-lg"
-                    style={{ backgroundColor: color.hex }}
-                  />
+                  {color.image ? (
+                    <img src={color.image} alt={color.name} className="w-16 h-16 object-contain" />
+                  ) : (
+                    <div
+                      className="w-16 h-16 rounded-full border-4 border-background shadow-lg"
+                      style={{ backgroundColor: color.hex }}
+                    />
+                  )}
                   <span className="text-sm font-semibold">{color.name}</span>
                 </button>
               ))}
             </div>
+
+            {selectedColor && (
+              <Button className="w-full h-12 text-lg rounded-2xl gap-2 animate-fade-in" onClick={() => goToStep('schedule')}>
+                המשך
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            )}
           </div>
         )}
 
@@ -616,7 +692,7 @@ const DevicePurchase = () => {
             </div>
 
             {/* Gift toggle */}
-            <GiftOrderToggle isGift={isGiftOrder} onToggle={setIsGiftOrder} />
+            <GiftOrderToggle isGift={isGiftOrder} onToggle={setIsGiftOrder} label="שליחת מכשיר במתנה" />
 
             {/* Gift sender */}
             {isGiftOrder && (
@@ -693,7 +769,7 @@ const DevicePurchase = () => {
             {/* Order summary */}
             <Card className="p-5 space-y-4">
               <div className="flex items-center gap-4">
-                <img src={selectedModel.image} alt={selectedModel.name} className="w-16 h-16 object-contain" />
+                <img src={getColorImage()} alt={selectedModel.name} className="w-16 h-16 object-contain" />
                 <div>
                   <h3 className="font-bold text-lg">{selectedModel.name}</h3>
                   <p className="text-sm text-muted-foreground">{selectedStorage} · {selectedColor?.name}</p>

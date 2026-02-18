@@ -4,9 +4,10 @@ import { useState } from 'react';
 interface GiftOrderToggleProps {
   isGift: boolean;
   onToggle: (isGift: boolean) => void;
+  label?: string;
 }
 
-const GiftOrderToggle = ({ isGift, onToggle }: GiftOrderToggleProps) => {
+const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במתנה' }: GiftOrderToggleProps) => {
   const [showDetails, setShowDetails] = useState(false);
   const [heartBurst, setHeartBurst] = useState(false);
 
@@ -36,7 +37,7 @@ const GiftOrderToggle = ({ isGift, onToggle }: GiftOrderToggleProps) => {
           </div>
           <Gift className={`w-4 h-4 ${isGift ? 'text-primary' : 'text-muted-foreground'}`} />
           <span className={`font-medium ${isGift ? 'text-primary' : ''}`}>
-            שליחת תיקון במתנה
+            {label}
           </span>
 
           {/* Instagram-style heart burst */}
