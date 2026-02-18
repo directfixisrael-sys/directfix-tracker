@@ -47,8 +47,10 @@ import {
   CreditCard,
   DollarSign,
   Package,
-  Wrench
+  Wrench,
+  CalendarPlus
 } from 'lucide-react';
+import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -1055,7 +1057,7 @@ const AdminPanel = () => {
                           <Copy className="w-4 h-4" />
                           <span className="hidden sm:inline">העתק קישור</span>
                         </Button>
-                        <Button
+                      <Button
                           variant="outline"
                           size="sm"
                           onClick={() => sendWhatsAppManually(selectedOrder)}
@@ -1063,6 +1065,51 @@ const AdminPanel = () => {
                         >
                           <MessageCircle className="w-4 h-4" />
                           <span className="hidden sm:inline">שלח וואטסאפ</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            // Extract scheduled date/time from notes
+                            const scheduledNote = selectedOrder.notes.find(n => n.includes('מועד מבוקש:'));
+                            let startDate = new Date();
+                            let endDate = new Date();
+                            
+                            if (scheduledNote) {
+                              // Parse "מועד מבוקש: 2025-01-15 בשעות 14:00-16:00"
+                              const dateMatch = scheduledNote.match(/(\d{4}-\d{2}-\d{2})/);
+                              const timeMatch = scheduledNote.match(/(\d{2}:\d{2})-(\d{2}:\d{2})/);
+                              const singleTimeMatch = scheduledNote.match(/(\d{2}:\d{2})/);
+                              
+                              if (dateMatch) {
+                                const [year, month, day] = dateMatch[1].split('-');
+                                if (timeMatch) {
+                                  const [sH, sM] = timeMatch[1].split(':');
+                                  const [eH, eM] = timeMatch[2].split(':');
+                                  startDate = new Date(+year, +month - 1, +day, +sH, +sM);
+                                  endDate = new Date(+year, +month - 1, +day, +eH, +eM);
+                                } else if (singleTimeMatch) {
+                                  const [h, m] = singleTimeMatch[1].split(':');
+                                  startDate = new Date(+year, +month - 1, +day, +h, +m);
+                                  endDate = new Date(+year, +month - 1, +day, +h + 1, +m);
+                                } else {
+                                  startDate = new Date(+year, +month - 1, +day, 10, 0);
+                                  endDate = new Date(+year, +month - 1, +day, 12, 0);
+                                }
+                              }
+                            }
+                            
+                            const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+                            const title = encodeURIComponent(`תיקון ${selectedOrder.deviceType} - ${selectedOrder.customerName}`);
+                            const details = encodeURIComponent(`${selectedOrder.issueDescription}\nטלפון: ${selectedOrder.customerPhone}\nמחיר: ₪${selectedOrder.repairPrice}`);
+                            const location = encodeURIComponent(selectedOrder.customerAddress || '');
+                            const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(startDate)}/${fmt(endDate)}&details=${details}&location=${location}`;
+                            window.open(calUrl, '_blank');
+                          }}
+                          className="gap-1"
+                        >
+                          <CalendarPlus className="w-4 h-4" />
+                          <span className="hidden sm:inline">הוסף ליומן</span>
                         </Button>
                       </div>
                       <div className="text-right order-1 md:order-2 md:text-left">
@@ -1795,7 +1842,7 @@ const AdminPanel = () => {
               </DropdownMenu>
 
               <Dialog open={isNewOrderOpen} onOpenChange={setIsNewOrderOpen}>
-                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto mx-4 sm:mx-auto">
                   <DialogHeader>
                     <DialogTitle>{isEditMode ? 'עריכת הזמנה' : 'יצירת הזמנה חדשה'}</DialogTitle>
                     <DialogDescription>
@@ -1848,10 +1895,10 @@ const AdminPanel = () => {
                           onChange={(e) => setNewOrder({ ...newOrder, customerPhone: e.target.value })}
                           dir="ltr"
                         />
-                        <Input
-                          placeholder="כתובת"
+                        <AddressAutocomplete
                           value={newOrder.customerAddress}
-                          onChange={(e) => setNewOrder({ ...newOrder, customerAddress: e.target.value })}
+                          onChange={(val) => setNewOrder({ ...newOrder, customerAddress: val })}
+                          placeholder="כתובת"
                         />
                         <Input
                           placeholder="סוג מכשיר (לדוגמה: iPhone 14)"
