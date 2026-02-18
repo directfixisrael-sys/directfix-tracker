@@ -287,7 +287,8 @@ const DevicePurchase = () => {
         if (giftMessage) notes.push(`ברכה: ${giftMessage}`);
       }
 
-      const { error } = await supabase.from('orders').insert({
+      // Create order in DB first
+      const { data: orderData, error } = await supabase.from('orders').insert({
         customer_name: customerName,
         customer_phone: customerPhone,
         customer_address: customerAddress,
@@ -297,13 +298,35 @@ const DevicePurchase = () => {
         repair_price: getPrice(),
         notes,
         status: 'pending',
+        payment_status: 'awaiting_deposit',
         lead_source: 'device-purchase',
-      });
+      }).select('id, order_number').single();
 
       if (error) throw error;
 
-      toast({ title: 'ההזמנה התקבלה בהצלחה! 🎉', description: 'ניצור איתך קשר בקרוב' });
-      goToStep('hero');
+      // Create Cardcom payment page
+      const currentUrl = window.location.origin;
+      const { data: paymentData, error: paymentError } = await supabase.functions.invoke('cardcom-create-payment', {
+        body: {
+          amount: 500,
+          orderId: orderData.id,
+          customerName,
+          customerPhone,
+          productName: `מקדמה - ${selectedModel?.name} ${selectedStorage} ${selectedColor?.name}`,
+          successUrl: `${currentUrl}/track?phone=${encodeURIComponent(customerPhone)}&payment=success`,
+          errorUrl: `${currentUrl}/devices?payment=error`,
+        },
+      });
+
+      if (paymentError || !paymentData?.success) {
+        console.error('Payment error:', paymentError || paymentData?.error);
+        // Still notify about the order even if payment fails
+        toast({ title: 'ההזמנה נשמרה! 📱', description: 'לא הצלחנו לפתוח דף תשלום. נציג ייצור איתך קשר.' });
+        return;
+      }
+
+      // Redirect to Cardcom payment page
+      window.location.href = paymentData.url;
     } catch (err) {
       console.error(err);
       toast({ title: 'שגיאה בשליחת ההזמנה', variant: 'destructive' });
