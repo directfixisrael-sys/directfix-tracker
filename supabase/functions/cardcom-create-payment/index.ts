@@ -53,10 +53,11 @@ Deno.serve(async (req) => {
 
     const data = await response.json();
 
-    if (!response.ok || !data.Url) {
+    if (!response.ok || !data.Url || !data.LowProfileId || data.Url.includes('GeneralMassage')) {
       console.error('Cardcom API error:', JSON.stringify(data));
+      const errorMsg = data.Description || (data.Url?.includes('No permission') ? 'LowProfile module not enabled on terminal' : 'Payment page creation failed');
       return new Response(
-        JSON.stringify({ success: false, error: data.Description || 'Payment page creation failed' }),
+        JSON.stringify({ success: false, error: errorMsg }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
