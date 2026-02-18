@@ -60,6 +60,18 @@ const Index = () => {
               <Smartphone className="w-5 h-5" />
               <span>עקוב אחר התיקון שלך</span>
             </Button>
+
+            <Button 
+              size="lg" 
+              className="w-full h-14 text-base font-semibold rounded-2xl gap-3 border-2 border-accent bg-accent/10 hover:bg-accent/20 text-accent-foreground transition-all duration-300 group"
+              onClick={() => navigate('/devices')}
+            >
+              <div className="w-8 h-8 bg-accent/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span className="text-lg">📱</span>
+              </div>
+              <span>קנה מכשיר חדש</span>
+              <ChevronLeft className="w-4 h-4 opacity-60 group-hover:translate-x-[-4px] transition-transform" />
+            </Button>
           </div>
 
           {/* Features - Minimal */}
