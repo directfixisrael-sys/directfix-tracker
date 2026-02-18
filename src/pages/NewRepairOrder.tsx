@@ -972,21 +972,20 @@ const NewRepairOrder = () => {
 
   // Shared cart display for additional repairs
   const renderRepairCart = () => (
-    <div className="bg-muted/50 rounded-2xl p-4 space-y-2">
-      <p className="text-xs font-semibold text-muted-foreground mb-2">🛒 תיקונים שנבחרו:</p>
+    <div className="space-y-3">
+      <p className="text-xs font-semibold text-muted-foreground">🛒 תיקונים שנבחרו:</p>
       {additionalRepairs.map((ar, idx) => (
-        <div key={idx} className="flex justify-between items-center text-sm py-1 border-b border-border/30 last:border-0">
-          <div className="flex-1">
-            <span className="font-semibold">{ar.model.name}</span>
-            <span className="text-muted-foreground"> · {ar.repair.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
+        <Card key={idx} className="p-4 rounded-2xl border border-border/60">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex-1 text-right">
+              <p className="font-bold text-base">
+                {ar.model.name} · {ar.repair.name}{ar.backColor ? ` ${ar.backColor}` : ''}
+              </p>
+            </div>
+            <span className="text-xl font-extrabold text-primary whitespace-nowrap">₪{ar.price}</span>
           </div>
-          <span className="font-bold">₪{ar.price}</span>
-        </div>
+        </Card>
       ))}
-      <div className="flex justify-between items-center text-xs pt-1 text-muted-foreground">
-        <span>סה״כ עד כה</span>
-        <span className="font-bold text-foreground">₪{getAdditionalRepairsTotal()}</span>
-      </div>
     </div>
   );
 
