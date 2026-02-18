@@ -1865,9 +1865,19 @@ const NewRepairOrder = () => {
 
       {/* Sticky Footer with Action Buttons */}
       {step !== 'success' && step !== 'model' && step !== 'repair' && <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border/50 p-4 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-          {step === 'price' && <Button onClick={handlePriceConfirm} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
-              אישור ובחירת מועד לטכנאי
-            </Button>}
+          {step === 'price' && <div className="space-y-2">
+              <Button onClick={handlePriceConfirm} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
+                אישור ובחירת מועד לטכנאי
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => { setStep('repair'); setSelectedRepair(null); }}
+                className="w-full h-11 text-sm rounded-2xl gap-2"
+              >
+                <Wrench className="w-4 h-4" />
+                הוסף תיקון נוסף
+              </Button>
+            </div>}
           
           {step === 'schedule' && <Button onClick={handleScheduleConfirm} disabled={!selectedDate || !selectedTimeSlot} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
               המשך לפרטים
