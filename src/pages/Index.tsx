@@ -41,39 +41,38 @@ const Index = () => {
           </div>
 
           {/* Main CTAs */}
-          <div className="space-y-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <Button 
-              size="lg" 
-              className="w-full h-16 text-lg font-bold rounded-2xl gap-3 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group bg-gradient-to-r from-primary to-primary/85"
-              onClick={() => navigate('/order')}
-            >
-              <div className="w-10 h-10 bg-primary-foreground/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+          <div className="space-y-3 animate-fade-in" style={{ animationDelay: '200ms' }}>
+            {/* Row 1: Repair + Device */}
+            <div className="flex gap-3">
+              <Button 
+                size="lg" 
+                className="flex-1 h-14 text-base font-bold rounded-2xl gap-2 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group bg-gradient-to-r from-primary to-primary/85"
+                onClick={() => navigate('/order')}
+              >
                 <Wrench className="w-5 h-5" />
-              </div>
-              <span>הזמן תיקון חדש</span>
-              <ChevronLeft className="w-5 h-5 opacity-60 group-hover:translate-x-[-4px] transition-transform" />
-            </Button>
+                <span>הזמן תיקון</span>
+              </Button>
 
+              <Button 
+                variant="outline"
+                size="lg" 
+                className="h-14 px-4 text-sm font-semibold rounded-2xl gap-2 border-2 border-primary/30 bg-primary/10 hover:bg-primary/20 text-foreground transition-all duration-300 group"
+                onClick={() => navigate('/devices')}
+              >
+                <span className="text-base">📱</span>
+                <span>קנה מכשיר</span>
+              </Button>
+            </div>
+
+            {/* Row 2: Track */}
             <Button 
               variant="outline"
               size="lg" 
-              className="w-full h-14 text-base font-semibold rounded-2xl gap-3 border-2 hover:bg-muted/50 transition-all duration-300"
+              className="w-full h-12 text-sm font-semibold rounded-2xl gap-2 border hover:bg-muted/50 transition-all duration-300"
               onClick={() => navigate('/track')}
             >
-              <Smartphone className="w-5 h-5" />
+              <Smartphone className="w-4 h-4" />
               <span>עקוב אחר התיקון שלך</span>
-            </Button>
-
-            <Button 
-              size="lg" 
-              className="w-full h-14 text-base font-semibold rounded-2xl gap-3 border-2 border-primary/30 bg-primary/10 hover:bg-primary/20 text-foreground transition-all duration-300 group"
-              onClick={() => navigate('/devices')}
-            >
-              <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                <span className="text-lg">📱</span>
-              </div>
-              <span>קנה מכשיר חדש</span>
-              <ChevronLeft className="w-4 h-4 opacity-60 group-hover:translate-x-[-4px] transition-transform" />
             </Button>
           </div>
 
