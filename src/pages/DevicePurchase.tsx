@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Smartphone, Shield, Battery, Zap, Package, Truck, Check, Gift, Star,
   Phone, User, MapPin, ArrowLeft, ArrowRight, Calendar, Clock, Heart,
-  CreditCard, ChevronDown, Sparkles, Monitor, RefreshCw, Send, CheckCircle2
+  CreditCard, ChevronDown, Sparkles, RefreshCw, Send, CheckCircle2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -60,10 +60,9 @@ const phoneModels: PhoneModel[] = [
       { name: 'כחול עמוק', hex: '#2C4A6E', image: iphone17ProMaxBlue },
     ],
     storage: [
-      { size: '256GB', price: 6299 },
-      { size: '512GB', price: 7299 },
-      { size: '1TB', price: 8299 },
-      { size: '2TB', price: 9299 },
+      { size: '256GB', price: 5299 },
+      { size: '512GB', price: 6149 },
+      { size: '1TB', price: 7099 },
     ],
   },
   {
@@ -80,10 +79,9 @@ const phoneModels: PhoneModel[] = [
       { name: 'אפור', hex: '#8E8E93' },
     ],
     storage: [
-      { size: '128GB', price: 5299 },
-      { size: '256GB', price: 5799 },
-      { size: '512GB', price: 6799 },
-      { size: '1TB', price: 7799 },
+      { size: '256GB', price: 5299 },
+      { size: '512GB', price: 6149 },
+      { size: '1TB', price: 7099 },
     ],
   },
   {
@@ -94,15 +92,14 @@ const phoneModels: PhoneModel[] = [
     isNew: true,
     badge: 'חדש!',
     colors: [
-      { name: 'כחול בהיר', hex: '#A8C8E8' },
       { name: 'זהב בהיר', hex: '#E8D5B0' },
-      { name: 'כסוף', hex: '#E5E5E0' },
-      { name: 'שחור', hex: '#2C2C2C' },
+      { name: 'כחול שמיים', hex: '#A8C8E8' },
+      { name: 'לבן', hex: '#F5F5F0' },
+      { name: 'שחור חלל', hex: '#2C2C2C' },
     ],
     storage: [
-      { size: '128GB', price: 4799 },
-      { size: '256GB', price: 5299 },
-      { size: '512GB', price: 6299 },
+      { size: '256GB', price: 3899 },
+      { size: '512GB', price: 4799 },
     ],
   },
   {
@@ -116,12 +113,10 @@ const phoneModels: PhoneModel[] = [
       { name: 'כחול', hex: '#5B7FAE' },
       { name: 'שחור', hex: '#2C2C2C' },
       { name: 'לבן', hex: '#F5F5F0' },
-      { name: 'אפור', hex: '#8E8E93' },
     ],
     storage: [
-      { size: '128GB', price: 3999 },
-      { size: '256GB', price: 4499 },
-      { size: '512GB', price: 5499 },
+      { size: '256GB', price: 3899 },
+      { size: '512GB', price: 4699 },
     ],
   },
 ];
@@ -440,7 +435,7 @@ const DevicePurchase = () => {
             </Button>
 
             <p className="text-center text-xs text-muted-foreground">
-              החל מ-₪3,999 · תשלום מקדמה בלבד
+              החל מ-₪3,899 · תשלום מקדמה בלבד
             </p>
           </div>
         )}
@@ -524,16 +519,15 @@ const DevicePurchase = () => {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
-                      <Monitor className="w-6 h-6 text-primary" />
+                      <Battery className="w-6 h-6 text-primary" />
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold">{s.size}</p>
                       <p className="text-xs text-muted-foreground">
-                        {s.size === '128GB' ? 'מתאים לשימוש בסיסי' :
-                         s.size === '256GB' ? 'הפופולרי ביותר' :
+                        {s.size === '256GB' ? 'הפופולרי ביותר' :
                          s.size === '512GB' ? 'לצלמים ויוצרי תוכן' :
                          s.size === '1TB' ? 'נפח מקסימלי לכל דבר' :
-                         'הגדול ביותר אי פעם'}
+                         'מתאים לשימוש בסיסי'}
                       </p>
                     </div>
                   </div>
