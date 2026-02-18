@@ -1466,37 +1466,28 @@ const NewRepairOrder = () => {
               </div>
             </div>
 
-            {/* All repairs as cards */}
-            <div className="space-y-3">
-              {additionalRepairs.map((ar, idx) => (
-                <Card key={idx} className="p-4 rounded-2xl border border-border/60">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex-1 text-right">
-                      <p className="font-bold text-base">
-                        {ar.model.name} · {ar.repair.name}{ar.backColor ? ` ${ar.backColor}` : ''}
-                      </p>
-                    </div>
-                    <span className="text-xl font-extrabold text-primary whitespace-nowrap">₪{ar.price}</span>
-                  </div>
-                </Card>
-              ))}
-              {/* Current repair */}
-              {selectedRepair && selectedModel && (
-                <Card className="p-4 rounded-2xl border border-border/60">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex-1 text-right">
-                      <p className="font-bold text-base">
-                        {selectedModel.name} · {getRepairTypeName()}{selectedBackColor ? ` ${selectedBackColor}` : ''}
-                      </p>
-                    </div>
-                    <span className="text-xl font-extrabold text-primary whitespace-nowrap">₪{getPrice()}</span>
-                  </div>
-                </Card>
-              )}
-            </div>
-
             <Card className="p-5 bg-gradient-to-br from-card via-card to-primary/5 border-2 border-primary/20 shadow-lg">
               <div className="space-y-3">
+                {/* All repairs as line items */}
+                {additionalRepairs.map((ar, idx) => (
+                  <div key={idx} className="flex justify-between items-center text-sm py-1 border-b border-border/30 last:border-0">
+                    <div className="flex-1">
+                      <span className="font-semibold">{ar.model.name}</span>
+                      <span className="text-muted-foreground"> · {ar.repair.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
+                    </div>
+                    <span className="font-bold">₪{ar.price}</span>
+                  </div>
+                ))}
+                {/* Current repair */}
+                {selectedRepair && selectedModel && (
+                  <div className="flex justify-between items-center text-sm py-1 border-b border-border/30 last:border-0">
+                    <div className="flex-1">
+                      <span className="font-semibold">{selectedModel.name}</span>
+                      <span className="text-muted-foreground"> · {getRepairTypeName()}{selectedBackColor ? ` (${selectedBackColor})` : ''}</span>
+                    </div>
+                    <span className="font-bold">₪{getPrice()}</span>
+                  </div>
+                )}
                 
                 {/* Bundle Addon */}
                 {selectedBundleAddon && currentBundle && selectedModel && <div className="flex justify-between items-center text-sm bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-2 -mx-1">
@@ -1827,18 +1818,33 @@ const NewRepairOrder = () => {
               </label>
             </div>
 
-            <Card className="p-4 bg-muted/30">
+            <Card className="p-4 bg-muted/30 space-y-2">
+              {additionalRepairs.map((ar, idx) => (
+                <div key={idx} className="flex justify-between items-center text-base border-b border-border/30 pb-2">
+                  <span className="font-medium">{ar.model.name} • {ar.repair.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
+                  <span className="font-bold text-primary text-lg whitespace-nowrap">₪{ar.price}</span>
+                </div>
+              ))}
               <div className="flex justify-between items-center text-base">
                 <span className="font-medium">{selectedModel?.name} • {getRepairTypeName()}</span>
                 <div className="text-right">
                   {appliedCoupon && <span className="text-muted-foreground line-through mr-2 text-base">₪{getPrice()}</span>}
-                  <span className="font-bold text-primary text-xl">₪{getFinalPrice()}</span>
+                  <span className="font-bold text-primary text-xl">₪{getPrice()}</span>
                 </div>
               </div>
-              {appliedCoupon && <div className="text-base text-success mt-2">
+              {(additionalRepairs.length > 0 || appliedCoupon) && (
+                <div className="flex justify-between items-center text-base border-t border-border pt-2 mt-1">
+                  <span className="font-bold">סה״כ</span>
+                  <div className="text-right">
+                    {appliedCoupon && <span className="text-muted-foreground line-through mr-2 text-base">₪{getTotalPrice()}</span>}
+                    <span className="font-extrabold text-primary text-xl">₪{getFinalPrice()}</span>
+                  </div>
+                </div>
+              )}
+              {appliedCoupon && <div className="text-base text-success">
                   קופון {appliedCoupon.code} - חיסכת ₪{getDiscount()}!
                 </div>}
-              <div className="text-base text-muted-foreground mt-2">
+              <div className="text-base text-muted-foreground">
                 {formatSelectedDateTime()}
               </div>
             </Card>
