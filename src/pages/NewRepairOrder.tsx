@@ -970,7 +970,27 @@ const NewRepairOrder = () => {
         </div>}
     </div>;
 
-  // Loading state
+  // Shared cart display for additional repairs
+  const renderRepairCart = () => (
+    <div className="bg-muted/50 rounded-2xl p-4 space-y-2">
+      <p className="text-xs font-semibold text-muted-foreground mb-2">🛒 תיקונים שנבחרו:</p>
+      {additionalRepairs.map((ar, idx) => (
+        <div key={idx} className="flex justify-between items-center text-sm py-1 border-b border-border/30 last:border-0">
+          <div className="flex-1">
+            <span className="font-semibold">{ar.model.name}</span>
+            <span className="text-muted-foreground"> · {ar.repair.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
+          </div>
+          <span className="font-bold">₪{ar.price}</span>
+        </div>
+      ))}
+      <div className="flex justify-between items-center text-xs pt-1 text-muted-foreground">
+        <span>סה״כ עד כה</span>
+        <span className="font-bold text-foreground">₪{getAdditionalRepairsTotal()}</span>
+      </div>
+    </div>
+  );
+
+
   if (isLoading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -1092,10 +1112,13 @@ const NewRepairOrder = () => {
 
         {/* Step 1: Select Model - Enhanced Welcome */}
         {step === 'model' && <div className="space-y-8 animate-fade-in py-0">
+            {/* Show cart if adding more repairs */}
+            {additionalRepairs.length > 0 && renderRepairCart()}
+
             {/* Hero Welcome Section */}
             <div className="text-center py-4">
               <h1 className="text-4xl font-extrabold mb-3 tracking-tight">
-                מה נתקן היום?
+                {additionalRepairs.length > 0 ? 'בחרו דגם לתיקון הנוסף' : 'מה נתקן היום?'}
               </h1>
               <p className="text-muted-foreground text-sm">בחרו דגם ונגיע אליכם תוך שעה*</p>
               <div className="flex items-center justify-center gap-4 mt-4">
@@ -1187,18 +1210,7 @@ const NewRepairOrder = () => {
               <h2 className="text-3xl font-extrabold">{additionalRepairs.length > 0 ? 'הוסף תיקון נוסף' : 'מה צריך לתקן?'}</h2>
             </div>
 
-            {/* Show already added repairs */}
-            {additionalRepairs.length > 0 && (
-              <div className="bg-muted/50 rounded-2xl p-4 space-y-2">
-                <p className="text-xs font-semibold text-muted-foreground mb-1">תיקונים שנבחרו:</p>
-                {additionalRepairs.map((ar, idx) => (
-                  <div key={idx} className="flex justify-between items-center text-sm">
-                    <span className="font-medium">{ar.repair.name} — {ar.model.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
-                    <span className="font-semibold">₪{ar.price}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+            {additionalRepairs.length > 0 && renderRepairCart()}
 
             <div className="space-y-3">
               {repairTypes.filter(repair => {
@@ -1457,24 +1469,26 @@ const NewRepairOrder = () => {
 
             <Card className="p-5 bg-gradient-to-br from-card via-card to-primary/5 border-2 border-primary/20 shadow-lg">
               <div className="space-y-3">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">דגם</span>
-                  <span className="font-semibold">{selectedModel?.name}</span>
-                </div>
-                {/* Previously added repairs */}
+                {/* All repairs as line items */}
                 {additionalRepairs.map((ar, idx) => (
-                  <div key={idx} className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">{ar.repair.name} — {ar.model.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
-                    <span className="font-semibold">₪{ar.price}</span>
+                  <div key={idx} className="flex justify-between items-center text-sm py-1 border-b border-border/30 last:border-0">
+                    <div className="flex-1">
+                      <span className="font-semibold">{ar.model.name}</span>
+                      <span className="text-muted-foreground"> · {ar.repair.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
+                    </div>
+                    <span className="font-bold">₪{ar.price}</span>
                   </div>
                 ))}
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">סוג תיקון</span>
-                  <div className="text-left">
-                    <span className="font-semibold">{getRepairTypeName()}</span>
-                    <span className="text-muted-foreground mr-2">₪{getPrice()}</span>
+                {/* Current repair */}
+                {selectedRepair && selectedModel && (
+                  <div className="flex justify-between items-center text-sm py-1 border-b border-border/30 last:border-0">
+                    <div className="flex-1">
+                      <span className="font-semibold">{selectedModel.name}</span>
+                      <span className="text-muted-foreground"> · {getRepairTypeName()}{selectedBackColor ? ` (${selectedBackColor})` : ''}</span>
+                    </div>
+                    <span className="font-bold">₪{getPrice()}</span>
                   </div>
-                </div>
+                )}
                 
                 {/* Bundle Addon */}
                 {selectedBundleAddon && currentBundle && selectedModel && <div className="flex justify-between items-center text-sm bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-2 -mx-1">
