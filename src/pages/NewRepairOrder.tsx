@@ -326,6 +326,7 @@ const NewRepairOrder = () => {
   const [selectedBackColor, setSelectedBackColor] = useState<string>('');
   const [showBackColorPicker, setShowBackColorPicker] = useState(false);
   const [otherRepairDescription, setOtherRepairDescription] = useState('');
+  const [additionalRepairs, setAdditionalRepairs] = useState<{ repair: RepairType; price: number; backColor?: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   // Privacy consent
@@ -486,17 +487,24 @@ const NewRepairOrder = () => {
     return true;
   };
   const filteredModels = models.filter(model => model.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  const getPrice = () => {
-    if (!selectedModel || !selectedRepair) return 0;
-    const isOriginalScreen = selectedRepair.name.includes('מסך מקורי');
-    const isCompatibleScreen = selectedRepair.name.includes('מסך תואם');
-    const isBattery = selectedRepair.name.includes('סוללה');
-    const isBackGlass = selectedRepair.name.includes('גב');
+  const getRepairPrice = (repair: RepairType) => {
+    if (!selectedModel) return 0;
+    const isOriginalScreen = repair.name.includes('מסך מקורי');
+    const isCompatibleScreen = repair.name.includes('מסך תואם');
+    const isBattery = repair.name.includes('סוללה');
+    const isBackGlass = repair.name.includes('גב');
     if (isOriginalScreen) return selectedModel.original_screen_price;
     if (isCompatibleScreen) return selectedModel.compatible_screen_price;
     if (isBattery) return selectedModel.battery_price;
     if (isBackGlass) return selectedModel.back_glass_price;
     return 0;
+  };
+  const getPrice = () => {
+    if (!selectedModel || !selectedRepair) return 0;
+    return getRepairPrice(selectedRepair);
+  };
+  const getAdditionalRepairsTotal = () => {
+    return additionalRepairs.reduce((sum, r) => sum + r.price, 0);
   };
   const getBundleAddonPrice = () => {
     if (!selectedModel || !selectedBundleAddon || !currentBundle) return 0;
@@ -505,11 +513,16 @@ const NewRepairOrder = () => {
     return discountedPrice;
   };
   const getTotalPrice = () => {
-    return getPrice() + getBundleAddonPrice();
+    return getPrice() + getBundleAddonPrice() + getAdditionalRepairsTotal();
   };
   const getRepairTypeName = () => {
     if (!selectedRepair) return '';
     return selectedRepair.name;
+  };
+  const getAllRepairNames = () => {
+    const names = additionalRepairs.map(r => r.repair.name);
+    if (selectedRepair) names.push(selectedRepair.name);
+    return names;
   };
   const goToStep = (newStep: Step) => {
     setIsAnimating(true);
@@ -826,11 +839,18 @@ const NewRepairOrder = () => {
     setIsSubmitting(true);
     try {
       const scheduleNote = formatSelectedDateTime();
-      const repairDescription = selectedBundleAddon && currentBundle ? `${getRepairTypeName()} + החלפת סוללה (חבילה)` : getRepairTypeName();
+      const allRepairNames = getAllRepairNames();
+      const repairDescription = selectedBundleAddon && currentBundle 
+        ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה)` 
+        : allRepairNames.join(' + ');
       const notes = [`הזמנה מהאתר - ${repairDescription}`, `מועד מבוקש: ${scheduleNote}`];
       if (selectedBundleAddon && currentBundle && selectedModel) {
         notes.push(`חבילת תיקון: ${currentBundle.name} - סוללה ב-${currentBundle.discount_percent}% הנחה (₪${getBundleAddonPrice()} במקום ₪${selectedModel.battery_price})`);
       }
+      // Add back color notes for all repairs
+      additionalRepairs.forEach(ar => {
+        if (ar.backColor) notes.push(`צבע גב מכשיר (${ar.repair.name}): ${ar.backColor}`);
+      });
       if (selectedBackColor) {
         notes.push(`צבע גב מכשיר: ${selectedBackColor}`);
       }
@@ -877,7 +897,7 @@ const NewRepairOrder = () => {
 
       // Send notifications (email + WhatsApp)
       try {
-        const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${getRepairTypeName()} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : getRepairTypeName();
+        const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
         const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
         const leadSource = getLeadSource();
         await supabase.functions.invoke('send-order-notifications', {
@@ -1424,6 +1444,13 @@ const NewRepairOrder = () => {
                   <span className="text-muted-foreground">דגם</span>
                   <span className="font-semibold">{selectedModel?.name}</span>
                 </div>
+                {/* Previously added repairs */}
+                {additionalRepairs.map((ar, idx) => (
+                  <div key={idx} className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">{ar.repair.name}{ar.backColor ? ` (${ar.backColor})` : ''}</span>
+                    <span className="font-semibold">₪{ar.price}</span>
+                  </div>
+                ))}
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">סוג תיקון</span>
                   <div className="text-left">
@@ -1871,7 +1898,30 @@ const NewRepairOrder = () => {
               </Button>
               <Button 
                 variant="outline" 
-                onClick={() => { setStep('repair'); setSelectedRepair(null); }}
+                onClick={() => {
+                  // Save current repair before going back
+                  if (selectedRepair && selectedModel) {
+                    setAdditionalRepairs(prev => [...prev, { 
+                      repair: selectedRepair, 
+                      price: getRepairPrice(selectedRepair),
+                      backColor: selectedBackColor || undefined 
+                    }]);
+                  }
+                  if (selectedBundleAddon && currentBundle && selectedModel) {
+                    const batteryRepair = repairTypes.find(r => r.name.includes('סוללה'));
+                    if (batteryRepair) {
+                      setAdditionalRepairs(prev => [...prev, { 
+                        repair: batteryRepair, 
+                        price: getBundleAddonPrice() 
+                      }]);
+                    }
+                    setSelectedBundleAddon(false);
+                    setCurrentBundle(null);
+                  }
+                  setSelectedRepair(null);
+                  setSelectedBackColor('');
+                  setStep('repair');
+                }}
                 className="w-full h-11 text-sm rounded-2xl gap-2"
               >
                 <Wrench className="w-4 h-4" />
