@@ -46,7 +46,8 @@ import {
   Gift,
   CreditCard,
   DollarSign,
-  Package
+  Package,
+  Wrench
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -365,21 +366,23 @@ const AdminPanel = () => {
     
     switch (order.status) {
       case 'pending':
-        return `שלום ${order.customerName}! 👋\n\nהזמנתך התקבלה בהצלחה ✅\n📱 ${order.deviceType}\n🔧 ${order.issueDescription}\n\n🔗 עקבו בזמן אמת:\n${trackingUrl}\n\nתודה שבחרתם בנו! 🙏`;
+        return `שלום ${order.customerName}!\n\nהזמנתך התקבלה בהצלחה\n${order.deviceType}\n${order.issueDescription}\n\nעקבו בזמן אמת:\n${trackingUrl}\n\nתודה שבחרתם בנו!`;
       case 'confirmed':
-        return `שלום ${order.customerName}! 👋\n\nההזמנה שלך אושרה ✅\n📱 ${order.deviceType} - ${order.issueDescription}\n\nניצור איתך קשר בקרוב לתיאום הגעה.\n\n🔗 מעקב: ${trackingUrl}`;
+        return `שלום ${order.customerName}!\n\nההזמנה שלך אושרה\n${order.deviceType} - ${order.issueDescription}\n\nניצור איתך קשר בקרוב לתיאום הגעה.\n\nמעקב: ${trackingUrl}`;
       case 'technician_assigned':
-        return `שלום ${order.customerName}! 👋\n\nטכנאי שובץ להזמנה שלך 👨‍🔧\n${order.technicianName ? `שם הטכנאי: ${order.technicianName}` : ''}\n📱 ${order.deviceType}\n\n🔗 מעקב בזמן אמת: ${trackingUrl}`;
+        return `שלום ${order.customerName}!\n\nטכנאי שובץ להזמנה שלך\n${order.technicianName ? `שם הטכנאי: ${order.technicianName}` : ''}\n${order.deviceType}\n\nמעקב בזמן אמת: ${trackingUrl}`;
       case 'on_the_way':
-        return `שלום ${order.customerName}! 🏍️\n\nהטכנאי בדרך אליך! 🚀\n${order.estimatedArrival ? `⏰ זמן הגעה משוער: ${order.estimatedArrival}` : ''}\n📱 ${order.deviceType} - ${order.issueDescription}\n\n🔗 עקבו בזמן אמת: ${trackingUrl}`;
+        return `שלום ${order.customerName}!\n\nהטכנאי בדרך אליך!\n${order.estimatedArrival ? `זמן הגעה משוער: ${order.estimatedArrival}` : ''}\n${order.deviceType} - ${order.issueDescription}\n\nעקבו בזמן אמת: ${trackingUrl}`;
       case 'arrived':
-        return `שלום ${order.customerName}! 📍\n\nהטכנאי הגיע! ✅\nאנא פתחו את הדלת 🚪\n\n📱 ${order.deviceType} - ${order.issueDescription}`;
+        return `שלום ${order.customerName}!\n\nהטכנאי הגיע!\nאנא פתחו את הדלת\n\n${order.deviceType} - ${order.issueDescription}`;
       case 'in_progress':
-        return `שלום ${order.customerName}! 🔧\n\nהתיקון בעיצומו! ⚡\n📱 ${order.deviceType} - ${order.issueDescription}\n\nנעדכן אותך ברגע שנסיים 👌`;
+        return `שלום ${order.customerName}!\n\nהתיקון בעיצומו!\n${order.deviceType} - ${order.issueDescription}\n\nנעדכן אותך ברגע שנסיים`;
       case 'completed':
-        return `שלום ${order.customerName}! 🎉\n\nהתיקון הושלם בהצלחה! ✅\n📱 ${order.deviceType} - ${order.issueDescription}\n💰 סה"כ: ₪${order.repairPrice}\n\n${order.invoiceLink ? `📄 חשבונית: ${order.invoiceLink}\n` : ''}תודה שבחרתם ב-DirectFix! ⭐\nנשמח לדירוג: ${trackingUrl}`;
+        return `שלום ${order.customerName}!\n\nהתיקון הושלם בהצלחה!\n${order.deviceType} - ${order.issueDescription}\nסה"כ: ${order.repairPrice} ש"ח\n\n${order.invoiceLink ? `חשבונית: ${order.invoiceLink}\n` : ''}תודה שבחרתם ב-DirectFix!\nנשמח לדירוג: ${trackingUrl}`;
+      case 'cancelled':
+        return `שלום ${order.customerName}!\n\nההזמנה שלך בוטלה.\n${order.deviceType} - ${order.issueDescription}\n\nאם ברצונך להזמין מחדש, נשמח לעזור!\n${window.location.origin}`;
       default:
-        return `שלום ${order.customerName}! 👋\n\n🔗 מעקב אחרי ההזמנה: ${trackingUrl}\n\nתודה שבחרתם בנו! 🙏`;
+        return `שלום ${order.customerName}!\n\nמעקב אחרי ההזמנה: ${trackingUrl}\n\nתודה שבחרתם בנו!`;
     }
   };
 
@@ -426,6 +429,7 @@ const AdminPanel = () => {
       case 'arrived': return 'bg-accent/10 text-accent';
       case 'in_progress': return 'bg-accent/10 text-accent';
       case 'completed': return 'bg-success/10 text-success';
+      case 'cancelled': return 'bg-destructive/10 text-destructive';
       default: return 'bg-muted text-muted-foreground';
     }
   };
@@ -979,17 +983,17 @@ const AdminPanel = () => {
             ) : (
               orders.map((order) => (
                 <div key={order.id} className="flex items-stretch">
-                  <div 
-                    className="flex items-center px-2 cursor-pointer hover:bg-muted/50"
-                    onClick={(e) => { e.stopPropagation(); toggleOrderSelection(order.id); }}
+                  <label 
+                    className="flex items-center px-3 cursor-pointer hover:bg-muted/50"
+                    onClick={(e) => { e.stopPropagation(); }}
                   >
                     <input 
                       type="checkbox" 
                       checked={selectedOrderIds.has(order.id)}
                       onChange={() => toggleOrderSelection(order.id)}
-                      className="w-4 h-4 accent-primary rounded"
+                      className="w-5 h-5 accent-primary rounded cursor-pointer"
                     />
-                  </div>
+                  </label>
                   <div className="flex-1">
                     <SwipeableOrderCard
                       order={order}
@@ -1506,7 +1510,14 @@ const AdminPanel = () => {
       <aside className="hidden md:flex w-64 bg-sidebar border-l border-sidebar-border flex-col fixed right-0 top-0 h-screen z-40">
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center justify-between">
-            <Logo size="sm" />
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
+              <div className="w-9 h-9 bg-primary-foreground rounded-xl flex items-center justify-center shadow-md">
+                <Wrench className="w-5 h-5 text-primary" />
+              </div>
+              <span className="font-extrabold text-sidebar-foreground text-lg tracking-tight" style={{ fontFamily: "'Rubik', sans-serif" }}>
+                direct<span className="text-primary-foreground">fix</span>
+              </span>
+            </div>
             <button
               onClick={handleManualRefresh}
               className="w-8 h-8 flex items-center justify-center text-sidebar-foreground hover:bg-sidebar-accent rounded-lg transition-colors"
@@ -1871,20 +1882,41 @@ const AdminPanel = () => {
                           dir="ltr"
                         />
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-foreground">תאריך ושעה</label>
+                          <label className="text-sm font-medium text-foreground">תאריך</label>
+                          <Input
+                            type="date"
+                            value={newOrder.scheduledDate}
+                            onChange={(e) => setNewOrder({ ...newOrder, scheduledDate: e.target.value })}
+                            dir="ltr"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-foreground">טווח שעות</label>
                           <div className="grid grid-cols-2 gap-2">
-                            <Input
-                              type="date"
-                              value={newOrder.scheduledDate}
-                              onChange={(e) => setNewOrder({ ...newOrder, scheduledDate: e.target.value })}
-                              dir="ltr"
-                            />
-                            <Input
-                              type="time"
-                              value={newOrder.scheduledTime}
-                              onChange={(e) => setNewOrder({ ...newOrder, scheduledTime: e.target.value })}
-                              dir="ltr"
-                            />
+                            <div>
+                              <label className="text-xs text-muted-foreground">משעה</label>
+                              <Input
+                                type="time"
+                                value={newOrder.scheduledTime.split('-')[0] || ''}
+                                onChange={(e) => {
+                                  const endTime = newOrder.scheduledTime.split('-')[1] || '';
+                                  setNewOrder({ ...newOrder, scheduledTime: `${e.target.value}${endTime ? '-' + endTime : ''}` });
+                                }}
+                                dir="ltr"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-muted-foreground">עד שעה</label>
+                              <Input
+                                type="time"
+                                value={newOrder.scheduledTime.split('-')[1] || ''}
+                                onChange={(e) => {
+                                  const startTime = newOrder.scheduledTime.split('-')[0] || '';
+                                  setNewOrder({ ...newOrder, scheduledTime: `${startTime}-${e.target.value}` });
+                                }}
+                                dir="ltr"
+                              />
+                            </div>
                           </div>
                         </div>
                         <Button 

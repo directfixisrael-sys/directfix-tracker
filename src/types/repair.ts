@@ -5,7 +5,8 @@ export type RepairStatus =
   | 'on_the_way' 
   | 'arrived'
   | 'in_progress' 
-  | 'completed';
+  | 'completed'
+  | 'cancelled';
 
 export type PaymentStatus = 'none' | 'pending' | 'paid';
 
@@ -71,6 +72,7 @@ export const statusLabels: Record<RepairStatus, string> = {
   arrived: 'טכנאי הגיע',
   in_progress: 'עובדים על המכשיר שלך',
   completed: 'התיקון הושלם',
+  cancelled: 'הזמנה בוטלה',
 };
 
 export const statusIcons: Record<RepairStatus, string> = {
@@ -81,4 +83,5 @@ export const statusIcons: Record<RepairStatus, string> = {
   arrived: '📍',
   in_progress: '🔧',
   completed: '✅',
+  cancelled: '❌',
 };
