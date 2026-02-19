@@ -517,6 +517,14 @@ const NewRepairOrder = () => {
   const getAdditionalRepairsTotal = () => {
     return additionalRepairs.reduce((sum, r) => sum + r.price, 0);
   };
+  const getMultiRepairDiscount = () => {
+    // 15% off the cheapest repair when there are 2+ repairs total
+    const allPrices: number[] = [...additionalRepairs.map(r => r.price)];
+    if (selectedRepair) allPrices.push(getRepairPrice(selectedRepair));
+    if (allPrices.length < 2) return 0;
+    const cheapest = Math.min(...allPrices);
+    return Math.round(cheapest * 0.15);
+  };
   const getBundleAddonPrice = () => {
     if (!selectedModel || !selectedBundleAddon || !currentBundle) return 0;
     const basePrice = selectedModel.battery_price;
@@ -524,7 +532,7 @@ const NewRepairOrder = () => {
     return discountedPrice;
   };
   const getTotalPrice = () => {
-    return getPrice() + getBundleAddonPrice() + getAdditionalRepairsTotal();
+    return getPrice() + getBundleAddonPrice() + getAdditionalRepairsTotal() - getMultiRepairDiscount();
   };
   const getRepairTypeName = () => {
     if (!selectedRepair) return '';
@@ -863,6 +871,10 @@ const NewRepairOrder = () => {
         notes.push(`תיקון נוסף: ${ar.repair.name} ל-${ar.model.name} — ₪${ar.price}`);
         if (ar.backColor) notes.push(`צבע גב מכשיר (${ar.repair.name} - ${ar.model.name}): ${ar.backColor}`);
       });
+      const multiDiscount = getMultiRepairDiscount();
+      if (multiDiscount > 0) {
+        notes.push(`הנחת תיקון נוסף (15% על הזול): -₪${multiDiscount}`);
+      }
       if (selectedBackColor) {
         notes.push(`צבע גב מכשיר: ${selectedBackColor}`);
       }
@@ -1551,6 +1563,16 @@ const NewRepairOrder = () => {
                       <span className="font-semibold text-success">₪{getBundleAddonPrice()}</span>
                     </div>
                   </div>}
+
+                {/* Multi-repair discount */}
+                {getMultiRepairDiscount() > 0 && (
+                  <div className="flex justify-between items-center text-sm bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg p-2 -mx-1">
+                    <span className="text-success font-medium flex items-center gap-1.5">
+                      🎉 15% הנחה על התיקון הזול
+                    </span>
+                    <span className="font-bold text-success">-₪{getMultiRepairDiscount()}</span>
+                  </div>
+                )}
                 
                 {/* Active Promotion - Dynamic */}
                 {activePromotion && <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-3 -mx-1 space-y-1">
@@ -1883,6 +1905,12 @@ const NewRepairOrder = () => {
                   <span className="font-bold text-primary text-xl">₪{getPrice()}</span>
                 </div>
               </div>
+              {getMultiRepairDiscount() > 0 && (
+                <div className="flex justify-between items-center text-base bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg p-2">
+                  <span className="text-success font-medium">🎉 15% הנחה על התיקון הזול</span>
+                  <span className="font-bold text-success">-₪{getMultiRepairDiscount()}</span>
+                </div>
+              )}
               {(additionalRepairs.length > 0 || appliedCoupon) && (
                 <div className="flex justify-between items-center text-base border-t border-border pt-2 mt-1">
                   <span className="font-bold">סה״כ</span>
@@ -2021,10 +2049,10 @@ const NewRepairOrder = () => {
                   setSelectedBackColor('');
                   goToStep('model');
                 }}
-                className="w-full h-11 text-sm rounded-2xl gap-2"
+                className="w-full h-12 text-sm rounded-2xl gap-2 border-2 border-primary/30 hover:border-primary/50 bg-primary/5 hover:bg-primary/10 text-primary font-bold"
               >
-                <Wrench className="w-4 h-4" />
-                הוסף תיקון נוסף
+                <Gift className="w-4 h-4" />
+                הוסיפו תיקון נוסף וקבלו 15% הנחה על התיקון הזול!
               </Button>
             </div>}
           
