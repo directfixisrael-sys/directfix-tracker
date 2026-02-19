@@ -337,6 +337,16 @@ const NewRepairOrder = () => {
   const [giftSenderName, setGiftSenderName] = useState('');
   const [giftSenderPhone, setGiftSenderPhone] = useState('');
   const [giftMessage, setGiftMessage] = useState('');
+  const [showGiftBurst, setShowGiftBurst] = useState(false);
+
+  const handleGiftToggle = () => {
+    const newVal = !isGiftOrder;
+    setIsGiftOrder(newVal);
+    if (newVal) {
+      setShowGiftBurst(true);
+      setTimeout(() => setShowGiftBurst(false), 1200);
+    }
+  };
 
   // Gift promo popup
   const [showGiftPopup, setShowGiftPopup] = useState(false);
@@ -1109,8 +1119,44 @@ const NewRepairOrder = () => {
           </div>}
 
 
+        {/* Fullscreen gift burst animation */}
+        {showGiftBurst && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none animate-fade-in">
+            <div className="absolute inset-0 bg-primary/10 backdrop-blur-sm animate-fade-in" />
+            <div className="relative flex flex-col items-center gap-4 animate-scale-in">
+              <div className="text-8xl animate-bounce-slow">🎁</div>
+              <p className="text-2xl font-extrabold text-primary drop-shadow-lg">מצב מתנה!</p>
+              {[...Array(12)].map((_, i) => (
+                <Heart
+                  key={i}
+                  className="w-5 h-5 text-primary fill-primary absolute animate-heart-particle"
+                  style={{
+                    '--particle-angle': `${i * 30}deg`,
+                    top: '40%',
+                  } as React.CSSProperties}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Step 1: Select Model - Enhanced Welcome */}
         {step === 'model' && <div className="space-y-8 animate-fade-in py-0">
+            {/* Gift mode switcher */}
+            <div className="flex items-center justify-center gap-3 py-2">
+              <button
+                onClick={handleGiftToggle}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-full border-2 transition-all duration-300 text-sm font-bold ${
+                  isGiftOrder 
+                    ? 'border-primary bg-primary/10 text-primary shadow-md' 
+                    : 'border-border bg-card text-muted-foreground hover:border-primary/40'
+                }`}
+              >
+                <Gift className={`w-5 h-5 transition-transform duration-300 ${isGiftOrder ? 'scale-110' : ''}`} />
+                {isGiftOrder ? 'מצב מתנה פעיל 🎉' : 'הזמנה במתנה 🎁'}
+              </button>
+            </div>
+
             {/* Show cart if adding more repairs */}
             {additionalRepairs.length > 0 && renderRepairCart()}
 
@@ -1195,8 +1241,6 @@ const NewRepairOrder = () => {
 
             <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => setSelectedModel(model)} onConfirm={model => handleModelSelect(model)} />
 
-            {/* Gift Order Toggle - below model picker */}
-            <GiftOrderToggle isGift={isGiftOrder} onToggle={setIsGiftOrder} />
           </div>}
 
         {/* Step 2: Select Repair Type */}
