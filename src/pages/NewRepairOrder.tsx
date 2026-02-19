@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -1144,17 +1145,23 @@ const NewRepairOrder = () => {
         {step === 'model' && <div className="space-y-8 animate-fade-in py-0">
             {/* Gift mode switcher */}
             <div className="flex items-center justify-center gap-3 py-2">
-              <button
-                onClick={handleGiftToggle}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full border-2 transition-all duration-300 text-sm font-bold ${
-                  isGiftOrder 
-                    ? 'border-primary bg-primary/10 text-primary shadow-md' 
-                    : 'border-border bg-card text-muted-foreground hover:border-primary/40'
-                }`}
-              >
-                <Gift className={`w-5 h-5 transition-transform duration-300 ${isGiftOrder ? 'scale-110' : ''}`} />
-                {isGiftOrder ? 'מצב מתנה פעיל 🎉' : 'הזמנה במתנה 🎁'}
-              </button>
+              <label htmlFor="gift-toggle" className="flex items-center gap-3 cursor-pointer select-none">
+                <Switch
+                  id="gift-toggle"
+                  checked={isGiftOrder}
+                  onCheckedChange={(checked) => {
+                    setIsGiftOrder(checked);
+                    if (checked) {
+                      setShowGiftBurst(true);
+                      setTimeout(() => setShowGiftBurst(false), 1200);
+                    }
+                  }}
+                />
+                <span className={`text-sm font-bold transition-colors ${isGiftOrder ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <Gift className="w-4 h-4 inline-block ml-1" />
+                  הזמנה במתנה
+                </span>
+              </label>
             </div>
 
             {/* Show cart if adding more repairs */}
