@@ -19,7 +19,7 @@ export default {
   				'sans-serif'
   			],
   			sans: [
-  				'Space Grotesk',
+  				'Montserrat',
   				'ui-sans-serif',
   				'system-ui',
   				'-apple-system',
@@ -32,7 +32,7 @@ export default {
   				'sans-serif'
   			],
   			serif: [
-  				'Lora',
+  				'Cormorant Garamond',
   				'ui-serif',
   				'Georgia',
   				'Cambria',
@@ -41,7 +41,7 @@ export default {
   				'serif'
   			],
   			mono: [
-  				'Space Mono',
+  				'IBM Plex Mono',
   				'ui-monospace',
   				'SFMono-Regular',
   				'Menlo',
@@ -133,7 +133,7 @@ export default {
   			'accordion-up': 'accordion-up 0.2s ease-out'
   		},
   		boxShadow: {
-  			'wolt': '0 2px 8px rgba(0,0,0,0.08)',
+  			wolt: '0 2px 8px rgba(0,0,0,0.08)',
   			'wolt-lg': '0 4px 20px rgba(0,0,0,0.12)',
   			'wolt-xl': '0 8px 30px rgba(0,0,0,0.16)',
   			'2xs': 'var(--shadow-2xs)',
