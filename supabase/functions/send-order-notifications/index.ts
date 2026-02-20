@@ -194,7 +194,7 @@ const handler = async (req: Request): Promise<Response> => {
       try {
         const businessEmail = await sendEmail(
           resendApiKey,
-          "DirectFix <orders@directfix.co.il>",
+          "דיירקט פיקס <orders@directfix.co.il>",
           ["directfixisrael@gmail.com"],
           `התקבלה הזמנה לתיקון חדש 🎉${orderData.orderNumber ? ` #${orderData.orderNumber}` : ''} - ${orderData.customerName} - ${orderData.deviceType}`,
           businessEmailHtml
@@ -418,7 +418,7 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
       try {
         const customerEmail = await sendEmail(
           resendApiKey,
-          "DirectFix <orders@directfix.co.il>",
+          "דיירקט פיקס <orders@directfix.co.il>",
           [orderData.customerEmail],
           `✅ ההזמנה התקבלה - ${orderData.deviceType} ${orderData.repairType}`,
           customerEmailHtml
