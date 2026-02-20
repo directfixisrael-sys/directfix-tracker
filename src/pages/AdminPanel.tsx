@@ -109,6 +109,7 @@ const AdminPanel = () => {
   const [customerSortBy, setCustomerSortBy] = useState<'name' | 'orders' | 'recent'>('recent');
   const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set());
   const [bulkStatusDialogOpen, setBulkStatusDialogOpen] = useState(false);
+  const [orderStatusFilter, setOrderStatusFilter] = useState<'active' | 'all'>('active');
 
   const { 
     orders, 
@@ -956,8 +957,32 @@ const AdminPanel = () => {
       default: // orders
         const isSelectionMode = selectedOrderIds.size > 0;
 
+        const filteredOrders = orderStatusFilter === 'active' 
+          ? orders.filter(o => !['completed', 'cancelled'].includes(o.status))
+          : orders;
+
         const ordersList = (
           <>
+            {/* Filter toggle */}
+            <div className="p-3 border-b border-border flex items-center gap-2">
+              <Button 
+                size="sm" 
+                variant={orderStatusFilter === 'active' ? 'default' : 'outline'}
+                onClick={() => setOrderStatusFilter('active')}
+                className="text-xs rounded-full"
+              >
+                בתהליך ({orders.filter(o => !['completed', 'cancelled'].includes(o.status)).length})
+              </Button>
+              <Button 
+                size="sm" 
+                variant={orderStatusFilter === 'all' ? 'default' : 'outline'}
+                onClick={() => setOrderStatusFilter('all')}
+                className="text-xs rounded-full"
+              >
+                הכל ({orders.length})
+              </Button>
+            </div>
+
             {/* Bulk actions bar */}
             {isSelectionMode && (
               <div className="sticky top-0 z-10 bg-primary/10 border-b border-primary/20 p-3 flex items-center justify-between gap-2">
@@ -976,14 +1001,13 @@ const AdminPanel = () => {
                 </div>
               </div>
             )}
-            {orders.length === 0 ? (
+            {filteredOrders.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
                 <Smartphone className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                <p>אין הזמנות עדיין</p>
-                <p className="text-sm">לחצו על "הזמנה חדשה" להתחיל</p>
+                <p>{orderStatusFilter === 'active' ? 'אין הזמנות פעילות' : 'אין הזמנות עדיין'}</p>
               </div>
             ) : (
-              orders.map((order) => (
+              filteredOrders.map((order) => (
                 <div key={order.id} className="flex items-stretch">
                   <label 
                     className="flex items-center px-3 cursor-pointer hover:bg-muted/50"

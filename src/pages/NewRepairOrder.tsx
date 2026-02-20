@@ -1155,26 +1155,7 @@ const NewRepairOrder = () => {
 
         {/* Step 1: Select Model - Enhanced Welcome */}
         {step === 'model' && <div className="space-y-8 animate-fade-in py-0">
-            {/* Gift mode switcher */}
-            <div className="flex items-center justify-center gap-3 py-2">
-              <label htmlFor="gift-toggle" className="flex items-center gap-3 cursor-pointer select-none">
-                <Switch
-                  id="gift-toggle"
-                  checked={isGiftOrder}
-                  onCheckedChange={(checked) => {
-                    setIsGiftOrder(checked);
-                    if (checked) {
-                      setShowGiftBurst(true);
-                      setTimeout(() => setShowGiftBurst(false), 1200);
-                    }
-                  }}
-                />
-                <span className={`text-sm font-bold transition-colors ${isGiftOrder ? 'text-primary' : 'text-muted-foreground'}`}>
-                  <Gift className="w-4 h-4 inline-block ml-1" />
-                  הזמנה במתנה
-                </span>
-              </label>
-            </div>
+
 
             {/* Show cart if adding more repairs */}
             {additionalRepairs.length > 0 && renderRepairCart()}
@@ -1254,6 +1235,27 @@ const NewRepairOrder = () => {
 
             {/* Testimonials Slider */}
             <TestimonialsSlider />
+
+            {/* Gift mode switcher */}
+            <div className="flex items-center justify-center gap-3 py-2">
+              <label htmlFor="gift-toggle" className="flex items-center gap-3 cursor-pointer select-none">
+                <Switch
+                  id="gift-toggle"
+                  checked={isGiftOrder}
+                  onCheckedChange={(checked) => {
+                    setIsGiftOrder(checked);
+                    if (checked) {
+                      setShowGiftBurst(true);
+                      setTimeout(() => setShowGiftBurst(false), 1200);
+                    }
+                  }}
+                />
+                <span className={`text-sm font-bold transition-colors ${isGiftOrder ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <Gift className="w-4 h-4 inline-block ml-1" />
+                  הזמנה במתנה
+                </span>
+              </label>
+            </div>
 
             {/* Smart AI Search */}
             <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
@@ -2049,10 +2051,10 @@ const NewRepairOrder = () => {
                   setSelectedBackColor('');
                   goToStep('model');
                 }}
-                className="w-full h-12 text-sm rounded-2xl gap-2 border-2 border-primary/30 hover:border-primary/50 bg-primary/5 hover:bg-primary/10 text-primary font-bold"
+                className="w-full h-12 text-sm rounded-2xl gap-2"
               >
-                <Gift className="w-4 h-4" />
-                הוסיפו תיקון נוסף וקבלו 15% הנחה על התיקון הזול!
+                <Wrench className="w-4 h-4" />
+                + תיקון נוסף (15% הנחה!)
               </Button>
             </div>}
           
