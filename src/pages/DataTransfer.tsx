@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Phone, CheckCircle2, Moon, Sun, Calendar, Clock, Accessibility, ArrowLeftRight, AlertTriangle, MapPin, Image, MessageSquare, Contact, Music, FileText, Shield } from 'lucide-react';
+import { ArrowRight, Smartphone, Phone, CheckCircle2, Moon, Sun, Calendar, Clock, Accessibility, ArrowLeftRight, AlertTriangle, MapPin } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -294,26 +294,6 @@ const DataTransfer = () => {
               <p className="text-xl font-bold text-primary mt-3">₪{DATA_TRANSFER_PRICE}</p>
             </div>
 
-            {/* What's included */}
-            <div className="space-y-3">
-              <h3 className="text-sm font-bold text-muted-foreground text-center">מה כולל השירות?</h3>
-              <div className="grid grid-cols-2 gap-2.5">
-                {[
-                  { icon: Image, label: 'תמונות וסרטונים' },
-                  { icon: Contact, label: 'אנשי קשר' },
-                  { icon: MessageSquare, label: 'הודעות וצ\'אטים' },
-                  { icon: Music, label: 'מוזיקה וקבצים' },
-                  { icon: FileText, label: 'מסמכים ויומן' },
-                  { icon: Shield, label: 'אחריות מלאה' },
-                ].map(({ icon: Icon, label }) => (
-                  <div key={label} className="flex items-center gap-2.5 bg-card border border-border/60 rounded-xl px-3 py-2.5">
-                    <Icon className="w-4 h-4 text-primary flex-shrink-0" />
-                    <span className="text-sm font-medium text-foreground">{label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             <div className="text-center">
               <h2 className="text-xl font-bold mb-4">מאיזה מכשיר אתם מעבירים?</h2>
               <div className="grid grid-cols-2 gap-4">
@@ -322,9 +302,7 @@ const DataTransfer = () => {
                   className="p-6 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 border-border hover:border-primary/40 hover:bg-primary/5 text-center"
                 >
                   <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-3">
-                    <svg viewBox="0 0 24 24" className="w-8 h-8" fill="currentColor" opacity="0.7">
-                      <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.51 4.7 9.56C5.55 8.08 7.13 7.14 8.82 7.12C10.1 7.1 11.32 7.97 12.11 7.97C12.89 7.97 14.37 6.92 15.92 7.08C16.57 7.11 18.39 7.35 19.56 9.07C19.47 9.13 17.49 10.26 17.51 12.66C17.54 15.53 20.07 16.45 20.1 16.46C20.07 16.53 19.71 17.77 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
-                    </svg>
+                    <Smartphone className="w-8 h-8 text-foreground/70" />
                   </div>
                   <p className="font-bold text-lg">אייפון</p>
                   <p className="text-sm text-muted-foreground">iPhone</p>
@@ -334,9 +312,7 @@ const DataTransfer = () => {
                   className="p-6 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 border-border hover:border-primary/40 hover:bg-primary/5 text-center"
                 >
                   <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-3">
-                    <svg viewBox="0 0 24 24" className="w-8 h-8" fill="currentColor" opacity="0.7">
-                      <path d="M17.6 9.48L19.44 6.3C19.54 6.12 19.48 5.9 19.3 5.8C19.12 5.7 18.9 5.76 18.8 5.94L16.96 9.12C15.44 8.42 13.78 8.04 12 8.04C10.22 8.04 8.56 8.42 7.04 9.12L5.2 5.94C5.1 5.76 4.88 5.7 4.7 5.8C4.52 5.9 4.46 6.12 4.56 6.3L6.4 9.48C3.32 11.2 1.16 14.16 1 17.6H23C22.84 14.16 20.68 11.2 17.6 9.48ZM7 14.5C6.45 14.5 6 14.05 6 13.5C6 12.95 6.45 12.5 7 12.5C7.55 12.5 8 12.95 8 13.5C8 14.05 7.55 14.5 7 14.5ZM17 14.5C16.45 14.5 16 14.05 16 13.5C16 12.95 16.45 12.5 17 12.5C17.55 12.5 18 12.95 18 13.5C18 14.05 17.55 14.5 17 14.5Z"/>
-                    </svg>
+                    <Smartphone className="w-8 h-8 text-foreground/70" />
                   </div>
                   <p className="font-bold text-lg">אנדרואיד</p>
                   <p className="text-sm text-muted-foreground">Android</p>
@@ -351,7 +327,7 @@ const DataTransfer = () => {
           <div className="space-y-8 animate-fade-in">
             <div className="text-center py-4">
               <div className="inline-flex items-center gap-2 bg-accent/10 text-accent rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
-                <ArrowLeftRight className="w-4 h-4" />
+                <Smartphone className="w-4 h-4" />
                 מ{sourceDevice === 'iphone' ? 'אייפון' : 'אנדרואיד'}
               </div>
               <h2 className="text-2xl font-extrabold">לאיזה מכשיר אתם עוברים?</h2>
@@ -363,9 +339,7 @@ const DataTransfer = () => {
                 className="p-6 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 border-border hover:border-primary/40 hover:bg-primary/5 text-center"
               >
                 <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-3">
-                  <svg viewBox="0 0 24 24" className="w-8 h-8" fill="currentColor" opacity="0.7">
-                    <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.51 4.7 9.56C5.55 8.08 7.13 7.14 8.82 7.12C10.1 7.1 11.32 7.97 12.11 7.97C12.89 7.97 14.37 6.92 15.92 7.08C16.57 7.11 18.39 7.35 19.56 9.07C19.47 9.13 17.49 10.26 17.51 12.66C17.54 15.53 20.07 16.45 20.1 16.46C20.07 16.53 19.71 17.77 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
-                  </svg>
+                  <Smartphone className="w-8 h-8 text-foreground/70" />
                 </div>
                 <p className="font-bold text-lg">אייפון</p>
                 <p className="text-sm text-muted-foreground">iPhone</p>
@@ -375,9 +349,7 @@ const DataTransfer = () => {
                 className="p-6 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 border-border hover:border-primary/40 hover:bg-primary/5 text-center"
               >
                 <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-3">
-                  <svg viewBox="0 0 24 24" className="w-8 h-8" fill="currentColor" opacity="0.7">
-                    <path d="M17.6 9.48L19.44 6.3C19.54 6.12 19.48 5.9 19.3 5.8C19.12 5.7 18.9 5.76 18.8 5.94L16.96 9.12C15.44 8.42 13.78 8.04 12 8.04C10.22 8.04 8.56 8.42 7.04 9.12L5.2 5.94C5.1 5.76 4.88 5.7 4.7 5.8C4.52 5.9 4.46 6.12 4.56 6.3L6.4 9.48C3.32 11.2 1.16 14.16 1 17.6H23C22.84 14.16 20.68 11.2 17.6 9.48ZM7 14.5C6.45 14.5 6 14.05 6 13.5C6 12.95 6.45 12.5 7 12.5C7.55 12.5 8 12.95 8 13.5C8 14.05 7.55 14.5 7 14.5ZM17 14.5C16.45 14.5 16 14.05 16 13.5C16 12.95 16.45 12.5 17 12.5C17.55 12.5 18 12.95 18 13.5C18 14.05 17.55 14.5 17 14.5Z"/>
-                  </svg>
+                  <Smartphone className="w-8 h-8 text-foreground/70" />
                 </div>
                 <p className="font-bold text-lg">אנדרואיד</p>
                 <p className="text-sm text-muted-foreground">Android</p>
