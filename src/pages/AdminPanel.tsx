@@ -296,19 +296,43 @@ const AdminPanel = () => {
   const playCompletionSound = () => {
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-      notes.forEach((freq, i) => {
+      const now = audioCtx.currentTime;
+      
+      // Warm victory arpeggio with triangle waves
+      const melody = [
+        { freq: 523.25, time: 0, dur: 0.35 },     // C5
+        { freq: 659.25, time: 0.12, dur: 0.35 },   // E5
+        { freq: 783.99, time: 0.24, dur: 0.35 },   // G5
+        { freq: 1046.50, time: 0.4, dur: 0.6 },    // C6 (held longer)
+        { freq: 1318.51, time: 0.55, dur: 0.5 },   // E6 sparkle
+      ];
+      
+      melody.forEach(({ freq, time, dur }) => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.frequency.value = freq;
-        osc.type = 'sine';
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime + i * 0.15);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.15 + 0.4);
-        osc.start(audioCtx.currentTime + i * 0.15);
-        osc.stop(audioCtx.currentTime + i * 0.15 + 0.4);
+        osc.type = 'triangle';
+        gain.gain.setValueAtTime(0, now + time);
+        gain.gain.linearRampToValueAtTime(0.18, now + time + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + time + dur);
+        osc.start(now + time);
+        osc.stop(now + time + dur);
       });
+
+      // Soft shimmer pad
+      const pad = audioCtx.createOscillator();
+      const padGain = audioCtx.createGain();
+      pad.connect(padGain);
+      padGain.connect(audioCtx.destination);
+      pad.frequency.value = 783.99;
+      pad.type = 'sine';
+      padGain.gain.setValueAtTime(0, now + 0.3);
+      padGain.gain.linearRampToValueAtTime(0.08, now + 0.5);
+      padGain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+      pad.start(now + 0.3);
+      pad.stop(now + 1.2);
     } catch (e) { console.log('Audio not supported'); }
   };
 
@@ -1520,17 +1544,42 @@ const AdminPanel = () => {
     <div className="min-h-screen bg-background flex flex-col md:flex-row relative">
       {/* Completion Celebration Overlay */}
       {showCompletionCelebration && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none animate-fade-in">
-          <div className="bg-card/95 backdrop-blur-sm border border-border rounded-3xl p-8 shadow-2xl text-center animate-scale-in pointer-events-auto max-w-xs">
-            <div className="text-6xl mb-4 animate-bounce">⭐</div>
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
+          style={{ animation: 'celebrationFadeIn 0.6s ease-out forwards' }}
+        >
+          <div 
+            className="bg-card/95 backdrop-blur-sm border border-border rounded-3xl p-8 shadow-2xl text-center pointer-events-auto max-w-xs"
+            style={{ animation: 'celebrationPopIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' }}
+          >
+            <div className="text-6xl mb-4" style={{ animation: 'celebrationStar 1s ease-in-out infinite' }}>⭐</div>
             <h2 className="text-2xl font-extrabold text-foreground mb-2">כל הכבוד! 🎉</h2>
             <p className="text-muted-foreground font-medium">סיימת עוד תיקון בהצלחה!</p>
             <div className="mt-4 flex justify-center gap-2 text-2xl">
-              <span className="animate-bounce" style={{ animationDelay: '0.1s' }}>🌟</span>
-              <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>💪</span>
-              <span className="animate-bounce" style={{ animationDelay: '0.3s' }}>🔧</span>
+              <span style={{ animation: 'celebrationFloat 1.5s ease-in-out infinite', animationDelay: '0.1s' }}>🌟</span>
+              <span style={{ animation: 'celebrationFloat 1.5s ease-in-out infinite', animationDelay: '0.3s' }}>💪</span>
+              <span style={{ animation: 'celebrationFloat 1.5s ease-in-out infinite', animationDelay: '0.5s' }}>🔧</span>
             </div>
           </div>
+          <style>{`
+            @keyframes celebrationFadeIn {
+              from { opacity: 0; backdrop-filter: blur(0); }
+              to { opacity: 1; backdrop-filter: blur(4px); }
+            }
+            @keyframes celebrationPopIn {
+              0% { opacity: 0; transform: scale(0.3) translateY(30px); }
+              50% { opacity: 1; }
+              100% { transform: scale(1) translateY(0); }
+            }
+            @keyframes celebrationStar {
+              0%, 100% { transform: scale(1) rotate(0deg); }
+              50% { transform: scale(1.15) rotate(10deg); }
+            }
+            @keyframes celebrationFloat {
+              0%, 100% { transform: translateY(0); }
+              50% { transform: translateY(-6px); }
+            }
+          `}</style>
         </div>
       )}
       {/* Mobile Bottom Navigation */}
