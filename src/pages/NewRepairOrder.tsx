@@ -270,7 +270,7 @@ interface RepairBundle {
   addon_repair_type: string;
   discount_percent: number;
 }
-type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'payment-choice' | 'processing' | 'success';
+type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'processing' | 'success';
 const NewRepairOrder = () => {
   const navigate = useNavigate();
   const {
@@ -856,13 +856,7 @@ const NewRepairOrder = () => {
       toast.error('מספר טלפון של השולח לא תקין');
       return;
     }
-    // For gift orders, go directly to submission (payment required from sender)
-    if (isGiftOrder) {
-      await submitOrder();
-    } else {
-      // Show payment choice step
-      goToStep('payment-choice');
-    }
+    await submitOrder(paymentChoice === 'now');
   };
 
   const submitOrder = async (payNow = false) => {
@@ -1928,6 +1922,65 @@ const NewRepairOrder = () => {
               </label>
             </div>
 
+            {/* Payment Choice - Inline */}
+            {!isGiftOrder && (
+              <div className="space-y-3 mt-6 pt-6 border-t border-border">
+                <div className="flex items-center gap-2 mb-1">
+                  <CreditCard className="w-5 h-5 text-primary" />
+                  <h3 className="font-bold text-lg">בחירת תשלום</h3>
+                </div>
+                
+                <button
+                  onClick={() => setPaymentChoice('now')}
+                  className={`w-full p-4 rounded-2xl border-2 text-right transition-all ${
+                    paymentChoice === 'now'
+                      ? 'border-primary bg-primary/5 shadow-md'
+                      : 'border-border hover:border-primary/40'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      paymentChoice === 'now' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                    }`}>
+                      <CreditCard className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-base">לשלם עכשיו</h4>
+                      <p className="text-xs text-muted-foreground mt-0.5">תשלום מאובטח בכרטיס אשראי</p>
+                    </div>
+                    {paymentChoice === 'now' && <Check className="w-5 h-5 text-primary" />}
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setPaymentChoice('later')}
+                  className={`w-full p-4 rounded-2xl border-2 text-right transition-all ${
+                    paymentChoice === 'later'
+                      ? 'border-primary bg-primary/5 shadow-md'
+                      : 'border-border hover:border-primary/40'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      paymentChoice === 'later' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                    }`}>
+                      <Send className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-base">לשלם אחרי התיקון</h4>
+                      <p className="text-xs text-muted-foreground mt-0.5">מזומן, ביט או אשראי בסיום</p>
+                    </div>
+                    {paymentChoice === 'later' && <Check className="w-5 h-5 text-primary" />}
+                  </div>
+                </button>
+
+                <div className="flex items-center justify-center gap-2 pt-1">
+                  <Shield className="w-3.5 h-3.5 text-success" />
+                  <span className="text-xs text-muted-foreground">תשלום מאובטח ומוצפן SSL 🔒</span>
+                </div>
+              </div>
+            )}
+
             <Card className="p-4 bg-muted/30 space-y-2">
               {additionalRepairs.map((ar, idx) => (
                 <div key={idx} className="flex justify-between items-center text-base border-b border-border/30 pb-2">
@@ -1965,67 +2018,6 @@ const NewRepairOrder = () => {
               </div>
             </Card>
           </div>}
-
-        {/* Step: Payment Choice */}
-        {step === 'payment-choice' && (
-          <div className="space-y-5 animate-fade-in py-4">
-            <div className="text-center mb-2">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                <CreditCard className="w-8 h-8 text-primary" />
-              </div>
-              <h2 className="text-2xl font-extrabold">איך תרצו לשלם?</h2>
-              <p className="text-sm text-muted-foreground mt-1">סה״כ לתשלום: <span className="font-bold text-foreground">₪{getFinalPrice()}</span></p>
-            </div>
-
-            <div className="space-y-3">
-              <button
-                onClick={() => setPaymentChoice('now')}
-                className={`w-full p-5 rounded-2xl border-2 text-right transition-all ${
-                  paymentChoice === 'now'
-                    ? 'border-primary bg-primary/5 shadow-md'
-                    : 'border-border hover:border-primary/40'
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${
-                    paymentChoice === 'now' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                  }`}>
-                    <CreditCard className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-lg">לשלם עכשיו</h3>
-                    <p className="text-sm text-muted-foreground mt-0.5">תשלום מאובטח בכרטיס אשראי — ונגיע אליכם מוכנים</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Shield className="w-3.5 h-3.5 text-success" />
-                      <span className="text-xs text-success font-medium">תשלום מאובטח SSL</span>
-                    </div>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => setPaymentChoice('later')}
-                className={`w-full p-5 rounded-2xl border-2 text-right transition-all ${
-                  paymentChoice === 'later'
-                    ? 'border-primary bg-primary/5 shadow-md'
-                    : 'border-border hover:border-primary/40'
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${
-                    paymentChoice === 'later' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                  }`}>
-                    <Send className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-lg">לשלם אחרי התיקון</h3>
-                    <p className="text-sm text-muted-foreground mt-0.5">שלמו בנוחות לאחר שהתיקון הושלם בהצלחה — מזומן, ביט או אשראי</p>
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Step: Processing Payment */}
         {step === 'processing' && (
@@ -2166,18 +2158,7 @@ const NewRepairOrder = () => {
               המשך לפרטים
             </Button>}
           
-          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
-              {isSubmitting ? <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  שולח...
-                </div> : 'המשך'}
-            </Button>}
-
-          {step === 'payment-choice' && <Button 
-              onClick={() => submitOrder(paymentChoice === 'now')} 
-              disabled={!paymentChoice || isSubmitting} 
-              className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl"
-            >
+          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact || (!isGiftOrder && !paymentChoice)} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
               {isSubmitting ? <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   שולח...
