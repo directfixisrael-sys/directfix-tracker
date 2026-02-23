@@ -1420,6 +1420,75 @@ const AdminPanel = () => {
                       <CreditCard className="w-5 h-5" />
                       קישור לתשלום
                     </h3>
+                    
+                    {/* Generate PayPlus link */}
+                    <div className="space-y-3 mb-4">
+                      <div className="p-3 bg-primary/5 rounded-xl border border-primary/20">
+                        <p className="text-sm font-semibold mb-2 flex items-center gap-1.5">
+                          <Sparkles className="w-4 h-4 text-primary" />
+                          יצירת לינק תשלום PayPlus
+                        </p>
+                        <div className="space-y-2">
+                          <Input
+                            type="number"
+                            placeholder="סכום (₪)"
+                            value={paymentAmount}
+                            onChange={(e) => setPaymentAmount(e.target.value)}
+                            className="h-9 text-sm"
+                            dir="ltr"
+                          />
+                          <Input
+                            placeholder="תיאור (למשל: תיקון מסך)"
+                            value={paymentDescription}
+                            onChange={(e) => setPaymentDescription(e.target.value)}
+                            className="h-9 text-sm"
+                          />
+                          <Button
+                            size="sm"
+                            className="w-full"
+                            disabled={isGeneratingPayment || !paymentAmount}
+                            onClick={async () => {
+                              if (!selectedOrder || !paymentAmount) return;
+                              setIsGeneratingPayment(true);
+                              try {
+                                const { data, error } = await supabase.functions.invoke('payplus-create-payment', {
+                                  body: {
+                                    amount: parseFloat(paymentAmount),
+                                    description: paymentDescription || `תשלום הזמנה #${selectedOrder.orderNumber}`,
+                                    customerName: selectedOrder.customerName,
+                                    customerPhone: selectedOrder.customerPhone,
+                                    customerEmail: selectedOrder.customerEmail,
+                                    orderId: selectedOrder.id,
+                                  },
+                                });
+                                if (error) throw error;
+                                if (data?.paymentLink) {
+                                  updatePaymentLink(selectedOrder.id, data.paymentLink);
+                                  toast({ title: "לינק תשלום נוצר!", description: `₪${paymentAmount} — הלינק נשמר בהזמנה` });
+                                  setPaymentAmount('');
+                                  setPaymentDescription('');
+                                } else {
+                                  throw new Error(data?.error || 'Failed to generate link');
+                                }
+                              } catch (err: any) {
+                                toast({ title: "שגיאה ביצירת לינק", description: err.message, variant: "destructive" });
+                              } finally {
+                                setIsGeneratingPayment(false);
+                              }
+                            }}
+                          >
+                            {isGeneratingPayment ? (
+                              <><RefreshCw className="w-4 h-4 animate-spin mr-1" /> יוצר לינק...</>
+                            ) : (
+                              <><CreditCard className="w-4 h-4 mr-1" /> צור לינק תשלום</>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Manual link */}
+                    <p className="text-xs text-muted-foreground mb-2">או הכנסת לינק ידני:</p>
                     <div className="flex gap-2">
                       <Input
                         placeholder="הכנס קישור לתשלום..."
@@ -1468,6 +1537,18 @@ const AdminPanel = () => {
                           )}
                         </div>
                         <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => {
+                              navigator.clipboard.writeText(selectedOrder.paymentLink || '');
+                              toast({ title: "הלינק הועתק!" });
+                            }}
+                          >
+                            <Copy className="w-4 h-4 mr-1" />
+                            העתק
+                          </Button>
                           <Button 
                             variant="outline" 
                             size="sm"
