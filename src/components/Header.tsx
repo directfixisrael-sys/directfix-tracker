@@ -69,7 +69,7 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
 
       {/* Mobile menu dropdown */}
       {menuOpen && (
-        <div className="sm:hidden bg-card border-t border-border/50 animate-slide-down">
+        <div className="sm:hidden bg-background border-t border-border animate-slide-down">
           <div className="flex items-center justify-center gap-4 py-3 px-4">
             <a
               href="tel:033106020"
