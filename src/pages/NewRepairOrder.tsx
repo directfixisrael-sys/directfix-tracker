@@ -1902,6 +1902,7 @@ const NewRepairOrder = () => {
                   onClick={() => {
                     if (pendingPaymentOrderNumber) {
                       setCompletedOrderNumber(pendingPaymentOrderNumber);
+                      sendPaymentNotifications(pendingPaymentOrderNumber);
                     }
                     goToStep('success');
                   }}
