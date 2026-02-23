@@ -201,7 +201,7 @@ const handler = async (req: Request): Promise<Response> => {
           resendApiKey,
           "דיירקט פיקס <orders@directfix.co.il>",
           ["directfixisrael@gmail.com"],
-          `התקבלה הזמנה לתיקון חדש 🎉${orderData.orderNumber ? ` #${orderData.orderNumber}` : ''} - ${orderData.customerName} - ${orderData.deviceType}`,
+          `${isConsultation ? '📞 שיחת ייעוץ חדשה' : 'התקבלה הזמנה לתיקון חדש 🎉'}${orderData.orderNumber ? ` #${orderData.orderNumber}` : ''} - ${orderData.customerName} - ${orderData.deviceType}`,
           businessEmailHtml
         );
         results.email = businessEmail;
