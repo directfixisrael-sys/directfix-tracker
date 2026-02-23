@@ -932,37 +932,34 @@ const NewRepairOrder = () => {
         customerEmail: customerEmail.trim() || undefined,
       } as any);
 
-      // Send notifications
-      try {
-        const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
-        const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
-        const leadSource = getLeadSource();
-        await supabase.functions.invoke('send-order-notifications', {
-          body: {
-            customerName: customerName.trim(),
-            customerPhone: customerPhone.trim(),
-            customerAddress: customerAddress.trim(),
-            deviceType: selectedModel?.name || '',
-            repairType: repairTypeForNotification + colorNote,
-            repairPrice: getFinalPrice(),
-            scheduledTime: scheduleNote,
-            notes: customerNotes.trim(),
-            customerEmail: customerEmail.trim() || undefined,
-            orderNumber: orderResult?.order_number || undefined,
-            promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
-            leadSource: leadSource.source,
-            leadSourceDetails: leadSource,
-          }
-        });
-      } catch (notificationError) {
-        console.error('Error sending notifications:', notificationError);
-      }
+      // Build notification data
+      const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
+      const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
+      const leadSourceData = getLeadSource();
+      const notificationData = {
+        customerName: customerName.trim(),
+        customerPhone: customerPhone.trim(),
+        customerAddress: customerAddress.trim(),
+        deviceType: selectedModel?.name || '',
+        repairType: repairTypeForNotification + colorNote,
+        repairPrice: getFinalPrice(),
+        scheduledTime: scheduleNote,
+        notes: customerNotes.trim(),
+        customerEmail: customerEmail.trim() || undefined,
+        orderNumber: orderResult?.order_number || undefined,
+        promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
+        leadSource: leadSourceData.source,
+        leadSourceDetails: leadSourceData,
+      };
 
-      trackPurchase(getFinalPrice());
-      gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
-
-      // If pay now, generate payment link
+      // If pay now, defer notifications until after payment
       if (payNow && orderResult) {
+        setPendingNotificationData(notificationData);
+        setPendingOrderId(orderResult.id);
+        
+        trackPurchase(getFinalPrice());
+        gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
+
         goToStep('processing');
         try {
           const currentUrl = window.location.origin + '/new-repair';
@@ -983,6 +980,7 @@ const NewRepairOrder = () => {
           if (data?.paymentLink) {
             await supabase.from('orders').update({ payment_link: data.paymentLink, payment_status: 'pending' }).eq('id', orderResult.id);
             setPaymentIframeUrl(data.paymentLink);
+            setCompletedOrderNumber(orderResult.order_number);
             goToStep('processing');
             setTimeout(() => {
               paymentIframeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -994,6 +992,17 @@ const NewRepairOrder = () => {
         } catch (err) {
           console.error('Payment error:', err);
           toast.error('שגיאה ביצירת לינק תשלום. ההזמנה נשלחה בהצלחה — נציג ייצור קשר.');
+          // Send notifications anyway since payment failed
+          try {
+            await supabase.functions.invoke('send-order-notifications', { body: notificationData });
+          } catch (e) { console.error('Notification error:', e); }
+        }
+      } else {
+        // Pay later or gift - send notifications immediately
+        try {
+          await supabase.functions.invoke('send-order-notifications', { body: notificationData });
+        } catch (notificationError) {
+          console.error('Error sending notifications:', notificationError);
         }
       }
 
