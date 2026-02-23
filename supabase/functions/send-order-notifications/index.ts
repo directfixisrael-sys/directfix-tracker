@@ -401,11 +401,11 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
       ` : ''}
 
       <!-- Action Buttons -->
-      <div style="text-align: center; margin-bottom: 20px;">
+      ${!isConsultation ? `<div style="text-align: center; margin-bottom: 20px;">
         <a href="${trackingUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #0d64f4 0%, #0a4dbf 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(13, 100, 244, 0.3); margin-bottom: 10px;">
           📍 עקוב אחר התיקון שלך
         </a>
-      </div>
+      </div>` : ''}
       
       <div style="text-align: center; margin-bottom: 20px;">
         <a href="${customerCalendarLink}" target="_blank" style="display: inline-block; background: white; color: #333; text-decoration: none; padding: 12px 28px; border-radius: 12px; font-size: 14px; font-weight: 600; border: 2px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
@@ -414,13 +414,13 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
       </div>
       
       <div style="background: #eff6ff; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 15px;">
-        <p style="margin: 0 0 8px 0; color: #1e40af; font-weight: 600;">💳 תשלום בסיום התיקון בלבד</p>
-        <p style="margin: 0; color: #3b82f6; font-size: 14px;">ניצור איתך קשר לאישור המועד</p>
+        <p style="margin: 0 0 8px 0; color: #1e40af; font-weight: 600;">${isConsultation ? '📞 ניצור איתך קשר במועד שנקבע' : '💳 תשלום בסיום התיקון בלבד'}</p>
+        <p style="margin: 0; color: #3b82f6; font-size: 14px;">${isConsultation ? 'הטכנאי יתקשר אליך בשעה שנבחרה' : 'ניצור איתך קשר לאישור המועד'}</p>
       </div>
 
-      <div style="background: #f0fdf4; border-radius: 12px; padding: 15px; text-align: center;">
+      ${!isConsultation ? `<div style="background: #f0fdf4; border-radius: 12px; padding: 15px; text-align: center;">
         <p style="margin: 0; color: #166534; font-size: 14px;">🛡️ כל התיקונים שלנו כוללים אחריות מלאה</p>
-      </div>
+      </div>` : ''}
     </div>
     
     <p style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
