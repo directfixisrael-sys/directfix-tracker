@@ -86,7 +86,7 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
 
       {/* Models list for active series */}
       {activeSeries && grouped[activeSeries] && (
-        <div id={`models-${activeSeries.replace(/\s/g, '-')}`} role="tabpanel" aria-label={`דגמי ${activeSeries}`} className="space-y-1.5 animate-fade-in pt-1">
+        <div ref={modelsListRef} id={`models-${activeSeries.replace(/\s/g, '-')}`} role="tabpanel" aria-label={`דגמי ${activeSeries}`} className="space-y-1.5 animate-fade-in pt-1">
           {grouped[activeSeries].map(model => (
             <ModelButton
               key={model.id}
