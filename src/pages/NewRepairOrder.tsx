@@ -343,6 +343,10 @@ const NewRepairOrder = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   // Privacy consent
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
+  // Payment processing state
+  const [pendingPaymentLink, setPendingPaymentLink] = useState<string | null>(null);
+  const [pendingPaymentOrderNumber, setPendingPaymentOrderNumber] = useState<number | null>(null);
+  const [pendingPaymentOrderId, setPendingPaymentOrderId] = useState<string | null>(null);
 
   // Gift order mode
   const [isGiftOrder, setIsGiftOrder] = useState(false);
