@@ -39,6 +39,41 @@ const ConsultationBooking = () => {
     if (paymentSuccess && returnedOrderNumber) return 'done';
     return 'choose';
   });
+
+  // Send notifications after payment return for paid consultations
+  useEffect(() => {
+    if (paymentSuccess && returnedOrderNumber) {
+      const sendNotifications = async () => {
+        try {
+          const { data: orderData } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('order_number', parseInt(returnedOrderNumber))
+            .single();
+          if (orderData) {
+            await supabase.from('orders').update({ payment_status: 'paid', notes: [...orderData.notes.filter((n: string) => !n.includes('ממתין לתשלום')), '✅ תשלום התקבל'] }).eq('id', orderData.id);
+            await supabase.functions.invoke('send-order-notifications', {
+              body: {
+                customerName: orderData.customer_name,
+                customerPhone: orderData.customer_phone,
+                customerAddress: '',
+                customerEmail: orderData.customer_email,
+                deviceType: orderData.device_type,
+                repairType: orderData.issue_description,
+                repairPrice: orderData.repair_price,
+                scheduledTime: orderData.estimated_arrival || '',
+                notes: '',
+                orderNumber: orderData.order_number,
+                serviceType: 'consultation',
+                leadSource: orderData.lead_source,
+              }
+            });
+          }
+        } catch (e) { console.error('Post-payment notification error:', e); }
+      };
+      sendNotifications();
+    }
+  }, [paymentSuccess, returnedOrderNumber]);
   const [consultationType, setConsultationType] = useState<ConsultationType>(() => {
     if (paymentSuccess) return 'paid';
     return null;
