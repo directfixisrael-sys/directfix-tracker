@@ -1764,66 +1764,122 @@ const NewRepairOrder = () => {
               </div>
             </Card>
 
-            {/* Payment Info with Icons */}
-            <div className="bg-gradient-to-br from-muted/60 to-accent/5 rounded-2xl p-4 border border-border/50">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm">{isGiftOrder ? 'תשלום מראש מהשולח' : 'תשלום בסיום התיקון בלבד'}</p>
-                    <p className="text-muted-foreground text-xs mt-0.5">
-                      {isGiftOrder ? 'נציג ייצור קשר לגביית התשלום לפני ההגעה' : 'מזומן, אשראי או ביט'}
-                    </p>
-                  </div>
-                </div>
-              </div>
+            {/* Payment Method Selection */}
+            <div className="space-y-3">
+              <h3 className="font-bold text-sm flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-primary" />
+                בחרו אופן תשלום
+              </h3>
               
-              {/* Payment Method Icons */}
-              <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-border">
-                {/* Apple Pay */}
-                <div className="flex flex-col items-center gap-1">
-                  <div className="w-12 h-8 bg-foreground rounded-md flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="w-6 h-4 text-background" fill="currentColor">
-                      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-                    </svg>
+              {/* Pay Now Option */}
+              <button
+                onClick={() => setPaymentMethod('now')}
+                className={`w-full text-right p-4 rounded-2xl border-2 transition-all ${
+                  paymentMethod === 'now'
+                    ? 'border-primary bg-primary/5 shadow-sm'
+                    : 'border-border hover:border-primary/30'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center flex-shrink-0 ${
+                    paymentMethod === 'now' ? 'border-primary bg-primary' : 'border-muted-foreground/40'
+                  }`}>
+                    {paymentMethod === 'now' && <Check className="w-3 h-3 text-primary-foreground" />}
                   </div>
-                  <span className="text-[10px] text-muted-foreground">Apple Pay</span>
-                </div>
-                
-                {/* Google Pay */}
-                <div className="flex flex-col items-center gap-1">
-                  <div className="w-12 h-8 bg-card border border-border rounded-md flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="w-6 h-4" fill="none">
-                      <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z" fill="#4285F4" />
-                    </svg>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-primary" />
+                      <span className="font-bold">תשלום עכשיו</span>
+                      <span className="bg-success/10 text-success text-[10px] font-bold px-2 py-0.5 rounded-full">מומלץ</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">תשלום מאובטח באמצעות כרטיס אשראי, Apple Pay, Google Pay או Bit</p>
+                    
+                    {/* Trust badges inline */}
+                    <div className="flex items-center gap-3 mt-2">
+                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <Shield className="w-3 h-3 text-success" />
+                        <span>SSL מוצפן</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <Lock className="w-3 h-3 text-success" />
+                        <span>PCI DSS</span>
+                      </div>
+                    </div>
+
+                    {/* Payment method icons */}
+                    {paymentMethod === 'now' && (
+                      <div className="flex items-center gap-3 mt-3 pt-2 border-t border-border/30">
+                        <div className="w-10 h-7 bg-foreground rounded flex items-center justify-center">
+                          <svg viewBox="0 0 24 24" className="w-5 h-3.5 text-background" fill="currentColor">
+                            <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+                          </svg>
+                        </div>
+                        <div className="w-10 h-7 bg-card border border-border rounded flex items-center justify-center">
+                          <svg viewBox="0 0 24 24" className="w-5 h-3.5" fill="none">
+                            <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z" fill="#4285F4" />
+                          </svg>
+                        </div>
+                        <div className="w-10 h-7 bg-gradient-to-br from-blue-500 to-blue-600 rounded flex items-center justify-center">
+                          <svg viewBox="0 0 24 24" className="w-4 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                            <line x1="1" y1="10" x2="23" y2="10" />
+                          </svg>
+                        </div>
+                        <div className="w-10 h-7 bg-gradient-to-br from-primary to-blue-600 rounded flex items-center justify-center">
+                          <span className="text-white text-[10px] font-bold">Bit</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <span className="text-[10px] text-muted-foreground">Google Pay</span>
                 </div>
-                
-                {/* Credit Card */}
-                <div className="flex flex-col items-center gap-1">
-                  <div className="w-12 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="w-5 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-                      <line x1="1" y1="10" x2="23" y2="10" />
-                    </svg>
+              </button>
+
+              {/* Pay After Option - hidden for gift orders */}
+              {!isGiftOrder && (
+                <button
+                  onClick={() => setPaymentMethod('after')}
+                  className={`w-full text-right p-4 rounded-2xl border-2 transition-all ${
+                    paymentMethod === 'after'
+                      ? 'border-primary bg-primary/5 shadow-sm'
+                      : 'border-border hover:border-primary/30'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center flex-shrink-0 ${
+                      paymentMethod === 'after' ? 'border-primary bg-primary' : 'border-muted-foreground/40'
+                    }`}>
+                      {paymentMethod === 'after' && <Check className="w-3 h-3 text-primary-foreground" />}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <Banknote className="w-4 h-4 text-muted-foreground" />
+                        <span className="font-bold">תשלום לאחר התיקון</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">מזומן, אשראי או Bit — משלמים רק כשהתיקון הושלם</p>
+                    </div>
                   </div>
-                  <span className="text-[10px] text-muted-foreground">אשראי</span>
+                </button>
+              )}
+
+              {isGiftOrder && (
+                <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-center gap-2">
+                  <Gift className="w-4 h-4 text-primary flex-shrink-0" />
+                  <p className="text-xs text-muted-foreground">
+                    <span className="font-semibold text-foreground">הזמנת מתנה</span> — נדרש תשלום מראש מהשולח
+                  </p>
                 </div>
-                
-                {/* Cash */}
-                <div className="flex flex-col items-center gap-1">
-                  <div className="w-12 h-8 bg-gradient-to-br from-success to-green-600 rounded-md flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">₪</span>
-                  </div>
-                  <span className="text-[10px] text-muted-foreground">מזומן</span>
-                </div>
-              </div>
+              )}
             </div>
           </div>}
 
+        {/* Processing Payment Screen */}
+        {step === 'processing' && (
+          <div className="text-center py-20 animate-fade-in">
+            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+            <h2 className="text-xl font-bold mb-2">מעבירים לדף התשלום...</h2>
+            <p className="text-muted-foreground text-sm">תועברו בשניות לדף התשלום המאובטח</p>
+          </div>
+        )}
         {/* Step 4: Schedule */}
         {step === 'schedule' && <div className="space-y-5 animate-fade-in">
             <div className="text-center mb-4">
