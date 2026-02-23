@@ -1966,6 +1966,76 @@ const NewRepairOrder = () => {
             </Card>
           </div>}
 
+        {/* Step: Payment Choice */}
+        {step === 'payment-choice' && (
+          <div className="space-y-5 animate-fade-in py-4">
+            <div className="text-center mb-2">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                <CreditCard className="w-8 h-8 text-primary" />
+              </div>
+              <h2 className="text-2xl font-extrabold">איך תרצו לשלם?</h2>
+              <p className="text-sm text-muted-foreground mt-1">סה״כ לתשלום: <span className="font-bold text-foreground">₪{getFinalPrice()}</span></p>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => setPaymentChoice('now')}
+                className={`w-full p-5 rounded-2xl border-2 text-right transition-all ${
+                  paymentChoice === 'now'
+                    ? 'border-primary bg-primary/5 shadow-md'
+                    : 'border-border hover:border-primary/40'
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${
+                    paymentChoice === 'now' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                  }`}>
+                    <CreditCard className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-lg">לשלם עכשיו</h3>
+                    <p className="text-sm text-muted-foreground mt-0.5">תשלום מאובטח בכרטיס אשראי — ונגיע אליכם מוכנים</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Shield className="w-3.5 h-3.5 text-success" />
+                      <span className="text-xs text-success font-medium">תשלום מאובטח SSL</span>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setPaymentChoice('later')}
+                className={`w-full p-5 rounded-2xl border-2 text-right transition-all ${
+                  paymentChoice === 'later'
+                    ? 'border-primary bg-primary/5 shadow-md'
+                    : 'border-border hover:border-primary/40'
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${
+                    paymentChoice === 'later' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                  }`}>
+                    <Send className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-lg">לשלם אחרי התיקון</h3>
+                    <p className="text-sm text-muted-foreground mt-0.5">שלמו בנוחות לאחר שהתיקון הושלם בהצלחה — מזומן, ביט או אשראי</p>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step: Processing Payment */}
+        {step === 'processing' && (
+          <div className="text-center py-20 animate-fade-in">
+            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+            <h2 className="text-xl font-bold mb-2">מעבירים לדף התשלום...</h2>
+            <p className="text-muted-foreground text-sm">תועברו בשניות לדף התשלום המאובטח</p>
+          </div>
+        )}
+
         {/* Step 6: Success */}
         {step === 'success' && <div className="text-center space-y-5 animate-fade-in py-6">
             <div className="flex justify-center">
