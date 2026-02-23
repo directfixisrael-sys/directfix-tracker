@@ -2158,18 +2158,7 @@ const NewRepairOrder = () => {
               המשך לפרטים
             </Button>}
           
-          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
-              {isSubmitting ? <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  שולח...
-                </div> : 'המשך'}
-            </Button>}
-
-          {step === 'payment-choice' && <Button 
-              onClick={() => submitOrder(paymentChoice === 'now')} 
-              disabled={!paymentChoice || isSubmitting} 
-              className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl"
-            >
+          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact || (!isGiftOrder && !paymentChoice)} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
               {isSubmitting ? <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   שולח...
