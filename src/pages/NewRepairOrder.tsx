@@ -1999,6 +1999,16 @@ const NewRepairOrder = () => {
               </div>
             </Card>
 
+            {/* Add to calendar */}
+            {getCalendarLink() && (
+              <a href={getCalendarLink()} target="_blank" rel="noopener noreferrer" className="block">
+                <Button variant="outline" className="w-full h-12 text-base rounded-xl gap-2 border-primary/30 text-primary hover:bg-primary/5">
+                  <Calendar className="w-5 h-5" />
+                  הוסף ליומן שלי
+                </Button>
+              </a>
+            )}
+
             <div className="bg-muted/50 rounded-xl p-4">
               <p className="text-sm text-muted-foreground mb-3">תוכלו לעקוב אחרי סטטוס התיקון בזמן אמת</p>
               <Button onClick={handleTrackOrder} className="w-full h-12 text-base rounded-xl">
