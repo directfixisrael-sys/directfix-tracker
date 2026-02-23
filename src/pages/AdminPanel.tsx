@@ -110,6 +110,7 @@ const AdminPanel = () => {
   const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set());
   const [bulkStatusDialogOpen, setBulkStatusDialogOpen] = useState(false);
   const [orderStatusFilter, setOrderStatusFilter] = useState<'active' | 'all'>('active');
+  const [showCompletionCelebration, setShowCompletionCelebration] = useState(false);
 
   const { 
     orders, 
@@ -291,10 +292,37 @@ const AdminPanel = () => {
     }
   };
 
+
+  const playCompletionSound = () => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      notes.forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime + i * 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.15 + 0.4);
+        osc.start(audioCtx.currentTime + i * 0.15);
+        osc.stop(audioCtx.currentTime + i * 0.15 + 0.4);
+      });
+    } catch (e) { console.log('Audio not supported'); }
+  };
+
   const handleUpdateStatus = (status: RepairStatus) => {
     if (selectedOrder) {
       updateOrderStatus(selectedOrder.id, status, statusNote || undefined);
       setStatusNote('');
+      
+      if (status === 'completed') {
+        setShowCompletionCelebration(true);
+        playCompletionSound();
+        setTimeout(() => setShowCompletionCelebration(false), 3000);
+      }
+      
       toast({
         title: "סטטוס עודכן",
         description: `הסטטוס שונה ל-${statusLabels[status]}`,
@@ -1489,7 +1517,22 @@ const AdminPanel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col md:flex-row">
+    <div className="min-h-screen bg-background flex flex-col md:flex-row relative">
+      {/* Completion Celebration Overlay */}
+      {showCompletionCelebration && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none animate-fade-in">
+          <div className="bg-card/95 backdrop-blur-sm border border-border rounded-3xl p-8 shadow-2xl text-center animate-scale-in pointer-events-auto max-w-xs">
+            <div className="text-6xl mb-4 animate-bounce">⭐</div>
+            <h2 className="text-2xl font-extrabold text-foreground mb-2">כל הכבוד! 🎉</h2>
+            <p className="text-muted-foreground font-medium">סיימת עוד תיקון בהצלחה!</p>
+            <div className="mt-4 flex justify-center gap-2 text-2xl">
+              <span className="animate-bounce" style={{ animationDelay: '0.1s' }}>🌟</span>
+              <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>💪</span>
+              <span className="animate-bounce" style={{ animationDelay: '0.3s' }}>🔧</span>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-sidebar border-t border-sidebar-border z-50 px-2 py-2 safe-area-pb">
         <div className="flex justify-around items-center">
