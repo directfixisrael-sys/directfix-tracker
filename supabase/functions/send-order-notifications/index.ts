@@ -17,6 +17,7 @@ interface OrderData {
   customerEmail?: string;
   orderNumber?: number;
   promotionTitle?: string;
+  isConsultation?: boolean;
   leadSource?: string;
   leadSourceDetails?: {
     gclid?: string;
@@ -196,7 +197,9 @@ const handler = async (req: Request): Promise<Response> => {
           resendApiKey,
           "דיירקט פיקס <orders@directfix.co.il>",
           ["directfixisrael@gmail.com"],
-          `התקבלה הזמנה לתיקון חדש 🎉${orderData.orderNumber ? ` #${orderData.orderNumber}` : ''} - ${orderData.customerName} - ${orderData.deviceType}`,
+          orderData.isConsultation 
+            ? `דיירקט פיקס 📞 שיחת ייעוץ חדשה${orderData.orderNumber ? ` #${orderData.orderNumber}` : ''} - ${orderData.customerName}`
+            : `דיירקט פיקס 📱 התקבלה הזמנה חדשה! 🎉${orderData.orderNumber ? ` #${orderData.orderNumber}` : ''} - ${orderData.customerName} - ${orderData.deviceType}`,
           businessEmailHtml
         );
         results.email = businessEmail;
@@ -420,7 +423,9 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
           resendApiKey,
           "דיירקט פיקס <orders@directfix.co.il>",
           [orderData.customerEmail],
-          `✅ ההזמנה התקבלה - ${orderData.deviceType} ${orderData.repairType}`,
+          orderData.isConsultation
+            ? `דיירקט פיקס 📞 שיחת הייעוץ נקבעה - ${orderData.deviceType}`
+            : `דיירקט פיקס ✅ ההזמנה התקבלה - ${orderData.deviceType} ${orderData.repairType}`,
           customerEmailHtml
         );
         results.customerEmail = customerEmail;

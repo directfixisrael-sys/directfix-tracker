@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -273,6 +273,7 @@ interface RepairBundle {
 type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'processing' | 'success';
 const NewRepairOrder = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const {
     addOrder
   } = useRepairStore();
@@ -298,6 +299,8 @@ const NewRepairOrder = () => {
   const [completedOrderNumber, setCompletedOrderNumber] = useState<number | null>(null);
   const [paymentChoice, setPaymentChoice] = useState<'now' | 'later' | null>(null);
   const [paymentIframeUrl, setPaymentIframeUrl] = useState<string | null>(null);
+  const [pendingNotificationData, setPendingNotificationData] = useState<any>(null);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const paymentIframeRef = useRef<HTMLDivElement>(null);
 
   // Schedule fields
@@ -367,6 +370,51 @@ const NewRepairOrder = () => {
     };
   }, [isGiftOrder]);
   const [giftClaimed, setGiftClaimed] = useState(false);
+
+  // If we're inside an iframe after payment success, notify parent and stop
+  useEffect(() => {
+    const paymentSuccess = searchParams.get('payment') === 'success';
+    const orderNum = searchParams.get('order');
+    if (paymentSuccess && orderNum && window.parent !== window) {
+      // We're in the iframe - notify parent
+      window.parent.postMessage({ type: 'payment-success', orderNumber: orderNum }, '*');
+      return;
+    }
+  }, [searchParams]);
+
+  // Listen for payment success message from iframe
+  useEffect(() => {
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.data?.type === 'payment-success' && event.data?.orderNumber) {
+        const orderNum = event.data.orderNumber;
+        // Update order payment status
+        const { data } = await supabase
+          .from('orders')
+          .select('id')
+          .eq('order_number', parseInt(orderNum))
+          .single();
+        if (data) {
+          await supabase
+            .from('orders')
+            .update({ payment_status: 'paid', status: 'confirmed' })
+            .eq('id', data.id);
+        }
+        // Send deferred notifications
+        if (pendingNotificationData) {
+          try {
+            await supabase.functions.invoke('send-order-notifications', { body: pendingNotificationData });
+          } catch (e) { console.error('Notification error:', e); }
+          setPendingNotificationData(null);
+        }
+        setCompletedOrderNumber(parseInt(orderNum));
+        setPaymentIframeUrl(null);
+        setPendingOrderId(null);
+        goToStep('success');
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [pendingNotificationData]);
 
   // Broadcast initial step on mount
   useEffect(() => {
@@ -929,37 +977,34 @@ const NewRepairOrder = () => {
         customerEmail: customerEmail.trim() || undefined,
       } as any);
 
-      // Send notifications
-      try {
-        const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
-        const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
-        const leadSource = getLeadSource();
-        await supabase.functions.invoke('send-order-notifications', {
-          body: {
-            customerName: customerName.trim(),
-            customerPhone: customerPhone.trim(),
-            customerAddress: customerAddress.trim(),
-            deviceType: selectedModel?.name || '',
-            repairType: repairTypeForNotification + colorNote,
-            repairPrice: getFinalPrice(),
-            scheduledTime: scheduleNote,
-            notes: customerNotes.trim(),
-            customerEmail: customerEmail.trim() || undefined,
-            orderNumber: orderResult?.order_number || undefined,
-            promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
-            leadSource: leadSource.source,
-            leadSourceDetails: leadSource,
-          }
-        });
-      } catch (notificationError) {
-        console.error('Error sending notifications:', notificationError);
-      }
+      // Build notification data
+      const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
+      const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
+      const leadSourceData = getLeadSource();
+      const notificationData = {
+        customerName: customerName.trim(),
+        customerPhone: customerPhone.trim(),
+        customerAddress: customerAddress.trim(),
+        deviceType: selectedModel?.name || '',
+        repairType: repairTypeForNotification + colorNote,
+        repairPrice: getFinalPrice(),
+        scheduledTime: scheduleNote,
+        notes: customerNotes.trim(),
+        customerEmail: customerEmail.trim() || undefined,
+        orderNumber: orderResult?.order_number || undefined,
+        promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
+        leadSource: leadSourceData.source,
+        leadSourceDetails: leadSourceData,
+      };
 
-      trackPurchase(getFinalPrice());
-      gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
-
-      // If pay now, generate payment link
+      // If pay now, defer notifications until after payment
       if (payNow && orderResult) {
+        setPendingNotificationData(notificationData);
+        setPendingOrderId(orderResult.id);
+        
+        trackPurchase(getFinalPrice());
+        gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
+
         goToStep('processing');
         try {
           const currentUrl = window.location.origin + '/new-repair';
@@ -980,6 +1025,7 @@ const NewRepairOrder = () => {
           if (data?.paymentLink) {
             await supabase.from('orders').update({ payment_link: data.paymentLink, payment_status: 'pending' }).eq('id', orderResult.id);
             setPaymentIframeUrl(data.paymentLink);
+            setCompletedOrderNumber(orderResult.order_number);
             goToStep('processing');
             setTimeout(() => {
               paymentIframeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -991,7 +1037,20 @@ const NewRepairOrder = () => {
         } catch (err) {
           console.error('Payment error:', err);
           toast.error('שגיאה ביצירת לינק תשלום. ההזמנה נשלחה בהצלחה — נציג ייצור קשר.');
+          // Send notifications anyway since payment failed
+          try {
+            await supabase.functions.invoke('send-order-notifications', { body: notificationData });
+          } catch (e) { console.error('Notification error:', e); }
         }
+      } else {
+        // Pay later or gift - send notifications immediately
+        try {
+          await supabase.functions.invoke('send-order-notifications', { body: notificationData });
+        } catch (notificationError) {
+          console.error('Error sending notifications:', notificationError);
+        }
+        trackPurchase(getFinalPrice());
+        gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
       }
 
       setCompletedOrderNumber(orderResult?.order_number || null);
