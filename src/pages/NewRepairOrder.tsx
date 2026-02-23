@@ -1024,7 +1024,10 @@ const NewRepairOrder = () => {
               .update({ payment_link: data.paymentLink, payment_status: 'pending' })
               .eq('id', orderResult?.id);
 
-            window.location.href = data.paymentLink;
+            setPendingPaymentLink(data.paymentLink);
+            setPendingPaymentOrderNumber(orderResult?.order_number || null);
+            setPendingPaymentOrderId(orderResult?.id || null);
+            window.open(data.paymentLink, '_blank');
             return;
           } else {
             throw new Error(data?.error || 'Failed to generate payment link');
