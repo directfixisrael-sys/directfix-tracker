@@ -970,7 +970,9 @@ const NewRepairOrder = () => {
         if (giftMessage.trim()) {
           notes.push(`ברכה: ${giftMessage.trim()}`);
         }
-        notes.push('⚠️ דורש תשלום מראש מהשולח לפני תיאום הגעה');
+      }
+      if (paymentMethod === 'now') {
+        notes.push('⚠️ ממתין לתשלום מקוון');
       }
       const leadSource = getLeadSource();
       const orderResult: any = await addOrder({
@@ -988,40 +990,80 @@ const NewRepairOrder = () => {
         customerEmail: customerEmail.trim() || undefined,
       } as any);
 
-      // Send notifications (email + WhatsApp)
-      try {
-        const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
-        const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
-        const leadSource = getLeadSource();
-        await supabase.functions.invoke('send-order-notifications', {
-          body: {
-            customerName: customerName.trim(),
-            customerPhone: customerPhone.trim(),
-            customerAddress: customerAddress.trim(),
-            deviceType: selectedModel?.name || '',
-            repairType: repairTypeForNotification + colorNote,
-            repairPrice: getFinalPrice(),
-            scheduledTime: scheduleNote,
-            notes: customerNotes.trim(),
-            customerEmail: customerEmail.trim() || undefined,
-            orderNumber: orderResult?.order_number || undefined,
-            promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
-            leadSource: leadSource.source,
-            leadSourceDetails: leadSource,
-          }
-        });
-        console.log('Notifications sent successfully');
-      } catch (notificationError) {
-        console.error('Error sending notifications:', notificationError);
-        // Don't fail the order if notifications fail
-      }
+      // If paying now → generate PayPlus link and redirect
+      if (paymentMethod === 'now') {
+        goToStep('processing');
+        try {
+          const currentUrl = window.location.origin + '/order';
+          const successUrl = `${currentUrl}?payment=success&order=${orderResult?.order_number}`;
+          const failureUrl = `${currentUrl}?payment=failed`;
 
-      // Track Facebook Pixel Purchase event
-      trackPurchase(getFinalPrice());
-      // Track Google Analytics conversion
-      gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
-      setCompletedOrderNumber(orderResult?.order_number || null);
-      goToStep('success');
+          const { data, error } = await supabase.functions.invoke('payplus-create-payment', {
+            body: {
+              amount: getFinalPrice(),
+              description: `תיקון ${selectedModel?.name || ''} - ${repairDescription}`,
+              customerName: customerName.trim(),
+              customerPhone: customerPhone.trim(),
+              customerEmail: customerEmail.trim() || undefined,
+              orderId: orderResult?.id,
+              moreInfo: `repair-${orderResult?.order_number}`,
+              successUrl,
+              failureUrl,
+            },
+          });
+
+          if (error) throw error;
+
+          if (data?.paymentLink) {
+            await supabase
+              .from('orders')
+              .update({ payment_link: data.paymentLink, payment_status: 'pending' })
+              .eq('id', orderResult?.id);
+
+            window.location.href = data.paymentLink;
+            return;
+          } else {
+            throw new Error(data?.error || 'Failed to generate payment link');
+          }
+        } catch (err: any) {
+          console.error('Payment link error:', err);
+          toast.error('שגיאה ביצירת לינק תשלום. ניצור קשר בהקדם.');
+          setCompletedOrderNumber(orderResult?.order_number || null);
+          goToStep('success');
+        }
+      } else {
+        // Pay after → send notifications immediately
+        try {
+          const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
+          const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
+          const leadSource = getLeadSource();
+          await supabase.functions.invoke('send-order-notifications', {
+            body: {
+              customerName: customerName.trim(),
+              customerPhone: customerPhone.trim(),
+              customerAddress: customerAddress.trim(),
+              deviceType: selectedModel?.name || '',
+              repairType: repairTypeForNotification + colorNote,
+              repairPrice: getFinalPrice(),
+              scheduledTime: scheduleNote,
+              notes: customerNotes.trim(),
+              customerEmail: customerEmail.trim() || undefined,
+              orderNumber: orderResult?.order_number || undefined,
+              promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
+              leadSource: leadSource.source,
+              leadSourceDetails: leadSource,
+            }
+          });
+          console.log('Notifications sent successfully');
+        } catch (notificationError) {
+          console.error('Error sending notifications:', notificationError);
+        }
+
+        trackPurchase(getFinalPrice());
+        gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
+        setCompletedOrderNumber(orderResult?.order_number || null);
+        goToStep('success');
+      }
     } catch (error) {
       toast.error('אירעה שגיאה, נסה שוב');
     } finally {
