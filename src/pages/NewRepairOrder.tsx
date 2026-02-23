@@ -2051,9 +2051,6 @@ const NewRepairOrder = () => {
             </Card>
           </div>}
 
-        {/* Step: Processing Payment */}
-        {step === 'processing' && (
-          <div className="text-center py-20 animate-fade-in">
         {/* Step: Inline Payment */}
         {step === 'processing' && (
           <div className="animate-fade-in space-y-4" ref={paymentIframeRef}>
