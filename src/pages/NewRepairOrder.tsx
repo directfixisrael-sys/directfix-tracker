@@ -1881,10 +1881,47 @@ const NewRepairOrder = () => {
 
         {/* Processing Payment Screen */}
         {step === 'processing' && (
-          <div className="text-center py-20 animate-fade-in">
-            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">מעבירים לדף התשלום...</h2>
-            <p className="text-muted-foreground text-sm">תועברו בשניות לדף התשלום המאובטח</p>
+          <div className="text-center py-12 animate-fade-in space-y-6">
+            {!pendingPaymentLink ? (
+              <>
+                <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+                <h2 className="text-xl font-bold mb-2">מכינים את דף התשלום...</h2>
+                <p className="text-muted-foreground text-sm">רק רגע...</p>
+              </>
+            ) : (
+              <>
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                  <CreditCard className="w-8 h-8 text-primary" />
+                </div>
+                <h2 className="text-xl font-bold">דף התשלום נפתח בחלון חדש</h2>
+                <p className="text-muted-foreground text-sm">
+                  לאחר השלמת התשלום, לחצו על הכפתור למטה
+                </p>
+                
+                <Button
+                  onClick={() => {
+                    if (pendingPaymentOrderNumber) {
+                      setCompletedOrderNumber(pendingPaymentOrderNumber);
+                    }
+                    goToStep('success');
+                  }}
+                  className="w-full h-14 text-base rounded-2xl font-bold shadow-lg"
+                  size="lg"
+                >
+                  <CheckCircle2 className="w-5 h-5 ml-2" />
+                  שילמתי — חזרה להזמנה
+                </Button>
+
+                <a
+                  href={pendingPaymentLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-sm text-primary underline"
+                >
+                  דף התשלום לא נפתח? לחצו כאן
+                </a>
+              </>
+            )}
           </div>
         )}
         {/* Step 4: Schedule */}
