@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { Phone, Clock, Star, Shield, CheckCircle2, ArrowRight, CreditCard, Crown, Calendar } from 'lucide-react';
+import { Phone, Clock, Star, Shield, CheckCircle2, ArrowRight, CreditCard, Crown, Calendar, Loader2 } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -30,8 +31,18 @@ const consultationReviews = [
 ];
 
 const ConsultationBooking = () => {
-  const [step, setStep] = useState<'choose' | 'schedule' | 'details' | 'done'>('choose');
-  const [consultationType, setConsultationType] = useState<ConsultationType>(null);
+  const [searchParams] = useSearchParams();
+  const paymentSuccess = searchParams.get('payment') === 'success';
+  const returnedOrderNumber = searchParams.get('order');
+
+  const [step, setStep] = useState<'choose' | 'schedule' | 'details' | 'processing' | 'done'>(() => {
+    if (paymentSuccess && returnedOrderNumber) return 'done';
+    return 'choose';
+  });
+  const [consultationType, setConsultationType] = useState<ConsultationType>(() => {
+    if (paymentSuccess) return 'paid';
+    return null;
+  });
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState('');
   const [customerName, setCustomerName] = useState('');
@@ -41,6 +52,10 @@ const ConsultationBooking = () => {
   const [issueDescription, setIssueDescription] = useState('');
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [completedOrderNumber, setCompletedOrderNumber] = useState<number | null>(() => {
+    if (returnedOrderNumber) return parseInt(returnedOrderNumber);
+    return null;
+  });
   const { addOrder } = useRepairStore();
 
   // Get available dates: tomorrow to +7 days
@@ -57,25 +72,21 @@ const ConsultationBooking = () => {
 
   const slots = consultationType === 'free' ? FREE_SLOTS : PAID_SLOTS;
 
-  // Filter out past time slots if selected date is today (shouldn't happen since we start from tomorrow, but safety)
   const getAvailableSlots = () => {
     if (!selectedDate) return [];
     const now = new Date();
-    const isToday = selectedDate.toDateString() === now.toDateString();
-    // Also check if selected date is tomorrow and current time matters
     const isTomorrow = (() => {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       return selectedDate.toDateString() === tomorrow.toDateString();
     })();
+    const isToday = selectedDate.toDateString() === now.toDateString();
 
     return slots.filter(time => {
-      // For tomorrow or later, check if we're past the slot time considering "now"
       if (isToday || isTomorrow) {
         const [hours, minutes] = time.split(':').map(Number);
         const slotDate = new Date(selectedDate);
         slotDate.setHours(hours, minutes, 0, 0);
-        // Need at least 30 min from now
         return slotDate.getTime() > now.getTime() + 30 * 60 * 1000;
       }
       return true;
@@ -119,10 +130,10 @@ const ConsultationBooking = () => {
       ].filter(Boolean);
 
       if (consultationType === 'paid') {
-        notes.push('⚠️ התשלום ייגבה לפני השיחה');
+        notes.push('⚠️ ממתין לתשלום');
       }
 
-      await addOrder({
+      const orderData = await addOrder({
         customerPhone,
         customerName,
         customerAddress: '',
@@ -134,8 +145,16 @@ const ConsultationBooking = () => {
         accessories: [],
         notes,
         wantsPromotions: false,
+        leadSource: 'consultation',
       } as any);
 
+      if (!orderData) {
+        throw new Error('Failed to create order');
+      }
+
+      const orderNumber = orderData.order_number;
+
+      // Send notifications
       try {
         await supabase.functions.invoke('send-order-notifications', {
           body: {
@@ -153,32 +172,102 @@ const ConsultationBooking = () => {
         });
       } catch (e) { console.error('Notification error:', e); }
 
-      setStep('done');
+      // For paid consultations: generate PayPlus link and redirect
+      if (consultationType === 'paid') {
+        setStep('processing');
+        try {
+          const currentUrl = window.location.origin + window.location.pathname;
+          const successUrl = `${currentUrl}?payment=success&order=${orderNumber}`;
+
+          const { data, error } = await supabase.functions.invoke('payplus-create-payment', {
+            body: {
+              amount: PAID_PRICE,
+              description: `שיחת ייעוץ מקצועי - הזמנה #${orderNumber}`,
+              customerName,
+              customerPhone,
+              customerEmail,
+              orderId: orderData.id,
+              moreInfo: `consultation-${orderNumber}`,
+              successUrl,
+            },
+          });
+
+          if (error) throw error;
+
+          if (data?.paymentLink) {
+            // Save payment link to the order
+            await supabase
+              .from('orders')
+              .update({ payment_link: data.paymentLink, payment_status: 'pending' })
+              .eq('id', orderData.id);
+
+            // Redirect to PayPlus payment page
+            window.location.href = data.paymentLink;
+            return;
+          } else {
+            throw new Error(data?.error || 'Failed to generate payment link');
+          }
+        } catch (err: any) {
+          console.error('Payment link error:', err);
+          toast.error('שגיאה ביצירת לינק תשלום. ניצור קשר בהקדם.');
+          setCompletedOrderNumber(orderNumber);
+          setStep('done');
+        }
+      } else {
+        // Free consultation - go straight to done
+        setCompletedOrderNumber(orderNumber);
+        setStep('done');
+      }
     } catch (e) {
+      console.error('Submit error:', e);
       toast.error('שגיאה בשליחה, נסו שנית');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Done screen
   if (step === 'done') {
     const dateStr = selectedDate ? `${selectedDate.getDate()}/${selectedDate.getMonth() + 1}` : '';
+    const isPaid = consultationType === 'paid';
+    const orderNum = completedOrderNumber || returnedOrderNumber;
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-6" dir="rtl">
         <div className="text-center max-w-sm animate-scale-in">
-          <div className="text-6xl mb-4">✅</div>
-          <h1 className="text-2xl font-extrabold mb-2">הבקשה התקבלה!</h1>
+          <div className="text-6xl mb-4">{isPaid && paymentSuccess ? '🎉' : '✅'}</div>
+          <h1 className="text-2xl font-extrabold mb-2">
+            {isPaid && paymentSuccess ? 'התשלום בוצע בהצלחה!' : 'הבקשה התקבלה!'}
+          </h1>
+          {orderNum && (
+            <div className="bg-primary/10 rounded-2xl px-4 py-3 mb-4 inline-block">
+              <p className="text-sm text-muted-foreground">מספר הזמנה</p>
+              <p className="text-3xl font-extrabold text-primary">#{orderNum}</p>
+            </div>
+          )}
           <p className="text-muted-foreground mb-1">
-            {consultationType === 'free' ? 'שיחת הייעוץ החינמית' : 'שיחת הייעוץ'} נקבעה ל-{dateStr} בשעה {selectedTime}
+            {isPaid ? 'שיחת הייעוץ המקצועי נקבעה' : 'שיחת הייעוץ החינמית נקבעה'}
+            {dateStr ? ` ל-${dateStr} בשעה ${selectedTime}` : ''}
           </p>
-          {consultationType === 'paid' && (
-            <p className="text-sm text-warning font-medium mt-2">
-              <CreditCard className="w-4 h-4 inline ml-1" />
-              ניצור קשר לגביית התשלום לפני השיחה
+          {isPaid && paymentSuccess && (
+            <p className="text-sm text-success font-medium mt-2 flex items-center justify-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4" />
+              התשלום התקבל — ₪{PAID_PRICE}
             </p>
           )}
-          <p className="text-sm text-muted-foreground mt-2">פרטי הבקשה נשלחו ל-{customerEmail}</p>
           <p className="text-sm text-muted-foreground mt-4">ניצור אתכם קשר בהקדם!</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Processing payment screen
+  if (step === 'processing') {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-6" dir="rtl">
+        <div className="text-center max-w-sm animate-fade-in">
+          <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">מעבירים לדף התשלום...</h2>
+          <p className="text-muted-foreground text-sm">תועברו בשניות לדף התשלום המאובטח</p>
         </div>
       </div>
     );
@@ -456,7 +545,7 @@ const ConsultationBooking = () => {
             <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-300/50 rounded-xl p-3 text-center">
               <p className="text-sm font-medium text-amber-700 dark:text-amber-400 flex items-center justify-center gap-1.5">
                 <CreditCard className="w-4 h-4" />
-                התשלום (₪{PAID_PRICE}) ייגבה לפני השיחה
+                לאחר לחיצה תועברו לדף תשלום מאובטח (₪{PAID_PRICE})
               </p>
             </div>
           )}
@@ -464,9 +553,12 @@ const ConsultationBooking = () => {
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting || !isDetailsValid}
-            className="w-full h-12 rounded-2xl font-bold text-base"
+            className={cn(
+              "w-full h-12 rounded-2xl font-bold text-base",
+              consultationType === 'paid' && "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+            )}
           >
-            {isSubmitting ? 'שולח...' : 'קבעו שיחה'}
+            {isSubmitting ? 'שולח...' : consultationType === 'paid' ? `עברו לתשלום — ₪${PAID_PRICE}` : 'קבעו שיחה'}
           </Button>
         </div>
       )}
