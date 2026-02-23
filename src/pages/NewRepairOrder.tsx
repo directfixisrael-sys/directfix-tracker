@@ -273,6 +273,7 @@ interface RepairBundle {
 type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'processing' | 'success';
 const NewRepairOrder = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const {
     addOrder
   } = useRepairStore();
