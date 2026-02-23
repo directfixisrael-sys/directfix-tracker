@@ -1766,33 +1766,27 @@ const NewRepairOrder = () => {
                   {getTimeSlotsForDate(selectedDate).map(slot => {
               const isAvailable = isSlotAvailable(selectedDate, slot);
               const isSelected = selectedTimeSlot === slot;
-              return <button key={slot} onClick={() => setSelectedTimeSlot(slot)} disabled={!isAvailable} className={`p-4 rounded-2xl border-2 text-center transition-all flex items-center justify-center gap-2 ${isSelected ? 'border-primary bg-primary/10 text-primary shadow-sm' : isAvailable ? 'border-border hover:border-primary/40 hover:bg-muted/30' : 'border-border/50 opacity-40 cursor-not-allowed'}`}>
+              return <button key={slot} onClick={() => setSelectedTimeSlot(slot)} disabled={!isAvailable} className={`p-3 rounded-xl text-center transition-all duration-200 flex items-center justify-center gap-2 ${isSelected ? 'bg-primary text-primary-foreground shadow-wolt-lg' : isAvailable ? 'bg-card shadow-wolt hover:shadow-wolt-lg' : 'bg-muted/50 opacity-40 cursor-not-allowed'}`}>
                         <Clock className="w-4 h-4" />
-                        <span className="text-base font-semibold">{slot}</span>
+                        <span className="text-sm font-semibold">{slot}</span>
                       </button>;
             })}
                 </div>
               </div>}
 
-            {selectedDate && selectedTimeSlot && <Card className="p-4 bg-primary/5 border-primary/20 animate-fade-in">
-                <p className="text-lg text-center">
+            {selectedDate && selectedTimeSlot && <div className="bg-primary/5 rounded-xl p-3 animate-fade-in">
+                <p className="text-sm text-center">
                   <span className="text-muted-foreground">מועד נבחר: </span>
                   <span className="font-semibold">{formatSelectedDateTime()}</span>
                 </p>
-              </Card>}
+              </div>}
           </div>}
 
         {/* Step 5: Customer Details */}
-        {step === 'details' && <div className="space-y-5 animate-fade-in">
-            <div className="text-center mb-4">
-              <div className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold mb-3 ${
-                isGiftOrder ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
-              }`}>
-                {isGiftOrder ? <Gift className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
-                {isGiftOrder ? 'תיקון במתנה 🎁' : 'פרטים אחרונים'}
-              </div>
-              <h2 className="text-3xl font-extrabold mb-1">{isGiftOrder ? 'פרטי המתנה' : 'לאן נגיע?'}</h2>
-              <p className="text-muted-foreground">{isGiftOrder ? 'מלאו את פרטי השולח ומקבל המתנה' : 'מלאו את הפרטים ואנחנו בדרך'}</p>
+        {step === 'details' && <div className="space-y-4 animate-fade-in">
+            <div className="text-center mb-3">
+              <h2 className="text-xl font-bold mb-1">{isGiftOrder ? 'פרטי המתנה' : 'לאן נגיע?'}</h2>
+              <p className="text-sm text-muted-foreground">{isGiftOrder ? 'מלאו את פרטי השולח ומקבל המתנה' : 'מלאו את הפרטים ואנחנו בדרך'}</p>
             </div>
 
             {/* Gift sender details */}
