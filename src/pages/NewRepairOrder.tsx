@@ -856,13 +856,7 @@ const NewRepairOrder = () => {
       toast.error('מספר טלפון של השולח לא תקין');
       return;
     }
-    // For gift orders, go directly to submission (payment required from sender)
-    if (isGiftOrder) {
-      await submitOrder();
-    } else {
-      // Show payment choice step
-      goToStep('payment-choice');
-    }
+    await submitOrder(paymentChoice === 'now');
   };
 
   const submitOrder = async (payNow = false) => {
