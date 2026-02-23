@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Phone, Clock, Star, Shield, CheckCircle2, ArrowRight, CreditCard, Crown, Calendar, Loader2 } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { supabase } from '@/integrations/supabase/client';
@@ -56,6 +57,10 @@ const ConsultationBooking = () => {
     if (returnedOrderNumber) return parseInt(returnedOrderNumber);
     return null;
   });
+  const [paymentIframeUrl, setPaymentIframeUrl] = useState<string | null>(null);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
+  const paymentIframeRef = useRef<HTMLDivElement>(null);
   const { addOrder } = useRepairStore();
 
   // Get available dates: tomorrow to +7 days
@@ -135,10 +140,45 @@ const ConsultationBooking = () => {
     } catch (e) { console.error('Notification error:', e); }
   };
 
-  // On returning from payment, send notifications and update status
+  // If loaded inside iframe with payment=success, notify parent
   useEffect(() => {
-    if (paymentSuccess && returnedOrderNumber) {
-      // Update payment status to paid
+    if (paymentSuccess && window.self !== window.top) {
+      window.parent.postMessage({ type: 'payment-success' }, '*');
+      return;
+    }
+  }, [paymentSuccess]);
+
+  // Listen for payment-success message from iframe
+  useEffect(() => {
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.data?.type === 'payment-success' && pendingOrderId) {
+        // Update order status
+        await supabase
+          .from('orders')
+          .update({ payment_status: 'paid', status: 'confirmed' })
+          .eq('id', pendingOrderId);
+        
+        // Show green checkmark popup
+        setPaymentIframeUrl(null);
+        setShowPaymentSuccess(true);
+        
+        // Send notifications
+        await sendNotifications();
+        
+        // After 2.5 seconds, transition to done
+        setTimeout(() => {
+          setShowPaymentSuccess(false);
+          setStep('done');
+        }, 2500);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [pendingOrderId]);
+
+  // On returning from payment (external redirect fallback)
+  useEffect(() => {
+    if (paymentSuccess && returnedOrderNumber && window.self === window.top) {
       const updatePayment = async () => {
         const { data } = await supabase
           .from('orders')
@@ -151,7 +191,6 @@ const ConsultationBooking = () => {
             .update({ payment_status: 'paid', status: 'confirmed' })
             .eq('id', data.id);
         }
-        // Now send notifications after payment confirmed
         await sendNotifications();
       };
       updatePayment();
@@ -200,9 +239,11 @@ const ConsultationBooking = () => {
 
       const orderNumber = orderData.order_number;
 
-      // For paid consultations: generate PayPlus link and redirect (NO notifications yet)
+      // For paid consultations: generate PayPlus link and show iframe (NO notifications yet)
       if (consultationType === 'paid') {
         setStep('processing');
+        setPendingOrderId(orderData.id);
+        setCompletedOrderNumber(orderNumber);
         try {
           const currentUrl = window.location.origin + window.location.pathname;
           const successUrl = `${currentUrl}?payment=success&order=${orderNumber}`;
@@ -228,7 +269,10 @@ const ConsultationBooking = () => {
               .update({ payment_link: data.paymentLink, payment_status: 'pending' })
               .eq('id', orderData.id);
 
-            window.location.href = data.paymentLink;
+            setPaymentIframeUrl(data.paymentLink);
+            setTimeout(() => {
+              paymentIframeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
             return;
           } else {
             throw new Error(data?.error || 'Failed to generate payment link');
@@ -330,15 +374,57 @@ const ConsultationBooking = () => {
     );
   }
 
-  // Processing payment screen
+  // Payment success popup dialog
+  const paymentSuccessDialog = (
+    <Dialog open={showPaymentSuccess} onOpenChange={() => {}}>
+      <DialogContent className="max-w-xs text-center border-0 shadow-2xl [&>button]:hidden" dir="rtl">
+        <div className="py-4 space-y-4 animate-fade-in">
+          <div className="flex justify-center">
+            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center shadow-lg animate-scale-in">
+              <CheckCircle2 className="w-12 h-12 text-white" />
+            </div>
+          </div>
+          <h2 className="text-xl font-bold text-green-600">התשלום התקבל בהצלחה! ✅</h2>
+          <p className="text-muted-foreground text-sm">מעבירים לאישור ההזמנה...</p>
+          <div className="flex justify-center">
+            <Loader2 className="w-5 h-5 text-primary animate-spin" />
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
+  // Processing payment screen - show iframe
   if (step === 'processing') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-6" dir="rtl">
-        <div className="text-center max-w-sm animate-fade-in">
-          <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">מעבירים לדף התשלום...</h2>
-          <p className="text-muted-foreground text-sm">תועברו בשניות לדף התשלום המאובטח</p>
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 max-w-lg mx-auto px-5 py-8" dir="rtl">
+        {paymentSuccessDialog}
+        <div className="text-center mb-6 animate-fade-in">
+          <Logo size="md" className="mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-1">תשלום מאובטח</h2>
+          <p className="text-muted-foreground text-sm">הזמנה #{completedOrderNumber} · ₪{PAID_PRICE}</p>
         </div>
+
+        {paymentIframeUrl ? (
+          <div ref={paymentIframeRef} className="rounded-2xl overflow-hidden border-2 border-primary/20 shadow-lg bg-card animate-fade-in">
+            <div className="bg-primary/5 px-4 py-2 flex items-center justify-center gap-2 border-b border-border">
+              <Shield className="w-4 h-4 text-primary" />
+              <span className="text-xs font-medium text-primary">תשלום מאובטח SSL</span>
+            </div>
+            <iframe
+              src={paymentIframeUrl}
+              className="w-full border-0"
+              style={{ minHeight: '600px', height: '70vh' }}
+              title="דף תשלום מאובטח"
+              allow="payment"
+            />
+          </div>
+        ) : (
+          <div className="text-center py-12 animate-fade-in">
+            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground text-sm">יוצרים דף תשלום מאובטח...</p>
+          </div>
+        )}
       </div>
     );
   }
