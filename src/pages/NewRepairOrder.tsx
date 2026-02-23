@@ -731,6 +731,22 @@ const NewRepairOrder = () => {
     return `יום ${dayName} ${dateStr} בשעות ${selectedTimeSlot}`;
   };
 
+  const getCalendarLink = () => {
+    if (!selectedDate || !selectedTimeSlot || !selectedModel || !selectedRepair) return '';
+    const [startTime, endTime] = selectedTimeSlot.split('-');
+    const [startH, startM] = startTime.split(':').map(Number);
+    const [endH, endM] = endTime.split(':').map(Number);
+    const start = new Date(selectedDate);
+    start.setHours(startH, startM, 0, 0);
+    const end = new Date(selectedDate);
+    end.setHours(endH, endM, 0, 0);
+    const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const title = encodeURIComponent(`תיקון ${selectedModel.name} - DirectFix`);
+    const details = encodeURIComponent(`תיקון: ${getRepairTypeName()}\nדגם: ${selectedModel.name}\nהזמנה: #${completedOrderNumber || ''}`);
+    const location = encodeURIComponent(customerAddress || '');
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(start)}/${fmt(end)}&details=${details}&location=${location}`;
+  };
+
   // Coupon validation
   const validateCoupon = async () => {
     if (!couponCode.trim()) return;
