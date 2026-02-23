@@ -296,6 +296,7 @@ const NewRepairOrder = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [completedOrderNumber, setCompletedOrderNumber] = useState<number | null>(null);
+  const [paymentChoice, setPaymentChoice] = useState<'now' | 'later' | null>(null);
 
   // Schedule fields
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
