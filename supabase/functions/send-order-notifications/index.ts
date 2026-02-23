@@ -423,7 +423,9 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
           resendApiKey,
           "דיירקט פיקס <orders@directfix.co.il>",
           [orderData.customerEmail],
-          `✅ ההזמנה התקבלה - ${orderData.deviceType} ${orderData.repairType}`,
+          orderData.isConsultation
+            ? `דיירקט פיקס 📞 שיחת הייעוץ נקבעה - ${orderData.deviceType}`
+            : `דיירקט פיקס ✅ ההזמנה התקבלה - ${orderData.deviceType} ${orderData.repairType}`,
           customerEmailHtml
         );
         results.customerEmail = customerEmail;
