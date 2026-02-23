@@ -115,6 +115,10 @@ const handler = async (req: Request): Promise<Response> => {
     const calendarLink = buildCalendarLink(orderData);
     console.log("Calendar link generated:", calendarLink);
 
+    const isConsultation = orderData.serviceType === 'consultation';
+    const serviceLabel = isConsultation ? 'שיחת ייעוץ' : 'תיקון';
+    const serviceEmoji = isConsultation ? '📞' : '🔧';
+
     // 1. Send email to business owner
     const businessEmailHtml = `
 <!DOCTYPE html>
@@ -125,9 +129,9 @@ const handler = async (req: Request): Promise<Response> => {
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5; direction: rtl;">
   <div style="max-width: 600px; margin: 0 auto; padding: 20px; direction: rtl;">
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px 16px 0 0; padding: 30px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 28px;">🎉 הזמנה חדשה!</h1>
-      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">התקבלה הזמנת תיקון חדשה${orderData.orderNumber ? ` (#${orderData.orderNumber})` : ''}</p>
+    <div style="background: linear-gradient(135deg, ${isConsultation ? '#f59e0b 0%, #d97706 100%' : '#667eea 0%, #764ba2 100%'}); border-radius: 16px 16px 0 0; padding: 30px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 28px;">${serviceEmoji} ${isConsultation ? 'שיחת ייעוץ חדשה!' : '🎉 הזמנה חדשה!'}</h1>
+      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">התקבלה הזמנת ${serviceLabel} חדשה${orderData.orderNumber ? ` (#${orderData.orderNumber})` : ''}</p>
     </div>
     
     <div style="background: white; border-radius: 0 0 16px 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: right;">
