@@ -1458,7 +1458,6 @@ const AdminPanel = () => {
                                     description: paymentDescription || `תשלום הזמנה #${selectedOrder.orderNumber}`,
                                     customerName: selectedOrder.customerName,
                                     customerPhone: selectedOrder.customerPhone,
-                                    customerEmail: selectedOrder.customerEmail,
                                     orderId: selectedOrder.id,
                                   },
                                 });
