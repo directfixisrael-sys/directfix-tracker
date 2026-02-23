@@ -2221,11 +2221,16 @@ const NewRepairOrder = () => {
               המשך לפרטים
             </Button>}
           
-          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
+          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact} className={`w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl ${paymentMethod === 'now' ? 'bg-gradient-to-r from-success to-green-600 hover:from-success hover:to-green-700' : ''}`}>
               {isSubmitting ? <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  שולח...
-                </div> : 'שלח הזמנה'}
+                  {paymentMethod === 'now' ? 'מעבד...' : 'שולח...'}
+                </div> : paymentMethod === 'now' ? (
+                  <span className="flex items-center gap-2">
+                    <Lock className="w-4 h-4" />
+                    שלם ₪{getFinalPrice()} ושלח הזמנה
+                  </span>
+                ) : 'שלח הזמנה'}
             </Button>}
         </div>}
     </div>;
