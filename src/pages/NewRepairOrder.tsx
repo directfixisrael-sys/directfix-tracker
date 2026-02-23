@@ -303,7 +303,10 @@ const NewRepairOrder = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [completedOrderNumber, setCompletedOrderNumber] = useState<number | null>(null);
+  const [completedOrderNumber, setCompletedOrderNumber] = useState<number | null>(() => {
+    if (returnedOrderNumber) return parseInt(returnedOrderNumber);
+    return null;
+  });
 
   // Schedule fields
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
