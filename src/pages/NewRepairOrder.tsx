@@ -2121,6 +2121,23 @@ const NewRepairOrder = () => {
         {/* Step: Inline Payment */}
         {step === 'processing' && (
           <div className="animate-fade-in space-y-4" ref={paymentIframeRef}>
+            {/* Payment success popup */}
+            <Dialog open={showPaymentSuccess} onOpenChange={() => {}}>
+              <DialogContent className="max-w-xs text-center border-0 shadow-2xl [&>button]:hidden" dir="rtl">
+                <div className="py-4 space-y-4 animate-fade-in">
+                  <div className="flex justify-center">
+                    <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center shadow-lg animate-scale-in">
+                      <CheckCircle2 className="w-12 h-12 text-white" />
+                    </div>
+                  </div>
+                  <h2 className="text-xl font-bold text-green-600">התשלום התקבל בהצלחה! ✅</h2>
+                  <p className="text-muted-foreground text-sm">מעבירים לאישור ההזמנה...</p>
+                  <div className="flex justify-center">
+                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
             {paymentIframeUrl ? (
               <>
                 <div className="text-center mb-2">
