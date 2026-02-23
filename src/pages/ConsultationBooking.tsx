@@ -140,10 +140,45 @@ const ConsultationBooking = () => {
     } catch (e) { console.error('Notification error:', e); }
   };
 
-  // On returning from payment, send notifications and update status
+  // If loaded inside iframe with payment=success, notify parent
   useEffect(() => {
-    if (paymentSuccess && returnedOrderNumber) {
-      // Update payment status to paid
+    if (paymentSuccess && window.self !== window.top) {
+      window.parent.postMessage({ type: 'payment-success' }, '*');
+      return;
+    }
+  }, [paymentSuccess]);
+
+  // Listen for payment-success message from iframe
+  useEffect(() => {
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.data?.type === 'payment-success' && pendingOrderId) {
+        // Update order status
+        await supabase
+          .from('orders')
+          .update({ payment_status: 'paid', status: 'confirmed' })
+          .eq('id', pendingOrderId);
+        
+        // Show green checkmark popup
+        setPaymentIframeUrl(null);
+        setShowPaymentSuccess(true);
+        
+        // Send notifications
+        await sendNotifications();
+        
+        // After 2.5 seconds, transition to done
+        setTimeout(() => {
+          setShowPaymentSuccess(false);
+          setStep('done');
+        }, 2500);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [pendingOrderId]);
+
+  // On returning from payment (external redirect fallback)
+  useEffect(() => {
+    if (paymentSuccess && returnedOrderNumber && window.self === window.top) {
       const updatePayment = async () => {
         const { data } = await supabase
           .from('orders')
@@ -156,7 +191,6 @@ const ConsultationBooking = () => {
             .update({ payment_status: 'paid', status: 'confirmed' })
             .eq('id', data.id);
         }
-        // Now send notifications after payment confirmed
         await sendNotifications();
       };
       updatePayment();
