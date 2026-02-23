@@ -3,13 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { Phone, Clock, Star, Shield, CheckCircle2, ArrowRight, CreditCard, Crown } from 'lucide-react';
+import { Phone, Clock, Star, Shield, CheckCircle2, ArrowRight, CreditCard, Crown, Calendar } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import Logo from '@/components/Logo';
 import { cn } from '@/lib/utils';
-import TestimonialsSlider from '@/components/TestimonialsSlider';
 
 type ConsultationType = 'free' | 'paid' | null;
 
@@ -19,6 +18,8 @@ const PAID_SLOTS = [
   '13:30', '14:30', '15:30', '16:30', '17:30', '18:30', '19:30', '20:00',
 ];
 const PAID_PRICE = 149;
+
+const hebrewDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
 const consultationReviews = [
   { name: 'אורית כ.', text: 'התקשרתי בקשר לאייפון שנתקע, הטכנאי הדריך אותי בטלפון ופתר את הבעיה תוך דקות!', date: 'ינואר 2026', source: 'google' as const },
@@ -31,7 +32,7 @@ const consultationReviews = [
 const ConsultationBooking = () => {
   const [step, setStep] = useState<'choose' | 'schedule' | 'details' | 'done'>('choose');
   const [consultationType, setConsultationType] = useState<ConsultationType>(null);
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -42,27 +43,60 @@ const ConsultationBooking = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { addOrder } = useRepairStore();
 
-  const getTomorrowDate = () => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0];
-  };
-
-  const getMaxDate = () => {
-    const d = new Date();
-    d.setDate(d.getDate() + 14);
-    return d.toISOString().split('T')[0];
+  // Get available dates: tomorrow to +7 days
+  const getAvailableDates = () => {
+    const dates: Date[] = [];
+    const today = new Date();
+    for (let i = 1; i <= 7; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      dates.push(date);
+    }
+    return dates;
   };
 
   const slots = consultationType === 'free' ? FREE_SLOTS : PAID_SLOTS;
 
+  // Filter out past time slots if selected date is today (shouldn't happen since we start from tomorrow, but safety)
+  const getAvailableSlots = () => {
+    if (!selectedDate) return [];
+    const now = new Date();
+    const isToday = selectedDate.toDateString() === now.toDateString();
+    // Also check if selected date is tomorrow and current time matters
+    const isTomorrow = (() => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      return selectedDate.toDateString() === tomorrow.toDateString();
+    })();
+
+    return slots.filter(time => {
+      // For tomorrow or later, check if we're past the slot time considering "now"
+      if (isToday || isTomorrow) {
+        const [hours, minutes] = time.split(':').map(Number);
+        const slotDate = new Date(selectedDate);
+        slotDate.setHours(hours, minutes, 0, 0);
+        // Need at least 30 min from now
+        return slotDate.getTime() > now.getTime() + 30 * 60 * 1000;
+      }
+      return true;
+    });
+  };
+
   const handleChoose = (type: ConsultationType) => {
     setConsultationType(type);
     setStep('schedule');
+    setSelectedDate(null);
+    setSelectedTime('');
   };
 
   const handleScheduleNext = () => {
     if (selectedDate && selectedTime) setStep('details');
+  };
+
+  const formatSelectedDate = () => {
+    if (!selectedDate) return '';
+    const dayName = hebrewDays[selectedDate.getDay()];
+    return `יום ${dayName}, ${selectedDate.getDate()}/${selectedDate.getMonth() + 1}`;
   };
 
   const isDetailsValid = customerName.trim() && customerPhone.trim() && customerEmail.trim() && deviceModel.trim() && issueDescription.trim();
@@ -74,10 +108,11 @@ const ConsultationBooking = () => {
     }
     setIsSubmitting(true);
     try {
+      const dateStr = selectedDate ? `${selectedDate.getDate()}/${selectedDate.getMonth() + 1}` : '';
       const label = consultationType === 'free' ? 'שיחת ייעוץ חינם (עד 5 דק׳)' : `שיחת ייעוץ בתשלום (עד 30 דק׳) - ₪${PAID_PRICE}`;
       const notes = [
         `סוג: ${label}`,
-        `מועד: ${selectedDate} בשעה ${selectedTime}`,
+        `מועד: ${dateStr} בשעה ${selectedTime}`,
         `דגם: ${deviceModel}`,
         `תיאור: ${issueDescription}`,
         additionalNotes ? `הערות: ${additionalNotes}` : '',
@@ -111,7 +146,7 @@ const ConsultationBooking = () => {
             deviceType: `שיחת ייעוץ - ${deviceModel}`,
             repairType: label,
             repairPrice: consultationType === 'paid' ? PAID_PRICE : 0,
-            scheduledTime: `${selectedDate} בשעה ${selectedTime}`,
+            scheduledTime: `${dateStr} בשעה ${selectedTime}`,
             notes: issueDescription + (additionalNotes ? `\n${additionalNotes}` : ''),
             leadSource: 'consultation',
           },
@@ -127,13 +162,14 @@ const ConsultationBooking = () => {
   };
 
   if (step === 'done') {
+    const dateStr = selectedDate ? `${selectedDate.getDate()}/${selectedDate.getMonth() + 1}` : '';
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-6">
         <div className="text-center max-w-sm animate-scale-in">
           <div className="text-6xl mb-4">✅</div>
           <h1 className="text-2xl font-extrabold mb-2">הבקשה התקבלה!</h1>
           <p className="text-muted-foreground mb-1">
-            {consultationType === 'free' ? 'שיחת הייעוץ החינמית' : 'שיחת הייעוץ'} נקבעה ל-{selectedDate} בשעה {selectedTime}
+            {consultationType === 'free' ? 'שיחת הייעוץ החינמית' : 'שיחת הייעוץ'} נקבעה ל-{dateStr} בשעה {selectedTime}
           </p>
           {consultationType === 'paid' && (
             <p className="text-sm text-warning font-medium mt-2">
@@ -152,13 +188,37 @@ const ConsultationBooking = () => {
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 max-w-lg mx-auto px-5 py-8" dir="rtl">
       <div className="text-center mb-8 animate-fade-in">
         <Logo size="md" className="mx-auto mb-4" />
-        <h1 className="text-3xl font-extrabold tracking-tight">שיחת ייעוץ תיקונים</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">שיחת ייעוץ למכשירי Apple</h1>
         <p className="text-muted-foreground text-sm mt-2">דברו עם מומחי האייפון שלנו — בטלפון</p>
       </div>
 
       {/* Step: Choose type */}
       {step === 'choose' && (
         <div className="space-y-4 animate-fade-in">
+          {/* Duration circles */}
+          <div className="flex justify-center gap-6 mb-6">
+            <button
+              onClick={() => handleChoose('free')}
+              className="flex flex-col items-center gap-2 group"
+            >
+              <div className="w-20 h-20 rounded-full border-3 border-success bg-success/10 flex items-center justify-center transition-all group-hover:scale-105 group-hover:shadow-lg group-active:scale-95">
+                <span className="text-lg font-extrabold text-success">5 דק׳</span>
+              </div>
+              <span className="text-sm font-bold text-foreground">ייעוץ חינם</span>
+              <span className="text-[11px] text-success font-semibold">חינם!</span>
+            </button>
+            <button
+              onClick={() => handleChoose('paid')}
+              className="flex flex-col items-center gap-2 group"
+            >
+              <div className="w-20 h-20 rounded-full border-3 border-amber-400 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/30 dark:to-amber-800/20 flex items-center justify-center transition-all group-hover:scale-105 group-hover:shadow-lg group-active:scale-95">
+                <span className="text-lg font-extrabold text-amber-600 dark:text-amber-400">30 דק׳</span>
+              </div>
+              <span className="text-sm font-bold text-foreground">ייעוץ מומחה</span>
+              <span className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold">₪{PAID_PRICE}</span>
+            </button>
+          </div>
+
           {/* Free */}
           <Card
             className="p-5 cursor-pointer border-2 hover:border-primary/50 transition-all active:scale-[0.98]"
@@ -225,49 +285,83 @@ const ConsultationBooking = () => {
       {/* Step: Schedule */}
       {step === 'schedule' && (
         <div className="space-y-6 animate-fade-in">
-          <button onClick={() => setStep('choose')} className="flex items-center gap-1 text-sm text-primary font-medium">
+          <button onClick={() => { setStep('choose'); setConsultationType(null); }} className="flex items-center gap-1 text-sm text-primary font-medium">
             <ArrowRight className="w-4 h-4" /> חזרה
           </button>
 
           <div className="text-center">
-            <h2 className="text-xl font-bold mb-1">בחרו מועד</h2>
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
+              <Calendar className="w-4 h-4" />
+              קביעת מועד
+            </div>
+            <h2 className="text-2xl font-extrabold mb-1">מתי נתקשר?</h2>
             <p className="text-sm text-muted-foreground">
               {consultationType === 'free' ? 'שיחת ייעוץ חינם (עד 5 דק׳)' : `שיחת ייעוץ מקצועי (₪${PAID_PRICE})`}
             </p>
           </div>
 
+          {/* Date selection - card style like repairs */}
           <div>
-            <label className="text-sm font-semibold mb-2 block text-right">תאריך</label>
-            <Input
-              type="date"
-              min={getTomorrowDate()}
-              max={getMaxDate()}
-              value={selectedDate}
-              onChange={e => { setSelectedDate(e.target.value); setSelectedTime(''); }}
-              className="text-center"
-            />
-          </div>
-
-          {selectedDate && (
-            <div>
-              <label className="text-sm font-semibold mb-2 block text-right">שעה</label>
-              <div className="grid grid-cols-3 gap-2">
-                {slots.map(time => (
+            <label className="block text-sm font-bold mb-3">בחרו יום</label>
+            <div className="grid grid-cols-4 gap-3">
+              {getAvailableDates().map((date, index) => {
+                const dayName = hebrewDays[date.getDay()];
+                const isSelected = selectedDate?.toDateString() === date.toDateString();
+                return (
                   <button
-                    key={time}
-                    onClick={() => setSelectedTime(time)}
+                    key={index}
+                    onClick={() => { setSelectedDate(date); setSelectedTime(''); }}
                     className={cn(
-                      "py-3 rounded-xl text-sm font-semibold transition-all",
-                      selectedTime === time
-                        ? "bg-primary text-primary-foreground shadow-md"
-                        : "bg-muted hover:bg-muted/80 text-foreground"
+                      "p-3 rounded-2xl border-2 text-center transition-all",
+                      isSelected
+                        ? "border-primary bg-primary/10 text-primary shadow-sm"
+                        : "border-border hover:border-primary/40 hover:bg-muted/30"
                     )}
                   >
-                    {time}
+                    <div className="text-sm font-bold">{dayName}</div>
+                    <div className="text-sm text-muted-foreground">{date.getDate()}/{date.getMonth() + 1}</div>
                   </button>
-                ))}
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Time slot selection - circle style */}
+          {selectedDate && (
+            <div className="animate-fade-in">
+              <label className="block text-sm font-bold mb-3">בחרו שעה</label>
+              <div className="flex flex-wrap gap-3 justify-center">
+                {getAvailableSlots().length > 0 ? getAvailableSlots().map(time => {
+                  const isSelected = selectedTime === time;
+                  return (
+                    <button
+                      key={time}
+                      onClick={() => setSelectedTime(time)}
+                      className={cn(
+                        "w-16 h-16 rounded-full flex items-center justify-center text-sm font-bold transition-all",
+                        isSelected
+                          ? "bg-primary text-primary-foreground shadow-md scale-105"
+                          : "bg-muted hover:bg-muted/80 text-foreground hover:scale-105"
+                      )}
+                    >
+                      {time}
+                    </button>
+                  );
+                }) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">אין זמנים זמינים ביום זה, נסו יום אחר</p>
+                )}
               </div>
             </div>
+          )}
+
+          {/* Selected summary */}
+          {selectedDate && selectedTime && (
+            <Card className="p-4 bg-primary/5 border-primary/20 animate-fade-in">
+              <p className="text-lg text-center">
+                <span className="text-muted-foreground">מועד נבחר: </span>
+                <span className="font-semibold">{formatSelectedDate()} בשעה {selectedTime}</span>
+              </p>
+            </Card>
           )}
 
           {selectedDate && selectedTime && (
@@ -286,14 +380,15 @@ const ConsultationBooking = () => {
           </button>
 
           <div className="text-center">
-            <h2 className="text-xl font-bold mb-1">פרטים ליצירת קשר</h2>
-            <p className="text-sm text-muted-foreground">{selectedDate} בשעה {selectedTime}</p>
+            <h2 className="text-xl font-bold mb-1">שיחת ייעוץ תיקונים</h2>
             {consultationType === 'paid' && (
               <p className="text-sm font-semibold text-amber-600 dark:text-amber-400 mt-1">מחיר שיחת יעוץ: ₪{PAID_PRICE}</p>
             )}
+            <p className="text-sm text-muted-foreground mt-1">{formatSelectedDate()} בשעה {selectedTime}</p>
           </div>
 
           <div className="space-y-3 text-right">
+            <h3 className="font-bold text-base">פרטים ליצירת קשר</h3>
             <div>
               <label className="text-sm font-semibold mb-1.5 block">שם מלא *</label>
               <Input
@@ -306,12 +401,13 @@ const ConsultationBooking = () => {
             <div>
               <label className="text-sm font-semibold mb-1.5 block">טלפון *</label>
               <Input
-                placeholder="טלפון"
+                placeholder="050-0000000"
                 type="tel"
                 value={customerPhone}
                 onChange={e => setCustomerPhone(e.target.value)}
-                className="h-12 rounded-xl"
+                className="h-12 rounded-xl text-right"
                 dir="ltr"
+                style={{ textAlign: 'right' }}
               />
             </div>
             <div>
@@ -321,8 +417,9 @@ const ConsultationBooking = () => {
                 type="email"
                 value={customerEmail}
                 onChange={e => setCustomerEmail(e.target.value)}
-                className="h-12 rounded-xl"
+                className="h-12 rounded-xl text-right"
                 dir="ltr"
+                style={{ textAlign: 'right' }}
               />
               <p className="text-[11px] text-muted-foreground mt-1">פרטי הבקשה ישלחו לכתובת זו</p>
             </div>
@@ -434,7 +531,5 @@ const ConsultationReviews = () => {
     </div>
   );
 };
-
-
 
 export default ConsultationBooking;
