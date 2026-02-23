@@ -343,6 +343,10 @@ const NewRepairOrder = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   // Privacy consent
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
+  // Payment processing state
+  const [pendingPaymentLink, setPendingPaymentLink] = useState<string | null>(null);
+  const [pendingPaymentOrderNumber, setPendingPaymentOrderNumber] = useState<number | null>(null);
+  const [pendingPaymentOrderId, setPendingPaymentOrderId] = useState<string | null>(null);
 
   // Gift order mode
   const [isGiftOrder, setIsGiftOrder] = useState(false);
@@ -382,55 +386,55 @@ const NewRepairOrder = () => {
   }, [isGiftOrder]);
 
   // Handle payment return - send notifications after successful payment
+  // This runs either from PayPlus redirect (?payment=success) or when user clicks "שילמתי"
+  const sendPaymentNotifications = async (orderNumber: number) => {
+    try {
+      const { data: orderData } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('order_number', orderNumber)
+        .single();
+      
+      if (orderData) {
+        // Update payment status
+        await supabase
+          .from('orders')
+          .update({ payment_status: 'paid' })
+          .eq('id', orderData.id);
+
+        // Remove the waiting note and update status
+        const updatedNotes = (orderData.notes as string[]).filter((n: string) => !n.includes('ממתין לתשלום'));
+        updatedNotes.push('✅ תשלום התקבל');
+        await supabase
+          .from('orders')
+          .update({ notes: updatedNotes })
+          .eq('id', orderData.id);
+
+        // Send notifications
+        await supabase.functions.invoke('send-order-notifications', {
+          body: {
+            customerName: orderData.customer_name,
+            customerPhone: orderData.customer_phone,
+            customerAddress: orderData.customer_address,
+            customerEmail: orderData.customer_email,
+            deviceType: orderData.device_type,
+            repairType: orderData.issue_description,
+            repairPrice: orderData.repair_price,
+            scheduledTime: orderData.estimated_arrival || '',
+            notes: '',
+            orderNumber: orderData.order_number,
+            leadSource: orderData.lead_source,
+          }
+        });
+      }
+    } catch (e) {
+      console.error('Error sending notifications after payment:', e);
+    }
+  };
+
   useEffect(() => {
     if (paymentSuccess && returnedOrderNumber) {
-      // Send notifications now that payment is confirmed
-      const sendNotifications = async () => {
-        try {
-          // Get order data from DB to send notifications
-          const { data: orderData } = await supabase
-            .from('orders')
-            .select('*')
-            .eq('order_number', parseInt(returnedOrderNumber))
-            .single();
-          
-          if (orderData) {
-            // Update payment status
-            await supabase
-              .from('orders')
-              .update({ payment_status: 'paid' })
-              .eq('id', orderData.id);
-
-            // Remove the waiting note and update status
-            const updatedNotes = orderData.notes.filter((n: string) => !n.includes('ממתין לתשלום'));
-            updatedNotes.push('✅ תשלום התקבל');
-            await supabase
-              .from('orders')
-              .update({ notes: updatedNotes })
-              .eq('id', orderData.id);
-
-            // Send notifications
-            await supabase.functions.invoke('send-order-notifications', {
-              body: {
-                customerName: orderData.customer_name,
-                customerPhone: orderData.customer_phone,
-                customerAddress: orderData.customer_address,
-                customerEmail: orderData.customer_email,
-                deviceType: orderData.device_type,
-                repairType: orderData.issue_description,
-                repairPrice: orderData.repair_price,
-                scheduledTime: orderData.estimated_arrival || '',
-                notes: '',
-                orderNumber: orderData.order_number,
-                leadSource: orderData.lead_source,
-              }
-            });
-          }
-        } catch (e) {
-          console.error('Error sending notifications after payment:', e);
-        }
-      };
-      sendNotifications();
+      sendPaymentNotifications(parseInt(returnedOrderNumber));
     }
   }, [paymentSuccess, returnedOrderNumber]);
 
@@ -1020,7 +1024,10 @@ const NewRepairOrder = () => {
               .update({ payment_link: data.paymentLink, payment_status: 'pending' })
               .eq('id', orderResult?.id);
 
-            window.location.href = data.paymentLink;
+            setPendingPaymentLink(data.paymentLink);
+            setPendingPaymentOrderNumber(orderResult?.order_number || null);
+            setPendingPaymentOrderId(orderResult?.id || null);
+            window.open(data.paymentLink, '_blank');
             return;
           } else {
             throw new Error(data?.error || 'Failed to generate payment link');
@@ -1874,10 +1881,48 @@ const NewRepairOrder = () => {
 
         {/* Processing Payment Screen */}
         {step === 'processing' && (
-          <div className="text-center py-20 animate-fade-in">
-            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">מעבירים לדף התשלום...</h2>
-            <p className="text-muted-foreground text-sm">תועברו בשניות לדף התשלום המאובטח</p>
+          <div className="text-center py-12 animate-fade-in space-y-6">
+            {!pendingPaymentLink ? (
+              <>
+                <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+                <h2 className="text-xl font-bold mb-2">מכינים את דף התשלום...</h2>
+                <p className="text-muted-foreground text-sm">רק רגע...</p>
+              </>
+            ) : (
+              <>
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                  <CreditCard className="w-8 h-8 text-primary" />
+                </div>
+                <h2 className="text-xl font-bold">דף התשלום נפתח בחלון חדש</h2>
+                <p className="text-muted-foreground text-sm">
+                  לאחר השלמת התשלום, לחצו על הכפתור למטה
+                </p>
+                
+                <Button
+                  onClick={() => {
+                    if (pendingPaymentOrderNumber) {
+                      setCompletedOrderNumber(pendingPaymentOrderNumber);
+                      sendPaymentNotifications(pendingPaymentOrderNumber);
+                    }
+                    goToStep('success');
+                  }}
+                  className="w-full h-14 text-base rounded-2xl font-bold shadow-lg"
+                  size="lg"
+                >
+                  <CheckCircle2 className="w-5 h-5 ml-2" />
+                  שילמתי — חזרה להזמנה
+                </Button>
+
+                <a
+                  href={pendingPaymentLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-sm text-primary underline"
+                >
+                  דף התשלום לא נפתח? לחצו כאן
+                </a>
+              </>
+            )}
           </div>
         )}
         {/* Step 4: Schedule */}
