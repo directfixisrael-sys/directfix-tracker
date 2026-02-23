@@ -1312,10 +1312,10 @@ const NewRepairOrder = () => {
             };
             const IconComponent = getIcon();
             return <div key={repair.id}>
-                    <Card onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 shadow-sm hover:shadow-md ${
+                    <Card onClick={() => handleRepairSelect(repair)} className={`p-4 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-xl border-0 shadow-wolt hover:shadow-wolt-lg ${
                       showBackColorPicker && isBackGlass 
-                        ? 'border-primary bg-primary/5' 
-                        : isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-border hover:border-primary/40 hover:bg-primary/5'
+                        ? 'ring-2 ring-primary bg-primary/5' 
+                        : isPhoneOnly ? 'opacity-70' : ''
                     }`}>
                       <div className="flex items-center gap-4">
                         {/* Simple Icon */}
