@@ -274,6 +274,9 @@ type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | '
 type PaymentMethod = 'now' | 'after';
 const NewRepairOrder = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const paymentSuccess = searchParams.get('payment') === 'success';
+  const returnedOrderNumber = searchParams.get('order');
   const {
     addOrder
   } = useRepairStore();
@@ -281,7 +284,11 @@ const NewRepairOrder = () => {
     resolvedTheme,
     setTheme
   } = useTheme();
-  const [step, setStep] = useState<Step>('model');
+  const [step, setStep] = useState<Step>(() => {
+    if (paymentSuccess && returnedOrderNumber) return 'success';
+    return 'model';
+  });
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('after');
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
