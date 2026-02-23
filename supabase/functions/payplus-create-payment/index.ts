@@ -15,9 +15,14 @@ serve(async (req) => {
   try {
     const apiKey = Deno.env.get('PAYPLUS_API_KEY');
     const secretKey = Deno.env.get('PAYPLUS_SECRET_KEY');
+    const paymentPageUid = Deno.env.get('PAYPLUS_PAYMENT_PAGE_UID');
 
     if (!apiKey || !secretKey) {
       throw new Error('PayPlus API credentials not configured');
+    }
+
+    if (!paymentPageUid) {
+      throw new Error('PayPlus payment page UID not configured');
     }
 
     const { amount, description, customerName, customerPhone, customerEmail, orderId, moreInfo, successUrl, failureUrl } = await req.json();
@@ -30,8 +35,8 @@ serve(async (req) => {
     }
 
     const payload: Record<string, any> = {
-      payment_page_uid: '',
-      charge_method: 1, // Regular charge
+      payment_page_uid: paymentPageUid,
+      charge_method: 1,
       amount,
       currency_code: 'ILS',
       description: description || 'תשלום DirectFix',
@@ -50,8 +55,6 @@ serve(async (req) => {
     if (customerEmail) payload.customer.email = customerEmail;
 
     console.log('Creating PayPlus payment link:', { amount, description, customerName });
-
-    console.log('Using API key (first 8 chars):', apiKey.substring(0, 8));
 
     const response = await fetch(`${PAYPLUS_API_URL}/PaymentPages/generateLink`, {
       method: 'POST',
