@@ -731,6 +731,22 @@ const NewRepairOrder = () => {
     return `יום ${dayName} ${dateStr} בשעות ${selectedTimeSlot}`;
   };
 
+  const getCalendarLink = () => {
+    if (!selectedDate || !selectedTimeSlot || !selectedModel || !selectedRepair) return '';
+    const [startTime, endTime] = selectedTimeSlot.split('-');
+    const [startH, startM] = startTime.split(':').map(Number);
+    const [endH, endM] = endTime.split(':').map(Number);
+    const start = new Date(selectedDate);
+    start.setHours(startH, startM, 0, 0);
+    const end = new Date(selectedDate);
+    end.setHours(endH, endM, 0, 0);
+    const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const title = encodeURIComponent(`תיקון ${selectedModel.name} - DirectFix`);
+    const details = encodeURIComponent(`תיקון: ${getRepairTypeName()}\nדגם: ${selectedModel.name}\nהזמנה: #${completedOrderNumber || ''}`);
+    const location = encodeURIComponent(customerAddress || '');
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(start)}/${fmt(end)}&details=${details}&location=${location}`;
+  };
+
   // Coupon validation
   const validateCoupon = async () => {
     if (!couponCode.trim()) return;
@@ -1982,6 +1998,16 @@ const NewRepairOrder = () => {
                 </div>
               </div>
             </Card>
+
+            {/* Add to calendar */}
+            {getCalendarLink() && (
+              <a href={getCalendarLink()} target="_blank" rel="noopener noreferrer" className="block">
+                <Button variant="outline" className="w-full h-12 text-base rounded-xl gap-2 border-primary/30 text-primary hover:bg-primary/5">
+                  <Calendar className="w-5 h-5" />
+                  הוסף ליומן שלי
+                </Button>
+              </a>
+            )}
 
             <div className="bg-muted/50 rounded-xl p-4">
               <p className="text-sm text-muted-foreground mb-3">תוכלו לעקוב אחרי סטטוס התיקון בזמן אמת</p>
