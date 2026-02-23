@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Phone, Clock, Star, Shield, CheckCircle2, ArrowRight, CreditCard, Crown, Calendar, Loader2 } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { supabase } from '@/integrations/supabase/client';
@@ -57,10 +56,6 @@ const ConsultationBooking = () => {
     if (returnedOrderNumber) return parseInt(returnedOrderNumber);
     return null;
   });
-  const [paymentIframeUrl, setPaymentIframeUrl] = useState<string | null>(null);
-  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
-  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
-  const paymentIframeRef = useRef<HTMLDivElement>(null);
   const { addOrder } = useRepairStore();
 
   // Get available dates: tomorrow to +7 days
@@ -117,86 +112,6 @@ const ConsultationBooking = () => {
 
   const isDetailsValid = customerName.trim() && customerPhone.trim() && customerEmail.trim() && deviceModel.trim() && issueDescription.trim();
 
-  // Send notifications (called after payment success or for free consultations)
-  const sendNotifications = async () => {
-    const dateStr = selectedDate ? `${selectedDate.getDate()}/${selectedDate.getMonth() + 1}` : '';
-    const label = consultationType === 'free' ? 'שיחת ייעוץ חינם (עד 5 דק׳)' : `שיחת ייעוץ בתשלום (עד 30 דק׳) - ₪${PAID_PRICE}`;
-    try {
-      await supabase.functions.invoke('send-order-notifications', {
-        body: {
-          customerName,
-          customerPhone,
-          customerEmail,
-          customerAddress: '',
-          deviceType: `שיחת ייעוץ - ${deviceModel}`,
-          repairType: label,
-          repairPrice: consultationType === 'paid' ? PAID_PRICE : 0,
-          scheduledTime: `${dateStr} בשעה ${selectedTime}`,
-          notes: issueDescription + (additionalNotes ? `\n${additionalNotes}` : ''),
-          leadSource: 'consultation',
-          isConsultation: true,
-        },
-      });
-    } catch (e) { console.error('Notification error:', e); }
-  };
-
-  // If loaded inside iframe with payment=success, notify parent
-  useEffect(() => {
-    if (paymentSuccess && window.self !== window.top) {
-      window.parent.postMessage({ type: 'payment-success' }, '*');
-      return;
-    }
-  }, [paymentSuccess]);
-
-  // Listen for payment-success message from iframe
-  useEffect(() => {
-    const handleMessage = async (event: MessageEvent) => {
-      if (event.data?.type === 'payment-success' && pendingOrderId) {
-        // Update order status
-        await supabase
-          .from('orders')
-          .update({ payment_status: 'paid', status: 'confirmed' })
-          .eq('id', pendingOrderId);
-        
-        // Show green checkmark popup
-        setPaymentIframeUrl(null);
-        setShowPaymentSuccess(true);
-        
-        // Send notifications
-        await sendNotifications();
-        
-        // After 2.5 seconds, transition to done
-        setTimeout(() => {
-          setShowPaymentSuccess(false);
-          setStep('done');
-        }, 2500);
-      }
-    };
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, [pendingOrderId]);
-
-  // On returning from payment (external redirect fallback)
-  useEffect(() => {
-    if (paymentSuccess && returnedOrderNumber && window.self === window.top) {
-      const updatePayment = async () => {
-        const { data } = await supabase
-          .from('orders')
-          .select('id')
-          .eq('order_number', parseInt(returnedOrderNumber))
-          .single();
-        if (data) {
-          await supabase
-            .from('orders')
-            .update({ payment_status: 'paid', status: 'confirmed' })
-            .eq('id', data.id);
-        }
-        await sendNotifications();
-      };
-      updatePayment();
-    }
-  }, [paymentSuccess, returnedOrderNumber]);
-
   const handleSubmit = async () => {
     if (!isDetailsValid) {
       toast.error('נא למלא את כל שדות החובה');
@@ -239,11 +154,27 @@ const ConsultationBooking = () => {
 
       const orderNumber = orderData.order_number;
 
-      // For paid consultations: generate PayPlus link and show iframe (NO notifications yet)
+      // Send notifications
+      try {
+        await supabase.functions.invoke('send-order-notifications', {
+          body: {
+            customerName,
+            customerPhone,
+            customerEmail,
+            customerAddress: '',
+            deviceType: `שיחת ייעוץ - ${deviceModel}`,
+            repairType: label,
+            repairPrice: consultationType === 'paid' ? PAID_PRICE : 0,
+            scheduledTime: `${dateStr} בשעה ${selectedTime}`,
+            notes: issueDescription + (additionalNotes ? `\n${additionalNotes}` : ''),
+            leadSource: 'consultation',
+          },
+        });
+      } catch (e) { console.error('Notification error:', e); }
+
+      // For paid consultations: generate PayPlus link and redirect
       if (consultationType === 'paid') {
         setStep('processing');
-        setPendingOrderId(orderData.id);
-        setCompletedOrderNumber(orderNumber);
         try {
           const currentUrl = window.location.origin + window.location.pathname;
           const successUrl = `${currentUrl}?payment=success&order=${orderNumber}`;
@@ -264,15 +195,14 @@ const ConsultationBooking = () => {
           if (error) throw error;
 
           if (data?.paymentLink) {
+            // Save payment link to the order
             await supabase
               .from('orders')
               .update({ payment_link: data.paymentLink, payment_status: 'pending' })
               .eq('id', orderData.id);
 
-            setPaymentIframeUrl(data.paymentLink);
-            setTimeout(() => {
-              paymentIframeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 300);
+            // Redirect to PayPlus payment page
+            window.location.href = data.paymentLink;
             return;
           } else {
             throw new Error(data?.error || 'Failed to generate payment link');
@@ -284,8 +214,7 @@ const ConsultationBooking = () => {
           setStep('done');
         }
       } else {
-        // Free consultation - send notifications immediately, go to done
-        await sendNotifications();
+        // Free consultation - go straight to done
         setCompletedOrderNumber(orderNumber);
         setStep('done');
       }
@@ -297,134 +226,49 @@ const ConsultationBooking = () => {
     }
   };
 
-  // Done screen - matching repair order success style
+  // Done screen
   if (step === 'done') {
     const dateStr = selectedDate ? `${selectedDate.getDate()}/${selectedDate.getMonth() + 1}` : '';
     const isPaid = consultationType === 'paid';
     const orderNum = completedOrderNumber || returnedOrderNumber;
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 max-w-lg mx-auto px-5 py-8" dir="rtl">
-        <div className="text-center space-y-5 animate-fade-in py-6">
-          <div className="flex justify-center">
-            <div className="relative">
-              <div className="w-24 h-24 bg-gradient-to-br from-success/30 to-success/10 rounded-full flex items-center justify-center animate-scale-in">
-                <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center shadow-lg">
-                  <CheckCircle2 className="w-10 h-10 text-success-foreground" />
-                </div>
-              </div>
-              <div className="absolute -top-1 -right-1 text-3xl animate-bounce">🎉</div>
-              <div className="absolute -bottom-1 -left-1 text-3xl animate-bounce" style={{ animationDelay: '100ms' }}>✨</div>
-            </div>
-          </div>
-
-          <div>
-            <h2 className="text-2xl font-bold mb-1 text-success">
-              {isPaid && paymentSuccess ? 'התשלום בוצע — השיחה אושרה!' : 'שיחת הייעוץ נקבעה!'}
-            </h2>
-            {orderNum && <p className="text-sm font-semibold text-foreground mb-1">הזמנה #{orderNum}</p>}
-            <p className="text-muted-foreground text-sm">
-              ניצור איתכם קשר במועד שנקבע
-            </p>
-          </div>
-
-          <Card className="p-4 bg-gradient-to-br from-card to-success/5">
-            <div className="space-y-2 text-right text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">סוג שיחה</span>
-                <span className="font-medium">{isPaid ? 'ייעוץ מקצועי מעמיק' : 'ייעוץ חינם'}</span>
-              </div>
-              {deviceModel && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">דגם</span>
-                  <span className="font-medium">{deviceModel}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">מועד</span>
-                <span className="font-medium">{dateStr ? `${formatSelectedDate()} בשעה ${selectedTime}` : 'ייקבע בהמשך'}</span>
-              </div>
-              {isPaid && paymentSuccess && (
-                <div className="flex justify-between items-center bg-success/10 rounded-lg p-2 -mx-1">
-                  <span className="text-success flex items-center gap-1 text-xs">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    התשלום התקבל
-                  </span>
-                  <span className="font-bold text-success text-xs">₪{PAID_PRICE} ✓</span>
-                </div>
-              )}
-              <div className="flex justify-between pt-2 border-t border-border">
-                <span className="font-bold">סה״כ</span>
-                <span className="font-bold text-primary text-lg">{isPaid ? `₪${PAID_PRICE}` : 'חינם'}</span>
-              </div>
-            </div>
-          </Card>
-
-          {customerEmail && (
-            <div className="bg-primary/5 border border-primary/20 rounded-xl p-3">
-              <p className="text-sm text-foreground">📧 פרטי השיחה נשלחו לאימייל <span className="font-semibold" dir="ltr">{customerEmail}</span></p>
-              <p className="text-xs text-muted-foreground mt-1">מומלץ לבדוק גם בתיבת הספאם</p>
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-6" dir="rtl">
+        <div className="text-center max-w-sm animate-scale-in">
+          <div className="text-6xl mb-4">{isPaid && paymentSuccess ? '🎉' : '✅'}</div>
+          <h1 className="text-2xl font-extrabold mb-2">
+            {isPaid && paymentSuccess ? 'התשלום בוצע בהצלחה!' : 'הבקשה התקבלה!'}
+          </h1>
+          {orderNum && (
+            <div className="bg-primary/10 rounded-2xl px-4 py-3 mb-4 inline-block">
+              <p className="text-sm text-muted-foreground">מספר הזמנה</p>
+              <p className="text-3xl font-extrabold text-primary">#{orderNum}</p>
             </div>
           )}
-
-          <Button variant="outline" onClick={() => window.location.href = '/'} className="w-full h-10 rounded-xl">
-            חזרה לדף הבית
-          </Button>
+          <p className="text-muted-foreground mb-1">
+            {isPaid ? 'שיחת הייעוץ המקצועי נקבעה' : 'שיחת הייעוץ החינמית נקבעה'}
+            {dateStr ? ` ל-${dateStr} בשעה ${selectedTime}` : ''}
+          </p>
+          {isPaid && paymentSuccess && (
+            <p className="text-sm text-success font-medium mt-2 flex items-center justify-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4" />
+              התשלום התקבל — ₪{PAID_PRICE}
+            </p>
+          )}
+          <p className="text-sm text-muted-foreground mt-4">ניצור אתכם קשר בהקדם!</p>
         </div>
       </div>
     );
   }
 
-  // Payment success popup dialog
-  const paymentSuccessDialog = (
-    <Dialog open={showPaymentSuccess} onOpenChange={() => {}}>
-      <DialogContent className="max-w-xs text-center border-0 shadow-2xl [&>button]:hidden" dir="rtl">
-        <div className="py-4 space-y-4 animate-fade-in">
-          <div className="flex justify-center">
-            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center shadow-lg animate-scale-in">
-              <CheckCircle2 className="w-12 h-12 text-white" />
-            </div>
-          </div>
-          <h2 className="text-xl font-bold text-green-600">התשלום התקבל בהצלחה! ✅</h2>
-          <p className="text-muted-foreground text-sm">מעבירים לאישור ההזמנה...</p>
-          <div className="flex justify-center">
-            <Loader2 className="w-5 h-5 text-primary animate-spin" />
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-
-  // Processing payment screen - show iframe
+  // Processing payment screen
   if (step === 'processing') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 max-w-lg mx-auto px-5 py-8" dir="rtl">
-        {paymentSuccessDialog}
-        <div className="text-center mb-6 animate-fade-in">
-          <Logo size="md" className="mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-1">תשלום מאובטח</h2>
-          <p className="text-muted-foreground text-sm">הזמנה #{completedOrderNumber} · ₪{PAID_PRICE}</p>
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-6" dir="rtl">
+        <div className="text-center max-w-sm animate-fade-in">
+          <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">מעבירים לדף התשלום...</h2>
+          <p className="text-muted-foreground text-sm">תועברו בשניות לדף התשלום המאובטח</p>
         </div>
-
-        {paymentIframeUrl ? (
-          <div ref={paymentIframeRef} className="rounded-2xl overflow-hidden border-2 border-primary/20 shadow-lg bg-card animate-fade-in">
-            <div className="bg-primary/5 px-4 py-2 flex items-center justify-center gap-2 border-b border-border">
-              <Shield className="w-4 h-4 text-primary" />
-              <span className="text-xs font-medium text-primary">תשלום מאובטח SSL</span>
-            </div>
-            <iframe
-              src={paymentIframeUrl}
-              className="w-full border-0"
-              style={{ minHeight: '600px', height: '70vh' }}
-              title="דף תשלום מאובטח"
-              allow="payment"
-            />
-          </div>
-        ) : (
-          <div className="text-center py-12 animate-fade-in">
-            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-            <p className="text-muted-foreground text-sm">יוצרים דף תשלום מאובטח...</p>
-          </div>
-        )}
       </div>
     );
   }
