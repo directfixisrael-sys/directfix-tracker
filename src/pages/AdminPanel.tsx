@@ -111,6 +111,9 @@ const AdminPanel = () => {
   const [bulkStatusDialogOpen, setBulkStatusDialogOpen] = useState(false);
   const [orderStatusFilter, setOrderStatusFilter] = useState<'active' | 'all'>('active');
   const [showCompletionCelebration, setShowCompletionCelebration] = useState(false);
+  const [isGeneratingPayment, setIsGeneratingPayment] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState('');
+  const [paymentDescription, setPaymentDescription] = useState('');
 
   const { 
     orders, 
