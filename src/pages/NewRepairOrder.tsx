@@ -410,7 +410,13 @@ const NewRepairOrder = () => {
         setCompletedOrderNumber(parseInt(orderNum));
         setPaymentIframeUrl(null);
         setPendingOrderId(null);
-        goToStep('success');
+        
+        // Show green checkmark popup, then transition to success
+        setShowPaymentSuccess(true);
+        setTimeout(() => {
+          setShowPaymentSuccess(false);
+          goToStep('success');
+        }, 2500);
       }
     };
     window.addEventListener('message', handleMessage);
