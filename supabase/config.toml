@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.cardcom-create-payment]
 verify_jwt = false
+
+[functions.payplus-create-payment]
+verify_jwt = false
