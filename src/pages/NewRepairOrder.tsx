@@ -1733,20 +1733,16 @@ const NewRepairOrder = () => {
           </div>}
 
         {/* Step 4: Schedule */}
-        {step === 'schedule' && <div className="space-y-5 animate-fade-in">
-            <div className="text-center mb-4">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
-                <Calendar className="w-4 h-4" />
-                קביעת מועד
-              </div>
-              <h2 className="text-3xl font-extrabold mb-1">מתי נגיע?</h2>
-              <p className="text-muted-foreground">בחרו יום ושעה שנוחים לכם</p>
+        {step === 'schedule' && <div className="space-y-4 animate-fade-in">
+            <div className="text-center mb-3">
+              <h2 className="text-xl font-bold mb-1">מתי נגיע?</h2>
+              <p className="text-sm text-muted-foreground">בחרו יום ושעה שנוחים לכם</p>
             </div>
 
             {/* Date selection */}
             <div>
-              <label className="block text-sm font-bold mb-3">בחר יום</label>
-              <div className="grid grid-cols-4 gap-3">
+              <label className="block text-xs font-semibold mb-2 text-muted-foreground uppercase tracking-wider">בחר יום</label>
+              <div className="grid grid-cols-4 gap-2">
                 {getAvailableDates().map((date, index) => {
               const dayName = hebrewDays[date.getDay()];
               const isToday = index === 0;
@@ -1755,9 +1751,9 @@ const NewRepairOrder = () => {
               return <button key={index} onClick={() => {
                 setSelectedDate(date);
                 setSelectedTimeSlot('');
-              }} disabled={!hasAvailableSlots} className={`p-3 rounded-2xl border-2 text-center transition-all ${isSelected ? 'border-primary bg-primary/10 text-primary shadow-sm' : hasAvailableSlots ? 'border-border hover:border-primary/40 hover:bg-muted/30' : 'border-border/50 opacity-40 cursor-not-allowed'}`}>
-                      <div className="text-sm font-bold">{isToday ? 'היום' : dayName}</div>
-                      <div className="text-sm text-muted-foreground">{date.getDate()}/{date.getMonth() + 1}</div>
+              }} disabled={!hasAvailableSlots} className={`p-2.5 rounded-xl text-center transition-all duration-200 ${isSelected ? 'bg-primary text-primary-foreground shadow-wolt-lg' : hasAvailableSlots ? 'bg-card shadow-wolt hover:shadow-wolt-lg' : 'bg-muted/50 opacity-40 cursor-not-allowed'}`}>
+                      <div className="text-xs font-bold">{isToday ? 'היום' : dayName}</div>
+                      <div className="text-xs text-inherit opacity-70">{date.getDate()}/{date.getMonth() + 1}</div>
                     </button>;
             })}
               </div>
