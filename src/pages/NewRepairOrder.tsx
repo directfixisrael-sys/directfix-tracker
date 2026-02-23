@@ -2054,9 +2054,39 @@ const NewRepairOrder = () => {
         {/* Step: Processing Payment */}
         {step === 'processing' && (
           <div className="text-center py-20 animate-fade-in">
-            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">מעבירים לדף התשלום...</h2>
-            <p className="text-muted-foreground text-sm">תועברו בשניות לדף התשלום המאובטח</p>
+        {/* Step: Inline Payment */}
+        {step === 'processing' && (
+          <div className="animate-fade-in space-y-4" ref={paymentIframeRef}>
+            {paymentIframeUrl ? (
+              <>
+                <div className="text-center mb-2">
+                  <div className="inline-flex items-center gap-2 bg-success/10 text-success rounded-full px-4 py-1.5 text-sm font-semibold mb-2">
+                    <Shield className="w-4 h-4" />
+                    תשלום מאובטח
+                  </div>
+                  <h2 className="text-xl font-bold">השלימו את התשלום</h2>
+                  <p className="text-xs text-muted-foreground mt-1">סה״כ: <span className="font-bold text-foreground">₪{getFinalPrice()}</span></p>
+                </div>
+                <div className="rounded-2xl overflow-hidden border-2 border-primary/20 shadow-lg bg-card">
+                  <iframe 
+                    src={paymentIframeUrl} 
+                    className="w-full border-0" 
+                    style={{ minHeight: '600px', height: '70vh' }}
+                    title="דף תשלום מאובטח"
+                    allow="payment"
+                  />
+                </div>
+                <p className="text-center text-[11px] text-muted-foreground">
+                  🔒 התשלום מאובטח ומוצפן בתקן PCI DSS
+                </p>
+              </>
+            ) : (
+              <div className="text-center py-20">
+                <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+                <h2 className="text-xl font-bold mb-2">מכינים את דף התשלום...</h2>
+                <p className="text-muted-foreground text-sm">רגע אחד...</p>
+              </div>
+            )}
           </div>
         )}
 
