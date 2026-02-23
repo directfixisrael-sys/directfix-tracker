@@ -18,7 +18,7 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
   };
 
   return (
-    <header className="bg-card/80 backdrop-blur-lg border-b border-border/50 sticky top-0 z-50 pt-[env(safe-area-inset-top)]" role="banner" aria-label="כותרת עליונה">
+    <header className="bg-background/95 backdrop-blur-md border-b border-border sticky top-0 z-50 pt-[env(safe-area-inset-top)]" role="banner" aria-label="כותרת עליונה">
       <nav className="container flex items-center justify-between h-14 px-4" aria-label="ניווט ראשי">
         {showBackButton ? (
           <button 
