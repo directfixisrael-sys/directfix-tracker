@@ -112,6 +112,51 @@ const ConsultationBooking = () => {
 
   const isDetailsValid = customerName.trim() && customerPhone.trim() && customerEmail.trim() && deviceModel.trim() && issueDescription.trim();
 
+  // Send notifications (called after payment success or for free consultations)
+  const sendNotifications = async () => {
+    const dateStr = selectedDate ? `${selectedDate.getDate()}/${selectedDate.getMonth() + 1}` : '';
+    const label = consultationType === 'free' ? 'שיחת ייעוץ חינם (עד 5 דק׳)' : `שיחת ייעוץ בתשלום (עד 30 דק׳) - ₪${PAID_PRICE}`;
+    try {
+      await supabase.functions.invoke('send-order-notifications', {
+        body: {
+          customerName,
+          customerPhone,
+          customerEmail,
+          customerAddress: '',
+          deviceType: `שיחת ייעוץ - ${deviceModel}`,
+          repairType: label,
+          repairPrice: consultationType === 'paid' ? PAID_PRICE : 0,
+          scheduledTime: `${dateStr} בשעה ${selectedTime}`,
+          notes: issueDescription + (additionalNotes ? `\n${additionalNotes}` : ''),
+          leadSource: 'consultation',
+        },
+      });
+    } catch (e) { console.error('Notification error:', e); }
+  };
+
+  // On returning from payment, send notifications and update status
+  useEffect(() => {
+    if (paymentSuccess && returnedOrderNumber) {
+      // Update payment status to paid
+      const updatePayment = async () => {
+        const { data } = await supabase
+          .from('orders')
+          .select('id')
+          .eq('order_number', parseInt(returnedOrderNumber))
+          .single();
+        if (data) {
+          await supabase
+            .from('orders')
+            .update({ payment_status: 'paid', status: 'confirmed' })
+            .eq('id', data.id);
+        }
+        // Now send notifications after payment confirmed
+        await sendNotifications();
+      };
+      updatePayment();
+    }
+  }, [paymentSuccess, returnedOrderNumber]);
+
   const handleSubmit = async () => {
     if (!isDetailsValid) {
       toast.error('נא למלא את כל שדות החובה');
@@ -154,25 +199,7 @@ const ConsultationBooking = () => {
 
       const orderNumber = orderData.order_number;
 
-      // Send notifications
-      try {
-        await supabase.functions.invoke('send-order-notifications', {
-          body: {
-            customerName,
-            customerPhone,
-            customerEmail,
-            customerAddress: '',
-            deviceType: `שיחת ייעוץ - ${deviceModel}`,
-            repairType: label,
-            repairPrice: consultationType === 'paid' ? PAID_PRICE : 0,
-            scheduledTime: `${dateStr} בשעה ${selectedTime}`,
-            notes: issueDescription + (additionalNotes ? `\n${additionalNotes}` : ''),
-            leadSource: 'consultation',
-          },
-        });
-      } catch (e) { console.error('Notification error:', e); }
-
-      // For paid consultations: generate PayPlus link and redirect
+      // For paid consultations: generate PayPlus link and redirect (NO notifications yet)
       if (consultationType === 'paid') {
         setStep('processing');
         try {
@@ -195,13 +222,11 @@ const ConsultationBooking = () => {
           if (error) throw error;
 
           if (data?.paymentLink) {
-            // Save payment link to the order
             await supabase
               .from('orders')
               .update({ payment_link: data.paymentLink, payment_status: 'pending' })
               .eq('id', orderData.id);
 
-            // Redirect to PayPlus payment page
             window.location.href = data.paymentLink;
             return;
           } else {
@@ -214,7 +239,8 @@ const ConsultationBooking = () => {
           setStep('done');
         }
       } else {
-        // Free consultation - go straight to done
+        // Free consultation - send notifications immediately, go to done
+        await sendNotifications();
         setCompletedOrderNumber(orderNumber);
         setStep('done');
       }
@@ -226,35 +252,78 @@ const ConsultationBooking = () => {
     }
   };
 
-  // Done screen
+  // Done screen - matching repair order success style
   if (step === 'done') {
     const dateStr = selectedDate ? `${selectedDate.getDate()}/${selectedDate.getMonth() + 1}` : '';
     const isPaid = consultationType === 'paid';
     const orderNum = completedOrderNumber || returnedOrderNumber;
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-6" dir="rtl">
-        <div className="text-center max-w-sm animate-scale-in">
-          <div className="text-6xl mb-4">{isPaid && paymentSuccess ? '🎉' : '✅'}</div>
-          <h1 className="text-2xl font-extrabold mb-2">
-            {isPaid && paymentSuccess ? 'התשלום בוצע בהצלחה!' : 'הבקשה התקבלה!'}
-          </h1>
-          {orderNum && (
-            <div className="bg-primary/10 rounded-2xl px-4 py-3 mb-4 inline-block">
-              <p className="text-sm text-muted-foreground">מספר הזמנה</p>
-              <p className="text-3xl font-extrabold text-primary">#{orderNum}</p>
+      <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 max-w-lg mx-auto px-5 py-8" dir="rtl">
+        <div className="text-center space-y-5 animate-fade-in py-6">
+          <div className="flex justify-center">
+            <div className="relative">
+              <div className="w-24 h-24 bg-gradient-to-br from-success/30 to-success/10 rounded-full flex items-center justify-center animate-scale-in">
+                <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center shadow-lg">
+                  <CheckCircle2 className="w-10 h-10 text-success-foreground" />
+                </div>
+              </div>
+              <div className="absolute -top-1 -right-1 text-3xl animate-bounce">🎉</div>
+              <div className="absolute -bottom-1 -left-1 text-3xl animate-bounce" style={{ animationDelay: '100ms' }}>✨</div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-2xl font-bold mb-1 text-success">
+              {isPaid && paymentSuccess ? 'התשלום בוצע — השיחה אושרה!' : 'שיחת הייעוץ נקבעה!'}
+            </h2>
+            {orderNum && <p className="text-sm font-semibold text-foreground mb-1">הזמנה #{orderNum}</p>}
+            <p className="text-muted-foreground text-sm">
+              ניצור איתכם קשר במועד שנקבע
+            </p>
+          </div>
+
+          <Card className="p-4 bg-gradient-to-br from-card to-success/5">
+            <div className="space-y-2 text-right text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">סוג שיחה</span>
+                <span className="font-medium">{isPaid ? 'ייעוץ מקצועי מעמיק' : 'ייעוץ חינם'}</span>
+              </div>
+              {deviceModel && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">דגם</span>
+                  <span className="font-medium">{deviceModel}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">מועד</span>
+                <span className="font-medium">{dateStr ? `${formatSelectedDate()} בשעה ${selectedTime}` : 'ייקבע בהמשך'}</span>
+              </div>
+              {isPaid && paymentSuccess && (
+                <div className="flex justify-between items-center bg-success/10 rounded-lg p-2 -mx-1">
+                  <span className="text-success flex items-center gap-1 text-xs">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    התשלום התקבל
+                  </span>
+                  <span className="font-bold text-success text-xs">₪{PAID_PRICE} ✓</span>
+                </div>
+              )}
+              <div className="flex justify-between pt-2 border-t border-border">
+                <span className="font-bold">סה״כ</span>
+                <span className="font-bold text-primary text-lg">{isPaid ? `₪${PAID_PRICE}` : 'חינם'}</span>
+              </div>
+            </div>
+          </Card>
+
+          {customerEmail && (
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-3">
+              <p className="text-sm text-foreground">📧 פרטי השיחה נשלחו לאימייל <span className="font-semibold" dir="ltr">{customerEmail}</span></p>
+              <p className="text-xs text-muted-foreground mt-1">מומלץ לבדוק גם בתיבת הספאם</p>
             </div>
           )}
-          <p className="text-muted-foreground mb-1">
-            {isPaid ? 'שיחת הייעוץ המקצועי נקבעה' : 'שיחת הייעוץ החינמית נקבעה'}
-            {dateStr ? ` ל-${dateStr} בשעה ${selectedTime}` : ''}
-          </p>
-          {isPaid && paymentSuccess && (
-            <p className="text-sm text-success font-medium mt-2 flex items-center justify-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4" />
-              התשלום התקבל — ₪{PAID_PRICE}
-            </p>
-          )}
-          <p className="text-sm text-muted-foreground mt-4">ניצור אתכם קשר בהקדם!</p>
+
+          <Button variant="outline" onClick={() => window.location.href = '/'} className="w-full h-10 rounded-xl">
+            חזרה לדף הבית
+          </Button>
         </div>
       </div>
     );
