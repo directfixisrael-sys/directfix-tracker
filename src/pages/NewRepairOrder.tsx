@@ -1791,9 +1791,9 @@ const NewRepairOrder = () => {
 
             {/* Gift sender details */}
             {isGiftOrder && (
-              <div className="space-y-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl p-5 border border-primary/20 shadow-sm">
-                <div className="flex items-center gap-2 mb-2">
-                  <Heart className="w-5 h-5 text-primary fill-primary" />
+              <div className="space-y-3 bg-primary/5 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Heart className="w-4 h-4 text-primary fill-primary" />
                   <h3 className="font-bold text-lg">פרטי השולח (שלכם)</h3>
                 </div>
                 <div>
