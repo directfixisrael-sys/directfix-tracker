@@ -1980,7 +1980,6 @@ const NewRepairOrder = () => {
                           <span className="text-[8px] font-bold text-blue-600">Bit</span>
                         </div>
                       </div>
-                      </div>
                     </div>
                     {paymentChoice === 'now' && <Check className="w-5 h-5 text-primary flex-shrink-0" />}
                   </div>
