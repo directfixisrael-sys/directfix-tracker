@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -34,6 +34,15 @@ const seriesOrder = [
 
 const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPickerProps) => {
   const [activeSeries, setActiveSeries] = useState<string | null>(null);
+  const modelsListRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (activeSeries && modelsListRef.current) {
+      setTimeout(() => {
+        modelsListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [activeSeries]);
 
   const grouped = useMemo(() => {
     return models.reduce<Record<string, IphoneModel[]>>((acc, model) => {
@@ -77,7 +86,7 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
 
       {/* Models list for active series */}
       {activeSeries && grouped[activeSeries] && (
-        <div id={`models-${activeSeries.replace(/\s/g, '-')}`} role="tabpanel" aria-label={`דגמי ${activeSeries}`} className="space-y-1.5 animate-fade-in pt-1">
+        <div ref={modelsListRef} id={`models-${activeSeries.replace(/\s/g, '-')}`} role="tabpanel" aria-label={`דגמי ${activeSeries}`} className="space-y-1.5 animate-fade-in pt-1">
           {grouped[activeSeries].map(model => (
             <ModelButton
               key={model.id}
