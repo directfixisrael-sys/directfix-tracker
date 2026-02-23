@@ -239,9 +239,11 @@ const ConsultationBooking = () => {
 
       const orderNumber = orderData.order_number;
 
-      // For paid consultations: generate PayPlus link and redirect (NO notifications yet)
+      // For paid consultations: generate PayPlus link and show iframe (NO notifications yet)
       if (consultationType === 'paid') {
         setStep('processing');
+        setPendingOrderId(orderData.id);
+        setCompletedOrderNumber(orderNumber);
         try {
           const currentUrl = window.location.origin + window.location.pathname;
           const successUrl = `${currentUrl}?payment=success&order=${orderNumber}`;
@@ -267,7 +269,10 @@ const ConsultationBooking = () => {
               .update({ payment_link: data.paymentLink, payment_status: 'pending' })
               .eq('id', orderData.id);
 
-            window.location.href = data.paymentLink;
+            setPaymentIframeUrl(data.paymentLink);
+            setTimeout(() => {
+              paymentIframeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
             return;
           } else {
             throw new Error(data?.error || 'Failed to generate payment link');
