@@ -129,6 +129,7 @@ const ConsultationBooking = () => {
           scheduledTime: `${dateStr} בשעה ${selectedTime}`,
           notes: issueDescription + (additionalNotes ? `\n${additionalNotes}` : ''),
           leadSource: 'consultation',
+          isConsultation: true,
         },
       });
     } catch (e) { console.error('Notification error:', e); }
