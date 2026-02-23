@@ -301,6 +301,7 @@ const NewRepairOrder = () => {
   const [paymentIframeUrl, setPaymentIframeUrl] = useState<string | null>(null);
   const [pendingNotificationData, setPendingNotificationData] = useState<any>(null);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
   const paymentIframeRef = useRef<HTMLDivElement>(null);
 
   // Schedule fields
