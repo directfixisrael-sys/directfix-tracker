@@ -18,7 +18,7 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
   };
 
   return (
-    <header className="bg-background/95 backdrop-blur-md border-b border-border sticky top-0 z-50 pt-[env(safe-area-inset-top)]" role="banner" aria-label="כותרת עליונה">
+    <header className="bg-card/80 backdrop-blur-lg border-b border-border/50 sticky top-0 z-50 pt-[env(safe-area-inset-top)]" role="banner" aria-label="כותרת עליונה">
       <nav className="container flex items-center justify-between h-14 px-4" aria-label="ניווט ראשי">
         {showBackButton ? (
           <button 
@@ -69,7 +69,7 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
 
       {/* Mobile menu dropdown */}
       {menuOpen && (
-        <div className="sm:hidden bg-background border-t border-border animate-slide-down">
+        <div className="sm:hidden bg-card border-t border-border/50 animate-slide-down">
           <div className="flex items-center justify-center gap-4 py-3 px-4">
             <a
               href="tel:033106020"

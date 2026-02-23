@@ -90,9 +90,9 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       boxShadow: {
-        "wolt": "0 1px 6px rgba(0,0,0,0.06)",
-        "wolt-lg": "0 4px 16px rgba(0,0,0,0.1)",
-        "wolt-xl": "0 8px 24px rgba(0,0,0,0.12)",
+        "wolt": "0 2px 8px rgba(0,0,0,0.08)",
+        "wolt-lg": "0 4px 20px rgba(0,0,0,0.12)",
+        "wolt-xl": "0 8px 30px rgba(0,0,0,0.16)",
       },
     },
   },
