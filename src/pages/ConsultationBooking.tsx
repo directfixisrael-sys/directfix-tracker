@@ -39,41 +39,6 @@ const ConsultationBooking = () => {
     if (paymentSuccess && returnedOrderNumber) return 'done';
     return 'choose';
   });
-
-  // Send notifications after payment return for paid consultations
-  useEffect(() => {
-    if (paymentSuccess && returnedOrderNumber) {
-      const sendNotifications = async () => {
-        try {
-          const { data: orderData } = await supabase
-            .from('orders')
-            .select('*')
-            .eq('order_number', parseInt(returnedOrderNumber))
-            .single();
-          if (orderData) {
-            await supabase.from('orders').update({ payment_status: 'paid', notes: [...orderData.notes.filter((n: string) => !n.includes('ממתין לתשלום')), '✅ תשלום התקבל'] }).eq('id', orderData.id);
-            await supabase.functions.invoke('send-order-notifications', {
-              body: {
-                customerName: orderData.customer_name,
-                customerPhone: orderData.customer_phone,
-                customerAddress: '',
-                customerEmail: orderData.customer_email,
-                deviceType: orderData.device_type,
-                repairType: orderData.issue_description,
-                repairPrice: orderData.repair_price,
-                scheduledTime: orderData.estimated_arrival || '',
-                notes: '',
-                orderNumber: orderData.order_number,
-                serviceType: 'consultation',
-                leadSource: orderData.lead_source,
-              }
-            });
-          }
-        } catch (e) { console.error('Post-payment notification error:', e); }
-      };
-      sendNotifications();
-    }
-  }, [paymentSuccess, returnedOrderNumber]);
   const [consultationType, setConsultationType] = useState<ConsultationType>(() => {
     if (paymentSuccess) return 'paid';
     return null;
@@ -189,27 +154,23 @@ const ConsultationBooking = () => {
 
       const orderNumber = orderData.order_number;
 
-      // Send notifications - only for free consultations (paid ones send after payment return)
-      if (consultationType === 'free') {
-        try {
-          await supabase.functions.invoke('send-order-notifications', {
-            body: {
-              customerName,
-              customerPhone,
-              customerEmail,
-              customerAddress: '',
-              deviceType: `שיחת ייעוץ - ${deviceModel}`,
-              repairType: label,
-              repairPrice: 0,
-              scheduledTime: `${dateStr} בשעה ${selectedTime}`,
-              notes: issueDescription + (additionalNotes ? `\n${additionalNotes}` : ''),
-              leadSource: 'consultation',
-              serviceType: 'consultation',
-              orderNumber,
-            },
-          });
-        } catch (e) { console.error('Notification error:', e); }
-      }
+      // Send notifications
+      try {
+        await supabase.functions.invoke('send-order-notifications', {
+          body: {
+            customerName,
+            customerPhone,
+            customerEmail,
+            customerAddress: '',
+            deviceType: `שיחת ייעוץ - ${deviceModel}`,
+            repairType: label,
+            repairPrice: consultationType === 'paid' ? PAID_PRICE : 0,
+            scheduledTime: `${dateStr} בשעה ${selectedTime}`,
+            notes: issueDescription + (additionalNotes ? `\n${additionalNotes}` : ''),
+            leadSource: 'consultation',
+          },
+        });
+      } catch (e) { console.error('Notification error:', e); }
 
       // For paid consultations: generate PayPlus link and redirect
       if (consultationType === 'paid') {

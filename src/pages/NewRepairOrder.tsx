@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -7,7 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send, Lock, Banknote } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -270,13 +270,9 @@ interface RepairBundle {
   addon_repair_type: string;
   discount_percent: number;
 }
-type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'processing' | 'success';
-type PaymentMethod = 'now' | 'after';
+type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'success';
 const NewRepairOrder = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const paymentSuccess = searchParams.get('payment') === 'success';
-  const returnedOrderNumber = searchParams.get('order');
   const {
     addOrder
   } = useRepairStore();
@@ -284,11 +280,7 @@ const NewRepairOrder = () => {
     resolvedTheme,
     setTheme
   } = useTheme();
-  const [step, setStep] = useState<Step>(() => {
-    if (paymentSuccess && returnedOrderNumber) return 'success';
-    return 'model';
-  });
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('after');
+  const [step, setStep] = useState<Step>('model');
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
@@ -303,10 +295,7 @@ const NewRepairOrder = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [completedOrderNumber, setCompletedOrderNumber] = useState<number | null>(() => {
-    if (returnedOrderNumber) return parseInt(returnedOrderNumber);
-    return null;
-  });
+  const [completedOrderNumber, setCompletedOrderNumber] = useState<number | null>(null);
 
   // Schedule fields
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -343,10 +332,6 @@ const NewRepairOrder = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   // Privacy consent
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
-  // Payment processing state
-  const [pendingPaymentLink, setPendingPaymentLink] = useState<string | null>(null);
-  const [pendingPaymentOrderNumber, setPendingPaymentOrderNumber] = useState<number | null>(null);
-  const [pendingPaymentOrderId, setPendingPaymentOrderId] = useState<string | null>(null);
 
   // Gift order mode
   const [isGiftOrder, setIsGiftOrder] = useState(false);
@@ -379,64 +364,6 @@ const NewRepairOrder = () => {
     };
   }, [isGiftOrder]);
   const [giftClaimed, setGiftClaimed] = useState(false);
-
-  // Force payment method for gift orders
-  useEffect(() => {
-    if (isGiftOrder) setPaymentMethod('now');
-  }, [isGiftOrder]);
-
-  // Handle payment return - send notifications after successful payment
-  // This runs either from PayPlus redirect (?payment=success) or when user clicks "שילמתי"
-  const sendPaymentNotifications = async (orderNumber: number) => {
-    try {
-      const { data: orderData } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('order_number', orderNumber)
-        .single();
-      
-      if (orderData) {
-        // Update payment status
-        await supabase
-          .from('orders')
-          .update({ payment_status: 'paid' })
-          .eq('id', orderData.id);
-
-        // Remove the waiting note and update status
-        const updatedNotes = (orderData.notes as string[]).filter((n: string) => !n.includes('ממתין לתשלום'));
-        updatedNotes.push('✅ תשלום התקבל');
-        await supabase
-          .from('orders')
-          .update({ notes: updatedNotes })
-          .eq('id', orderData.id);
-
-        // Send notifications
-        await supabase.functions.invoke('send-order-notifications', {
-          body: {
-            customerName: orderData.customer_name,
-            customerPhone: orderData.customer_phone,
-            customerAddress: orderData.customer_address,
-            customerEmail: orderData.customer_email,
-            deviceType: orderData.device_type,
-            repairType: orderData.issue_description,
-            repairPrice: orderData.repair_price,
-            scheduledTime: orderData.estimated_arrival || '',
-            notes: '',
-            orderNumber: orderData.order_number,
-            leadSource: orderData.lead_source,
-          }
-        });
-      }
-    } catch (e) {
-      console.error('Error sending notifications after payment:', e);
-    }
-  };
-
-  useEffect(() => {
-    if (paymentSuccess && returnedOrderNumber) {
-      sendPaymentNotifications(parseInt(returnedOrderNumber));
-    }
-  }, [paymentSuccess, returnedOrderNumber]);
 
   // Broadcast initial step on mount
   useEffect(() => {
@@ -974,9 +901,7 @@ const NewRepairOrder = () => {
         if (giftMessage.trim()) {
           notes.push(`ברכה: ${giftMessage.trim()}`);
         }
-      }
-      if (paymentMethod === 'now') {
-        notes.push('⚠️ ממתין לתשלום מקוון');
+        notes.push('⚠️ דורש תשלום מראש מהשולח לפני תיאום הגעה');
       }
       const leadSource = getLeadSource();
       const orderResult: any = await addOrder({
@@ -994,83 +919,40 @@ const NewRepairOrder = () => {
         customerEmail: customerEmail.trim() || undefined,
       } as any);
 
-      // If paying now → generate PayPlus link and redirect
-      if (paymentMethod === 'now') {
-        goToStep('processing');
-        try {
-          const currentUrl = window.location.origin + '/order';
-          const successUrl = `${currentUrl}?payment=success&order=${orderResult?.order_number}`;
-          const failureUrl = `${currentUrl}?payment=failed`;
-
-          const { data, error } = await supabase.functions.invoke('payplus-create-payment', {
-            body: {
-              amount: getFinalPrice(),
-              description: `תיקון ${selectedModel?.name || ''} - ${repairDescription}`,
-              customerName: customerName.trim(),
-              customerPhone: customerPhone.trim(),
-              customerEmail: customerEmail.trim() || undefined,
-              orderId: orderResult?.id,
-              moreInfo: `repair-${orderResult?.order_number}`,
-              successUrl,
-              failureUrl,
-            },
-          });
-
-          if (error) throw error;
-
-          if (data?.paymentLink) {
-            await supabase
-              .from('orders')
-              .update({ payment_link: data.paymentLink, payment_status: 'pending' })
-              .eq('id', orderResult?.id);
-
-            setPendingPaymentLink(data.paymentLink);
-            setPendingPaymentOrderNumber(orderResult?.order_number || null);
-            setPendingPaymentOrderId(orderResult?.id || null);
-            window.open(data.paymentLink, '_blank');
-            return;
-          } else {
-            throw new Error(data?.error || 'Failed to generate payment link');
+      // Send notifications (email + WhatsApp)
+      try {
+        const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
+        const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
+        const leadSource = getLeadSource();
+        await supabase.functions.invoke('send-order-notifications', {
+          body: {
+            customerName: customerName.trim(),
+            customerPhone: customerPhone.trim(),
+            customerAddress: customerAddress.trim(),
+            deviceType: selectedModel?.name || '',
+            repairType: repairTypeForNotification + colorNote,
+            repairPrice: getFinalPrice(),
+            scheduledTime: scheduleNote,
+            notes: customerNotes.trim(),
+            customerEmail: customerEmail.trim() || undefined,
+            orderNumber: orderResult?.order_number || undefined,
+            promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
+            leadSource: leadSource.source,
+            leadSourceDetails: leadSource,
           }
-        } catch (err: any) {
-          console.error('Payment link error:', err);
-          toast.error('שגיאה ביצירת לינק תשלום. ניצור קשר בהקדם.');
-          setCompletedOrderNumber(orderResult?.order_number || null);
-          goToStep('success');
-        }
-      } else {
-        // Pay after → send notifications immediately
-        try {
-          const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
-          const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
-          const leadSource = getLeadSource();
-          await supabase.functions.invoke('send-order-notifications', {
-            body: {
-              customerName: customerName.trim(),
-              customerPhone: customerPhone.trim(),
-              customerAddress: customerAddress.trim(),
-              deviceType: selectedModel?.name || '',
-              repairType: repairTypeForNotification + colorNote,
-              repairPrice: getFinalPrice(),
-              scheduledTime: scheduleNote,
-              notes: customerNotes.trim(),
-              customerEmail: customerEmail.trim() || undefined,
-              orderNumber: orderResult?.order_number || undefined,
-              promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
-              leadSource: leadSource.source,
-              leadSourceDetails: leadSource,
-            }
-          });
-          console.log('Notifications sent successfully');
-        } catch (notificationError) {
-          console.error('Error sending notifications:', notificationError);
-        }
-
-        trackPurchase(getFinalPrice());
-        gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
-        setCompletedOrderNumber(orderResult?.order_number || null);
-        goToStep('success');
+        });
+        console.log('Notifications sent successfully');
+      } catch (notificationError) {
+        console.error('Error sending notifications:', notificationError);
+        // Don't fail the order if notifications fail
       }
+
+      // Track Facebook Pixel Purchase event
+      trackPurchase(getFinalPrice());
+      // Track Google Analytics conversion
+      gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
+      setCompletedOrderNumber(orderResult?.order_number || null);
+      goToStep('success');
     } catch (error) {
       toast.error('אירעה שגיאה, נסה שוב');
     } finally {
@@ -1771,160 +1653,66 @@ const NewRepairOrder = () => {
               </div>
             </Card>
 
-            {/* Payment Method Selection */}
-            <div className="space-y-3">
-              <h3 className="font-bold text-sm flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-primary" />
-                בחרו אופן תשלום
-              </h3>
+            {/* Payment Info with Icons */}
+            <div className="bg-gradient-to-br from-muted/60 to-accent/5 rounded-2xl p-4 border border-border/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm">{isGiftOrder ? 'תשלום מראש מהשולח' : 'תשלום בסיום התיקון בלבד'}</p>
+                    <p className="text-muted-foreground text-xs mt-0.5">
+                      {isGiftOrder ? 'נציג ייצור קשר לגביית התשלום לפני ההגעה' : 'מזומן, אשראי או ביט'}
+                    </p>
+                  </div>
+                </div>
+              </div>
               
-              {/* Pay Now Option */}
-              <button
-                onClick={() => setPaymentMethod('now')}
-                className={`w-full text-right p-4 rounded-2xl border-2 transition-all ${
-                  paymentMethod === 'now'
-                    ? 'border-primary bg-primary/5 shadow-sm'
-                    : 'border-border hover:border-primary/30'
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center flex-shrink-0 ${
-                    paymentMethod === 'now' ? 'border-primary bg-primary' : 'border-muted-foreground/40'
-                  }`}>
-                    {paymentMethod === 'now' && <Check className="w-3 h-3 text-primary-foreground" />}
+              {/* Payment Method Icons */}
+              <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-border">
+                {/* Apple Pay */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-12 h-8 bg-foreground rounded-md flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" className="w-6 h-4 text-background" fill="currentColor">
+                      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+                    </svg>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-primary" />
-                      <span className="font-bold">תשלום עכשיו</span>
-                      <span className="bg-success/10 text-success text-[10px] font-bold px-2 py-0.5 rounded-full">מומלץ</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">תשלום מאובטח באמצעות כרטיס אשראי, Apple Pay, Google Pay או Bit</p>
-                    
-                    {/* Trust badges inline */}
-                    <div className="flex items-center gap-3 mt-2">
-                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <Shield className="w-3 h-3 text-success" />
-                        <span>SSL מוצפן</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <Lock className="w-3 h-3 text-success" />
-                        <span>PCI DSS</span>
-                      </div>
-                    </div>
-
-                    {/* Payment method icons */}
-                    {paymentMethod === 'now' && (
-                      <div className="flex items-center gap-3 mt-3 pt-2 border-t border-border/30">
-                        <div className="w-10 h-7 bg-foreground rounded flex items-center justify-center">
-                          <svg viewBox="0 0 24 24" className="w-5 h-3.5 text-background" fill="currentColor">
-                            <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-                          </svg>
-                        </div>
-                        <div className="w-10 h-7 bg-card border border-border rounded flex items-center justify-center">
-                          <svg viewBox="0 0 24 24" className="w-5 h-3.5" fill="none">
-                            <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z" fill="#4285F4" />
-                          </svg>
-                        </div>
-                        <div className="w-10 h-7 bg-gradient-to-br from-blue-500 to-blue-600 rounded flex items-center justify-center">
-                          <svg viewBox="0 0 24 24" className="w-4 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-                            <line x1="1" y1="10" x2="23" y2="10" />
-                          </svg>
-                        </div>
-                        <div className="w-10 h-7 bg-gradient-to-br from-primary to-blue-600 rounded flex items-center justify-center">
-                          <span className="text-white text-[10px] font-bold">Bit</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  <span className="text-[10px] text-muted-foreground">Apple Pay</span>
                 </div>
-              </button>
-
-              {/* Pay After Option - hidden for gift orders */}
-              {!isGiftOrder && (
-                <button
-                  onClick={() => setPaymentMethod('after')}
-                  className={`w-full text-right p-4 rounded-2xl border-2 transition-all ${
-                    paymentMethod === 'after'
-                      ? 'border-primary bg-primary/5 shadow-sm'
-                      : 'border-border hover:border-primary/30'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center flex-shrink-0 ${
-                      paymentMethod === 'after' ? 'border-primary bg-primary' : 'border-muted-foreground/40'
-                    }`}>
-                      {paymentMethod === 'after' && <Check className="w-3 h-3 text-primary-foreground" />}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <Banknote className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-bold">תשלום לאחר התיקון</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">מזומן, אשראי או Bit — משלמים רק כשהתיקון הושלם</p>
-                    </div>
+                
+                {/* Google Pay */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-12 h-8 bg-card border border-border rounded-md flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" className="w-6 h-4" fill="none">
+                      <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z" fill="#4285F4" />
+                    </svg>
                   </div>
-                </button>
-              )}
-
-              {isGiftOrder && (
-                <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-center gap-2">
-                  <Gift className="w-4 h-4 text-primary flex-shrink-0" />
-                  <p className="text-xs text-muted-foreground">
-                    <span className="font-semibold text-foreground">הזמנת מתנה</span> — נדרש תשלום מראש מהשולח
-                  </p>
+                  <span className="text-[10px] text-muted-foreground">Google Pay</span>
                 </div>
-              )}
+                
+                {/* Credit Card */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-12 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" className="w-5 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                      <line x1="1" y1="10" x2="23" y2="10" />
+                    </svg>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">אשראי</span>
+                </div>
+                
+                {/* Cash */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-12 h-8 bg-gradient-to-br from-success to-green-600 rounded-md flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">₪</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">מזומן</span>
+                </div>
+              </div>
             </div>
           </div>}
 
-        {/* Processing Payment Screen */}
-        {step === 'processing' && (
-          <div className="text-center py-12 animate-fade-in space-y-6">
-            {!pendingPaymentLink ? (
-              <>
-                <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-                <h2 className="text-xl font-bold mb-2">מכינים את דף התשלום...</h2>
-                <p className="text-muted-foreground text-sm">רק רגע...</p>
-              </>
-            ) : (
-              <>
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                  <CreditCard className="w-8 h-8 text-primary" />
-                </div>
-                <h2 className="text-xl font-bold">דף התשלום נפתח בחלון חדש</h2>
-                <p className="text-muted-foreground text-sm">
-                  לאחר השלמת התשלום, לחצו על הכפתור למטה
-                </p>
-                
-                <Button
-                  onClick={() => {
-                    if (pendingPaymentOrderNumber) {
-                      setCompletedOrderNumber(pendingPaymentOrderNumber);
-                      sendPaymentNotifications(pendingPaymentOrderNumber);
-                    }
-                    goToStep('success');
-                  }}
-                  className="w-full h-14 text-base rounded-2xl font-bold shadow-lg"
-                  size="lg"
-                >
-                  <CheckCircle2 className="w-5 h-5 ml-2" />
-                  שילמתי — חזרה להזמנה
-                </Button>
-
-                <a
-                  href={pendingPaymentLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-sm text-primary underline"
-                >
-                  דף התשלום לא נפתח? לחצו כאן
-                </a>
-              </>
-            )}
-          </div>
-        )}
         {/* Step 4: Schedule */}
         {step === 'schedule' && <div className="space-y-5 animate-fade-in">
             <div className="text-center mb-4">
@@ -2221,7 +2009,7 @@ const NewRepairOrder = () => {
         </div>}
 
       {/* Sticky Footer with Action Buttons */}
-      {step !== 'success' && step !== 'model' && step !== 'repair' && step !== 'processing' && <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border/50 p-4 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+      {step !== 'success' && step !== 'model' && step !== 'repair' && <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border/50 p-4 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
           {step === 'price' && <div className="space-y-2">
               <Button onClick={handlePriceConfirm} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
                 אישור ובחירת מועד לטכנאי
@@ -2266,16 +2054,11 @@ const NewRepairOrder = () => {
               המשך לפרטים
             </Button>}
           
-          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact} className={`w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl ${paymentMethod === 'now' ? 'bg-gradient-to-r from-success to-green-600 hover:from-success hover:to-green-700' : ''}`}>
+          {step === 'details' && <Button onClick={handleSubmit} disabled={isSubmitting || !acceptPrivacy || !acceptContact} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
               {isSubmitting ? <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  {paymentMethod === 'now' ? 'מעבד...' : 'שולח...'}
-                </div> : paymentMethod === 'now' ? (
-                  <span className="flex items-center gap-2">
-                    <Lock className="w-4 h-4" />
-                    שלם ₪{getFinalPrice()} ושלח הזמנה
-                  </span>
-                ) : 'שלח הזמנה'}
+                  שולח...
+                </div> : 'שלח הזמנה'}
             </Button>}
         </div>}
     </div>;

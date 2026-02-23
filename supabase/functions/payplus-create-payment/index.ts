@@ -29,10 +29,8 @@ serve(async (req) => {
       );
     }
 
-    const paymentPageUid = Deno.env.get('PAYPLUS_PAYMENT_PAGE_UID') || '';
-    
     const payload: Record<string, any> = {
-      payment_page_uid: paymentPageUid,
+      payment_page_uid: '',
       charge_method: 1, // Regular charge
       amount,
       currency_code: 'ILS',
@@ -41,15 +39,11 @@ serve(async (req) => {
       more_info_1: customerName || '',
       more_info_2: customerPhone || '',
       more_info_3: customerEmail || '',
-      refURL_success: successUrl || 'https://directfix-tracker.lovable.app/order?payment=success',
-      refURL_failure: failureUrl || 'https://directfix-tracker.lovable.app/order?payment=failed',
-      refURL_cancel: successUrl ? successUrl.split('?')[0] : 'https://directfix-tracker.lovable.app/order',
+      refURL_success: successUrl || '',
+      refURL_failure: failureUrl || '',
       sendEmailApproval: !!customerEmail,
       customer: {} as Record<string, any>,
     };
-
-    console.log('PayPlus payload refURL_success:', payload.refURL_success);
-    console.log('PayPlus payload refURL_failure:', payload.refURL_failure);
 
     if (customerName) payload.customer.customer_name = customerName;
     if (customerPhone) payload.customer.phone = customerPhone;

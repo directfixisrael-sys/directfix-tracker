@@ -18,7 +18,6 @@ interface OrderData {
   orderNumber?: number;
   promotionTitle?: string;
   leadSource?: string;
-  serviceType?: 'repair' | 'consultation';
   leadSourceDetails?: {
     gclid?: string;
     fbclid?: string;
@@ -115,10 +114,6 @@ const handler = async (req: Request): Promise<Response> => {
     const calendarLink = buildCalendarLink(orderData);
     console.log("Calendar link generated:", calendarLink);
 
-    const isConsultation = orderData.serviceType === 'consultation';
-    const serviceLabel = isConsultation ? 'שיחת ייעוץ' : 'תיקון';
-    const serviceEmoji = isConsultation ? '📞' : '🔧';
-
     // 1. Send email to business owner
     const businessEmailHtml = `
 <!DOCTYPE html>
@@ -129,9 +124,9 @@ const handler = async (req: Request): Promise<Response> => {
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5; direction: rtl;">
   <div style="max-width: 600px; margin: 0 auto; padding: 20px; direction: rtl;">
-    <div style="background: linear-gradient(135deg, ${isConsultation ? '#f59e0b 0%, #d97706 100%' : '#667eea 0%, #764ba2 100%'}); border-radius: 16px 16px 0 0; padding: 30px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 28px;">${serviceEmoji} ${isConsultation ? 'שיחת ייעוץ חדשה!' : '🎉 הזמנה חדשה!'}</h1>
-      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">התקבלה הזמנת ${serviceLabel} חדשה${orderData.orderNumber ? ` (#${orderData.orderNumber})` : ''}</p>
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px 16px 0 0; padding: 30px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 28px;">🎉 הזמנה חדשה!</h1>
+      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">התקבלה הזמנת תיקון חדשה${orderData.orderNumber ? ` (#${orderData.orderNumber})` : ''}</p>
     </div>
     
     <div style="background: white; border-radius: 0 0 16px 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: right;">
@@ -142,11 +137,11 @@ const handler = async (req: Request): Promise<Response> => {
         <p style="margin: 8px 0; color: #555; text-align: right;"><strong>כתובת:</strong> ${orderData.customerAddress}</p>
       </div>
       
-      <div style="background: linear-gradient(135deg, ${isConsultation ? '#f59e0b10 0%, #d9770610 100%' : '#667eea10 0%, #764ba210 100%'}); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid ${isConsultation ? '#f59e0b30' : '#667eea30'}; text-align: right;">
-        <h2 style="margin: 0 0 15px 0; color: #333; font-size: 18px; text-align: right;">${serviceEmoji} ${isConsultation ? 'פרטי הייעוץ' : 'פרטי התיקון'}</h2>
-        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>${isConsultation ? 'נושא:' : 'דגם:'}</strong> ${orderData.deviceType}</p>
-        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>${isConsultation ? 'תיאור:' : 'סוג תיקון:'}</strong> ${orderData.repairType}</p>
-        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>מחיר:</strong> <span style="color: ${isConsultation ? '#d97706' : '#667eea'}; font-weight: bold; font-size: 20px;">₪${orderData.repairPrice}</span></p>
+      <div style="background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #667eea30; text-align: right;">
+        <h2 style="margin: 0 0 15px 0; color: #333; font-size: 18px; text-align: right;">📱 פרטי התיקון</h2>
+        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>דגם:</strong> ${orderData.deviceType}</p>
+        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>סוג תיקון:</strong> ${orderData.repairType}</p>
+        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>מחיר:</strong> <span style="color: #667eea; font-weight: bold; font-size: 20px;">₪${orderData.repairPrice}</span></p>
       </div>
       
       <div style="background: #fff3cd; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #ffc107; text-align: right;">
@@ -201,7 +196,7 @@ const handler = async (req: Request): Promise<Response> => {
           resendApiKey,
           "דיירקט פיקס <orders@directfix.co.il>",
           ["directfixisrael@gmail.com"],
-          `${isConsultation ? '📞 שיחת ייעוץ חדשה' : 'התקבלה הזמנה לתיקון חדש 🎉'}${orderData.orderNumber ? ` #${orderData.orderNumber}` : ''} - ${orderData.customerName} - ${orderData.deviceType}`,
+          `התקבלה הזמנה לתיקון חדש 🎉${orderData.orderNumber ? ` #${orderData.orderNumber}` : ''} - ${orderData.customerName} - ${orderData.deviceType}`,
           businessEmailHtml
         );
         results.email = businessEmail;
@@ -246,22 +241,7 @@ const handler = async (req: Request): Promise<Response> => {
           to: `whatsapp:+${formattedPhone}`
         });
 
-        const customerWhatsappMessage = isConsultation
-          ? `📞 *שיחת הייעוץ נקבעה!*
-
-היי ${orderData.customerName}! 👋
-
-תודה שבחרת בנו! 💜
-
-*פרטי השיחה:*
-📱 ${orderData.deviceType}
-📝 ${orderData.repairType}
-${orderData.repairPrice > 0 ? `💰 מחיר: ₪${orderData.repairPrice}\n` : ''}📅 ${orderData.scheduledTime}
-
-ניצור איתך קשר במועד שנקבע.
-
-לכל שאלה - אנחנו כאן! 📞`
-          : `🎉 *ההזמנה התקבלה!*
+        const customerWhatsappMessage = `🎉 *ההזמנה התקבלה!*
 
 היי ${orderData.customerName}! 👋
 
@@ -307,13 +287,14 @@ ${orderData.promotionTitle ? `🎁 *${orderData.promotionTitle}*\n` : ''}
           to: `whatsapp:+${businessPhone}`
         });
 
-        const businessWhatsappMessage = `🔔 *${isConsultation ? 'שיחת ייעוץ חדשה!' : 'הזמנה חדשה!'}*
+        const businessWhatsappMessage = `🔔 *הזמנה חדשה!*
 
 👤 *לקוח:* ${orderData.customerName}
 📞 *טלפון:* ${orderData.customerPhone}
-${!isConsultation ? `📍 *כתובת:* ${orderData.customerAddress}\n` : ''}
-📱 *${isConsultation ? 'נושא' : 'דגם'}:* ${orderData.deviceType}
-${serviceEmoji} *${isConsultation ? 'תיאור' : 'תיקון'}:* ${orderData.repairType}
+📍 *כתובת:* ${orderData.customerAddress}
+
+📱 *דגם:* ${orderData.deviceType}
+🔧 *תיקון:* ${orderData.repairType}
 💰 *מחיר:* ₪${orderData.repairPrice}
 📅 *מועד:* ${orderData.scheduledTime}
 
@@ -359,37 +340,37 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5; direction: rtl;">
   <div style="max-width: 600px; margin: 0 auto; padding: 20px; direction: rtl;">
-    <div style="background: linear-gradient(135deg, ${isConsultation ? '#f59e0b 0%, #d97706 100%' : '#0d64f4 0%, #0a4dbf 100%'}); border-radius: 16px 16px 0 0; padding: 30px; text-align: center;">
-      <div style="font-size: 50px; margin-bottom: 10px;">${isConsultation ? '📞' : '✅'}</div>
-      <h1 style="color: white; margin: 0; font-size: 24px;">${isConsultation ? 'שיחת הייעוץ נקבעה!' : 'ההזמנה התקבלה בהצלחה!'}</h1>
+    <div style="background: linear-gradient(135deg, #0d64f4 0%, #0a4dbf 100%); border-radius: 16px 16px 0 0; padding: 30px; text-align: center;">
+      <div style="font-size: 50px; margin-bottom: 10px;">✅</div>
+      <h1 style="color: white; margin: 0; font-size: 24px;">ההזמנה התקבלה בהצלחה!</h1>
       ${orderData.orderNumber ? `<p style="color: rgba(255,255,255,0.8); margin: 8px 0 0 0; font-size: 14px;">הזמנה #${orderData.orderNumber}</p>` : ''}
       <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">תודה שבחרת ב-DirectFix, ${orderData.customerName}!</p>
     </div>
     
     <div style="background: white; border-radius: 0 0 16px 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: right;">
-      <h2 style="margin: 0 0 20px 0; color: #333; font-size: 18px; text-align: center;">📋 ${isConsultation ? 'פרטי שיחת הייעוץ' : 'סיכום ההזמנה'}</h2>
+      <h2 style="margin: 0 0 20px 0; color: #333; font-size: 18px; text-align: center;">📋 סיכום ההזמנה</h2>
       
       <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
         <table style="width: 100%; border-collapse: collapse;" dir="rtl">
           <tr>
-            <td style="padding: 10px 0; color: #888; text-align: right;">${isConsultation ? '📱 נושא' : '📱 דגם'}</td>
+            <td style="padding: 10px 0; color: #888; text-align: right;">📱 דגם</td>
             <td style="padding: 10px 0; color: #333; font-weight: 600; text-align: left;">${orderData.deviceType}</td>
           </tr>
           <tr>
-            <td style="padding: 10px 0; color: #888; text-align: right;">${isConsultation ? '📝 תיאור' : '🔧 סוג תיקון'}</td>
+            <td style="padding: 10px 0; color: #888; text-align: right;">🔧 סוג תיקון</td>
             <td style="padding: 10px 0; color: #333; font-weight: 600; text-align: left;">${orderData.repairType}</td>
           </tr>
           <tr>
             <td style="padding: 10px 0; color: #888; text-align: right;">📅 מועד</td>
             <td style="padding: 10px 0; color: #333; font-weight: 600; text-align: left;">${orderData.scheduledTime}</td>
           </tr>
-          ${!isConsultation ? `<tr>
+          <tr>
             <td style="padding: 10px 0; color: #888; text-align: right;">📍 כתובת</td>
             <td style="padding: 10px 0; color: #333; font-weight: 600; text-align: left;">${orderData.customerAddress}</td>
-          </tr>` : ''}
+          </tr>
           <tr style="border-top: 2px solid #e5e7eb;">
-            <td style="padding: 15px 0 8px 0; color: #333; font-weight: bold; font-size: 16px; text-align: right;">💰 ${isConsultation ? 'עלות' : 'סה"כ לתשלום'}</td>
-            <td style="padding: 15px 0 8px 0; color: ${isConsultation ? '#d97706' : '#0d64f4'}; font-weight: bold; font-size: 22px; text-align: left;">${orderData.repairPrice > 0 ? `₪${orderData.repairPrice}` : 'חינם'}</td>
+            <td style="padding: 15px 0 8px 0; color: #333; font-weight: bold; font-size: 16px; text-align: right;">💰 סה"כ לתשלום</td>
+            <td style="padding: 15px 0 8px 0; color: #0d64f4; font-weight: bold; font-size: 22px; text-align: left;">₪${orderData.repairPrice}</td>
           </tr>
         </table>
       </div>
@@ -401,11 +382,11 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
       ` : ''}
 
       <!-- Action Buttons -->
-      ${!isConsultation ? `<div style="text-align: center; margin-bottom: 20px;">
+      <div style="text-align: center; margin-bottom: 20px;">
         <a href="${trackingUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #0d64f4 0%, #0a4dbf 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(13, 100, 244, 0.3); margin-bottom: 10px;">
           📍 עקוב אחר התיקון שלך
         </a>
-      </div>` : ''}
+      </div>
       
       <div style="text-align: center; margin-bottom: 20px;">
         <a href="${customerCalendarLink}" target="_blank" style="display: inline-block; background: white; color: #333; text-decoration: none; padding: 12px 28px; border-radius: 12px; font-size: 14px; font-weight: 600; border: 2px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
@@ -414,13 +395,13 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
       </div>
       
       <div style="background: #eff6ff; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 15px;">
-        <p style="margin: 0 0 8px 0; color: #1e40af; font-weight: 600;">${isConsultation ? '📞 ניצור איתך קשר במועד שנקבע' : '💳 תשלום בסיום התיקון בלבד'}</p>
-        <p style="margin: 0; color: #3b82f6; font-size: 14px;">${isConsultation ? 'הטכנאי יתקשר אליך בשעה שנבחרה' : 'ניצור איתך קשר לאישור המועד'}</p>
+        <p style="margin: 0 0 8px 0; color: #1e40af; font-weight: 600;">💳 תשלום בסיום התיקון בלבד</p>
+        <p style="margin: 0; color: #3b82f6; font-size: 14px;">ניצור איתך קשר לאישור המועד</p>
       </div>
 
-      ${!isConsultation ? `<div style="background: #f0fdf4; border-radius: 12px; padding: 15px; text-align: center;">
+      <div style="background: #f0fdf4; border-radius: 12px; padding: 15px; text-align: center;">
         <p style="margin: 0; color: #166534; font-size: 14px;">🛡️ כל התיקונים שלנו כוללים אחריות מלאה</p>
-      </div>` : ''}
+      </div>
     </div>
     
     <p style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
@@ -439,7 +420,7 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
           resendApiKey,
           "דיירקט פיקס <orders@directfix.co.il>",
           [orderData.customerEmail],
-          `${isConsultation ? '📞 שיחת הייעוץ נקבעה' : '✅ ההזמנה התקבלה'} - ${orderData.deviceType} ${orderData.repairType}`,
+          `✅ ההזמנה התקבלה - ${orderData.deviceType} ${orderData.repairType}`,
           customerEmailHtml
         );
         results.customerEmail = customerEmail;
