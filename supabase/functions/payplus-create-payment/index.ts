@@ -51,17 +51,27 @@ serve(async (req) => {
 
     console.log('Creating PayPlus payment link:', { amount, description, customerName });
 
+    console.log('Using API key (first 8 chars):', apiKey.substring(0, 8));
+
     const response = await fetch(`${PAYPLUS_API_URL}/PaymentPages/generateLink`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'api-key': apiKey,
-        'secret-key': secretKey,
+        'Authorization': JSON.stringify({ api_key: apiKey, secret_key: secretKey }),
       },
       body: JSON.stringify(payload),
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    console.log('PayPlus raw response:', responseText.substring(0, 500));
+
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      console.error('PayPlus returned non-JSON:', responseText);
+      throw new Error(`PayPlus authentication failed: ${responseText}`);
+    }
 
     if (!response.ok || data.results?.status === 'error') {
       console.error('PayPlus API error:', JSON.stringify(data));
