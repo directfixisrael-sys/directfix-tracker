@@ -48,7 +48,8 @@ import {
   DollarSign,
   Package,
   Wrench,
-  CalendarPlus
+  CalendarPlus,
+  Sparkles
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
