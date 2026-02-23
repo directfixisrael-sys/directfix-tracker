@@ -18,6 +18,7 @@ interface OrderData {
   orderNumber?: number;
   promotionTitle?: string;
   leadSource?: string;
+  serviceType?: 'repair' | 'consultation';
   leadSourceDetails?: {
     gclid?: string;
     fbclid?: string;
