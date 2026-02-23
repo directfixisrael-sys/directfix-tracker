@@ -1797,8 +1797,8 @@ const NewRepairOrder = () => {
                   <h3 className="font-bold text-lg">פרטי השולח (שלכם)</h3>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold mb-1.5">שם השולח</label>
-                  <Input placeholder="השם שלכם" value={giftSenderName} onChange={e => setGiftSenderName(e.target.value)} className="h-13 text-base rounded-2xl bg-card border-border/50 focus:bg-card" />
+                  <label className="block text-xs font-semibold mb-1">שם השולח</label>
+                  <Input placeholder="השם שלכם" value={giftSenderName} onChange={e => setGiftSenderName(e.target.value)} className="h-11 text-sm rounded-xl bg-card" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold mb-1.5">טלפון השולח</label>
