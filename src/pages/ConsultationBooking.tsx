@@ -57,6 +57,10 @@ const ConsultationBooking = () => {
     if (returnedOrderNumber) return parseInt(returnedOrderNumber);
     return null;
   });
+  const [paymentIframeUrl, setPaymentIframeUrl] = useState<string | null>(null);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
+  const paymentIframeRef = useRef<HTMLDivElement>(null);
   const { addOrder } = useRepairStore();
 
   // Get available dates: tomorrow to +7 days
