@@ -297,6 +297,8 @@ const NewRepairOrder = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [completedOrderNumber, setCompletedOrderNumber] = useState<number | null>(null);
   const [paymentChoice, setPaymentChoice] = useState<'now' | 'later' | null>(null);
+  const [paymentIframeUrl, setPaymentIframeUrl] = useState<string | null>(null);
+  const paymentIframeRef = useRef<HTMLDivElement>(null);
 
   // Schedule fields
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -977,7 +979,11 @@ const NewRepairOrder = () => {
           if (error) throw error;
           if (data?.paymentLink) {
             await supabase.from('orders').update({ payment_link: data.paymentLink, payment_status: 'pending' }).eq('id', orderResult.id);
-            window.location.href = data.paymentLink;
+            setPaymentIframeUrl(data.paymentLink);
+            goToStep('processing');
+            setTimeout(() => {
+              paymentIframeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
             return;
           } else {
             throw new Error('Failed to generate payment link');
@@ -1947,8 +1953,35 @@ const NewRepairOrder = () => {
                     <div className="flex-1">
                       <h4 className="font-bold text-base">לשלם עכשיו</h4>
                       <p className="text-xs text-muted-foreground mt-0.5">תשלום מאובטח בכרטיס אשראי</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        {/* Apple Pay */}
+                        <div className="w-8 h-5 bg-foreground rounded flex items-center justify-center">
+                          <svg viewBox="0 0 24 24" className="w-4 h-3 text-background" fill="currentColor">
+                            <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+                          </svg>
+                        </div>
+                        {/* Google Pay */}
+                        <div className="w-8 h-5 bg-card border border-border rounded flex items-center justify-center">
+                          <svg viewBox="0 0 24 24" className="w-4 h-3" fill="none">
+                            <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z" fill="#4285F4" />
+                          </svg>
+                        </div>
+                        {/* Visa */}
+                        <div className="w-8 h-5 bg-card border border-border rounded flex items-center justify-center">
+                          <svg viewBox="0 0 48 48" className="w-5 h-3">
+                            <path d="M19.6 33.2H15.3l2.7-16.4h4.3l-2.7 16.4z" fill="#1565C0" />
+                            <path d="M34.6 17.2c-.9-.3-2.2-.7-3.9-.7-4.3 0-7.3 2.3-7.3 5.5 0 2.4 2.2 3.8 3.8 4.6 1.7.8 2.2 1.4 2.2 2.1 0 1.1-1.3 1.6-2.6 1.6-1.7 0-2.6-.2-4-.8l-.6-.3-.6 3.8c1 .5 2.8.8 4.7.8 4.5 0 7.5-2.2 7.5-5.7 0-1.9-1.1-3.3-3.6-4.5-1.5-.8-2.4-1.3-2.4-2.1 0-.7.8-1.4 2.4-1.4 1.4 0 2.4.3 3.2.6l.4.2.6-3.7z" fill="#1565C0" />
+                            <path d="M39.4 16.8h-3.3c-1 0-1.8.3-2.3 1.4l-6.4 15h4.5l.9-2.5h5.5l.5 2.5H43l-3.6-16.4zm-5.3 10.6l2.3-6.1 1.3 6.1h-3.6z" fill="#1565C0" />
+                            <path d="M13.3 16.8L9 28.5l-.5-2.4c-.8-2.7-3.3-5.6-6.1-7.1l3.8 14.2h4.6l6.8-16.4h-4.3z" fill="#1565C0" />
+                          </svg>
+                        </div>
+                        {/* Bit */}
+                        <div className="w-8 h-5 bg-card border border-border rounded flex items-center justify-center">
+                          <span className="text-[8px] font-bold text-blue-600">Bit</span>
+                        </div>
+                      </div>
                     </div>
-                    {paymentChoice === 'now' && <Check className="w-5 h-5 text-primary" />}
+                    {paymentChoice === 'now' && <Check className="w-5 h-5 text-primary flex-shrink-0" />}
                   </div>
                 </button>
 
@@ -2019,12 +2052,39 @@ const NewRepairOrder = () => {
             </Card>
           </div>}
 
-        {/* Step: Processing Payment */}
+        {/* Step: Inline Payment */}
         {step === 'processing' && (
-          <div className="text-center py-20 animate-fade-in">
-            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">מעבירים לדף התשלום...</h2>
-            <p className="text-muted-foreground text-sm">תועברו בשניות לדף התשלום המאובטח</p>
+          <div className="animate-fade-in space-y-4" ref={paymentIframeRef}>
+            {paymentIframeUrl ? (
+              <>
+                <div className="text-center mb-2">
+                  <div className="inline-flex items-center gap-2 bg-success/10 text-success rounded-full px-4 py-1.5 text-sm font-semibold mb-2">
+                    <Shield className="w-4 h-4" />
+                    תשלום מאובטח
+                  </div>
+                  <h2 className="text-xl font-bold">השלימו את התשלום</h2>
+                  <p className="text-xs text-muted-foreground mt-1">סה״כ: <span className="font-bold text-foreground">₪{getFinalPrice()}</span></p>
+                </div>
+                <div className="rounded-2xl overflow-hidden border-2 border-primary/20 shadow-lg bg-card">
+                  <iframe 
+                    src={paymentIframeUrl} 
+                    className="w-full border-0" 
+                    style={{ minHeight: '600px', height: '70vh' }}
+                    title="דף תשלום מאובטח"
+                    allow="payment"
+                  />
+                </div>
+                <p className="text-center text-[11px] text-muted-foreground">
+                  🔒 התשלום מאובטח ומוצפן בתקן PCI DSS
+                </p>
+              </>
+            ) : (
+              <div className="text-center py-20">
+                <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+                <h2 className="text-xl font-bold mb-2">מכינים את דף התשלום...</h2>
+                <p className="text-muted-foreground text-sm">רגע אחד...</p>
+              </div>
+            )}
           </div>
         )}
 
