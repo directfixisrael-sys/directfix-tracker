@@ -386,55 +386,57 @@ const NewRepairOrder = () => {
   }, [isGiftOrder]);
 
   // Handle payment return - send notifications after successful payment
+  // This runs either from PayPlus redirect (?payment=success) or when user clicks "שילמתי"
+  const sendPaymentNotifications = async (orderNumber: number) => {
+    try {
+      const { data: orderData } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('order_number', orderNumber)
+        .single();
+      
+      if (orderData) {
+        // Update payment status
+        await supabase
+          .from('orders')
+          .update({ payment_status: 'paid' })
+          .eq('id', orderData.id);
+
+        // Remove the waiting note and update status
+        const updatedNotes = (orderData.notes as string[]).filter((n: string) => !n.includes('ממתין לתשלום'));
+        updatedNotes.push('✅ תשלום התקבל');
+        await supabase
+          .from('orders')
+          .update({ notes: updatedNotes })
+          .eq('id', orderData.id);
+
+        // Send notifications
+        await supabase.functions.invoke('send-order-notifications', {
+          body: {
+            customerName: orderData.customer_name,
+            customerPhone: orderData.customer_phone,
+            customerAddress: orderData.customer_address,
+            customerEmail: orderData.customer_email,
+            deviceType: orderData.device_type,
+            repairType: orderData.issue_description,
+            repairPrice: orderData.repair_price,
+            scheduledTime: orderData.estimated_arrival || '',
+            notes: '',
+            orderNumber: orderData.order_number,
+            leadSource: orderData.lead_source,
+          }
+        });
+      }
+    } catch (e) {
+      console.error('Error sending notifications after payment:', e);
+    }
+  };
+
   useEffect(() => {
     if (paymentSuccess && returnedOrderNumber) {
-      // Send notifications now that payment is confirmed
-      const sendNotifications = async () => {
-        try {
-          // Get order data from DB to send notifications
-          const { data: orderData } = await supabase
-            .from('orders')
-            .select('*')
-            .eq('order_number', parseInt(returnedOrderNumber))
-            .single();
-          
-          if (orderData) {
-            // Update payment status
-            await supabase
-              .from('orders')
-              .update({ payment_status: 'paid' })
-              .eq('id', orderData.id);
-
-            // Remove the waiting note and update status
-            const updatedNotes = orderData.notes.filter((n: string) => !n.includes('ממתין לתשלום'));
-            updatedNotes.push('✅ תשלום התקבל');
-            await supabase
-              .from('orders')
-              .update({ notes: updatedNotes })
-              .eq('id', orderData.id);
-
-            // Send notifications
-            await supabase.functions.invoke('send-order-notifications', {
-              body: {
-                customerName: orderData.customer_name,
-                customerPhone: orderData.customer_phone,
-                customerAddress: orderData.customer_address,
-                customerEmail: orderData.customer_email,
-                deviceType: orderData.device_type,
-                repairType: orderData.issue_description,
-                repairPrice: orderData.repair_price,
-                scheduledTime: orderData.estimated_arrival || '',
-                notes: '',
-                orderNumber: orderData.order_number,
-                leadSource: orderData.lead_source,
-              }
-            });
-          }
-        } catch (e) {
-          console.error('Error sending notifications after payment:', e);
-        }
-      };
-      sendNotifications();
+      sendPaymentNotifications(parseInt(returnedOrderNumber));
+    }
+  }, [paymentSuccess, returnedOrderNumber]);
     }
   }, [paymentSuccess, returnedOrderNumber]);
 
