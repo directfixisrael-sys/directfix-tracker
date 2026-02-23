@@ -371,6 +371,70 @@ const NewRepairOrder = () => {
   }, [isGiftOrder]);
   const [giftClaimed, setGiftClaimed] = useState(false);
 
+  // Handle payment success from URL params (iframe redirect or page reload)
+  useEffect(() => {
+    const paymentSuccess = searchParams.get('payment') === 'success';
+    const orderNum = searchParams.get('order');
+    if (paymentSuccess && orderNum) {
+      // Payment was successful - update order and send notifications
+      const handlePaymentSuccess = async () => {
+        const { data } = await supabase
+          .from('orders')
+          .select('id, order_number')
+          .eq('order_number', parseInt(orderNum))
+          .single();
+        if (data) {
+          await supabase
+            .from('orders')
+            .update({ payment_status: 'paid', status: 'confirmed' })
+            .eq('id', data.id);
+        }
+        // Send deferred notifications if available
+        if (pendingNotificationData) {
+          try {
+            await supabase.functions.invoke('send-order-notifications', { body: pendingNotificationData });
+          } catch (e) { console.error('Notification error:', e); }
+          setPendingNotificationData(null);
+        }
+        setCompletedOrderNumber(parseInt(orderNum));
+        setPaymentIframeUrl(null);
+        goToStep('success');
+      };
+      handlePaymentSuccess();
+    }
+  }, [searchParams]);
+
+  // Listen for iframe navigation to payment success URL
+  useEffect(() => {
+    if (!paymentIframeUrl) return;
+    
+    const checkPaymentStatus = async () => {
+      if (!pendingOrderId) return;
+      const { data } = await supabase
+        .from('orders')
+        .select('payment_status, order_number')
+        .eq('id', pendingOrderId)
+        .single();
+      if (data?.payment_status === 'paid') {
+        // Payment confirmed! Send notifications now
+        if (pendingNotificationData) {
+          try {
+            await supabase.functions.invoke('send-order-notifications', { body: pendingNotificationData });
+          } catch (e) { console.error('Notification error:', e); }
+          setPendingNotificationData(null);
+        }
+        setCompletedOrderNumber(data.order_number);
+        setPaymentIframeUrl(null);
+        setPendingOrderId(null);
+        goToStep('success');
+      }
+    };
+
+    // Poll every 3 seconds to check if payment was completed
+    const interval = setInterval(checkPaymentStatus, 3000);
+    return () => clearInterval(interval);
+  }, [paymentIframeUrl, pendingOrderId, pendingNotificationData]);
+
   // Broadcast initial step on mount
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('repair-step-change', { detail: { step: 'model' } }));
