@@ -307,14 +307,13 @@ ${orderData.promotionTitle ? `🎁 *${orderData.promotionTitle}*\n` : ''}
           to: `whatsapp:+${businessPhone}`
         });
 
-        const businessWhatsappMessage = `🔔 *הזמנה חדשה!*
+        const businessWhatsappMessage = `🔔 *${isConsultation ? 'שיחת ייעוץ חדשה!' : 'הזמנה חדשה!'}*
 
 👤 *לקוח:* ${orderData.customerName}
 📞 *טלפון:* ${orderData.customerPhone}
-📍 *כתובת:* ${orderData.customerAddress}
-
-📱 *דגם:* ${orderData.deviceType}
-🔧 *תיקון:* ${orderData.repairType}
+${!isConsultation ? `📍 *כתובת:* ${orderData.customerAddress}\n` : ''}
+📱 *${isConsultation ? 'נושא' : 'דגם'}:* ${orderData.deviceType}
+${serviceEmoji} *${isConsultation ? 'תיאור' : 'תיקון'}:* ${orderData.repairType}
 💰 *מחיר:* ₪${orderData.repairPrice}
 📅 *מועד:* ${orderData.scheduledTime}
 
