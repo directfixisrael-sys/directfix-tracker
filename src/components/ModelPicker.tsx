@@ -34,6 +34,15 @@ const seriesOrder = [
 
 const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPickerProps) => {
   const [activeSeries, setActiveSeries] = useState<string | null>(null);
+  const modelsListRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (activeSeries && modelsListRef.current) {
+      setTimeout(() => {
+        modelsListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [activeSeries]);
 
   const grouped = useMemo(() => {
     return models.reduce<Record<string, IphoneModel[]>>((acc, model) => {
