@@ -142,11 +142,11 @@ const handler = async (req: Request): Promise<Response> => {
         <p style="margin: 8px 0; color: #555; text-align: right;"><strong>כתובת:</strong> ${orderData.customerAddress}</p>
       </div>
       
-      <div style="background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #667eea30; text-align: right;">
-        <h2 style="margin: 0 0 15px 0; color: #333; font-size: 18px; text-align: right;">📱 פרטי התיקון</h2>
-        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>דגם:</strong> ${orderData.deviceType}</p>
-        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>סוג תיקון:</strong> ${orderData.repairType}</p>
-        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>מחיר:</strong> <span style="color: #667eea; font-weight: bold; font-size: 20px;">₪${orderData.repairPrice}</span></p>
+      <div style="background: linear-gradient(135deg, ${isConsultation ? '#f59e0b10 0%, #d9770610 100%' : '#667eea10 0%, #764ba210 100%'}); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid ${isConsultation ? '#f59e0b30' : '#667eea30'}; text-align: right;">
+        <h2 style="margin: 0 0 15px 0; color: #333; font-size: 18px; text-align: right;">${serviceEmoji} ${isConsultation ? 'פרטי הייעוץ' : 'פרטי התיקון'}</h2>
+        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>${isConsultation ? 'נושא:' : 'דגם:'}</strong> ${orderData.deviceType}</p>
+        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>${isConsultation ? 'תיאור:' : 'סוג תיקון:'}</strong> ${orderData.repairType}</p>
+        <p style="margin: 8px 0; color: #555; text-align: right;"><strong>מחיר:</strong> <span style="color: ${isConsultation ? '#d97706' : '#667eea'}; font-weight: bold; font-size: 20px;">₪${orderData.repairPrice}</span></p>
       </div>
       
       <div style="background: #fff3cd; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #ffc107; text-align: right;">
