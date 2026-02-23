@@ -161,27 +161,27 @@
 
   html {
     direction: rtl;
-    font-size: 22px;
+    font-size: 16px;
   }
   
   @media (min-width: 640px) {
     html {
-      font-size: 22px;
+      font-size: 16px;
     }
   }
   
   @media (min-width: 1024px) {
     html {
-      font-size: 23px;
+      font-size: 16px;
     }
   }
 
   /* Ensure minimum readable font sizes */
   .text-xs {
-    font-size: 0.875rem !important; /* ~19px */
+    font-size: 0.75rem !important;
   }
   .text-sm {
-    font-size: 1rem !important; /* 22px */
+    font-size: 0.875rem !important;
   }
 
   body {
