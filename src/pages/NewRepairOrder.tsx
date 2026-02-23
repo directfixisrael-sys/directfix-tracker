@@ -437,8 +437,6 @@ const NewRepairOrder = () => {
       sendPaymentNotifications(parseInt(returnedOrderNumber));
     }
   }, [paymentSuccess, returnedOrderNumber]);
-    }
-  }, [paymentSuccess, returnedOrderNumber]);
 
   // Broadcast initial step on mount
   useEffect(() => {
