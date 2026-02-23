@@ -246,7 +246,22 @@ const handler = async (req: Request): Promise<Response> => {
           to: `whatsapp:+${formattedPhone}`
         });
 
-        const customerWhatsappMessage = `🎉 *ההזמנה התקבלה!*
+        const customerWhatsappMessage = isConsultation
+          ? `📞 *שיחת הייעוץ נקבעה!*
+
+היי ${orderData.customerName}! 👋
+
+תודה שבחרת בנו! 💜
+
+*פרטי השיחה:*
+📱 ${orderData.deviceType}
+📝 ${orderData.repairType}
+${orderData.repairPrice > 0 ? `💰 מחיר: ₪${orderData.repairPrice}\n` : ''}📅 ${orderData.scheduledTime}
+
+ניצור איתך קשר במועד שנקבע.
+
+לכל שאלה - אנחנו כאן! 📞`
+          : `🎉 *ההזמנה התקבלה!*
 
 היי ${orderData.customerName}! 👋
 
