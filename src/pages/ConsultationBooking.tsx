@@ -374,15 +374,57 @@ const ConsultationBooking = () => {
     );
   }
 
-  // Processing payment screen
+  // Payment success popup dialog
+  const paymentSuccessDialog = (
+    <Dialog open={showPaymentSuccess} onOpenChange={() => {}}>
+      <DialogContent className="max-w-xs text-center border-0 shadow-2xl [&>button]:hidden" dir="rtl">
+        <div className="py-4 space-y-4 animate-fade-in">
+          <div className="flex justify-center">
+            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center shadow-lg animate-scale-in">
+              <CheckCircle2 className="w-12 h-12 text-white" />
+            </div>
+          </div>
+          <h2 className="text-xl font-bold text-green-600">התשלום התקבל בהצלחה! ✅</h2>
+          <p className="text-muted-foreground text-sm">מעבירים לאישור ההזמנה...</p>
+          <div className="flex justify-center">
+            <Loader2 className="w-5 h-5 text-primary animate-spin" />
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
+  // Processing payment screen - show iframe
   if (step === 'processing') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-6" dir="rtl">
-        <div className="text-center max-w-sm animate-fade-in">
-          <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">מעבירים לדף התשלום...</h2>
-          <p className="text-muted-foreground text-sm">תועברו בשניות לדף התשלום המאובטח</p>
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 max-w-lg mx-auto px-5 py-8" dir="rtl">
+        {paymentSuccessDialog}
+        <div className="text-center mb-6 animate-fade-in">
+          <Logo size="md" className="mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-1">תשלום מאובטח</h2>
+          <p className="text-muted-foreground text-sm">הזמנה #{completedOrderNumber} · ₪{PAID_PRICE}</p>
         </div>
+
+        {paymentIframeUrl ? (
+          <div ref={paymentIframeRef} className="rounded-2xl overflow-hidden border-2 border-primary/20 shadow-lg bg-card animate-fade-in">
+            <div className="bg-primary/5 px-4 py-2 flex items-center justify-center gap-2 border-b border-border">
+              <Shield className="w-4 h-4 text-primary" />
+              <span className="text-xs font-medium text-primary">תשלום מאובטח SSL</span>
+            </div>
+            <iframe
+              src={paymentIframeUrl}
+              className="w-full border-0"
+              style={{ minHeight: '600px', height: '70vh' }}
+              title="דף תשלום מאובטח"
+              allow="payment"
+            />
+          </div>
+        ) : (
+          <div className="text-center py-12 animate-fade-in">
+            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground text-sm">יוצרים דף תשלום מאובטח...</p>
+          </div>
+        )}
       </div>
     );
   }
