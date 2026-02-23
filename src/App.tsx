@@ -10,6 +10,7 @@ import CustomerTracker from "./pages/CustomerTracker";
 import AdminPanel from "./pages/AdminPanel";
 import NewRepairOrder from "./pages/NewRepairOrder";
 import DevicePurchase from "./pages/DevicePurchase";
+import ConsultationBooking from "./pages/ConsultationBooking";
 import DataTransfer from "./pages/DataTransfer";
 import NotFound from "./pages/NotFound";
 import MinimalFooter from "./components/MinimalFooter";
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/order" element={<NewRepairOrder />} />
             <Route path="/devices" element={<DevicePurchase />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/consultation" element={<ConsultationBooking />} />
             <Route path="/data-transfer" element={<DataTransfer />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

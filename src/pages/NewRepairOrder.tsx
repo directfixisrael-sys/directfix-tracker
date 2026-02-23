@@ -1225,13 +1225,10 @@ const NewRepairOrder = () => {
             </div>
 
 
-            {/* Scroll hint */}
-            <div className="flex flex-col items-center gap-1 animate-fade-in py-0">
-              <span className="text-xs text-muted-foreground font-medium">בחרו דגם ↓</span>
-              <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex items-start justify-center p-1.5">
-                <div className="w-1.5 h-2.5 bg-muted-foreground/50 rounded-full animate-[bounce_1.5s_infinite]" />
-              </div>
-            </div>
+            {/* Smart AI Search */}
+            <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
+
+            <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => setSelectedModel(model)} onConfirm={model => handleModelSelect(model)} />
 
             {/* Testimonials Slider */}
             <TestimonialsSlider />
@@ -1256,11 +1253,6 @@ const NewRepairOrder = () => {
                 </span>
               </label>
             </div>
-
-            {/* Smart AI Search */}
-            <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
-
-            <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => setSelectedModel(model)} onConfirm={model => handleModelSelect(model)} />
 
           </div>}
 
