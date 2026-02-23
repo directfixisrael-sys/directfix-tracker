@@ -189,25 +189,27 @@ const ConsultationBooking = () => {
 
       const orderNumber = orderData.order_number;
 
-      // Send notifications
-      try {
-        await supabase.functions.invoke('send-order-notifications', {
-          body: {
-            customerName,
-            customerPhone,
-            customerEmail,
-            customerAddress: '',
-            deviceType: `שיחת ייעוץ - ${deviceModel}`,
-            repairType: label,
-            repairPrice: consultationType === 'paid' ? PAID_PRICE : 0,
-            scheduledTime: `${dateStr} בשעה ${selectedTime}`,
-            notes: issueDescription + (additionalNotes ? `\n${additionalNotes}` : ''),
-            leadSource: 'consultation',
-            serviceType: 'consultation',
-            orderNumber,
-          },
-        });
-      } catch (e) { console.error('Notification error:', e); }
+      // Send notifications - only for free consultations (paid ones send after payment return)
+      if (consultationType === 'free') {
+        try {
+          await supabase.functions.invoke('send-order-notifications', {
+            body: {
+              customerName,
+              customerPhone,
+              customerEmail,
+              customerAddress: '',
+              deviceType: `שיחת ייעוץ - ${deviceModel}`,
+              repairType: label,
+              repairPrice: 0,
+              scheduledTime: `${dateStr} בשעה ${selectedTime}`,
+              notes: issueDescription + (additionalNotes ? `\n${additionalNotes}` : ''),
+              leadSource: 'consultation',
+              serviceType: 'consultation',
+              orderNumber,
+            },
+          });
+        } catch (e) { console.error('Notification error:', e); }
+      }
 
       // For paid consultations: generate PayPlus link and redirect
       if (consultationType === 'paid') {
