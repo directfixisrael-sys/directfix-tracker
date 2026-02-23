@@ -1049,6 +1049,8 @@ const NewRepairOrder = () => {
         } catch (notificationError) {
           console.error('Error sending notifications:', notificationError);
         }
+        trackPurchase(getFinalPrice());
+        gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
       }
 
       setCompletedOrderNumber(orderResult?.order_number || null);
