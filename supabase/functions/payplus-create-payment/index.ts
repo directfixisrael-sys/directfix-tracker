@@ -29,8 +29,10 @@ serve(async (req) => {
       );
     }
 
+    const paymentPageUid = Deno.env.get('PAYPLUS_PAYMENT_PAGE_UID') || '';
+    
     const payload: Record<string, any> = {
-      payment_page_uid: '',
+      payment_page_uid: paymentPageUid,
       charge_method: 1, // Regular charge
       amount,
       currency_code: 'ILS',
