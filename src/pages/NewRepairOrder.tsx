@@ -979,7 +979,11 @@ const NewRepairOrder = () => {
           if (error) throw error;
           if (data?.paymentLink) {
             await supabase.from('orders').update({ payment_link: data.paymentLink, payment_status: 'pending' }).eq('id', orderResult.id);
-            window.location.href = data.paymentLink;
+            setPaymentIframeUrl(data.paymentLink);
+            goToStep('processing');
+            setTimeout(() => {
+              paymentIframeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
             return;
           } else {
             throw new Error('Failed to generate payment link');
