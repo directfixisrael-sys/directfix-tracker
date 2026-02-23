@@ -20,7 +20,7 @@ serve(async (req) => {
       throw new Error('PayPlus API credentials not configured');
     }
 
-    const { amount, description, customerName, customerPhone, customerEmail, orderId, moreInfo } = await req.json();
+    const { amount, description, customerName, customerPhone, customerEmail, orderId, moreInfo, successUrl, failureUrl } = await req.json();
 
     if (!amount || amount <= 0) {
       return new Response(
@@ -39,8 +39,8 @@ serve(async (req) => {
       more_info_1: customerName || '',
       more_info_2: customerPhone || '',
       more_info_3: customerEmail || '',
-      refURL_success: '',
-      refURL_failure: '',
+      refURL_success: successUrl || '',
+      refURL_failure: failureUrl || '',
       sendEmailApproval: !!customerEmail,
       customer: {} as Record<string, any>,
     };
