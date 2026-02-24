@@ -432,7 +432,7 @@ const AdminPanel = () => {
       case 'technician_assigned':
         return `שלום ${order.customerName}!\n\nטכנאי שובץ להזמנה שלך\n${order.technicianName ? `שם הטכנאי: ${order.technicianName}` : ''}\n${order.deviceType}\n\nמעקב בזמן אמת: ${trackingUrl}`;
       case 'on_the_way':
-        return `שלום ${order.customerName}!\n\nהטכנאי בדרך אליך!\n${order.estimatedArrival ? `זמן הגעה משוער: ${order.estimatedArrival}` : ''}\n${order.deviceType} - ${order.issueDescription}\n\nעקבו בזמן אמת: ${trackingUrl}`;
+        return `שלום ${order.customerName}!\n\nהטכנאי בדרך אליך!\n${order.estimatedArrival ? `זמן הגעה משוער: ${order.estimatedArrival}` : ''}\n${order.deviceType} - ${order.issueDescription}\n\nעקבו בזמן אמת:\n${trackingUrl}${order.wazeLink ? `\n\nמעקב מיקום בוויז:\n${order.wazeLink}` : ''}`;
       case 'arrived':
         return `שלום ${order.customerName}!\n\nהטכנאי הגיע!\nאנא פתחו את הדלת\n\n${order.deviceType} - ${order.issueDescription}`;
       case 'in_progress':
