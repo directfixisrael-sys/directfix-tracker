@@ -1780,6 +1780,7 @@ const AdminPanel = () => {
         </div>
 
         <nav className="flex-1 p-4 space-y-2">
+          {/* Main tabs */}
           <button 
             onClick={() => setActiveTab('dashboard')}
             className={cn(
@@ -1825,76 +1826,6 @@ const AdminPanel = () => {
             )}
           </button>
           <button 
-            onClick={() => setActiveTab('customers')}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              activeTab === 'customers' 
-                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-            )}
-          >
-            <Users className="w-5 h-5" />
-            <span>לקוחות</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('messages')}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors relative",
-              activeTab === 'messages' 
-                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-            )}
-          >
-            <MessageSquare className="w-5 h-5" />
-            <span>הודעות</span>
-            {unreadCount > 0 && (
-              <span className="mr-auto bg-warning text-warning-foreground text-xs px-2 py-0.5 rounded-full animate-pulse">
-                {unreadCount} חדשות
-              </span>
-            )}
-          </button>
-          <button 
-            onClick={() => setActiveTab('prices')}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              activeTab === 'prices' 
-                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-            )}
-          >
-            <FileText className="w-5 h-5" />
-            <span>ניהול מחירון</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('settings')}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              activeTab === 'settings' 
-                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-            )}
-          >
-            <Settings className="w-5 h-5" />
-            <span>הגדרות</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('feedback')}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              activeTab === 'feedback' 
-                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-            )}
-          >
-            <Star className="w-5 h-5" />
-            <span>משוב לקוחות</span>
-            {orders.filter(o => o.rating).length > 0 && (
-              <span className="mr-auto bg-warning/20 text-warning text-xs px-2 py-0.5 rounded-full">
-                {orders.filter(o => o.rating).length}
-              </span>
-            )}
-          </button>
-          <button 
             onClick={() => setActiveTab('analytics')}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
@@ -1905,56 +1836,136 @@ const AdminPanel = () => {
           >
             <Activity className="w-5 h-5" />
             <span>אנליטיקס</span>
-            {(() => {
-              const activeViewers = orders.filter(o => {
-                if (!o.isViewing || !o.lastViewedAt) return false;
-                const lastViewed = new Date(o.lastViewedAt);
-                const diffMs = new Date().getTime() - lastViewed.getTime();
-                return diffMs < 2 * 60 * 1000; // Within 2 minutes
-              });
-              return activeViewers.length > 0 && (
-                <span className="mr-auto bg-success/20 text-success text-xs px-2 py-0.5 rounded-full animate-pulse">
-                  {activeViewers.length} צופים
-                </span>
-              );
-            })()}
           </button>
+
+          {/* Divider */}
+          <div className="border-t border-sidebar-border my-3" />
+
+          {/* Settings section */}
           <button 
-            onClick={() => setActiveTab('promotions')}
+            onClick={() => setSettingsSubOpen(!settingsSubOpen)}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              activeTab === 'promotions' 
+              ['customers', 'messages', 'prices', 'feedback', 'promotions', 'coupons', 'bundles', 'settings'].includes(activeTab)
                 ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                 : "text-sidebar-foreground hover:bg-sidebar-accent/50"
             )}
           >
-            <Gift className="w-5 h-5" />
-            <span>מבצעים</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('coupons')}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              activeTab === 'coupons' 
-                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            <Settings className="w-5 h-5" />
+            <span>הגדרות</span>
+            <ChevronDown className={cn("w-4 h-4 mr-auto transition-transform", settingsSubOpen && "rotate-180")} />
+            {unreadCount > 0 && (
+              <span className="bg-warning text-warning-foreground text-xs px-2 py-0.5 rounded-full animate-pulse">
+                {unreadCount}
+              </span>
             )}
-          >
-            <CreditCard className="w-5 h-5" />
-            <span>קופונים</span>
           </button>
-          <button 
-            onClick={() => setActiveTab('bundles')}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              activeTab === 'bundles' 
-                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-            )}
-          >
-            <Package className="w-5 h-5" />
-            <span>חבילות תיקון</span>
-          </button>
+
+          {settingsSubOpen && (
+            <div className="pr-4 space-y-1">
+              <button 
+                onClick={() => setActiveTab('messages')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'messages' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>הודעות</span>
+                {unreadCount > 0 && (
+                  <span className="mr-auto bg-warning text-warning-foreground text-xs px-2 py-0.5 rounded-full animate-pulse">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              <button 
+                onClick={() => setActiveTab('customers')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'customers' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Users className="w-4 h-4" />
+                <span>לקוחות</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('prices')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'prices' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <FileText className="w-4 h-4" />
+                <span>ניהול מחירון</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('feedback')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'feedback' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Star className="w-4 h-4" />
+                <span>משוב לקוחות</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('promotions')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'promotions' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Gift className="w-4 h-4" />
+                <span>מבצעים</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('coupons')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'coupons' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <CreditCard className="w-4 h-4" />
+                <span>קופונים</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('bundles')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'bundles' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Package className="w-4 h-4" />
+                <span>חבילות תיקון</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('settings')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'settings' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Settings className="w-4 h-4" />
+                <span>הגדרות כלליות</span>
+              </button>
+            </div>
+          )}
         </nav>
 
         {/* Back to home link */}
