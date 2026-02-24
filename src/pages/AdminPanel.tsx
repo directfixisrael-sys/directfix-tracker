@@ -115,6 +115,7 @@ const AdminPanel = () => {
   const [isGeneratingPayment, setIsGeneratingPayment] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState('');
   const [paymentDescription, setPaymentDescription] = useState('');
+  const [settingsSubOpen, setSettingsSubOpen] = useState(false);
 
   const { 
     orders, 
