@@ -15,6 +15,7 @@ export interface RepairOrder {
   orderNumber?: number;
   customerPhone: string;
   customerName: string;
+  customerEmail?: string;
   customerAddress: string;
   deviceType: string;
   issueDescription: string;
