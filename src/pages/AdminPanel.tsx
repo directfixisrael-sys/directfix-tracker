@@ -1196,6 +1196,9 @@ const AdminPanel = () => {
                       <div className="text-right order-1 md:order-2 md:text-left">
                         <h2 className="text-xl md:text-2xl font-bold text-foreground">{selectedOrder.customerName}</h2>
                         <p className="text-muted-foreground">{selectedOrder.customerPhone}</p>
+                        {(selectedOrder as any).customerEmail && (
+                          <p className="text-muted-foreground text-sm">{(selectedOrder as any).customerEmail}</p>
+                        )}
                       </div>
                     </div>
                     
