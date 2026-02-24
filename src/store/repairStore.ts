@@ -53,6 +53,7 @@ const dbToOrder = (row: any): RepairOrder => ({
   orderNumber: row.order_number,
   customerPhone: row.customer_phone,
   customerName: row.customer_name,
+  customerEmail: row.customer_email || undefined,
   customerAddress: row.customer_address || '',
   deviceType: row.device_type || '',
   issueDescription: row.issue_description || '',
