@@ -4,23 +4,23 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 240 20% 16%;
+    --background: 40 60% 97%;
+    --foreground: 220 25% 12%;
 
-    --card: 40 30% 100%;
-    --card-foreground: 240 20% 16%;
+    --card: 40 50% 99%;
+    --card-foreground: 220 25% 12%;
 
-    --popover: 40 30% 100%;
-    --popover-foreground: 240 20% 16%;
+    --popover: 40 50% 99%;
+    --popover-foreground: 220 25% 12%;
 
     --primary: 218 93% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 40 25% 93%;
-    --secondary-foreground: 240 15% 25%;
+    --secondary: 40 35% 92%;
+    --secondary-foreground: 220 20% 20%;
 
-    --muted: 40 18% 93%;
-    --muted-foreground: 240 10% 46%;
+    --muted: 40 30% 93%;
+    --muted-foreground: 220 12% 44%;
 
     --accent: 218 93% 50%;
     --accent-foreground: 0 0% 100%;
@@ -34,19 +34,25 @@
     --destructive: 0 72% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 18% 87%;
-    --input: 40 18% 87%;
-    --ring: 12 80% 55%;
+    --border: 220 20% 18%;
+    --input: 220 20% 18%;
+    --ring: 218 93% 50%;
 
     --radius: 1.25rem;
 
-    --sidebar-background: 240 20% 14%;
-    --sidebar-foreground: 40 25% 96%;
+    /* Strategly-style section colors */
+    --section-cream: 42 80% 95%;
+    --section-lavender: 270 50% 93%;
+    --section-mint: 150 40% 93%;
+    --section-peach: 20 60% 94%;
+
+    --sidebar-background: 220 25% 12%;
+    --sidebar-foreground: 40 30% 96%;
     --sidebar-primary: 218 93% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 15% 25%;
-    --sidebar-accent-foreground: 40 25% 96%;
-    --sidebar-border: 240 12% 28%;
+    --sidebar-accent: 220 20% 20%;
+    --sidebar-accent-foreground: 40 30% 96%;
+    --sidebar-border: 220 15% 25%;
     --sidebar-ring: 218 93% 60%;
   }
 
