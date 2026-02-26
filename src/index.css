@@ -4,23 +4,23 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 240 20% 16%;
+    --background: 40 60% 97%;
+    --foreground: 220 25% 12%;
 
-    --card: 40 30% 100%;
-    --card-foreground: 240 20% 16%;
+    --card: 40 50% 99%;
+    --card-foreground: 220 25% 12%;
 
-    --popover: 40 30% 100%;
-    --popover-foreground: 240 20% 16%;
+    --popover: 40 50% 99%;
+    --popover-foreground: 220 25% 12%;
 
     --primary: 218 93% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 40 25% 93%;
-    --secondary-foreground: 240 15% 25%;
+    --secondary: 40 35% 92%;
+    --secondary-foreground: 220 20% 20%;
 
-    --muted: 40 18% 93%;
-    --muted-foreground: 240 10% 46%;
+    --muted: 40 30% 93%;
+    --muted-foreground: 220 12% 44%;
 
     --accent: 218 93% 50%;
     --accent-foreground: 0 0% 100%;
@@ -34,40 +34,46 @@
     --destructive: 0 72% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 18% 87%;
-    --input: 40 18% 87%;
-    --ring: 12 80% 55%;
+    --border: 220 20% 18%;
+    --input: 220 20% 18%;
+    --ring: 218 93% 50%;
 
     --radius: 1.25rem;
 
-    --sidebar-background: 240 20% 14%;
-    --sidebar-foreground: 40 25% 96%;
+    /* Strategly-style section colors */
+    --section-cream: 42 80% 95%;
+    --section-lavender: 270 50% 93%;
+    --section-mint: 150 40% 93%;
+    --section-peach: 20 60% 94%;
+
+    --sidebar-background: 220 25% 12%;
+    --sidebar-foreground: 40 30% 96%;
     --sidebar-primary: 218 93% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 15% 25%;
-    --sidebar-accent-foreground: 40 25% 96%;
-    --sidebar-border: 240 12% 28%;
+    --sidebar-accent: 220 20% 20%;
+    --sidebar-accent-foreground: 40 30% 96%;
+    --sidebar-border: 220 15% 25%;
     --sidebar-ring: 218 93% 60%;
   }
 
   .dark {
-    --background: 240 20% 6%;
-    --foreground: 40 25% 96%;
+    --background: 220 20% 7%;
+    --foreground: 40 30% 96%;
 
-    --card: 240 18% 10%;
-    --card-foreground: 40 25% 96%;
+    --card: 220 18% 11%;
+    --card-foreground: 40 30% 96%;
 
-    --popover: 240 18% 10%;
-    --popover-foreground: 40 25% 96%;
+    --popover: 220 18% 11%;
+    --popover-foreground: 40 30% 96%;
 
     --primary: 218 93% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 15% 15%;
-    --secondary-foreground: 40 25% 96%;
+    --secondary: 220 15% 16%;
+    --secondary-foreground: 40 30% 96%;
 
-    --muted: 240 15% 15%;
-    --muted-foreground: 240 10% 55%;
+    --muted: 220 15% 16%;
+    --muted-foreground: 220 12% 55%;
 
     --accent: 218 93% 55%;
     --accent-foreground: 0 0% 100%;
@@ -76,11 +82,16 @@
     --success-foreground: 0 0% 100%;
 
     --destructive: 0 65% 48%;
-    --destructive-foreground: 40 25% 96%;
+    --destructive-foreground: 40 30% 96%;
 
-    --border: 240 15% 17%;
-    --input: 240 15% 17%;
-    --ring: 12 85% 60%;
+    --border: 220 15% 22%;
+    --input: 220 15% 22%;
+    --ring: 218 93% 55%;
+
+    --section-cream: 42 30% 12%;
+    --section-lavender: 270 20% 14%;
+    --section-mint: 150 20% 12%;
+    --section-peach: 20 25% 13%;
   }
 
   /* Gift Mode - Warm & Loving theme */
@@ -228,11 +239,48 @@
 
 @layer components {
   .wolt-card {
-    @apply bg-card rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-border/50;
+    @apply bg-card rounded-2xl border-2 border-foreground/15 shadow-[4px_4px_0_0_hsl(var(--foreground)/0.08)];
   }
 
   .wolt-card-elevated {
-    @apply bg-card rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.12)];
+    @apply bg-card rounded-2xl border-2 border-foreground/20 shadow-[6px_6px_0_0_hsl(var(--foreground)/0.1)];
+  }
+
+  /* Strategly-style highlighted text */
+  .text-highlight {
+    @apply relative inline-block;
+    background: linear-gradient(180deg, transparent 55%, hsl(45, 95%, 70%) 55%);
+    padding: 0 4px;
+  }
+
+  .text-highlight-box {
+    @apply inline-block px-3 py-1 rounded-lg font-bold;
+    background-color: hsl(45, 95%, 72%);
+    color: hsl(var(--foreground));
+  }
+
+  /* Strategly-style section backgrounds */
+  .section-cream {
+    background-color: hsl(var(--section-cream));
+  }
+  .section-lavender {
+    background-color: hsl(var(--section-lavender));
+  }
+  .section-mint {
+    background-color: hsl(var(--section-mint));
+  }
+  .section-peach {
+    background-color: hsl(var(--section-peach));
+  }
+
+  /* Strategly-style bordered card */
+  .strategly-card {
+    @apply bg-card rounded-2xl border-2 border-foreground/15 p-5 transition-all duration-200;
+    box-shadow: 4px 4px 0 0 hsl(var(--foreground) / 0.08);
+  }
+  .strategly-card:hover {
+    box-shadow: 6px 6px 0 0 hsl(var(--foreground) / 0.12);
+    transform: translateY(-2px);
   }
 
   .status-dot {

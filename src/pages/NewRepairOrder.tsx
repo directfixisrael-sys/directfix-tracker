@@ -1043,13 +1043,13 @@ const NewRepairOrder = () => {
       {/* Skip to content */}
       <a href="#order-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-lg">דלג לתוכן הראשי</a>
       {/* Promotion Strip */}
-      {activePromotion && <div className="bg-foreground text-background text-center py-2.5 text-xs font-semibold tracking-wide">
+      {activePromotion && <div className="bg-foreground text-background text-center py-2.5 text-xs font-bold tracking-wide border-b-2 border-foreground/10">
           <span>{getPromotionIcon(activePromotion.icon)} {activePromotion.title} — {activePromotion.description}</span>
           {activePromotion.value && activePromotion.value > 0 && <span className="mr-1 font-bold"> | חינם! 🎉</span>}
         </div>}
 
       {/* Header - Clean & Minimal */}
-      <header className="sticky top-0 bg-background/80 backdrop-blur-xl border-b border-border/40 z-10" role="banner">
+      <header className="sticky top-0 bg-card/95 backdrop-blur-md border-b-2 border-foreground/10 z-10" role="banner">
         <nav className="flex items-center justify-between p-3 max-w-5xl mx-auto" aria-label="ניווט הזמנה">
           <div className="flex items-center gap-3">
             <button onClick={() => {
@@ -1059,23 +1059,23 @@ const NewRepairOrder = () => {
             } else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
               if (currentBundle) goToStep('bundle');else goToStep('repair');
             } else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
-          }} className="h-10 w-10 rounded-2xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors" aria-label="חזור לשלב הקודם">
+          }} className="h-10 w-10 rounded-xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors border-2 border-foreground/10" aria-label="חזור לשלב הקודם">
               <ArrowRight className="w-4 h-4" />
             </button>
             <Logo size="sm" />
           </div>
 
           <div className="flex items-center gap-1.5">
-            <a href="tel:033106020" className="h-9 w-9 rounded-2xl bg-accent text-accent-foreground flex items-center justify-center transition-colors" aria-label="התקשר 033106020">
+            <a href="tel:033106020" className="h-9 w-9 rounded-xl bg-accent text-accent-foreground flex items-center justify-center transition-colors border-2 border-foreground/10" aria-label="התקשר 033106020">
               <Phone className="w-4 h-4" />
             </a>
             <Button variant="ghost" size="icon" onClick={() => {
             const event = new CustomEvent('open-accessibility-widget');
             window.dispatchEvent(event);
-          }} className="h-9 w-9 rounded-2xl" aria-label="נגישות">
+          }} className="h-9 w-9 rounded-xl border-2 border-foreground/10" aria-label="נגישות">
               <Accessibility className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-2xl" aria-label={resolvedTheme === 'dark' ? 'עבור למצב בהיר' : 'עבור למצב כהה'}>
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-xl border-2 border-foreground/10" aria-label={resolvedTheme === 'dark' ? 'עבור למצב בהיר' : 'עבור למצב כהה'}>
               {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
             </Button>
           </div>
@@ -1309,10 +1309,10 @@ const NewRepairOrder = () => {
             };
             const IconComponent = getIcon();
             return <div key={repair.id}>
-                    <Card onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 shadow-sm hover:shadow-md ${
+                    <Card onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 hover:-translate-y-0.5 ${
                       showBackColorPicker && isBackGlass 
-                        ? 'border-primary bg-primary/5' 
-                        : isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-border hover:border-primary/40 hover:bg-primary/5'
+                        ? 'border-primary bg-primary/5 shadow-[4px_4px_0_0_hsl(var(--primary)/0.15)]' 
+                        : isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-foreground/15 hover:border-primary/40 hover:bg-primary/5 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[5px_5px_0_0_hsl(var(--foreground)/0.1)]'
                     }`}>
                       <div className="flex items-center gap-4">
                         {/* Simple Icon */}
@@ -2035,7 +2035,7 @@ const NewRepairOrder = () => {
         </div>}
 
       {/* Sticky Footer with Action Buttons */}
-      {step !== 'success' && step !== 'model' && step !== 'repair' && <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border/50 p-4 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+      {step !== 'success' && step !== 'model' && step !== 'repair' && <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t-2 border-foreground/10 p-4 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
           {step === 'price' && <div className="space-y-2">
               <Button onClick={handlePriceConfirm} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
                 אישור ובחירת מועד לטכנאי

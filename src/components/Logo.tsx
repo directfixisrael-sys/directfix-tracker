@@ -39,7 +39,7 @@ const Logo = ({ size = 'md', clickable = true, className }: LogoProps) => {
       onClick={clickable ? () => navigate('/') : undefined}
     >
       <div className={cn(
-        "bg-primary rounded-xl flex items-center justify-center shadow-md",
+        "bg-primary rounded-xl flex items-center justify-center shadow-md border-2 border-foreground/10",
         badgeSizes[size]
       )}>
         <Wrench className={cn("text-primary-foreground", iconSizes[size])} />

@@ -14,7 +14,7 @@ const MinimalFooter = () => {
 
   return (
     <>
-      <footer className="border-t border-border py-6 px-6" role="contentinfo" aria-label="תחתית העמוד">
+      <footer className="border-t-2 border-foreground/10 py-6 px-6 bg-card" role="contentinfo" aria-label="תחתית העמוד">
         <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2" aria-label="קישורים שימושיים">
           {footerLinks.map((link, i) => (
             <button
