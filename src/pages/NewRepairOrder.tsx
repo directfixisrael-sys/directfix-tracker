@@ -1049,7 +1049,7 @@ const NewRepairOrder = () => {
         </div>}
 
       {/* Header - Clean & Minimal */}
-      <header className="sticky top-0 bg-background/80 backdrop-blur-xl border-b border-border/40 z-10" role="banner">
+      <header className="sticky top-0 bg-card/95 backdrop-blur-md border-b-2 border-foreground/10 z-10" role="banner">
         <nav className="flex items-center justify-between p-3 max-w-5xl mx-auto" aria-label="ניווט הזמנה">
           <div className="flex items-center gap-3">
             <button onClick={() => {
