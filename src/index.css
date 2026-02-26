@@ -239,11 +239,48 @@
 
 @layer components {
   .wolt-card {
-    @apply bg-card rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-border/50;
+    @apply bg-card rounded-2xl border-2 border-foreground/15 shadow-[4px_4px_0_0_hsl(var(--foreground)/0.08)];
   }
 
   .wolt-card-elevated {
-    @apply bg-card rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.12)];
+    @apply bg-card rounded-2xl border-2 border-foreground/20 shadow-[6px_6px_0_0_hsl(var(--foreground)/0.1)];
+  }
+
+  /* Strategly-style highlighted text */
+  .text-highlight {
+    @apply relative inline-block;
+    background: linear-gradient(180deg, transparent 55%, hsl(45, 95%, 70%) 55%);
+    padding: 0 4px;
+  }
+
+  .text-highlight-box {
+    @apply inline-block px-3 py-1 rounded-lg font-bold;
+    background-color: hsl(45, 95%, 72%);
+    color: hsl(var(--foreground));
+  }
+
+  /* Strategly-style section backgrounds */
+  .section-cream {
+    background-color: hsl(var(--section-cream));
+  }
+  .section-lavender {
+    background-color: hsl(var(--section-lavender));
+  }
+  .section-mint {
+    background-color: hsl(var(--section-mint));
+  }
+  .section-peach {
+    background-color: hsl(var(--section-peach));
+  }
+
+  /* Strategly-style bordered card */
+  .strategly-card {
+    @apply bg-card rounded-2xl border-2 border-foreground/15 p-5 transition-all duration-200;
+    box-shadow: 4px 4px 0 0 hsl(var(--foreground) / 0.08);
+  }
+  .strategly-card:hover {
+    box-shadow: 6px 6px 0 0 hsl(var(--foreground) / 0.12);
+    transform: translateY(-2px);
   }
 
   .status-dot {
