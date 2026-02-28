@@ -2030,16 +2030,16 @@ const AdminPanel = () => {
           
           {activeTab === 'orders' && (
             <>
-              <DropdownMenu>
+              <DropdownMenu modal={true}>
                 <DropdownMenuTrigger asChild>
                   <Button className="gap-2" size="sm">
                     <Plus className="w-4 h-4" />
                     <span className="hidden sm:inline">ניהול הזמנות</span>
-                    <span className="sm:hidden">הזמנות</span>
+                    <span className="sm:hidden">+ חדש</span>
                     <ChevronDown className="w-3 h-3" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-popover border border-border shadow-lg z-50">
+                <DropdownMenuContent align="end" className="w-48 bg-popover border border-border shadow-lg z-[70]" sideOffset={5}>
                   <DropdownMenuItem 
                     onClick={() => {
                       setIsEditMode(false);
