@@ -1717,7 +1717,7 @@ const AdminPanel = () => {
               <button 
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
-                  ['live', 'analytics', 'feedback', 'promotions', 'settings'].includes(activeTab)
+                  ['live', 'analytics', 'messages', 'feedback', 'promotions', 'settings'].includes(activeTab)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground"
                 )}
@@ -1726,7 +1726,7 @@ const AdminPanel = () => {
                 <span className="text-[10px]">עוד</span>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="top" align="end" className="w-48 bg-popover z-[60] mb-2">
+            <DropdownMenuContent side="top" align="end" className="w-48 bg-popover border border-border shadow-lg z-[60] mb-2">
               <DropdownMenuItem onClick={() => setActiveTab('live')} className={cn("gap-3 py-3", activeTab === 'live' && "text-success font-medium")}>
                 <Eye className="w-4 h-4" />
                 <span>לייב</span>
@@ -1734,6 +1734,15 @@ const AdminPanel = () => {
               <DropdownMenuItem onClick={() => setActiveTab('analytics')} className={cn("gap-3 py-3", activeTab === 'analytics' && "text-primary font-medium")}>
                 <Activity className="w-4 h-4" />
                 <span>אנליטיקס</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('messages')} className={cn("gap-3 py-3", activeTab === 'messages' && "text-primary font-medium")}>
+                <MessageSquare className="w-4 h-4" />
+                <span>הודעות</span>
+                {unreadCount > 0 && (
+                  <span className="mr-auto bg-warning text-warning-foreground text-xs px-2 py-0.5 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('feedback')} className={cn("gap-3 py-3", activeTab === 'feedback' && "text-primary font-medium")}>
                 <Star className="w-4 h-4" />
