@@ -49,7 +49,8 @@ import {
   Package,
   Wrench,
   CalendarPlus,
-  Sparkles
+  Sparkles,
+  Image
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
