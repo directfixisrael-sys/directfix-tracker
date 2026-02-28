@@ -1700,21 +1700,16 @@ const AdminPanel = () => {
               </span>
             )}
           </button>
-          {/* Messages */}
+          {/* Coupons */}
           <button 
-            onClick={() => setActiveTab('messages')}
+            onClick={() => setActiveTab('coupons')}
             className={cn(
               "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors relative min-w-[56px]",
-              activeTab === 'messages' ? "bg-primary/10 text-primary" : "text-muted-foreground"
+              activeTab === 'coupons' ? "bg-primary/10 text-primary" : "text-muted-foreground"
             )}
           >
-            <MessageSquare className="w-5 h-5" />
-            <span className="text-[10px]">הודעות</span>
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-1 bg-warning text-warning-foreground text-[9px] w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
-                {unreadCount}
-              </span>
-            )}
+            <CreditCard className="w-5 h-5" />
+            <span className="text-[10px]">קופונים</span>
           </button>
           {/* More menu */}
           <DropdownMenu>

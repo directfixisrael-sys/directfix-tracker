@@ -933,6 +933,7 @@ const NewRepairOrder = () => {
         wantsPromotions: false,
         leadSource: leadSource.source,
         customerEmail: customerEmail.trim() || undefined,
+        deviceImages: deviceImages.length > 0 ? deviceImages : [],
       } as any);
 
       // Send notifications (email + WhatsApp)
