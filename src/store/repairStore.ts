@@ -277,6 +277,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
         wants_promotions: orderData.wantsPromotions,
         lead_source: (orderData as any).leadSource || null,
         customer_email: (orderData as any).customerEmail || null,
+        device_images: (orderData as any).deviceImages || [],
       })
       .select()
       .single();
