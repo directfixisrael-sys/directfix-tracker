@@ -44,7 +44,7 @@ const Index = () => {
               <Logo size="lg" clickable={false} className="justify-center mb-5" />
               <h1 className="text-4xl font-extrabold text-foreground tracking-tight leading-tight mb-3">
                 תיקוני אייפון עם{' '}
-                <span className="text-highlight-box">DirectFix</span>
+                <span className="text-highlight-box">החברה המובילה בישראל</span>
               </h1>
               <p className="text-muted-foreground text-lg mt-3 max-w-xs mx-auto leading-relaxed">
                 טכנאי מגיע עד אליך. מהיר, מקצועי, עם אחריות מלאה.
