@@ -76,6 +76,7 @@ const dbToOrder = (row: any): RepairOrder => ({
   paymentLink: row.payment_link,
   paymentStatus: row.payment_status as PaymentStatus || 'none',
   leadSource: row.lead_source || undefined,
+  deviceImages: row.device_images || [],
 });
 
 // Convert database row to ChatMessage
@@ -276,6 +277,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
         wants_promotions: orderData.wantsPromotions,
         lead_source: (orderData as any).leadSource || null,
         customer_email: (orderData as any).customerEmail || null,
+        device_images: (orderData as any).deviceImages || [],
       })
       .select()
       .single();

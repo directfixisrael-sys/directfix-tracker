@@ -49,7 +49,8 @@ import {
   Package,
   Wrench,
   CalendarPlus,
-  Sparkles
+  Sparkles,
+  Image
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
@@ -1227,6 +1228,25 @@ const AdminPanel = () => {
                       )}
                     </div>
 
+                    {/* Device images */}
+                    {selectedOrder.deviceImages && selectedOrder.deviceImages.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-border">
+                        <p className="text-muted-foreground text-sm mb-2 flex items-center gap-1">
+                          <Image className="w-4 h-4" />
+                          תמונות מכשיר ({selectedOrder.deviceImages.length})
+                        </p>
+                        <div className="flex gap-2 flex-wrap">
+                          {selectedOrder.deviceImages.map((img, idx) => (
+                            <a key={idx} href={img} target="_blank" rel="noopener noreferrer" className="block">
+                              <div className="w-20 h-20 rounded-lg overflow-hidden border-2 border-border hover:border-primary transition-colors">
+                                <img src={img} alt={`תמונה ${idx + 1}`} className="w-full h-full object-cover" />
+                              </div>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Selected accessories */}
                     {selectedOrder.accessories.some(acc => acc.selected) && (
                       <div className="mt-4 pt-4 border-t border-border">
@@ -1700,21 +1720,16 @@ const AdminPanel = () => {
               </span>
             )}
           </button>
-          {/* Messages */}
+          {/* Coupons */}
           <button 
-            onClick={() => setActiveTab('messages')}
+            onClick={() => setActiveTab('coupons')}
             className={cn(
               "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors relative min-w-[56px]",
-              activeTab === 'messages' ? "bg-primary/10 text-primary" : "text-muted-foreground"
+              activeTab === 'coupons' ? "bg-primary/10 text-primary" : "text-muted-foreground"
             )}
           >
-            <MessageSquare className="w-5 h-5" />
-            <span className="text-[10px]">הודעות</span>
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-1 bg-warning text-warning-foreground text-[9px] w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
-                {unreadCount}
-              </span>
-            )}
+            <CreditCard className="w-5 h-5" />
+            <span className="text-[10px]">קופונים</span>
           </button>
           {/* More menu */}
           <DropdownMenu>
@@ -1722,7 +1737,7 @@ const AdminPanel = () => {
               <button 
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
-                  ['live', 'analytics', 'feedback', 'promotions', 'settings'].includes(activeTab)
+                  ['live', 'analytics', 'messages', 'feedback', 'promotions', 'settings'].includes(activeTab)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground"
                 )}
@@ -1731,7 +1746,7 @@ const AdminPanel = () => {
                 <span className="text-[10px]">עוד</span>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="top" align="end" className="w-48 bg-popover z-[60] mb-2">
+            <DropdownMenuContent side="top" align="end" className="w-48 bg-popover border border-border shadow-lg z-[60] mb-2">
               <DropdownMenuItem onClick={() => setActiveTab('live')} className={cn("gap-3 py-3", activeTab === 'live' && "text-success font-medium")}>
                 <Eye className="w-4 h-4" />
                 <span>לייב</span>
@@ -1739,6 +1754,15 @@ const AdminPanel = () => {
               <DropdownMenuItem onClick={() => setActiveTab('analytics')} className={cn("gap-3 py-3", activeTab === 'analytics' && "text-primary font-medium")}>
                 <Activity className="w-4 h-4" />
                 <span>אנליטיקס</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('messages')} className={cn("gap-3 py-3", activeTab === 'messages' && "text-primary font-medium")}>
+                <MessageSquare className="w-4 h-4" />
+                <span>הודעות</span>
+                {unreadCount > 0 && (
+                  <span className="mr-auto bg-warning text-warning-foreground text-xs px-2 py-0.5 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('feedback')} className={cn("gap-3 py-3", activeTab === 'feedback' && "text-primary font-medium")}>
                 <Star className="w-4 h-4" />
@@ -2006,16 +2030,16 @@ const AdminPanel = () => {
           
           {activeTab === 'orders' && (
             <>
-              <DropdownMenu>
+              <DropdownMenu modal={true}>
                 <DropdownMenuTrigger asChild>
                   <Button className="gap-2" size="sm">
                     <Plus className="w-4 h-4" />
                     <span className="hidden sm:inline">ניהול הזמנות</span>
-                    <span className="sm:hidden">הזמנות</span>
+                    <span className="sm:hidden">+ חדש</span>
                     <ChevronDown className="w-3 h-3" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-popover border border-border shadow-lg z-50">
+                <DropdownMenuContent align="end" className="w-48 bg-popover border border-border shadow-lg z-[70]" sideOffset={5}>
                   <DropdownMenuItem 
                     onClick={() => {
                       setIsEditMode(false);

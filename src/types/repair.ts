@@ -38,6 +38,7 @@ export interface RepairOrder {
   paymentLink?: string;
   paymentStatus?: PaymentStatus;
   leadSource?: string;
+  deviceImages?: string[];
 }
 
 export interface Accessory {
