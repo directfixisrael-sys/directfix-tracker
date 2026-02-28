@@ -1228,6 +1228,25 @@ const AdminPanel = () => {
                       )}
                     </div>
 
+                    {/* Device images */}
+                    {selectedOrder.deviceImages && selectedOrder.deviceImages.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-border">
+                        <p className="text-muted-foreground text-sm mb-2 flex items-center gap-1">
+                          <Image className="w-4 h-4" />
+                          תמונות מכשיר ({selectedOrder.deviceImages.length})
+                        </p>
+                        <div className="flex gap-2 flex-wrap">
+                          {selectedOrder.deviceImages.map((img, idx) => (
+                            <a key={idx} href={img} target="_blank" rel="noopener noreferrer" className="block">
+                              <div className="w-20 h-20 rounded-lg overflow-hidden border-2 border-border hover:border-primary transition-colors">
+                                <img src={img} alt={`תמונה ${idx + 1}`} className="w-full h-full object-cover" />
+                              </div>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Selected accessories */}
                     {selectedOrder.accessories.some(acc => acc.selected) && (
                       <div className="mt-4 pt-4 border-t border-border">
