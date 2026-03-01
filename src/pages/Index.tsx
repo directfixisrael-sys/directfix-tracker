@@ -35,6 +35,8 @@ const Index = () => {
         </nav>
       </header>
 
+      <EmergencyBanner />
+
       {/* Main Content */}
       <main id="main-content" className="flex-1 flex flex-col" role="main" aria-label="דף הבית - דיירקט פיקס">
         
