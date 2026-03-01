@@ -3,7 +3,6 @@ import { ArrowRight, Moon, Sun, Phone, Accessibility, Menu, X } from 'lucide-rea
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/ThemeProvider';
 import Logo from '@/components/Logo';
-import EmergencyBanner from '@/components/EmergencyBanner';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -100,7 +99,6 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
           </div>
         </div>
       )}
-      <EmergencyBanner />
     </header>
   );
 };

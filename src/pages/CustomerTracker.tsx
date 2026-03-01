@@ -15,6 +15,7 @@ import StickyHeader from '@/components/StickyHeader';
 import PrivacyConsentModal from '@/components/PrivacyConsentModal';
 import { useRepairStore } from '@/store/repairStore';
 import Logo from '@/components/Logo';
+import EmergencyBanner from '@/components/EmergencyBanner';
 import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -186,7 +187,7 @@ const CustomerTracker = () => {
   return (
     <div className="min-h-screen bg-background pb-28" lang="he">
       <Header showBackButton onBack={handleBack} />
-      
+      <EmergencyBanner />
       {/* Privacy Consent Modal */}
       <PrivacyConsentModal
         open={showPrivacyModal}
