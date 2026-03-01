@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import EmergencyBanner from '@/components/EmergencyBanner';
 import { Button } from '@/components/ui/button';
 import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone } from 'lucide-react';
 import Logo from '@/components/Logo';
