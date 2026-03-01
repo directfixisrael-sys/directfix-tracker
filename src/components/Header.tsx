@@ -99,7 +99,6 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
           </div>
         </div>
       )}
-      <EmergencyBanner />
     </header>
   );
 };
