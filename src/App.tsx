@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import MinimalFooter from "./components/MinimalFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { VisitorTracker } from "./components/VisitorTracker";
+import EmergencyBanner from "./components/EmergencyBanner";
 import { captureLeadSource } from "./lib/leadSource";
 
 // Capture lead source (UTM, gclid, fbclid, referrer) on first visit
