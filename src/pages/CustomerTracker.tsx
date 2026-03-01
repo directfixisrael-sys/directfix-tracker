@@ -186,7 +186,6 @@ const CustomerTracker = () => {
   return (
     <div className="min-h-screen bg-background pb-28" lang="he">
       <Header showBackButton onBack={handleBack} />
-      <EmergencyBanner />
       {/* Privacy Consent Modal */}
       <PrivacyConsentModal
         open={showPrivacyModal}
