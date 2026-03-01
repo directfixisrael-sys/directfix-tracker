@@ -15,7 +15,6 @@ import StickyHeader from '@/components/StickyHeader';
 import PrivacyConsentModal from '@/components/PrivacyConsentModal';
 import { useRepairStore } from '@/store/repairStore';
 import Logo from '@/components/Logo';
-import EmergencyBanner from '@/components/EmergencyBanner';
 import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
