@@ -1988,6 +1988,18 @@ const AdminPanel = () => {
                 <span>חבילות תיקון</span>
               </button>
               <button 
+                onClick={() => setActiveTab('announcements')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'announcements' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Megaphone className="w-4 h-4" />
+                <span>הודעות והתראות</span>
+              </button>
+              <button 
                 onClick={() => setActiveTab('settings')}
                 className={cn(
                   "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
