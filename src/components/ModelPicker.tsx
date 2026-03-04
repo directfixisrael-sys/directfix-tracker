@@ -9,6 +9,7 @@ interface IphoneModel {
   compatible_screen_price: number;
   battery_price: number;
   back_glass_price: number;
+  series?: string;
 }
 
 interface ModelPickerProps {
@@ -17,20 +18,6 @@ interface ModelPickerProps {
   onSelect: (model: IphoneModel) => void;
   onConfirm: (model: IphoneModel) => void;
 }
-
-const getSeriesKey = (name: string): string => {
-  if (name.includes('סמסונג')) return 'Samsung';
-  const match = name.match(/iPhone\s+(X[SR]?|8|11|12|13|14|15|16)/);
-  if (!match) return 'Other';
-  const base = match[1];
-  if (['X', 'XS', 'XR'].includes(base)) return 'iPhone X';
-  return `iPhone ${base}`;
-};
-
-const seriesOrder = [
-  'iPhone 16', 'iPhone 15', 'iPhone 14', 'iPhone 13',
-  'iPhone 12', 'iPhone 11', 'iPhone X', 'iPhone 8', 'Samsung', 'Other'
-];
 
 const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPickerProps) => {
   const [activeSeries, setActiveSeries] = useState<string | null>(null);
