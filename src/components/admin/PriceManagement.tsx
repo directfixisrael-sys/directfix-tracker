@@ -209,6 +209,7 @@ const PriceManagement = () => {
         battery_price: model.battery_price,
         back_glass_price: model.back_glass_price,
         is_active: model.is_active,
+        min_lead_hours: model.min_lead_hours || 0,
       });
     } else {
       setEditingModel(null);
@@ -220,6 +221,7 @@ const PriceManagement = () => {
         battery_price: 0,
         back_glass_price: 0,
         is_active: true,
+        min_lead_hours: 0,
       });
     }
     setIsCreatingNewSeries(false);
