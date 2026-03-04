@@ -51,7 +51,8 @@ import {
   CalendarPlus,
   Sparkles,
   Image,
-  Megaphone
+  Megaphone,
+  Bell
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
@@ -72,6 +73,7 @@ import BundleManagement from '@/components/admin/BundleManagement';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import LiveView from '@/components/admin/LiveView';
 import AnnouncementsManagement from '@/components/admin/AnnouncementsManagement';
+import RemindersManagement from '@/components/admin/RemindersManagement';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -954,6 +956,9 @@ const AdminPanel = () => {
       case 'coupons':
         return <CouponManagement />;
 
+      case 'reminders':
+        return <RemindersManagement />;
+
       case 'bundles':
         return <BundleManagement />;
 
@@ -1747,16 +1752,16 @@ const AdminPanel = () => {
               </span>
             )}
           </button>
-          {/* Coupons */}
+          {/* Reminders */}
           <button 
-            onClick={() => setActiveTab('coupons')}
+            onClick={() => setActiveTab('reminders')}
             className={cn(
               "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors relative min-w-[56px]",
-              activeTab === 'coupons' ? "bg-primary/10 text-primary" : "text-muted-foreground"
+              activeTab === 'reminders' ? "bg-primary/10 text-primary" : "text-muted-foreground"
             )}
           >
-            <CreditCard className="w-5 h-5" />
-            <span className="text-[10px]">קופונים</span>
+            <Bell className="w-5 h-5" />
+            <span className="text-[10px]">תזכורות</span>
           </button>
           {/* More menu */}
           <DropdownMenu>
@@ -1764,7 +1769,7 @@ const AdminPanel = () => {
               <button 
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
-                  ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'bundles', 'settings', 'announcements'].includes(activeTab)
+                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'bundles', 'settings', 'announcements', 'coupons'].includes(activeTab)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground"
                 )}
@@ -1811,6 +1816,10 @@ const AdminPanel = () => {
                 <Megaphone className="w-4 h-4" />
                 <span>הודעות והתראות</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('coupons')} className={cn("gap-3 py-3", activeTab === 'coupons' && "text-primary font-medium")}>
+                <CreditCard className="w-4 h-4" />
+                <span>קופונים</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('settings')} className={cn("gap-3 py-3", activeTab === 'settings' && "text-primary font-medium")}>
                 <Settings className="w-4 h-4" />
                 <span>הגדרות</span>
@@ -1825,11 +1834,11 @@ const AdminPanel = () => {
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
-              <div className="w-9 h-9 bg-primary-foreground rounded-xl flex items-center justify-center shadow-md">
-                <Wrench className="w-5 h-5 text-primary" />
+              <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-md">
+                <Wrench className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="font-extrabold text-sidebar-foreground text-lg tracking-tight" style={{ fontFamily: "'Rubik', sans-serif" }}>
-                direct<span className="text-primary-foreground">fix</span>
+                direct<span className="text-sidebar-primary">fix</span>
               </span>
             </div>
             <button
@@ -1909,7 +1918,7 @@ const AdminPanel = () => {
             onClick={() => setSettingsSubOpen(!settingsSubOpen)}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              ['customers', 'messages', 'prices', 'feedback', 'promotions', 'coupons', 'bundles', 'settings', 'announcements'].includes(activeTab)
+              ['customers', 'messages', 'prices', 'feedback', 'promotions', 'coupons', 'bundles', 'settings', 'announcements', 'reminders'].includes(activeTab)
                 ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                 : "text-sidebar-foreground hover:bg-sidebar-accent/50"
             )}
@@ -2039,6 +2048,18 @@ const AdminPanel = () => {
                 <Settings className="w-4 h-4" />
                 <span>הגדרות כלליות</span>
               </button>
+              <button 
+                onClick={() => setActiveTab('reminders')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'reminders' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Bell className="w-4 h-4" />
+                <span>תזכורות</span>
+              </button>
             </div>
           )}
         </nav>
@@ -2073,6 +2094,7 @@ const AdminPanel = () => {
               {activeTab === 'coupons' && 'ניהול קופונים'}
               {activeTab === 'bundles' && 'ניהול חבילות תיקון'}
               {activeTab === 'announcements' && 'הודעות והתראות'}
+              {activeTab === 'reminders' && 'תזכורות ומשימות'}
             </h1>
             <p className="text-xs md:text-sm text-muted-foreground">
               {activeTab === 'orders' && `${orders.length} הזמנות`}
