@@ -1887,7 +1887,7 @@ const NewRepairOrder = () => {
                   <div className="flex items-center gap-2">
                     <CreditCard className="w-4 h-4 text-primary flex-shrink-0" />
                     <p className="text-xs text-muted-foreground">
-                      <span className="font-semibold text-foreground">שימו לב:</span> נציג שלנו ייצור איתכם קשר לגביית התשלום לפני תיאום ההגעה
+                      <span className="font-semibold text-foreground">שימו לב:</span> בשלב הבא תשלמו באופן מאובטח באתר, לפני הגעת הטכנאי
                     </p>
                   </div>
                 </div>
