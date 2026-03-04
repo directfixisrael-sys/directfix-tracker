@@ -41,11 +41,28 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
   }, [models]);
 
   const sortedSeries = useMemo(() => {
+    // Try to load admin-defined order from localStorage
+    let savedOrder: string[] = [];
+    try {
+      const saved = localStorage.getItem('series_order');
+      if (saved) savedOrder = JSON.parse(saved);
+    } catch {}
+
     const defaultOrder = [
-      'iPhone 16', 'iPhone 15', 'iPhone 14', 'iPhone 13',
+      'iPhone 17', 'iPhone 16', 'iPhone 15', 'iPhone 14', 'iPhone 13',
       'iPhone 12', 'iPhone 11', 'iPhone X', 'iPhone 8', 'Samsung', 'Other'
     ];
+    
     const allSeries = Object.keys(grouped);
+    
+    // If admin has saved an order, use it
+    if (savedOrder.length > 0) {
+      const ordered = savedOrder.filter(s => allSeries.includes(s));
+      const extra = allSeries.filter(s => !savedOrder.includes(s)).sort();
+      return [...ordered, ...extra];
+    }
+    
+    // Fallback to default order
     const ordered = defaultOrder.filter(s => allSeries.includes(s));
     const extra = allSeries.filter(s => !defaultOrder.includes(s)).sort();
     return [...ordered, ...extra];
