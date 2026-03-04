@@ -1834,11 +1834,11 @@ const AdminPanel = () => {
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
-              <div className="w-9 h-9 bg-primary-foreground rounded-xl flex items-center justify-center shadow-md">
-                <Wrench className="w-5 h-5 text-primary" />
+              <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-md">
+                <Wrench className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="font-extrabold text-sidebar-foreground text-lg tracking-tight" style={{ fontFamily: "'Rubik', sans-serif" }}>
-                direct<span className="text-primary-foreground">fix</span>
+                direct<span className="text-sidebar-primary">fix</span>
               </span>
             </div>
             <button
