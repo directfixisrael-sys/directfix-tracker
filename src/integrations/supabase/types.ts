@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_reminders: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          customer_name: string
+          customer_phone: string
+          due_date: string
+          id: string
+          is_completed: boolean
+          notes: string | null
+          subject: string
+          task_name: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string
+          due_date: string
+          id?: string
+          is_completed?: boolean
+          notes?: string | null
+          subject?: string
+          task_name: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string
+          due_date?: string
+          id?: string
+          is_completed?: boolean
+          notes?: string | null
+          subject?: string
+          task_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       announcements: {
         Row: {
           bg_color: string | null
