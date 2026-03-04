@@ -130,6 +130,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          min_lead_hours: number
           name: string
           original_screen_price: number
           series: string
@@ -143,6 +144,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          min_lead_hours?: number
           name: string
           original_screen_price?: number
           series?: string
@@ -156,6 +158,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          min_lead_hours?: number
           name?: string
           original_screen_price?: number
           series?: string

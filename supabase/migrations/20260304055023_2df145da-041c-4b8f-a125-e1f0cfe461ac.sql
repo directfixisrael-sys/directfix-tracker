@@ -1,0 +1,1 @@
+ALTER TABLE public.iphone_models ADD COLUMN min_lead_hours integer NOT NULL DEFAULT 0;
