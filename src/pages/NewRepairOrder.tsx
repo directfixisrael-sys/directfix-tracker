@@ -1118,7 +1118,7 @@ const NewRepairOrder = () => {
         <OrderPrivacyConsent open={showPrivacyConsent} onAccept={() => setShowPrivacyConsent(false)} />
 
         {/* Gift Promo Popup */}
-        {showGiftPopup && activePromotion && <GiftPromoPopup promotionTitle={activePromotion.title} promotionDescription={activePromotion.description} promotionIcon={activePromotion.icon || undefined} onClaimed={() => {
+        {showGiftPopup && activePromotion && (activePromotion.display_mode === 'popup' || activePromotion.display_mode === 'both') && <GiftPromoPopup promotionTitle={activePromotion.title} promotionDescription={activePromotion.description} promotionIcon={activePromotion.icon || undefined} onClaimed={() => {
         setShowGiftPopup(false);
         setGiftClaimed(true);
         sessionStorage.setItem('gift_promo_claimed', 'true');
