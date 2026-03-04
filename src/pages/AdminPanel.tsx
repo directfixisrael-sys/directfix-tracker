@@ -2048,6 +2048,18 @@ const AdminPanel = () => {
                 <Settings className="w-4 h-4" />
                 <span>הגדרות כלליות</span>
               </button>
+              <button 
+                onClick={() => setActiveTab('reminders')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'reminders' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Bell className="w-4 h-4" />
+                <span>תזכורות</span>
+              </button>
             </div>
           )}
         </nav>
