@@ -247,6 +247,7 @@ interface IphoneModel {
   compatible_screen_price: number;
   battery_price: number;
   back_glass_price: number;
+  min_lead_hours?: number;
 }
 interface RepairType {
   id: string;
@@ -464,7 +465,7 @@ const NewRepairOrder = () => {
     return weekdaySlots; // Sunday-Thursday
   };
 
-  // Check if a time slot is available (at least 40 minutes from now, and not blocked)
+  // Check if a time slot is available (respects model lead time and blocked slots)
   const isSlotAvailable = (date: Date, slot: string) => {
     const now = new Date();
     const [slotStart, slotEnd] = slot.split('-');
@@ -477,8 +478,9 @@ const NewRepairOrder = () => {
     const slotDate = new Date(date);
     slotDate.setHours(slotStartHour, slotStartMin, 0, 0);
 
-    // Must be at least 40 minutes from now
-    const minTimeFromNow = new Date(now.getTime() + 40 * 60 * 1000);
+    // Use model-specific lead time or default 40 minutes
+    const leadMinutes = selectedModel?.min_lead_hours ? selectedModel.min_lead_hours * 60 : 40;
+    const minTimeFromNow = new Date(now.getTime() + leadMinutes * 60 * 1000);
     if (slotDate <= minTimeFromNow) return false;
 
     // Check hourly blocks for this date

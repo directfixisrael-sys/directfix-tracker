@@ -44,6 +44,7 @@ interface IphoneModel {
   is_active: boolean;
   sort_order: number;
   series: string;
+  min_lead_hours: number;
 }
 
 interface RepairType {
@@ -76,6 +77,7 @@ const PriceManagement = () => {
     battery_price: 0,
     back_glass_price: 0,
     is_active: true,
+    min_lead_hours: 0,
   });
   const [newSeriesName, setNewSeriesName] = useState('');
   const [isCreatingNewSeries, setIsCreatingNewSeries] = useState(false);
@@ -207,6 +209,7 @@ const PriceManagement = () => {
         battery_price: model.battery_price,
         back_glass_price: model.back_glass_price,
         is_active: model.is_active,
+        min_lead_hours: model.min_lead_hours || 0,
       });
     } else {
       setEditingModel(null);
@@ -218,6 +221,7 @@ const PriceManagement = () => {
         battery_price: 0,
         back_glass_price: 0,
         is_active: true,
+        min_lead_hours: 0,
       });
     }
     setIsCreatingNewSeries(false);
@@ -249,6 +253,7 @@ const PriceManagement = () => {
             battery_price: modelForm.battery_price,
             back_glass_price: modelForm.back_glass_price,
             is_active: modelForm.is_active,
+            min_lead_hours: modelForm.min_lead_hours,
           })
           .eq('id', editingModel.id);
 
@@ -266,6 +271,7 @@ const PriceManagement = () => {
             battery_price: modelForm.battery_price,
             back_glass_price: modelForm.back_glass_price,
             is_active: modelForm.is_active,
+            min_lead_hours: modelForm.min_lead_hours,
             sort_order: maxOrder + 1,
           });
 
@@ -532,6 +538,7 @@ const PriceManagement = () => {
                       <span>מסך תואם: ₪{model.compatible_screen_price}</span>
                       <span>סוללה: ₪{model.battery_price}</span>
                       {model.back_glass_price > 0 && <span>גב: ₪{model.back_glass_price}</span>}
+                      {model.min_lead_hours > 0 && <span className="text-warning">⏰ {model.min_lead_hours} שעות מראש</span>}
                     </div>
                   </div>
 
@@ -754,6 +761,21 @@ const PriceManagement = () => {
                   onChange={(e) => setModelForm({ ...modelForm, back_glass_price: Number(e.target.value) })}
                 />
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">מרווח הזמנה מינימלי (שעות)</label>
+              <Input
+                type="number"
+                min={0}
+                placeholder="0 = ללא הגבלה"
+                value={modelForm.min_lead_hours}
+                onChange={(e) => setModelForm({ ...modelForm, min_lead_hours: Number(e.target.value) })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {modelForm.min_lead_hours > 0 
+                  ? `לקוחות יוכלו להזמין לפחות ${modelForm.min_lead_hours} שעות מראש`
+                  : 'ללא הגבלה - ניתן להזמין מעכשיו לעכשיו (40 דקות מינימום)'}
+              </p>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">הצג ללקוחות</span>
