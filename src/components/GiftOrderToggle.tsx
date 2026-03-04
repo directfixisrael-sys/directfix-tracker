@@ -91,9 +91,23 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
         )}
       </div>
 
-      {/* Expandable steps */}
+      {/* Expandable steps + video */}
       {isGift && showDetails && (
         <div className="mt-3 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 to-primary/10 overflow-hidden animate-fade-in">
+          {/* Video section */}
+          <div className="px-4 pt-4">
+            <div className="rounded-xl overflow-hidden border border-primary/20 shadow-md bg-black">
+              <video
+                controls
+                playsInline
+                preload="metadata"
+                poster=""
+                className="w-full aspect-video"
+                src="https://directfix.co.il/wp-content/uploads/2026/03/%D7%94%D7%A1%D7%91%D7%A8-%D7%A2%D7%9C-%D7%AA%D7%99%D7%A7%D7%95%D7%9F-%D7%91%D7%9E%D7%AA%D7%A0%D7%94.mp4"
+              />
+            </div>
+          </div>
+
           <div className="px-5 py-4 border-b border-primary/10 flex items-center gap-2">
             <Gift className="w-5 h-5 text-primary" />
             <h4 className="text-sm font-bold text-foreground">שירות תיקון במתנה 🎁</h4>
@@ -102,11 +116,9 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
           <div className="px-5 py-4 space-y-4">
             {steps.map((step, i) => (
               <div key={i} className="flex items-start gap-3 relative">
-                {/* Connector line */}
                 {i < steps.length - 1 && (
                   <div className="absolute right-[15px] top-8 w-0.5 h-[calc(100%+4px)] bg-primary/15" />
                 )}
-                {/* Step number circle */}
                 <div className="w-8 h-8 rounded-full bg-primary/15 border border-primary/25 flex items-center justify-center flex-shrink-0 z-10">
                   {step.icon}
                 </div>
@@ -118,7 +130,6 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
             ))}
           </div>
 
-          {/* Bottom highlight */}
           <div className="px-5 py-3 bg-primary/10 border-t border-primary/15 flex items-center gap-2">
             <CreditCard className="w-4 h-4 text-primary flex-shrink-0" />
             <p className="text-xs font-medium text-foreground">
