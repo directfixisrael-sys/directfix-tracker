@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone } from 'lucide-react';
+import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone, Play } from 'lucide-react';
+import { useState } from 'react';
 import Logo from '@/components/Logo';
 import paymentBit from '@/assets/payment-bit.png';
 import paymentPaybox from '@/assets/payment-paybox.png';
