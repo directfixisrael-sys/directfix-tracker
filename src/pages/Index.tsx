@@ -8,6 +8,7 @@ import paymentPaybox from '@/assets/payment-paybox.png';
 import paymentVisa from '@/assets/payment-visa.png';
 import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
+import VideoPlayer from '@/components/VideoPlayer';
 
 const Index = () => {
   const navigate = useNavigate();

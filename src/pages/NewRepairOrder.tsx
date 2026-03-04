@@ -13,6 +13,7 @@ import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import Logo from '@/components/Logo';
+import VideoPlayer from '@/components/VideoPlayer';
 import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
 import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
