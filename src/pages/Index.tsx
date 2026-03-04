@@ -49,7 +49,7 @@ const Index = () => {
                 תיקוני אייפון עם{' '}
                 <span className="text-highlight-box">החברה המובילה בישראל</span>
               </h1>
-              <p className="text-muted-foreground text-lg mt-3 max-w-xs mx-auto leading-relaxed">
+              <p className="text-muted-foreground text-lg mt-3 max-w-sm mx-auto leading-relaxed">
                 טכנאי מגיע עד אליך. מהיר, מקצועי, עם אחריות מלאה.
               </p>
             </div>
