@@ -29,7 +29,7 @@ const Index = () => {
               className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105"
               aria-label="התקשר 033106020">
               
-              <Phone className="w-4 h-4" />
+              <Phone className="w-4 h-4 border-0" />
             </a>
           </div>
           <Logo size="sm" />
@@ -82,7 +82,7 @@ const Index = () => {
         <section className="section-peach border-b-2 border-foreground/10">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
-              <span className="text-highlight text-secondary bg-amber-200 text-3xl">איך השירות עובד?</span>
+              <span className="text-highlight text-3xl text-secondary-foreground bg-primary-foreground">איך השירות עובד?</span>
             </h2>
             <p className="text-muted-foreground mb-6 text-base">צפו בסרטון קצר ותבינו כמה זה פשוט</p>
             
