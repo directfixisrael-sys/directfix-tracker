@@ -149,8 +149,14 @@ const PriceManagement = () => {
   };
 
   const saveModel = async () => {
+    const finalSeries = isCreatingNewSeries ? newSeriesName.trim() : modelForm.series;
+    
     if (!modelForm.name.trim()) {
       toast.error('יש להזין שם דגם');
+      return;
+    }
+    if (!finalSeries) {
+      toast.error('יש לבחור או ליצור סדרה');
       return;
     }
 
@@ -160,6 +166,7 @@ const PriceManagement = () => {
           .from('iphone_models')
           .update({
             name: modelForm.name.trim(),
+            series: finalSeries,
             original_screen_price: modelForm.original_screen_price,
             compatible_screen_price: modelForm.compatible_screen_price,
             battery_price: modelForm.battery_price,
@@ -176,6 +183,7 @@ const PriceManagement = () => {
           .from('iphone_models')
           .insert({
             name: modelForm.name.trim(),
+            series: finalSeries,
             original_screen_price: modelForm.original_screen_price,
             compatible_screen_price: modelForm.compatible_screen_price,
             battery_price: modelForm.battery_price,
