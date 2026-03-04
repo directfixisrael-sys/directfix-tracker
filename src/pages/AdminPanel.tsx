@@ -465,24 +465,12 @@ const AdminPanel = () => {
     
     let wazeEta: string | null = null;
     
-    // If status is on_the_way and there's a Waze link, try to extract ETA
+    // Extract ETA directly from the Waze share text (e.g. "ואגיע בשעה 8:24")
     if (order.status === 'on_the_way' && order.wazeLink) {
-      try {
-        toast({
-          title: "מחלץ זמן הגעה מוויז...",
-          description: "רגע אחד",
-        });
-        
-        const { data, error } = await supabase.functions.invoke('extract-waze-eta', {
-          body: { wazeLink: order.wazeLink },
-        });
-        
-        if (data?.eta) {
-          wazeEta = data.eta;
-          console.log('Extracted Waze ETA:', wazeEta);
-        }
-      } catch (e) {
-        console.error('Error extracting Waze ETA:', e);
+      const etaMatch = order.wazeLink.match(/(?:אגיע בשעה|arrive at|ETA[:\s]*)\s*(\d{1,2}:\d{2})/i);
+      if (etaMatch) {
+        wazeEta = etaMatch[1];
+        console.log('Extracted Waze ETA from text:', wazeEta);
       }
     }
     
