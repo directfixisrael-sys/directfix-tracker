@@ -43,6 +43,7 @@ interface IphoneModel {
   back_glass_price: number;
   is_active: boolean;
   sort_order: number;
+  series: string;
 }
 
 interface RepairType {
