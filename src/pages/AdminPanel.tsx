@@ -1752,16 +1752,16 @@ const AdminPanel = () => {
               </span>
             )}
           </button>
-          {/* Coupons */}
+          {/* Reminders */}
           <button 
-            onClick={() => setActiveTab('coupons')}
+            onClick={() => setActiveTab('reminders')}
             className={cn(
               "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors relative min-w-[56px]",
-              activeTab === 'coupons' ? "bg-primary/10 text-primary" : "text-muted-foreground"
+              activeTab === 'reminders' ? "bg-primary/10 text-primary" : "text-muted-foreground"
             )}
           >
-            <CreditCard className="w-5 h-5" />
-            <span className="text-[10px]">קופונים</span>
+            <Bell className="w-5 h-5" />
+            <span className="text-[10px]">תזכורות</span>
           </button>
           {/* More menu */}
           <DropdownMenu>
