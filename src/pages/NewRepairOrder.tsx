@@ -519,7 +519,7 @@ const NewRepairOrder = () => {
     if (isCompatibleScreen) return selectedModel.compatible_screen_price;
     if (isBattery) return selectedModel.battery_price;
     if (isBackGlass) return selectedModel.back_glass_price;
-    if (isCharging) return selectedModel.charging_price;
+    if (isCharging) return selectedModel.charging_price || 0;
     return 0;
   };
   const getPrice = () => {
