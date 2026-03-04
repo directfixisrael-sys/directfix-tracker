@@ -424,7 +424,7 @@ const AdminPanel = () => {
     });
   };
 
-  const getWhatsAppMessage = (order: RepairOrder) => {
+  const getWhatsAppMessage = (order: RepairOrder, wazeEta?: string | null) => {
     const trackingUrl = `${window.location.origin}/track?phone=${encodeURIComponent(order.customerPhone)}`;
     
     switch (order.status) {
@@ -434,8 +434,13 @@ const AdminPanel = () => {
         return `שלום ${order.customerName}!\n\nההזמנה שלך אושרה\n${order.deviceType} - ${order.issueDescription}\n\nניצור איתך קשר בקרוב לתיאום הגעה.\n\nמעקב: ${trackingUrl}`;
       case 'technician_assigned':
         return `שלום ${order.customerName}!\n\nטכנאי שובץ להזמנה שלך\n${order.technicianName ? `שם הטכנאי: ${order.technicianName}` : ''}\n${order.deviceType}\n\nמעקב בזמן אמת: ${trackingUrl}`;
-      case 'on_the_way':
-        return `שלום ${order.customerName}!\n\nהטכנאי בדרך אליך!\n${order.estimatedArrival ? `זמן הגעה משוער: ${order.estimatedArrival}` : ''}\n${order.deviceType} - ${order.issueDescription}\n\nעקבו בזמן אמת:\n${trackingUrl}${order.wazeLink ? `\n\nמעקב מיקום בוויז:\n${order.wazeLink}` : ''}`;
+      case 'on_the_way': {
+        const etaText = wazeEta 
+          ? `זמן הגעה משוער: ${wazeEta}` 
+          : (order.estimatedArrival ? `זמן הגעה משוער: ${order.estimatedArrival}` : '');
+        const wazeUrl = order.wazeLink ? order.wazeLink.match(/https:\/\/waze\.com\/ul[^\s]*/)?.[0] || order.wazeLink : '';
+        return `שלום ${order.customerName}!\n\nהטכנאי בדרך אליך!\n${etaText}\n${order.deviceType} - ${order.issueDescription}\n\nעקבו בזמן אמת:\n${trackingUrl}${wazeUrl ? `\n\nמעקב מיקום בוויז:\n${wazeUrl}` : ''}`;
+      }
       case 'arrived':
         return `שלום ${order.customerName}!\n\nהטכנאי הגיע!\nאנא פתחו את הדלת\n\n${order.deviceType} - ${order.issueDescription}`;
       case 'in_progress':
@@ -449,7 +454,7 @@ const AdminPanel = () => {
     }
   };
 
-  const sendWhatsAppManually = (order: RepairOrder) => {
+  const sendWhatsAppManually = async (order: RepairOrder) => {
     // Format phone number for WhatsApp (remove leading 0, add 972)
     let phone = order.customerPhone.replace(/\D/g, '');
     if (phone.startsWith('0')) {
@@ -458,13 +463,36 @@ const AdminPanel = () => {
       phone = '972' + phone;
     }
     
-    const message = getWhatsAppMessage(order);
+    let wazeEta: string | null = null;
+    
+    // If status is on_the_way and there's a Waze link, try to extract ETA
+    if (order.status === 'on_the_way' && order.wazeLink) {
+      try {
+        toast({
+          title: "מחלץ זמן הגעה מוויז...",
+          description: "רגע אחד",
+        });
+        
+        const { data, error } = await supabase.functions.invoke('extract-waze-eta', {
+          body: { wazeLink: order.wazeLink },
+        });
+        
+        if (data?.eta) {
+          wazeEta = data.eta;
+          console.log('Extracted Waze ETA:', wazeEta);
+        }
+      } catch (e) {
+        console.error('Error extracting Waze ETA:', e);
+      }
+    }
+    
+    const message = getWhatsAppMessage(order, wazeEta);
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     
     toast({
       title: "וואטסאפ נפתח",
-      description: "שלח את ההודעה ללקוח",
+      description: wazeEta ? `זמן הגעה מוויז: ${wazeEta}` : "שלח את ההודעה ללקוח",
     });
   };
 
