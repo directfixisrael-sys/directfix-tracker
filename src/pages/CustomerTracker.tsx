@@ -282,7 +282,7 @@ const CustomerTracker = () => {
         {/* Technician tracker - on the way */}
         {showTechnicianTracker && (
           <TechnicianTracker
-            technicianName={currentOrder.technicianName!}
+            technicianName={currentOrder.technicianName || 'הטכנאי'}
             estimatedArrival={currentOrder.estimatedArrival}
             customerAddress={currentOrder.customerAddress}
             wazeLink={currentOrder.wazeLink}
