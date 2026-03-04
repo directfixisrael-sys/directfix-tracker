@@ -34,7 +34,7 @@ const App = () => (
           <ScrollToTop />
           <VisitorTracker />
           <AccessibilityWidget showFloatingButton={false} />
-          <EmergencyBanner />
+          
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/track" element={<CustomerTracker />} />
