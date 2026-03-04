@@ -101,7 +101,7 @@ const Index = () => {
         </section>
 
         <section className="section-lavender border-b-2 border-foreground/10">
-          <div className="max-w-2xl mx-auto px-6 py-10 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
               <span className="text-highlight">למה לבחור בנו?</span>
             </h2>
