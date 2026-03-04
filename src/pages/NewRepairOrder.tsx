@@ -1267,7 +1267,7 @@ const NewRepairOrder = () => {
                         controls
                         playsInline
                         preload="metadata"
-                        className="relative w-full aspect-[9/16] bg-black rounded-xl"
+                        className="relative w-full rounded-xl"
                         src="https://directfix.co.il/wp-content/uploads/2026/03/%D7%93%D7%99%D7%99%D7%A8%D7%A7%D7%98-%D7%A4%D7%99%D7%A7%D7%A1_s-Video-Mar-4-2026.mp4"
                       />
                     </div>
