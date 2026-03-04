@@ -124,6 +124,7 @@ const PriceManagement = () => {
       setEditingModel(model);
       setModelForm({
         name: model.name,
+        series: model.series,
         original_screen_price: model.original_screen_price,
         compatible_screen_price: model.compatible_screen_price,
         battery_price: model.battery_price,
@@ -134,6 +135,7 @@ const PriceManagement = () => {
       setEditingModel(null);
       setModelForm({
         name: '',
+        series: '',
         original_screen_price: 0,
         compatible_screen_price: 0,
         battery_price: 0,
@@ -141,6 +143,8 @@ const PriceManagement = () => {
         is_active: true,
       });
     }
+    setIsCreatingNewSeries(false);
+    setNewSeriesName('');
     setIsModelDialogOpen(true);
   };
 
