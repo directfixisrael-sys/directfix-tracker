@@ -1,5 +1,6 @@
-import { Gift, Heart, CreditCard, ChevronDown, Truck, Mail, Sparkles, Play } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { Gift, Heart, CreditCard, ChevronDown, Truck, Mail, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import VideoPlayer from './VideoPlayer';
 
 interface GiftOrderToggleProps {
   isGift: boolean;
