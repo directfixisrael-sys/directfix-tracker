@@ -956,6 +956,9 @@ const AdminPanel = () => {
       case 'coupons':
         return <CouponManagement />;
 
+      case 'reminders':
+        return <RemindersManagement />;
+
       case 'bundles':
         return <BundleManagement />;
 
