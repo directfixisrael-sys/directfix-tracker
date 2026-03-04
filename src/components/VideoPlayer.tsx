@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Play } from 'lucide-react';
-import videoPoster from '@/assets/video-poster.jpg';
+import videoPoster from '@/assets/video-poster.png';
 
 interface VideoPlayerProps {
   src: string;
