@@ -84,7 +84,6 @@ const AnnouncementBanner = () => {
       {headerBanners.map(ann => (
         <div key={ann.id} className={`relative px-4 py-2.5 text-center text-sm font-medium ${colorMap[ann.bg_color] || colorMap.warning}`}>
           <div className="max-w-4xl mx-auto flex items-center justify-center gap-2">
-            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
             {ann.title && <strong>{ann.title}:</strong>}
             <span>{ann.message}</span>
           </div>
