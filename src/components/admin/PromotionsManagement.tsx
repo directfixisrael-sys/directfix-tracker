@@ -93,6 +93,7 @@ const PromotionsManagement = () => {
             end_date: formData.end_date || null,
             is_active: formData.is_active,
             value: formData.value ? Number(formData.value) : 0,
+            display_mode: formData.display_mode,
           })
           .eq('id', editingPromotion.id);
 
