@@ -77,7 +77,33 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Trust Section - Lavender */}
+        {/* How it works - Video Section */}
+        <section className="section-peach border-b-2 border-foreground/10">
+          <div className="max-w-2xl mx-auto px-6 py-10 text-center">
+            <h2 className="text-2xl font-extrabold mb-2">
+              <span className="text-highlight">איך השירות עובד?</span>
+            </h2>
+            <p className="text-muted-foreground mb-6 text-base">צפו בסרטון קצר ותבינו כמה זה פשוט</p>
+            
+            <div className="relative max-w-md mx-auto animate-fade-in" style={{ animationDelay: '180ms' }}>
+              {/* Blur glow behind */}
+              <div className="absolute -inset-4 bg-primary/20 rounded-3xl blur-2xl" />
+              <div className="absolute -inset-2 bg-primary/10 rounded-3xl blur-xl" />
+              
+              {/* Video card */}
+              <div className="relative rounded-2xl overflow-hidden border-2 border-foreground/10 bg-card/80 backdrop-blur-md shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)]">
+                <video
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="w-full aspect-[9/16]"
+                  src="https://directfix.co.il/wp-content/uploads/2026/03/%D7%93%D7%99%D7%99%D7%A8%D7%A7%D7%98-%D7%A4%D7%99%D7%A7%D7%A1_s-Video-Mar-4-2026.mp4"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="section-lavender border-b-2 border-foreground/10">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
