@@ -42,7 +42,7 @@ const Logo = ({ size = 'md', clickable = true, className }: LogoProps) => {
         "bg-primary rounded-xl flex items-center justify-center shadow-md border-2 border-foreground/10",
         badgeSizes[size]
       )}>
-        <Wrench className={cn("text-primary-foreground bg-[#0073ff]", iconSizes[size])} />
+        <Wrench className={cn("text-primary-foreground", iconSizes[size])} />
       </div>
       <div className="flex flex-col leading-none">
         <span className={cn(
