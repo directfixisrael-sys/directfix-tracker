@@ -50,7 +50,8 @@ import {
   Wrench,
   CalendarPlus,
   Sparkles,
-  Image
+  Image,
+  Megaphone
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
@@ -70,6 +71,7 @@ import CouponManagement from '@/components/admin/CouponManagement';
 import BundleManagement from '@/components/admin/BundleManagement';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import LiveView from '@/components/admin/LiveView';
+import AnnouncementsManagement from '@/components/admin/AnnouncementsManagement';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -939,6 +941,8 @@ const AdminPanel = () => {
       case 'bundles':
         return <BundleManagement />;
 
+      case 'announcements':
+        return <AnnouncementsManagement />;
       case 'feedback':
         const ordersWithFeedback = orders.filter(o => o.rating);
         const avgRating = ordersWithFeedback.length > 0 
@@ -1737,7 +1741,7 @@ const AdminPanel = () => {
               <button 
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
-                  ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'bundles', 'settings'].includes(activeTab)
+                  ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'bundles', 'settings', 'announcements'].includes(activeTab)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground"
                 )}
@@ -1779,6 +1783,10 @@ const AdminPanel = () => {
               <DropdownMenuItem onClick={() => setActiveTab('bundles')} className={cn("gap-3 py-3", activeTab === 'bundles' && "text-primary font-medium")}>
                 <Package className="w-4 h-4" />
                 <span>חבילות</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('announcements')} className={cn("gap-3 py-3", activeTab === 'announcements' && "text-primary font-medium")}>
+                <Megaphone className="w-4 h-4" />
+                <span>הודעות והתראות</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('settings')} className={cn("gap-3 py-3", activeTab === 'settings' && "text-primary font-medium")}>
                 <Settings className="w-4 h-4" />
@@ -1878,7 +1886,7 @@ const AdminPanel = () => {
             onClick={() => setSettingsSubOpen(!settingsSubOpen)}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              ['customers', 'messages', 'prices', 'feedback', 'promotions', 'coupons', 'bundles', 'settings'].includes(activeTab)
+              ['customers', 'messages', 'prices', 'feedback', 'promotions', 'coupons', 'bundles', 'settings', 'announcements'].includes(activeTab)
                 ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                 : "text-sidebar-foreground hover:bg-sidebar-accent/50"
             )}
@@ -1985,6 +1993,18 @@ const AdminPanel = () => {
                 <span>חבילות תיקון</span>
               </button>
               <button 
+                onClick={() => setActiveTab('announcements')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'announcements' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Megaphone className="w-4 h-4" />
+                <span>הודעות והתראות</span>
+              </button>
+              <button 
                 onClick={() => setActiveTab('settings')}
                 className={cn(
                   "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
@@ -2029,6 +2049,7 @@ const AdminPanel = () => {
               {activeTab === 'promotions' && 'ניהול מבצעים'}
               {activeTab === 'coupons' && 'ניהול קופונים'}
               {activeTab === 'bundles' && 'ניהול חבילות תיקון'}
+              {activeTab === 'announcements' && 'הודעות והתראות'}
             </h1>
             <p className="text-xs md:text-sm text-muted-foreground">
               {activeTab === 'orders' && `${orders.length} הזמנות`}

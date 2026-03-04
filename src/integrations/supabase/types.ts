@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcements: {
+        Row: {
+          bg_color: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          message: string
+          placement: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bg_color?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          message: string
+          placement?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          bg_color?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          message?: string
+          placement?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blocked_dates: {
         Row: {
           created_at: string
