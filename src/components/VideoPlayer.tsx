@@ -1,13 +1,16 @@
 import { useState, useRef } from 'react';
 import { Play } from 'lucide-react';
 import videoPoster from '@/assets/video-poster.png';
+import giftPoster from '@/assets/gift-video-poster.png';
 
 interface VideoPlayerProps {
   src: string;
   className?: string;
+  posterSrc?: 'default' | 'gift';
 }
 
-const VideoPlayer = ({ src, className = '' }: VideoPlayerProps) => {
+const VideoPlayer = ({ src, className = '', posterSrc = 'default' }: VideoPlayerProps) => {
+  const poster = posterSrc === 'gift' ? giftPoster : videoPoster;
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -29,7 +32,7 @@ const VideoPlayer = ({ src, className = '' }: VideoPlayerProps) => {
         >
           {/* Poster image */}
           <img
-            src={videoPoster}
+            src={poster}
             alt="צפו בסרטון"
             className="absolute inset-0 w-full h-full object-cover"
           />
@@ -55,7 +58,7 @@ const VideoPlayer = ({ src, className = '' }: VideoPlayerProps) => {
         preload="metadata"
         className="w-full"
         src={src}
-        poster={videoPoster}
+        poster={poster}
         onEnded={() => setIsPlaying(false)}
       />
     </div>

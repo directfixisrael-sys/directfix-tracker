@@ -1,5 +1,6 @@
-import { Gift, Heart, CreditCard, ChevronDown, Truck, Mail, Sparkles, Play } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { Gift, Heart, CreditCard, ChevronDown, Truck, Mail, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import VideoPlayer from './VideoPlayer';
 
 interface GiftOrderToggleProps {
   isGift: boolean;
@@ -96,16 +97,11 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
         <div className="mt-3 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 to-primary/10 overflow-hidden animate-fade-in">
           {/* Video section */}
           <div className="px-4 pt-4">
-            <div className="rounded-xl overflow-hidden border border-primary/20 shadow-md bg-black">
-              <video
-                controls
-                playsInline
-                preload="metadata"
-                poster=""
-                className="w-full aspect-video"
-                src="https://directfix.co.il/wp-content/uploads/2026/03/%D7%94%D7%A1%D7%91%D7%A8-%D7%A2%D7%9C-%D7%AA%D7%99%D7%A7%D7%95%D7%9F-%D7%91%D7%9E%D7%AA%D7%A0%D7%94.mp4"
-              />
-            </div>
+            <VideoPlayer
+              src="https://directfix.co.il/wp-content/uploads/2026/03/directfixgift-1.mp4"
+              posterSrc="gift"
+              className="border border-primary/20 shadow-md"
+            />
           </div>
 
           <div className="px-5 py-4 border-b border-primary/10 flex items-center gap-2">
