@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -79,6 +79,83 @@ const PriceManagement = () => {
   });
   const [newSeriesName, setNewSeriesName] = useState('');
   const [isCreatingNewSeries, setIsCreatingNewSeries] = useState(false);
+
+  // Series drag-and-drop state
+  const [seriesOrder, setSeriesOrder] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('series_order');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+  const [draggedSeries, setDraggedSeries] = useState<string | null>(null);
+  const [dragOverSeries, setDragOverSeries] = useState<string | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number; series: string } | null>(null);
+
+  // Get ordered series list
+  const getOrderedSeries = useCallback(() => {
+    const allSeries = Array.from(new Set(models.map(m => m.series).filter(Boolean)));
+    return [...allSeries].sort((a, b) => {
+      const idxA = seriesOrder.indexOf(a);
+      const idxB = seriesOrder.indexOf(b);
+      if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+      if (idxA === -1) return 1;
+      if (idxB === -1) return -1;
+      return idxA - idxB;
+    });
+  }, [models, seriesOrder]);
+
+  const handleSeriesDrop = (targetSeries: string) => {
+    if (!draggedSeries || draggedSeries === targetSeries) {
+      setDraggedSeries(null);
+      setDragOverSeries(null);
+      return;
+    }
+    const ordered = getOrderedSeries();
+    const fromIdx = ordered.indexOf(draggedSeries);
+    const toIdx = ordered.indexOf(targetSeries);
+    if (fromIdx === -1 || toIdx === -1) return;
+    const newOrder = [...ordered];
+    newOrder.splice(fromIdx, 1);
+    newOrder.splice(toIdx, 0, draggedSeries);
+    setSeriesOrder(newOrder);
+    localStorage.setItem('series_order', JSON.stringify(newOrder));
+    setDraggedSeries(null);
+    setDragOverSeries(null);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent, series: string) => {
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY, series };
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touch = e.touches[0];
+    const dx = Math.abs(touch.clientX - touchStartRef.current.x);
+    const dy = Math.abs(touch.clientY - touchStartRef.current.y);
+    if (dx > 10 || dy > 10) {
+      setDraggedSeries(touchStartRef.current.series);
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (el) {
+        const chipEl = el.closest('[data-series]') as HTMLElement;
+        if (chipEl) {
+          const overSeries = chipEl.getAttribute('data-series');
+          if (overSeries && overSeries !== touchStartRef.current.series) {
+            setDragOverSeries(overSeries);
+          }
+        }
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (draggedSeries && dragOverSeries) {
+      handleSeriesDrop(dragOverSeries);
+    }
+    setDraggedSeries(null);
+    setDragOverSeries(null);
+    touchStartRef.current = null;
+  };
   
   // Repair type dialog state
   const [isRepairDialogOpen, setIsRepairDialogOpen] = useState(false);
@@ -566,18 +643,34 @@ const PriceManagement = () => {
               {!isCreatingNewSeries ? (
                 <div className="space-y-2">
                   <div className="flex flex-wrap gap-2">
-                    {Array.from(new Set(models.map(m => m.series).filter(Boolean))).sort().map(series => (
+                    {getOrderedSeries().map(series => (
                       <button
                         key={series}
                         type="button"
+                        data-series={series}
+                        draggable
+                        onDragStart={() => setDraggedSeries(series)}
+                        onDragOver={(e) => { e.preventDefault(); if (draggedSeries && draggedSeries !== series) setDragOverSeries(series); }}
+                        onDrop={() => handleSeriesDrop(series)}
+                        onDragEnd={() => { setDraggedSeries(null); setDragOverSeries(null); }}
+                        onTouchStart={(e) => handleTouchStart(e, series)}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
                         onClick={() => setModelForm({ ...modelForm, series })}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-grab active:cursor-grabbing ${
                           modelForm.series === series
                             ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted hover:bg-muted/80 text-foreground'
+                            : dragOverSeries === series
+                              ? 'bg-primary/20 ring-2 ring-primary ring-dashed'
+                              : draggedSeries === series
+                                ? 'opacity-50 bg-muted text-foreground'
+                                : 'bg-muted hover:bg-muted/80 text-foreground'
                         }`}
                       >
-                        {series}
+                        <span className="flex items-center gap-1">
+                          <GripVertical className="w-3 h-3 opacity-40" />
+                          {series}
+                        </span>
                       </button>
                     ))}
                   </div>
