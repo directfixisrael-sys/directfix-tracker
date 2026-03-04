@@ -341,6 +341,8 @@ const NewRepairOrder = () => {
   const [giftSenderPhone, setGiftSenderPhone] = useState('');
   const [giftMessage, setGiftMessage] = useState('');
   const [showGiftBurst, setShowGiftBurst] = useState(false);
+  const [giftPaymentUrl, setGiftPaymentUrl] = useState<string | null>(null);
+  const [giftOrderResult, setGiftOrderResult] = useState<any>(null);
 
   const handleGiftToggle = () => {
     const newVal = !isGiftOrder;
