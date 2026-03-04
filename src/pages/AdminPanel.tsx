@@ -1388,14 +1388,21 @@ const AdminPanel = () => {
                         שמור
                       </Button>
                     </div>
-                    {selectedOrder.wazeLink && (
-                      <div className="mt-3 p-2 bg-success/10 rounded-lg">
-                        <p className="text-sm text-success font-medium">✓ קישור וויז פעיל</p>
-                        <p className="text-xs text-muted-foreground mt-1 truncate" dir="ltr">
-                          {selectedOrder.wazeLink}
-                        </p>
-                      </div>
-                    )}
+                    {selectedOrder.wazeLink && (() => {
+                      const etaMatch = selectedOrder.wazeLink?.match(/(?:אגיע בשעה|arrive at)\s*(\d{1,2}:\d{2})/i);
+                      const extractedEta = etaMatch ? etaMatch[1] : null;
+                      return (
+                        <div className="mt-3 p-2 bg-success/10 rounded-lg">
+                          <p className="text-sm text-success font-medium">✓ קישור וויז פעיל</p>
+                          {extractedEta && (
+                            <p className="text-sm font-semibold text-foreground mt-1">🕐 הגעה משוערת: {extractedEta}</p>
+                          )}
+                          <p className="text-xs text-muted-foreground mt-1 truncate" dir="ltr">
+                            {selectedOrder.wazeLink?.match(/https:\/\/waze\.com\/ul[^\s]*/)?.[0] || 'קישור פעיל'}
+                          </p>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Invoice link */}
