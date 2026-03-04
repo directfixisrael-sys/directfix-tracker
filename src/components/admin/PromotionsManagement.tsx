@@ -260,6 +260,9 @@ const PromotionsManagement = () => {
                         {promotion.badge_text}
                       </span>
                     )}
+                    <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+                      {(promotion as any).display_mode === 'banner' ? 'באנר' : (promotion as any).display_mode === 'popup' ? 'פופאפ' : 'באנר + פופאפ'}
+                    </span>
                   </div>
                    <p className="text-muted-foreground text-sm mb-2">{promotion.description}</p>
                    {promotion.value && promotion.value > 0 && (
