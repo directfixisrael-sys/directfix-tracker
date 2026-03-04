@@ -275,6 +275,7 @@ const PriceManagement = () => {
             compatible_screen_price: modelForm.compatible_screen_price,
             battery_price: modelForm.battery_price,
             back_glass_price: modelForm.back_glass_price,
+            charging_price: modelForm.charging_price,
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
             sort_order: maxOrder + 1,
