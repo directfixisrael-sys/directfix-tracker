@@ -550,11 +550,69 @@ const PriceManagement = () => {
 
       {/* Model Dialog */}
       <Dialog open={isModelDialogOpen} onOpenChange={setIsModelDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingModel ? 'עריכת דגם' : 'הוספת דגם חדש'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {/* Series selection */}
+            <div>
+              <label className="block text-sm font-medium mb-2">סדרה</label>
+              {!isCreatingNewSeries ? (
+                <div className="space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from(new Set(models.map(m => m.series).filter(Boolean))).sort().map(series => (
+                      <button
+                        key={series}
+                        type="button"
+                        onClick={() => setModelForm({ ...modelForm, series })}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                          modelForm.series === series
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted hover:bg-muted/80 text-foreground'
+                        }`}
+                      >
+                        {series}
+                      </button>
+                    ))}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setIsCreatingNewSeries(true);
+                      setModelForm({ ...modelForm, series: '' });
+                    }}
+                    className="gap-1"
+                  >
+                    <Plus className="w-3 h-3" />
+                    סדרה חדשה
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Input
+                    placeholder="לדוגמה: iPhone 17 או Samsung S25"
+                    value={newSeriesName}
+                    onChange={(e) => setNewSeriesName(e.target.value)}
+                    autoFocus
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setIsCreatingNewSeries(false);
+                      setNewSeriesName('');
+                    }}
+                  >
+                    חזרה לסדרות קיימות
+                  </Button>
+                </div>
+              )}
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-2">שם הדגם</label>
               <Input
