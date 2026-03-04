@@ -196,7 +196,7 @@ const CustomerTracker = () => {
       {/* Sticky header when scrolling */}
       {showTechnicianTracker && (
         <StickyHeader
-          technicianName={currentOrder.technicianName!}
+          technicianName={currentOrder.technicianName || 'הטכנאי'}
           estimatedArrival={currentOrder.estimatedArrival}
           isVisible={showStickyHeader}
         />
