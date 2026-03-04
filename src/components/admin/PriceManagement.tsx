@@ -77,6 +77,7 @@ const PriceManagement = () => {
     battery_price: 0,
     back_glass_price: 0,
     is_active: true,
+    min_lead_hours: 0,
   });
   const [newSeriesName, setNewSeriesName] = useState('');
   const [isCreatingNewSeries, setIsCreatingNewSeries] = useState(false);
