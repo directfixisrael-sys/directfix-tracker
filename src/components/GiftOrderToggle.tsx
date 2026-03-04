@@ -15,7 +15,10 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
     const newVal = !isGift;
     if (newVal) {
       setHeartBurst(true);
+      setShowDetails(true); // Auto-expand explanation when toggling ON
       setTimeout(() => setHeartBurst(false), 800);
+    } else {
+      setShowDetails(false);
     }
     onToggle(newVal);
   };
