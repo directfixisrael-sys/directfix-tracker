@@ -761,6 +761,21 @@ const PriceManagement = () => {
                 />
               </div>
             </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">מרווח הזמנה מינימלי (שעות)</label>
+              <Input
+                type="number"
+                min={0}
+                placeholder="0 = ללא הגבלה"
+                value={modelForm.min_lead_hours}
+                onChange={(e) => setModelForm({ ...modelForm, min_lead_hours: Number(e.target.value) })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {modelForm.min_lead_hours > 0 
+                  ? `לקוחות יוכלו להזמין לפחות ${modelForm.min_lead_hours} שעות מראש`
+                  : 'ללא הגבלה - ניתן להזמין מעכשיו לעכשיו (40 דקות מינימום)'}
+              </p>
+            </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">הצג ללקוחות</span>
               <Switch
