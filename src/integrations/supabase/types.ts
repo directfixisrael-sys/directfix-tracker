@@ -318,6 +318,7 @@ export type Database = {
           badge_text: string | null
           created_at: string
           description: string
+          display_mode: string
           end_date: string | null
           icon: string | null
           id: string
@@ -331,6 +332,7 @@ export type Database = {
           badge_text?: string | null
           created_at?: string
           description: string
+          display_mode?: string
           end_date?: string | null
           icon?: string | null
           id?: string
@@ -344,6 +346,7 @@ export type Database = {
           badge_text?: string | null
           created_at?: string
           description?: string
+          display_mode?: string
           end_date?: string | null
           icon?: string | null
           id?: string

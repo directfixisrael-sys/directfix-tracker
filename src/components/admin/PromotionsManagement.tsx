@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Edit, Trash2, Gift, Tag, Calendar, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -47,6 +48,7 @@ const PromotionsManagement = () => {
     end_date: '',
     is_active: true,
     value: '',
+    display_mode: 'both',
   });
 
   const loadPromotions = async () => {
@@ -92,6 +94,7 @@ const PromotionsManagement = () => {
             end_date: formData.end_date || null,
             is_active: formData.is_active,
             value: formData.value ? Number(formData.value) : 0,
+            display_mode: formData.display_mode,
           })
           .eq('id', editingPromotion.id);
 
@@ -110,6 +113,7 @@ const PromotionsManagement = () => {
             end_date: formData.end_date || null,
             is_active: formData.is_active,
             value: formData.value ? Number(formData.value) : 0,
+            display_mode: formData.display_mode,
           });
 
         if (error) throw error;
@@ -173,6 +177,7 @@ const PromotionsManagement = () => {
       end_date: '',
       is_active: true,
       value: '',
+      display_mode: 'both',
     });
     setEditingPromotion(null);
   };
@@ -188,6 +193,7 @@ const PromotionsManagement = () => {
       end_date: promotion.end_date || '',
       is_active: promotion.is_active,
       value: promotion.value ? String(promotion.value) : '',
+      display_mode: (promotion as any).display_mode || 'both',
     });
     setIsDialogOpen(true);
   };
@@ -254,6 +260,9 @@ const PromotionsManagement = () => {
                         {promotion.badge_text}
                       </span>
                     )}
+                    <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+                      {(promotion as any).display_mode === 'banner' ? 'באנר' : (promotion as any).display_mode === 'popup' ? 'פופאפ' : 'באנר + פופאפ'}
+                    </span>
                   </div>
                    <p className="text-muted-foreground text-sm mb-2">{promotion.description}</p>
                    {promotion.value && promotion.value > 0 && (
@@ -382,6 +391,18 @@ const PromotionsManagement = () => {
                   onChange={(e) => setFormData(prev => ({ ...prev, end_date: e.target.value }))}
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-1 block">אופן הצגה</label>
+              <Select value={formData.display_mode} onValueChange={(v) => setFormData(prev => ({ ...prev, display_mode: v }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="both">באנר + פופאפ</SelectItem>
+                  <SelectItem value="banner">באנר למעלה בלבד</SelectItem>
+                  <SelectItem value="popup">פופאפ בלבד</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex items-center justify-between">

@@ -1,0 +1,1 @@
+ALTER TABLE public.promotions ADD COLUMN display_mode text NOT NULL DEFAULT 'both';

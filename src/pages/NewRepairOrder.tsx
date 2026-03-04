@@ -263,6 +263,7 @@ interface Promotion {
   badge_text: string | null;
   icon: string | null;
   value: number | null;
+  display_mode: string;
 }
 interface RepairBundle {
   id: string;
@@ -423,12 +424,15 @@ const NewRepairOrder = () => {
         } = await supabase.from('promotions').select('*').eq('is_active', true).limit(1).maybeSingle();
         if (promotionData) {
           setActivePromotion(promotionData);
-          // Show gift popup if not already claimed this session
-          const alreadyClaimed = sessionStorage.getItem('gift_promo_claimed');
-          if (!alreadyClaimed) {
-            setTimeout(() => setShowGiftPopup(true), 800);
-          } else {
-            setGiftClaimed(true);
+          // Show gift popup if display mode includes popup
+          const mode = promotionData.display_mode || 'both';
+          if (mode === 'popup' || mode === 'both') {
+            const alreadyClaimed = sessionStorage.getItem('gift_promo_claimed');
+            if (!alreadyClaimed) {
+              setTimeout(() => setShowGiftPopup(true), 800);
+            } else {
+              setGiftClaimed(true);
+            }
           }
         }
       } catch (error) {
@@ -1046,7 +1050,7 @@ const NewRepairOrder = () => {
       {/* Skip to content */}
       <a href="#order-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-lg">דלג לתוכן הראשי</a>
       {/* Promotion Strip */}
-      {activePromotion && <div className="bg-foreground text-background text-center py-2.5 text-xs font-bold tracking-wide border-b-2 border-foreground/10">
+      {activePromotion && (activePromotion.display_mode === 'banner' || activePromotion.display_mode === 'both') && <div className="bg-foreground text-background text-center py-2.5 text-xs font-bold tracking-wide border-b-2 border-foreground/10">
           <span>{getPromotionIcon(activePromotion.icon)} {activePromotion.title} — {activePromotion.description}</span>
           {activePromotion.value && activePromotion.value > 0 && <span className="mr-1 font-bold"> | חינם! 🎉</span>}
         </div>}
@@ -1114,7 +1118,7 @@ const NewRepairOrder = () => {
         <OrderPrivacyConsent open={showPrivacyConsent} onAccept={() => setShowPrivacyConsent(false)} />
 
         {/* Gift Promo Popup */}
-        {showGiftPopup && activePromotion && <GiftPromoPopup promotionTitle={activePromotion.title} promotionDescription={activePromotion.description} promotionIcon={activePromotion.icon || undefined} onClaimed={() => {
+        {showGiftPopup && activePromotion && (activePromotion.display_mode === 'popup' || activePromotion.display_mode === 'both') && <GiftPromoPopup promotionTitle={activePromotion.title} promotionDescription={activePromotion.description} promotionIcon={activePromotion.icon || undefined} onClaimed={() => {
         setShowGiftPopup(false);
         setGiftClaimed(true);
         sessionStorage.setItem('gift_promo_claimed', 'true');
