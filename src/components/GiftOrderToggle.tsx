@@ -1,4 +1,4 @@
-import { Gift, Heart, CreditCard, ChevronDown } from 'lucide-react';
+import { Gift, Heart, CreditCard, ChevronDown, Truck, Mail, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 
 interface GiftOrderToggleProps {
@@ -15,7 +15,6 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
     const newVal = !isGift;
     if (newVal) {
       setHeartBurst(true);
-      setShowDetails(true); // Auto-expand explanation when toggling ON
       setTimeout(() => setHeartBurst(false), 800);
     } else {
       setShowDetails(false);
@@ -23,9 +22,32 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
     onToggle(newVal);
   };
 
+  const steps = [
+    {
+      icon: <Gift className="w-4 h-4 text-primary" />,
+      title: 'בחרו תיקון',
+      desc: 'בחרו את סוג התיקון והזינו את פרטי מקבל המתנה',
+    },
+    {
+      icon: <CreditCard className="w-4 h-4 text-primary" />,
+      title: 'שלמו מראש באשראי',
+      desc: 'התשלום מתבצע לפני הגעת הטכנאי — מקבל המתנה לא משלם כלום!',
+    },
+    {
+      icon: <Mail className="w-4 h-4 text-primary" />,
+      title: 'אישור במייל',
+      desc: 'לאחר התשלום נשלח אישור הזמנה אליכם ולמקבל המתנה',
+    },
+    {
+      icon: <Truck className="w-4 h-4 text-primary" />,
+      title: 'טכנאי מגיע',
+      desc: 'נתאם הגעה ישירות עם מקבל המתנה — הפתעה מושלמת!',
+    },
+  ];
+
   return (
     <div className="animate-fade-in">
-      {/* Compact inline toggle */}
+      {/* Toggle row */}
       <div className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 ${
         isGift ? 'bg-primary/8 border border-primary/20' : ''
       }`}>
@@ -43,7 +65,6 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
             {label}
           </span>
 
-          {/* Instagram-style heart burst */}
           {heartBurst && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <Heart className="w-10 h-10 text-primary fill-primary absolute animate-heart-burst" />
@@ -51,9 +72,7 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
                 <Heart
                   key={i}
                   className="w-3 h-3 text-primary fill-primary absolute animate-heart-particle"
-                  style={{
-                    '--particle-angle': `${i * 60}deg`,
-                  } as React.CSSProperties}
+                  style={{ '--particle-angle': `${i * 60}deg` } as React.CSSProperties}
                 />
               ))}
             </div>
@@ -61,46 +80,50 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
         </button>
 
         {isGift && (
-          <button 
+          <button
             onClick={() => setShowDetails(!showDetails)}
-            className="text-xs text-primary hover:underline flex items-center gap-0.5 mr-auto"
+            className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors mr-auto bg-primary/10 px-3 py-1.5 rounded-full"
           >
+            <Sparkles className="w-3 h-3" />
             איך זה עובד?
-            <ChevronDown className={`w-3 h-3 transition-transform ${showDetails ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${showDetails ? 'rotate-180' : ''}`} />
           </button>
         )}
       </div>
 
-      {/* Expanded details */}
+      {/* Expandable steps */}
       {isGift && showDetails && (
-        <div className="mt-3 px-5 py-4 bg-primary/5 border border-primary/15 rounded-2xl space-y-3 animate-fade-in">
-          <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
-            <Gift className="w-4 h-4 text-primary" />
-            איך שולחים תיקון במתנה?
-          </h4>
-          <div className="space-y-2.5">
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-bold text-primary">1</span>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">בחרו תיקון והזינו את פרטי <strong className="text-foreground">מקבל המתנה</strong></p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-bold text-primary">2</span>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">בסיום ההזמנה תשלמו <strong className="text-foreground">באשראי מאובטח</strong> ישירות באתר</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-bold text-primary">3</span>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">לאחר התשלום, נתאם הגעה <strong className="text-foreground">למקבל המתנה</strong> ונשלח אישור במייל</p>
-            </div>
+        <div className="mt-3 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 to-primary/10 overflow-hidden animate-fade-in">
+          <div className="px-5 py-4 border-b border-primary/10 flex items-center gap-2">
+            <Gift className="w-5 h-5 text-primary" />
+            <h4 className="text-sm font-bold text-foreground">שירות תיקון במתנה 🎁</h4>
           </div>
-          <div className="flex items-center gap-2 pt-2 border-t border-primary/10">
-            <CreditCard className="w-4 h-4 text-primary" />
-            <p className="text-sm text-muted-foreground font-medium">💳 התשלום מתבצע לפני הגעת הטכנאי — כך מקבל המתנה לא צריך לשלם כלום!</p>
+
+          <div className="px-5 py-4 space-y-4">
+            {steps.map((step, i) => (
+              <div key={i} className="flex items-start gap-3 relative">
+                {/* Connector line */}
+                {i < steps.length - 1 && (
+                  <div className="absolute right-[15px] top-8 w-0.5 h-[calc(100%+4px)] bg-primary/15" />
+                )}
+                {/* Step number circle */}
+                <div className="w-8 h-8 rounded-full bg-primary/15 border border-primary/25 flex items-center justify-center flex-shrink-0 z-10">
+                  {step.icon}
+                </div>
+                <div className="pt-0.5">
+                  <p className="text-sm font-bold text-foreground">{step.title}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom highlight */}
+          <div className="px-5 py-3 bg-primary/10 border-t border-primary/15 flex items-center gap-2">
+            <CreditCard className="w-4 h-4 text-primary flex-shrink-0" />
+            <p className="text-xs font-medium text-foreground">
+              💳 התשלום באשראי מתבצע <strong>לפני</strong> הגעת הטכנאי — כך מקבל המתנה לא צריך לשלם כלום!
+            </p>
           </div>
         </div>
       )}
