@@ -43,6 +43,7 @@ interface IphoneModel {
   back_glass_price: number;
   is_active: boolean;
   sort_order: number;
+  series: string;
 }
 
 interface RepairType {
@@ -69,12 +70,15 @@ const PriceManagement = () => {
   const [editingModel, setEditingModel] = useState<IphoneModel | null>(null);
   const [modelForm, setModelForm] = useState({
     name: '',
+    series: '',
     original_screen_price: 0,
     compatible_screen_price: 0,
     battery_price: 0,
     back_glass_price: 0,
     is_active: true,
   });
+  const [newSeriesName, setNewSeriesName] = useState('');
+  const [isCreatingNewSeries, setIsCreatingNewSeries] = useState(false);
   
   // Repair type dialog state
   const [isRepairDialogOpen, setIsRepairDialogOpen] = useState(false);
@@ -120,6 +124,7 @@ const PriceManagement = () => {
       setEditingModel(model);
       setModelForm({
         name: model.name,
+        series: model.series,
         original_screen_price: model.original_screen_price,
         compatible_screen_price: model.compatible_screen_price,
         battery_price: model.battery_price,
@@ -130,6 +135,7 @@ const PriceManagement = () => {
       setEditingModel(null);
       setModelForm({
         name: '',
+        series: '',
         original_screen_price: 0,
         compatible_screen_price: 0,
         battery_price: 0,
@@ -137,12 +143,20 @@ const PriceManagement = () => {
         is_active: true,
       });
     }
+    setIsCreatingNewSeries(false);
+    setNewSeriesName('');
     setIsModelDialogOpen(true);
   };
 
   const saveModel = async () => {
+    const finalSeries = isCreatingNewSeries ? newSeriesName.trim() : modelForm.series;
+    
     if (!modelForm.name.trim()) {
       toast.error('יש להזין שם דגם');
+      return;
+    }
+    if (!finalSeries) {
+      toast.error('יש לבחור או ליצור סדרה');
       return;
     }
 
@@ -152,6 +166,7 @@ const PriceManagement = () => {
           .from('iphone_models')
           .update({
             name: modelForm.name.trim(),
+            series: finalSeries,
             original_screen_price: modelForm.original_screen_price,
             compatible_screen_price: modelForm.compatible_screen_price,
             battery_price: modelForm.battery_price,
@@ -168,6 +183,7 @@ const PriceManagement = () => {
           .from('iphone_models')
           .insert({
             name: modelForm.name.trim(),
+            series: finalSeries,
             original_screen_price: modelForm.original_screen_price,
             compatible_screen_price: modelForm.compatible_screen_price,
             battery_price: modelForm.battery_price,
@@ -428,7 +444,12 @@ const PriceManagement = () => {
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold truncate">{model.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold truncate">{model.name}</p>
+                      {model.series && (
+                        <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">{model.series}</span>
+                      )}
+                    </div>
                     <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                       <span>מסך מקורי: ₪{model.original_screen_price}</span>
                       <span>מסך תואם: ₪{model.compatible_screen_price}</span>
@@ -534,11 +555,69 @@ const PriceManagement = () => {
 
       {/* Model Dialog */}
       <Dialog open={isModelDialogOpen} onOpenChange={setIsModelDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingModel ? 'עריכת דגם' : 'הוספת דגם חדש'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {/* Series selection */}
+            <div>
+              <label className="block text-sm font-medium mb-2">סדרה</label>
+              {!isCreatingNewSeries ? (
+                <div className="space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from(new Set(models.map(m => m.series).filter(Boolean))).sort().map(series => (
+                      <button
+                        key={series}
+                        type="button"
+                        onClick={() => setModelForm({ ...modelForm, series })}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                          modelForm.series === series
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted hover:bg-muted/80 text-foreground'
+                        }`}
+                      >
+                        {series}
+                      </button>
+                    ))}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setIsCreatingNewSeries(true);
+                      setModelForm({ ...modelForm, series: '' });
+                    }}
+                    className="gap-1"
+                  >
+                    <Plus className="w-3 h-3" />
+                    סדרה חדשה
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Input
+                    placeholder="לדוגמה: iPhone 17 או Samsung S25"
+                    value={newSeriesName}
+                    onChange={(e) => setNewSeriesName(e.target.value)}
+                    autoFocus
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setIsCreatingNewSeries(false);
+                      setNewSeriesName('');
+                    }}
+                  >
+                    חזרה לסדרות קיימות
+                  </Button>
+                </div>
+              )}
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-2">שם הדגם</label>
               <Input

@@ -9,6 +9,7 @@ interface IphoneModel {
   compatible_screen_price: number;
   battery_price: number;
   back_glass_price: number;
+  series?: string;
 }
 
 interface ModelPickerProps {
@@ -17,20 +18,6 @@ interface ModelPickerProps {
   onSelect: (model: IphoneModel) => void;
   onConfirm: (model: IphoneModel) => void;
 }
-
-const getSeriesKey = (name: string): string => {
-  if (name.includes('סמסונג')) return 'Samsung';
-  const match = name.match(/iPhone\s+(X[SR]?|8|11|12|13|14|15|16)/);
-  if (!match) return 'Other';
-  const base = match[1];
-  if (['X', 'XS', 'XR'].includes(base)) return 'iPhone X';
-  return `iPhone ${base}`;
-};
-
-const seriesOrder = [
-  'iPhone 16', 'iPhone 15', 'iPhone 14', 'iPhone 13',
-  'iPhone 12', 'iPhone 11', 'iPhone X', 'iPhone 8', 'Samsung', 'Other'
-];
 
 const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPickerProps) => {
   const [activeSeries, setActiveSeries] = useState<string | null>(null);
@@ -46,14 +33,23 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
 
   const grouped = useMemo(() => {
     return models.reduce<Record<string, IphoneModel[]>>((acc, model) => {
-      const key = getSeriesKey(model.name);
+      const key = model.series || 'Other';
       if (!acc[key]) acc[key] = [];
       acc[key].push(model);
       return acc;
     }, {});
   }, [models]);
 
-  const sortedSeries = seriesOrder.filter(s => grouped[s]?.length);
+  const sortedSeries = useMemo(() => {
+    const defaultOrder = [
+      'iPhone 16', 'iPhone 15', 'iPhone 14', 'iPhone 13',
+      'iPhone 12', 'iPhone 11', 'iPhone X', 'iPhone 8', 'Samsung', 'Other'
+    ];
+    const allSeries = Object.keys(grouped);
+    const ordered = defaultOrder.filter(s => allSeries.includes(s));
+    const extra = allSeries.filter(s => !defaultOrder.includes(s)).sort();
+    return [...ordered, ...extra];
+  }, [grouped]);
 
   return (
     <div className="space-y-3" role="region" aria-label="בחירת דגם מכשיר">
