@@ -1369,9 +1369,10 @@ const NewRepairOrder = () => {
             const isCompatibleScreen = repair.name.includes('מסך תואם');
             const isBattery = repair.name.includes('סוללה');
             const isBackGlass = repair.name.includes('גב');
+            const isCharging = repair.name.includes('טעינה');
             let price = 0;
             if (selectedModel) {
-              if (isOriginalScreen) price = selectedModel.original_screen_price;else if (isCompatibleScreen) price = selectedModel.compatible_screen_price;else if (isBattery) price = selectedModel.battery_price;else if (isBackGlass) price = selectedModel.back_glass_price;
+              if (isOriginalScreen) price = selectedModel.original_screen_price;else if (isCompatibleScreen) price = selectedModel.compatible_screen_price;else if (isBattery) price = selectedModel.battery_price;else if (isBackGlass) price = selectedModel.back_glass_price;else if (isCharging) price = selectedModel.charging_price || 0;
             }
             const infoKey = isOriginalScreen ? 'מסך מקורי' : isCompatibleScreen ? 'מסך תואם' : isBattery ? 'סוללה מקורית' : null;
             const info = infoKey ? repairInfoDescriptions[infoKey] : null;
