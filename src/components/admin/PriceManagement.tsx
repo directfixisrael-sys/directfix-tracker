@@ -210,6 +210,7 @@ const PriceManagement = () => {
         compatible_screen_price: model.compatible_screen_price,
         battery_price: model.battery_price,
         back_glass_price: model.back_glass_price,
+        charging_price: model.charging_price || 0,
         is_active: model.is_active,
         min_lead_hours: model.min_lead_hours || 0,
       });
@@ -222,6 +223,7 @@ const PriceManagement = () => {
         compatible_screen_price: 0,
         battery_price: 0,
         back_glass_price: 0,
+        charging_price: 0,
         is_active: true,
         min_lead_hours: 0,
       });
