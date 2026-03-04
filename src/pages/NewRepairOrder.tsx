@@ -263,6 +263,7 @@ interface Promotion {
   badge_text: string | null;
   icon: string | null;
   value: number | null;
+  display_mode: string;
 }
 interface RepairBundle {
   id: string;
