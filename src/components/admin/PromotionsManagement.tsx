@@ -390,6 +390,18 @@ const PromotionsManagement = () => {
               </div>
             </div>
 
+            <div>
+              <label className="text-sm font-medium mb-1 block">אופן הצגה</label>
+              <Select value={formData.display_mode} onValueChange={(v) => setFormData(prev => ({ ...prev, display_mode: v }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="both">באנר + פופאפ</SelectItem>
+                  <SelectItem value="banner">באנר למעלה בלבד</SelectItem>
+                  <SelectItem value="popup">פופאפ בלבד</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium">מבצע פעיל</label>
               <Switch
