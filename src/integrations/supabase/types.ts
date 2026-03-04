@@ -126,6 +126,7 @@ export type Database = {
         Row: {
           back_glass_price: number
           battery_price: number
+          charging_price: number
           compatible_screen_price: number
           created_at: string
           id: string
@@ -140,6 +141,7 @@ export type Database = {
         Insert: {
           back_glass_price?: number
           battery_price?: number
+          charging_price?: number
           compatible_screen_price?: number
           created_at?: string
           id?: string
@@ -154,6 +156,7 @@ export type Database = {
         Update: {
           back_glass_price?: number
           battery_price?: number
+          charging_price?: number
           compatible_screen_price?: number
           created_at?: string
           id?: string
