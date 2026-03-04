@@ -767,7 +767,19 @@ const PriceManagement = () => {
                   value={modelForm.back_glass_price}
                   onChange={(e) => setModelForm({ ...modelForm, back_glass_price: Number(e.target.value) })}
                 />
-              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">תיקון טעינה (₪)</label>
+              <Input
+                type="number"
+                placeholder="0 = לא מוצג"
+                value={modelForm.charging_price}
+                onChange={(e) => setModelForm({ ...modelForm, charging_price: Number(e.target.value) })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {modelForm.charging_price > 0 ? 'תיקון טעינה יוצג ללקוח' : 'תיקון טעינה לא יוצג (מחיר 0)'}
+              </p>
+            </div>
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">מרווח הזמנה מינימלי (שעות)</label>
