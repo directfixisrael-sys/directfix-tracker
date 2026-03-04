@@ -2004,6 +2004,59 @@ const NewRepairOrder = () => {
             </Card>
           </div>}
 
+        {/* Step 5.5: Gift Payment */}
+        {step === 'gift_payment' && <div className="space-y-5 animate-fade-in">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
+                <CreditCard className="w-4 h-4" />
+                תשלום מאובטח
+              </div>
+              <h2 className="text-3xl font-extrabold mb-1">💳 תשלום להזמנת המתנה</h2>
+              <p className="text-muted-foreground">השלימו את התשלום כדי לאשר את ההזמנה</p>
+              {completedOrderNumber && <p className="text-sm font-semibold text-foreground mt-1">הזמנה #{completedOrderNumber}</p>}
+            </div>
+
+            <Card className="p-4 bg-muted/30 space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">דגם</span>
+                <span className="font-medium">{selectedModel?.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">תיקון</span>
+                <span className="font-medium">{getRepairTypeName()}</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-border">
+                <span className="font-bold">סה״כ לתשלום</span>
+                <span className="font-bold text-primary text-lg">₪{getFinalPrice()}</span>
+              </div>
+            </Card>
+
+            {giftPaymentUrl && (
+              <div className="rounded-2xl overflow-hidden border-2 border-primary/20 shadow-lg">
+                <iframe
+                  src={giftPaymentUrl}
+                  className="w-full border-0"
+                  style={{ height: '500px' }}
+                  title="תשלום מאובטח"
+                  allow="payment"
+                />
+              </div>
+            )}
+
+            <div className="bg-muted/50 rounded-xl p-4 space-y-3">
+              <p className="text-sm text-muted-foreground text-center">
+                🔒 התשלום מתבצע בסביבה מאובטחת ומוצפנת
+              </p>
+              <Button onClick={handleGiftPaymentSuccess} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg">
+                <CheckCircle2 className="w-5 h-5 ml-2" />
+                שילמתי - המשך לאישור
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                לאחר לחיצה נשלח אישור הזמנה למייל שלכם ולמקבל המתנה
+              </p>
+            </div>
+          </div>}
+
         {/* Step 6: Success */}
         {step === 'success' && <div className="text-center space-y-5 animate-fade-in py-6">
             <div className="flex justify-center">
