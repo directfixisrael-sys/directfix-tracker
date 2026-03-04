@@ -1372,12 +1372,12 @@ const AdminPanel = () => {
                       />
                       <Button onClick={() => {
                         if (selectedOrder && wazeLink) {
-                          // Extract just the URL from the pasted text
+                          // Check that it contains a valid Waze URL
                           const urlMatch = wazeLink.match(/https:\/\/waze\.com\/ul[^\s]*/);
-                          const extractedUrl = urlMatch ? urlMatch[0] : wazeLink;
                           
-                          if (extractedUrl.includes('waze.com')) {
-                            updateWazeLink(selectedOrder.id, extractedUrl);
+                          if (urlMatch) {
+                            // Save the FULL text (includes ETA info like "ואגיע בשעה 8:24")
+                            updateWazeLink(selectedOrder.id, wazeLink);
                             toast({ title: "קישור וויז עודכן" });
                             setWazeLink('');
                           } else {
