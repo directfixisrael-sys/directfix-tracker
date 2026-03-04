@@ -1,0 +1,1 @@
+ALTER TABLE public.iphone_models ADD COLUMN series text NOT NULL DEFAULT '';
