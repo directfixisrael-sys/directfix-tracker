@@ -1816,6 +1816,10 @@ const AdminPanel = () => {
                 <Megaphone className="w-4 h-4" />
                 <span>הודעות והתראות</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('coupons')} className={cn("gap-3 py-3", activeTab === 'coupons' && "text-primary font-medium")}>
+                <CreditCard className="w-4 h-4" />
+                <span>קופונים</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('settings')} className={cn("gap-3 py-3", activeTab === 'settings' && "text-primary font-medium")}>
                 <Settings className="w-4 h-4" />
                 <span>הגדרות</span>
