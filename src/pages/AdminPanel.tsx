@@ -72,6 +72,7 @@ import BundleManagement from '@/components/admin/BundleManagement';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import LiveView from '@/components/admin/LiveView';
 import AnnouncementsManagement from '@/components/admin/AnnouncementsManagement';
+import RemindersManagement from '@/components/admin/RemindersManagement';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
