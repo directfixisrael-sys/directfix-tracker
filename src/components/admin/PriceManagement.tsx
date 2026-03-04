@@ -544,7 +544,8 @@ const PriceManagement = () => {
                       <span>מסך תואם: ₪{model.compatible_screen_price}</span>
                       <span>סוללה: ₪{model.battery_price}</span>
                       {model.back_glass_price > 0 && <span>גב: ₪{model.back_glass_price}</span>}
-                      {(model as any).charging_price > 0 && <span>טעינה: ₪{(model as any).charging_price}</span>}
+                      {model.charging_price > 0 && <span>טעינה: ₪{model.charging_price}</span>}
+                      {model.min_lead_hours > 0 && <span className="text-warning">⏰ {model.min_lead_hours} שעות מראש</span>}
                     </div>
                   </div>
 
