@@ -86,7 +86,7 @@ const Index = () => {
             </h2>
             <p className="text-muted-foreground mb-6 text-base">צפו בסרטון קצר ותבינו כמה זה פשוט</p>
             
-            <div className="relative max-w-md mx-auto animate-fade-in" style={{ animationDelay: '180ms' }}>
+            <div className="relative max-w-lg mx-auto animate-fade-in" style={{ animationDelay: '180ms' }}>
               {/* Blur glow behind */}
               <div className="absolute -inset-4 bg-primary/20 rounded-3xl blur-2xl" />
               <div className="absolute -inset-2 bg-primary/10 rounded-3xl blur-xl" />
