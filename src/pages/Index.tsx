@@ -42,7 +42,7 @@ const Index = () => {
         
         {/* Hero Section - Cream Background */}
         <section className="section-cream border-b-2 border-foreground/10">
-          <div className="max-w-2xl mx-auto px-6 py-12 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-12 text-center">
             <div className="mb-6 animate-fade-in">
               <Logo size="lg" clickable={false} className="justify-center mb-5" />
               <h1 className="text-4xl font-extrabold text-foreground tracking-tight leading-tight mb-3">
