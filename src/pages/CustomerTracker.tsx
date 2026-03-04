@@ -178,7 +178,7 @@ const CustomerTracker = () => {
     );
   }
 
-  const showTechnicianTracker = currentOrder.status === 'on_the_way' && currentOrder.technicianName;
+  const showTechnicianTracker = currentOrder.status === 'on_the_way';
   const showRepairInProgress = (currentOrder.status === 'in_progress' || currentOrder.status === 'arrived') && currentOrder.technicianName;
   const showAccessories = currentOrder.status !== 'completed';
   const showRating = currentOrder.status === 'completed';
@@ -196,7 +196,7 @@ const CustomerTracker = () => {
       {/* Sticky header when scrolling */}
       {showTechnicianTracker && (
         <StickyHeader
-          technicianName={currentOrder.technicianName!}
+          technicianName={currentOrder.technicianName || 'הטכנאי'}
           estimatedArrival={currentOrder.estimatedArrival}
           isVisible={showStickyHeader}
         />
@@ -282,7 +282,7 @@ const CustomerTracker = () => {
         {/* Technician tracker - on the way */}
         {showTechnicianTracker && (
           <TechnicianTracker
-            technicianName={currentOrder.technicianName!}
+            technicianName={currentOrder.technicianName || 'הטכנאי'}
             estimatedArrival={currentOrder.estimatedArrival}
             customerAddress={currentOrder.customerAddress}
             wazeLink={currentOrder.wazeLink}

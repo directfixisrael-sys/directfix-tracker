@@ -34,9 +34,9 @@ const getSecondsUntilEta = (etaTime: string): number => {
   const eta = new Date();
   eta.setHours(hours, minutes, 0, 0);
   
-  // If ETA is earlier than now, it might be tomorrow
-  if (eta.getTime() < now.getTime() - 60000) {
-    eta.setDate(eta.getDate() + 1);
+  // If ETA already passed (more than 5 min ago), return 0
+  if (eta.getTime() < now.getTime() - 5 * 60 * 1000) {
+    return 0;
   }
   
   return Math.max(0, Math.floor((eta.getTime() - now.getTime()) / 1000));
@@ -126,15 +126,21 @@ const CountdownTimer = ({ secondsLeft, etaTime }: { secondsLeft: number; etaTime
         </div>
 
         {/* Big countdown */}
-        <div className="flex items-center justify-center gap-1 my-4">
-          <div className="flex items-baseline gap-1">
-            <span className="text-6xl font-extrabold tabular-nums tracking-tight">
-              {String(minutes).padStart(2, '0')}
-            </span>
-            <span className="text-2xl font-bold opacity-60 animate-pulse">:</span>
-            <span className="text-6xl font-extrabold tabular-nums tracking-tight">
-              {String(seconds).padStart(2, '0')}
-            </span>
+        <div className="flex items-center justify-center my-4" dir="ltr">
+          <div className="flex items-center gap-3">
+            <div className="bg-white/15 rounded-xl px-4 py-2 min-w-[80px] text-center">
+              <span className="text-5xl font-extrabold tabular-nums">
+                {String(minutes).padStart(2, '0')}
+              </span>
+              <p className="text-[10px] opacity-60 mt-1">דקות</p>
+            </div>
+            <span className="text-4xl font-bold opacity-60 animate-pulse">:</span>
+            <div className="bg-white/15 rounded-xl px-4 py-2 min-w-[80px] text-center">
+              <span className="text-5xl font-extrabold tabular-nums">
+                {String(seconds).padStart(2, '0')}
+              </span>
+              <p className="text-[10px] opacity-60 mt-1">שניות</p>
+            </div>
           </div>
         </div>
         <p className="text-center text-sm font-medium opacity-80 mb-4">דקות עד הגעת הטכנאי</p>
