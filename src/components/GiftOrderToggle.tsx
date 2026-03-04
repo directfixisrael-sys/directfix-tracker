@@ -89,18 +89,18 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
               <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-xs font-bold text-primary">2</span>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">נציג שלנו ייצור איתכם קשר <strong className="text-foreground">לגביית התשלום</strong></p>
+              <p className="text-sm text-muted-foreground leading-relaxed">בסיום ההזמנה תשלמו <strong className="text-foreground">באשראי מאובטח</strong> ישירות באתר</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-xs font-bold text-primary">3</span>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">לאחר התשלום, נתאם הגעה <strong className="text-foreground">למקבל המתנה</strong></p>
+              <p className="text-sm text-muted-foreground leading-relaxed">לאחר התשלום, נתאם הגעה <strong className="text-foreground">למקבל המתנה</strong> ונשלח אישור במייל</p>
             </div>
           </div>
           <div className="flex items-center gap-2 pt-2 border-t border-primary/10">
             <CreditCard className="w-4 h-4 text-primary" />
-            <p className="text-sm text-muted-foreground font-medium">תשלום מראש נדרש לפני תיאום ההגעה</p>
+            <p className="text-sm text-muted-foreground font-medium">💳 התשלום מתבצע לפני הגעת הטכנאי — כך מקבל המתנה לא צריך לשלם כלום!</p>
           </div>
         </div>
       )}
