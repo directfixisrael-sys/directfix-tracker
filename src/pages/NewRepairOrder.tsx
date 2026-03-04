@@ -247,6 +247,7 @@ interface IphoneModel {
   compatible_screen_price: number;
   battery_price: number;
   back_glass_price: number;
+  min_lead_hours?: number;
 }
 interface RepairType {
   id: string;
