@@ -34,9 +34,9 @@ const getSecondsUntilEta = (etaTime: string): number => {
   const eta = new Date();
   eta.setHours(hours, minutes, 0, 0);
   
-  // If ETA is earlier than now, it might be tomorrow
-  if (eta.getTime() < now.getTime() - 60000) {
-    eta.setDate(eta.getDate() + 1);
+  // If ETA already passed (more than 5 min ago), return 0
+  if (eta.getTime() < now.getTime() - 5 * 60 * 1000) {
+    return 0;
   }
   
   return Math.max(0, Math.floor((eta.getTime() - now.getTime()) / 1000));
