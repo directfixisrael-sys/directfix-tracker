@@ -272,7 +272,7 @@ interface RepairBundle {
   addon_repair_type: string;
   discount_percent: number;
 }
-type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'success';
+type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'gift_payment' | 'success';
 const NewRepairOrder = () => {
   const navigate = useNavigate();
   const {
@@ -341,6 +341,8 @@ const NewRepairOrder = () => {
   const [giftSenderPhone, setGiftSenderPhone] = useState('');
   const [giftMessage, setGiftMessage] = useState('');
   const [showGiftBurst, setShowGiftBurst] = useState(false);
+  const [giftPaymentUrl, setGiftPaymentUrl] = useState<string | null>(null);
+  const [giftOrderResult, setGiftOrderResult] = useState<any>(null);
 
   const handleGiftToggle = () => {
     const newVal = !isGiftOrder;
@@ -860,6 +862,48 @@ const NewRepairOrder = () => {
   const removeImage = (index: number) => {
     setDeviceImages(prev => prev.filter((_, i) => i !== index));
   };
+  const sendOrderNotifications = async (orderResult: any, repairDescription: string, scheduleNote: string) => {
+    try {
+      const allRepairNames = getAllRepairNames();
+      const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
+      const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
+      const leadSrc = getLeadSource();
+      await supabase.functions.invoke('send-order-notifications', {
+        body: {
+          customerName: customerName.trim(),
+          customerPhone: customerPhone.trim(),
+          customerAddress: customerAddress.trim(),
+          deviceType: selectedModel?.name || '',
+          repairType: repairTypeForNotification + colorNote,
+          repairPrice: getFinalPrice(),
+          scheduledTime: scheduleNote,
+          notes: customerNotes.trim(),
+          customerEmail: customerEmail.trim() || undefined,
+          orderNumber: orderResult?.order_number || undefined,
+          promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
+          leadSource: leadSrc.source,
+          leadSourceDetails: leadSrc,
+        }
+      });
+      console.log('Notifications sent successfully');
+    } catch (notificationError) {
+      console.error('Error sending notifications:', notificationError);
+    }
+  };
+
+  const handleGiftPaymentSuccess = async () => {
+    if (giftOrderResult?.id) {
+      await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', giftOrderResult.id);
+    }
+    const scheduleNote = formatSelectedDateTime();
+    const allRepairNames = getAllRepairNames();
+    const repairDescription = selectedBundleAddon && currentBundle 
+      ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה)` 
+      : allRepairNames.join(' + ');
+    await sendOrderNotifications(giftOrderResult, repairDescription, scheduleNote);
+    goToStep('success');
+  };
+
   const handleSubmit = async () => {
     if (!customerName.trim() || !customerPhone.trim() || !customerAddress.trim()) {
       toast.error('אנא מלא את כל השדות');
@@ -942,40 +986,54 @@ const NewRepairOrder = () => {
         deviceImages: deviceImages.length > 0 ? deviceImages : [],
       } as any);
 
-      // Send notifications (email + WhatsApp)
-      try {
-        const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
-        const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
-        const leadSource = getLeadSource();
-        await supabase.functions.invoke('send-order-notifications', {
-          body: {
-            customerName: customerName.trim(),
-            customerPhone: customerPhone.trim(),
-            customerAddress: customerAddress.trim(),
-            deviceType: selectedModel?.name || '',
-            repairType: repairTypeForNotification + colorNote,
-            repairPrice: getFinalPrice(),
-            scheduledTime: scheduleNote,
-            notes: customerNotes.trim(),
-            customerEmail: customerEmail.trim() || undefined,
-            orderNumber: orderResult?.order_number || undefined,
-            promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
-            leadSource: leadSource.source,
-            leadSourceDetails: leadSource,
+      // For gift orders: create PayPlus payment link and go to payment step
+      // For gift orders: create PayPlus payment link and go to payment step
+      if (isGiftOrder) {
+        try {
+          const { data: payData, error: payError } = await supabase.functions.invoke('payplus-create-payment', {
+            body: {
+              amount: getFinalPrice(),
+              description: `תיקון ${selectedModel?.name || ''} - ${repairDescription} (הזמנת מתנה)`,
+              customerName: giftSenderName.trim(),
+              customerPhone: giftSenderPhone.trim(),
+              customerEmail: customerEmail.trim() || undefined,
+              orderId: orderResult?.id || '',
+              moreInfo: `הזמנה #${orderResult?.order_number || ''}`,
+            }
+          });
+          if (payError || !payData?.paymentLink) {
+            throw new Error(payData?.error || 'Failed to create payment link');
           }
-        });
-        console.log('Notifications sent successfully');
-      } catch (notificationError) {
-        console.error('Error sending notifications:', notificationError);
-        // Don't fail the order if notifications fail
+          setGiftPaymentUrl(payData.paymentLink);
+          setGiftOrderResult(orderResult);
+          setCompletedOrderNumber(orderResult?.order_number || null);
+          // Update order with payment link
+          if (orderResult?.id) {
+            await supabase.from('orders').update({ 
+              payment_link: payData.paymentLink,
+              payment_status: 'pending'
+            }).eq('id', orderResult.id);
+          }
+          goToStep('gift_payment');
+        } catch (payError) {
+          console.error('Error creating payment:', payError);
+          toast.error('שגיאה ביצירת קישור תשלום, ההזמנה נשמרה ונציג ייצור קשר');
+          // Fallback: send notifications and go to success
+          await sendOrderNotifications(orderResult, repairDescription, scheduleNote);
+          setCompletedOrderNumber(orderResult?.order_number || null);
+          goToStep('success');
+        }
+        // Track
+        trackPurchase(getFinalPrice());
+        gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
+      } else {
+        // Regular flow: send notifications immediately
+        await sendOrderNotifications(orderResult, repairDescription, scheduleNote);
+        trackPurchase(getFinalPrice());
+        gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
+        setCompletedOrderNumber(orderResult?.order_number || null);
+        goToStep('success');
       }
-
-      // Track Facebook Pixel Purchase event
-      trackPurchase(getFinalPrice());
-      // Track Google Analytics conversion
-      gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
-      setCompletedOrderNumber(orderResult?.order_number || null);
-      goToStep('success');
     } catch (error) {
       toast.error('אירעה שגיאה, נסה שוב');
     } finally {
@@ -1684,9 +1742,9 @@ const NewRepairOrder = () => {
                     <CheckCircle2 className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm">{isGiftOrder ? 'תשלום מראש מהשולח' : 'תשלום בסיום התיקון בלבד'}</p>
+                    <p className="font-semibold text-sm">{isGiftOrder ? 'תשלום מאובטח באתר' : 'תשלום בסיום התיקון בלבד'}</p>
                     <p className="text-muted-foreground text-xs mt-0.5">
-                      {isGiftOrder ? 'נציג ייצור קשר לגביית התשלום לפני ההגעה' : 'מזומן, אשראי או ביט'}
+                      {isGiftOrder ? 'Apple Pay, Google Pay, אשראי או Bit — לפני הגעת הטכנאי' : 'מזומן, אשראי או ביט'}
                     </p>
                   </div>
                 </div>
@@ -1829,7 +1887,7 @@ const NewRepairOrder = () => {
                   <div className="flex items-center gap-2">
                     <CreditCard className="w-4 h-4 text-primary flex-shrink-0" />
                     <p className="text-xs text-muted-foreground">
-                      <span className="font-semibold text-foreground">שימו לב:</span> נציג שלנו ייצור איתכם קשר לגביית התשלום לפני תיאום ההגעה
+                      <span className="font-semibold text-foreground">שימו לב:</span> בשלב הבא תשלמו באופן מאובטח באתר, לפני הגעת הטכנאי
                     </p>
                   </div>
                 </div>
@@ -1946,6 +2004,59 @@ const NewRepairOrder = () => {
             </Card>
           </div>}
 
+        {/* Step 5.5: Gift Payment */}
+        {step === 'gift_payment' && <div className="space-y-5 animate-fade-in">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
+                <CreditCard className="w-4 h-4" />
+                תשלום מאובטח
+              </div>
+              <h2 className="text-3xl font-extrabold mb-1">💳 תשלום להזמנת המתנה</h2>
+              <p className="text-muted-foreground">השלימו את התשלום כדי לאשר את ההזמנה</p>
+              {completedOrderNumber && <p className="text-sm font-semibold text-foreground mt-1">הזמנה #{completedOrderNumber}</p>}
+            </div>
+
+            <Card className="p-4 bg-muted/30 space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">דגם</span>
+                <span className="font-medium">{selectedModel?.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">תיקון</span>
+                <span className="font-medium">{getRepairTypeName()}</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-border">
+                <span className="font-bold">סה״כ לתשלום</span>
+                <span className="font-bold text-primary text-lg">₪{getFinalPrice()}</span>
+              </div>
+            </Card>
+
+            {giftPaymentUrl && (
+              <div className="rounded-2xl overflow-hidden border-2 border-primary/20 shadow-lg">
+                <iframe
+                  src={giftPaymentUrl}
+                  className="w-full border-0"
+                  style={{ height: '500px' }}
+                  title="תשלום מאובטח"
+                  allow="payment"
+                />
+              </div>
+            )}
+
+            <div className="bg-muted/50 rounded-xl p-4 space-y-3">
+              <p className="text-sm text-muted-foreground text-center">
+                🔒 התשלום מתבצע בסביבה מאובטחת ומוצפנת
+              </p>
+              <Button onClick={handleGiftPaymentSuccess} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg">
+                <CheckCircle2 className="w-5 h-5 ml-2" />
+                שילמתי - המשך לאישור
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                לאחר לחיצה נשלח אישור הזמנה למייל שלכם ולמקבל המתנה
+              </p>
+            </div>
+          </div>}
+
         {/* Step 6: Success */}
         {step === 'success' && <div className="text-center space-y-5 animate-fade-in py-6">
             <div className="flex justify-center">
@@ -1969,7 +2080,7 @@ const NewRepairOrder = () => {
               {completedOrderNumber && <p className="text-sm font-semibold text-foreground mb-1">הזמנה #{completedOrderNumber}</p>}
               <p className="text-muted-foreground text-sm">
                 {isGiftOrder 
-                  ? 'נציג שלנו ייצור איתכם קשר בהקדם לגביית התשלום ותיאום ההגעה'
+                  ? 'התשלום התקבל! נתאם הגעה למקבל המתנה ונשלח אישור במייל'
                   : 'ניצור איתך קשר לאישור המועד'}
               </p>
             </div>
@@ -2042,7 +2153,7 @@ const NewRepairOrder = () => {
         </div>}
 
       {/* Sticky Footer with Action Buttons */}
-      {step !== 'success' && step !== 'model' && step !== 'repair' && <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t-2 border-foreground/10 p-4 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+      {step !== 'success' && step !== 'model' && step !== 'repair' && step !== 'gift_payment' && <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t-2 border-foreground/10 p-4 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
           {step === 'price' && <div className="space-y-2">
               <Button onClick={handlePriceConfirm} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
                 אישור ובחירת מועד לטכנאי
@@ -2091,7 +2202,7 @@ const NewRepairOrder = () => {
               {isSubmitting ? <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   שולח...
-                </div> : 'שלח הזמנה'}
+                </div> : isGiftOrder ? '💳 המשך לתשלום' : 'שלח הזמנה'}
             </Button>}
         </div>}
     </div>;
