@@ -1380,6 +1380,7 @@ const NewRepairOrder = () => {
               if (isOriginalScreen || isCompatibleScreen) return Smartphone;
               if (isBattery) return Battery;
               if (isBackGlass) return FlipVertical;
+              if (isCharging) return Zap;
               return Phone;
             };
             const IconComponent = getIcon();
