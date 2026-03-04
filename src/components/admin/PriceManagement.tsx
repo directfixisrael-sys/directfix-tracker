@@ -44,6 +44,7 @@ interface IphoneModel {
   is_active: boolean;
   sort_order: number;
   series: string;
+  min_lead_hours: number;
 }
 
 interface RepairType {
