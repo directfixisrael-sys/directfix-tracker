@@ -1255,10 +1255,23 @@ const NewRepairOrder = () => {
                       איך השירות עובד?
                     </button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-sm">
+                  <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle className="text-right text-lg">איך זה עובד?</DialogTitle>
                     </DialogHeader>
+                    
+                    {/* Video */}
+                    <div className="relative rounded-xl overflow-hidden border border-border/50 shadow-md">
+                      <div className="absolute -inset-3 bg-primary/15 blur-xl rounded-2xl" />
+                      <video
+                        controls
+                        playsInline
+                        preload="metadata"
+                        className="relative w-full aspect-[9/16] bg-black rounded-xl"
+                        src="https://directfix.co.il/wp-content/uploads/2026/03/%D7%93%D7%99%D7%99%D7%A8%D7%A7%D7%98-%D7%A4%D7%99%D7%A7%D7%A1_s-Video-Mar-4-2026.mp4"
+                      />
+                    </div>
+
                     <div className="space-y-4 text-right">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
