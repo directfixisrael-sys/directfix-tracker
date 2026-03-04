@@ -8,6 +8,7 @@ import paymentPaybox from '@/assets/payment-paybox.png';
 import paymentVisa from '@/assets/payment-visa.png';
 import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
+import VideoPlayer from '@/components/VideoPlayer';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -91,15 +92,10 @@ const Index = () => {
               <div className="absolute -inset-2 bg-primary/10 rounded-3xl blur-xl" />
               
               {/* Video card */}
-              <div className="relative rounded-2xl overflow-hidden border-2 border-foreground/10 bg-card/80 backdrop-blur-md shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)]">
-                <video
-                  controls
-                  playsInline
-                  preload="metadata"
-                  className="w-full aspect-[9/16]"
-                  src="https://directfix.co.il/wp-content/uploads/2026/03/%D7%93%D7%99%D7%99%D7%A8%D7%A7%D7%98-%D7%A4%D7%99%D7%A7%D7%A1_s-Video-Mar-4-2026.mp4"
-                />
-              </div>
+              <VideoPlayer
+                src="https://directfix.co.il/wp-content/uploads/2026/03/directfixexplain2.mp4"
+                className="border-2 border-foreground/10 bg-card/80 backdrop-blur-md shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)]"
+              />
             </div>
           </div>
         </section>

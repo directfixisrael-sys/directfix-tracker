@@ -13,6 +13,7 @@ import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import Logo from '@/components/Logo';
+import VideoPlayer from '@/components/VideoPlayer';
 import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
 import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
@@ -1261,14 +1262,11 @@ const NewRepairOrder = () => {
                     </DialogHeader>
                     
                     {/* Video */}
-                    <div className="relative rounded-xl overflow-hidden border border-border/50 shadow-md">
+                    <div className="relative">
                       <div className="absolute -inset-3 bg-primary/15 blur-xl rounded-2xl" />
-                      <video
-                        controls
-                        playsInline
-                        preload="metadata"
-                        className="relative w-full rounded-xl"
-                        src="https://directfix.co.il/wp-content/uploads/2026/03/%D7%93%D7%99%D7%99%D7%A8%D7%A7%D7%98-%D7%A4%D7%99%D7%A7%D7%A1_s-Video-Mar-4-2026.mp4"
+                      <VideoPlayer
+                        src="https://directfix.co.il/wp-content/uploads/2026/03/directfixexplain2.mp4"
+                        className="relative border border-border/50 shadow-wolt-lg"
                       />
                     </div>
 
