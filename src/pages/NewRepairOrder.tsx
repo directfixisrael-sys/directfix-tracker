@@ -1315,25 +1315,17 @@ const NewRepairOrder = () => {
             <TestimonialsSlider />
 
             {/* Gift mode switcher */}
-            <div className="flex items-center justify-center gap-3 py-2">
-              <label htmlFor="gift-toggle" className="flex items-center gap-3 cursor-pointer select-none">
-                <Switch
-                  id="gift-toggle"
-                  checked={isGiftOrder}
-                  onCheckedChange={(checked) => {
-                    setIsGiftOrder(checked);
-                    if (checked) {
-                      setShowGiftBurst(true);
-                      setTimeout(() => setShowGiftBurst(false), 1200);
-                    }
-                  }}
-                />
-                <span className={`text-sm font-bold transition-colors ${isGiftOrder ? 'text-primary' : 'text-muted-foreground'}`}>
-                  <Gift className="w-4 h-4 inline-block ml-1" />
-                  הזמנה במתנה
-                </span>
-              </label>
-            </div>
+            <GiftOrderToggle
+              isGift={isGiftOrder}
+              onToggle={(checked) => {
+                setIsGiftOrder(checked);
+                if (checked) {
+                  setShowGiftBurst(true);
+                  setTimeout(() => setShowGiftBurst(false), 1200);
+                }
+              }}
+              label="הזמנה במתנה"
+            />
 
           </div>}
 
