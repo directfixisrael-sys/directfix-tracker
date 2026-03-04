@@ -1360,6 +1360,8 @@ const NewRepairOrder = () => {
               {repairTypes.filter(repair => {
                 // Hide back glass repair for models with no back glass price
                 if (repair.name.includes('גב') && selectedModel && selectedModel.back_glass_price <= 0) return false;
+                // Hide charging repair for models with no charging price
+                if (repair.name.includes('טעינה') && selectedModel && selectedModel.charging_price <= 0) return false;
                 return true;
               }).map((repair, index) => {
             const isPhoneOnly = repair.is_phone_only;
