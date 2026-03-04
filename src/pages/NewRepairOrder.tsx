@@ -424,12 +424,15 @@ const NewRepairOrder = () => {
         } = await supabase.from('promotions').select('*').eq('is_active', true).limit(1).maybeSingle();
         if (promotionData) {
           setActivePromotion(promotionData);
-          // Show gift popup if not already claimed this session
-          const alreadyClaimed = sessionStorage.getItem('gift_promo_claimed');
-          if (!alreadyClaimed) {
-            setTimeout(() => setShowGiftPopup(true), 800);
-          } else {
-            setGiftClaimed(true);
+          // Show gift popup if display mode includes popup
+          const mode = promotionData.display_mode || 'both';
+          if (mode === 'popup' || mode === 'both') {
+            const alreadyClaimed = sessionStorage.getItem('gift_promo_claimed');
+            if (!alreadyClaimed) {
+              setTimeout(() => setShowGiftPopup(true), 800);
+            } else {
+              setGiftClaimed(true);
+            }
           }
         }
       } catch (error) {
