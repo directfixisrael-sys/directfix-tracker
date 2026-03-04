@@ -32,7 +32,7 @@ const VideoPlayer = ({ src, className = '', posterSrc = 'default' }: VideoPlayer
         >
           {/* Poster image */}
           <img
-            src={videoPoster}
+            src={poster}
             alt="צפו בסרטון"
             className="absolute inset-0 w-full h-full object-cover"
           />
