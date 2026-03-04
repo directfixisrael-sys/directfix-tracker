@@ -58,7 +58,7 @@ const VideoPlayer = ({ src, className = '', posterSrc = 'default' }: VideoPlayer
         preload="metadata"
         className="w-full"
         src={src}
-        poster={videoPoster}
+        poster={poster}
         onEnded={() => setIsPlaying(false)}
       />
     </div>
