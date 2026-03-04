@@ -176,7 +176,7 @@ const Index = () => {
 
         {/* Payment Section - Peach */}
         <section className="section-peach">
-          <div className="max-w-3xl mx-auto px-6 py-10 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-10 lg:py-16 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
               <span className="text-highlight">אמצעי תשלום</span>
             </h2>
