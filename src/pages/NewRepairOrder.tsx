@@ -944,8 +944,7 @@ const NewRepairOrder = () => {
         deviceImages: deviceImages.length > 0 ? deviceImages : [],
       } as any);
 
-      // Send notifications (email + WhatsApp)
-      try {
+      // For gift orders: create PayPlus payment link and go to payment step
       // For gift orders: create PayPlus payment link and go to payment step
       if (isGiftOrder) {
         try {
