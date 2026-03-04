@@ -126,7 +126,7 @@ const CountdownTimer = ({ secondsLeft, etaTime }: { secondsLeft: number; etaTime
         </div>
 
         {/* Big countdown */}
-        <div className="flex items-center justify-center my-4">
+        <div className="flex items-center justify-center my-4" dir="ltr">
           <div className="flex items-center gap-3">
             <div className="bg-white/15 rounded-xl px-4 py-2 min-w-[80px] text-center">
               <span className="text-5xl font-extrabold tabular-nums">
