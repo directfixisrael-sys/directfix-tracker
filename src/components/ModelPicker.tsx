@@ -33,14 +33,23 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
 
   const grouped = useMemo(() => {
     return models.reduce<Record<string, IphoneModel[]>>((acc, model) => {
-      const key = getSeriesKey(model.name);
+      const key = model.series || 'Other';
       if (!acc[key]) acc[key] = [];
       acc[key].push(model);
       return acc;
     }, {});
   }, [models]);
 
-  const sortedSeries = seriesOrder.filter(s => grouped[s]?.length);
+  const sortedSeries = useMemo(() => {
+    const defaultOrder = [
+      'iPhone 16', 'iPhone 15', 'iPhone 14', 'iPhone 13',
+      'iPhone 12', 'iPhone 11', 'iPhone X', 'iPhone 8', 'Samsung', 'Other'
+    ];
+    const allSeries = Object.keys(grouped);
+    const ordered = defaultOrder.filter(s => allSeries.includes(s));
+    const extra = allSeries.filter(s => !defaultOrder.includes(s)).sort();
+    return [...ordered, ...extra];
+  }, [grouped]);
 
   return (
     <div className="space-y-3" role="region" aria-label="בחירת דגם מכשיר">
