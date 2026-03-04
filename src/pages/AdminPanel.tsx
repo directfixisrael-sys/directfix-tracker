@@ -2094,6 +2094,7 @@ const AdminPanel = () => {
               {activeTab === 'coupons' && 'ניהול קופונים'}
               {activeTab === 'bundles' && 'ניהול חבילות תיקון'}
               {activeTab === 'announcements' && 'הודעות והתראות'}
+              {activeTab === 'reminders' && 'תזכורות ומשימות'}
             </h1>
             <p className="text-xs md:text-sm text-muted-foreground">
               {activeTab === 'orders' && `${orders.length} הזמנות`}
