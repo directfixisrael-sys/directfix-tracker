@@ -14,19 +14,19 @@ const Logo = ({ size = 'md', clickable = true, className }: LogoProps) => {
   const sizeClasses = {
     sm: 'text-lg',
     md: 'text-xl',
-    lg: 'text-3xl',
+    lg: 'text-3xl'
   };
 
   const iconSizes = {
     sm: 'w-4 h-4',
     md: 'w-5 h-5',
-    lg: 'w-7 h-7',
+    lg: 'w-7 h-7'
   };
 
   const badgeSizes = {
     sm: 'w-7 h-7',
     md: 'w-9 h-9',
-    lg: 'w-12 h-12',
+    lg: 'w-12 h-12'
   };
 
   return (
@@ -36,26 +36,26 @@ const Logo = ({ size = 'md', clickable = true, className }: LogoProps) => {
         clickable && "cursor-pointer",
         className
       )}
-      onClick={clickable ? () => navigate('/') : undefined}
-    >
+      onClick={clickable ? () => navigate('/') : undefined}>
+      
       <div className={cn(
         "bg-primary rounded-xl flex items-center justify-center shadow-md border-2 border-foreground/10",
         badgeSizes[size]
       )}>
-        <Wrench className={cn("text-primary-foreground", iconSizes[size])} />
+        <Wrench className={cn("text-primary-foreground bg-[#0073ff]", iconSizes[size])} />
       </div>
       <div className="flex flex-col leading-none">
         <span className={cn(
           "font-extrabold tracking-tight text-foreground",
           sizeClasses[size]
         )}
-        style={{ fontFamily: "'Rubik', sans-serif" }}
-        >
+        style={{ fontFamily: "'Rubik', sans-serif" }}>
+          
           direct<span className="text-primary">fix</span>
         </span>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Logo;

@@ -22,13 +22,13 @@ const Index = () => {
 
       {/* Strategly-style Navbar */}
       <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b-2 border-foreground/10" role="banner">
-        <nav className="max-w-3xl mx-auto flex items-center justify-between px-4 h-14" aria-label="ניווט ראשי">
+        <nav className="max-w-2xl mx-auto flex items-center justify-between px-4 h-14" aria-label="ניווט ראשי">
           <div className="flex items-center gap-2">
             <a
               href="tel:033106020"
               className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105"
-              aria-label="התקשר 033106020"
-            >
+              aria-label="התקשר 033106020">
+              
               <Phone className="w-4 h-4" />
             </a>
           </div>
@@ -42,35 +42,35 @@ const Index = () => {
         
         {/* Hero Section - Cream Background */}
         <section className="section-cream border-b-2 border-foreground/10">
-          <div className="max-w-3xl mx-auto px-6 py-12 lg:py-20 text-center">
+          <div className="max-w-2xl mx-auto px-6 py-12 text-center">
             <div className="mb-6 animate-fade-in">
               <Logo size="lg" clickable={false} className="justify-center mb-5" />
               <h1 className="text-4xl font-extrabold text-foreground tracking-tight leading-tight mb-3">
                 תיקוני אייפון עם{' '}
-                <span className="text-highlight-box">החברה המובילה בישראל</span>
+                <span className="text-highlight-box text-3xl">החברה המובילה בישראל</span>
               </h1>
-              <p className="text-muted-foreground text-lg mt-3 max-w-sm mx-auto leading-relaxed">
+              <p className="text-muted-foreground mt-3 max-w-xs mx-auto leading-relaxed text-sm">
                 טכנאי מגיע עד אליך. מהיר, מקצועי, עם אחריות מלאה.
               </p>
             </div>
 
             {/* CTAs */}
-            <div className="space-y-3 max-w-md mx-auto animate-fade-in" style={{ animationDelay: '150ms' }}>
-              <Button 
-                size="lg" 
-                className="w-full h-14 text-lg font-extrabold rounded-2xl gap-2 border-2 border-foreground/10 shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:shadow-[6px_6px_0_0_hsl(var(--foreground)/0.12)] hover:-translate-y-0.5 transition-all duration-200"
-                onClick={() => navigate('/order')}
-              >
+            <div className="space-y-3 max-w-sm mx-auto animate-fade-in" style={{ animationDelay: '150ms' }}>
+              <Button
+                size="lg"
+                className="w-full h-14 text-lg font-extrabold rounded-2xl gap-2 border-2 border-foreground/10 shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:shadow-[6px_6px_0_0_hsl(var(--foreground)/0.12)] hover:-translate-y-0.5 transition-all duration-200 bg-[#0073ff]"
+                onClick={() => navigate('/order')}>
+                
                 <Wrench className="w-5 h-5" />
                 <span>הזמן תיקון עכשיו</span>
               </Button>
 
-              <Button 
+              <Button
                 variant="outline"
-                size="lg" 
+                size="lg"
                 className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
-                onClick={() => navigate('/track')}
-              >
+                onClick={() => navigate('/track')}>
+                
                 <Smartphone className="w-4 h-4" />
                 <span>עקוב אחר התיקון שלך</span>
               </Button>
@@ -80,13 +80,13 @@ const Index = () => {
 
         {/* How it works - Video Section */}
         <section className="section-peach border-b-2 border-foreground/10">
-          <div className="max-w-3xl mx-auto px-6 py-10 lg:py-16 text-center">
+          <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
-              <span className="text-highlight">איך השירות עובד?</span>
+              <span className="text-highlight text-secondary bg-amber-200 text-3xl">איך השירות עובד?</span>
             </h2>
             <p className="text-muted-foreground mb-6 text-base">צפו בסרטון קצר ותבינו כמה זה פשוט</p>
             
-            <div className="relative max-w-lg mx-auto animate-fade-in" style={{ animationDelay: '180ms' }}>
+            <div className="relative max-w-md mx-auto animate-fade-in" style={{ animationDelay: '180ms' }}>
               {/* Blur glow behind */}
               <div className="absolute -inset-4 bg-primary/20 rounded-3xl blur-2xl" />
               <div className="absolute -inset-2 bg-primary/10 rounded-3xl blur-xl" />
@@ -94,14 +94,14 @@ const Index = () => {
               {/* Video card */}
               <VideoPlayer
                 src="https://directfix.co.il/wp-content/uploads/2026/03/directfixexplain2.mp4"
-                className="border-2 border-foreground/10 bg-card/80 backdrop-blur-md shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)]"
-              />
+                className="border-2 border-foreground/10 bg-card/80 backdrop-blur-md shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)]" />
+              
             </div>
           </div>
         </section>
 
         <section className="section-lavender border-b-2 border-foreground/10">
-          <div className="max-w-3xl mx-auto px-6 py-10 lg:py-16 text-center">
+          <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
               <span className="text-highlight">למה לבחור בנו?</span>
             </h2>
@@ -135,7 +135,7 @@ const Index = () => {
 
         {/* Reviews Section - Mint */}
         <section className="section-mint border-b-2 border-foreground/10">
-          <div className="max-w-3xl mx-auto px-6 py-10 lg:py-16 text-center">
+          <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
               <span className="text-highlight">מה הלקוחות אומרים</span>
             </h2>
@@ -150,7 +150,7 @@ const Index = () => {
                 </svg>
                 <span className="text-base font-extrabold">5.0</span>
                 <div className="flex">
-                  {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
+                  {[1, 2, 3, 4, 5].map((s) => <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
                 </div>
               </div>
 
@@ -176,7 +176,7 @@ const Index = () => {
 
         {/* Payment Section - Peach */}
         <section className="section-peach">
-          <div className="max-w-3xl mx-auto px-6 py-10 lg:py-16 text-center">
+          <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
               <span className="text-highlight">אמצעי תשלום</span>
             </h2>
@@ -191,7 +191,7 @@ const Index = () => {
                 <img src={paymentPaybox} alt="PayBox" className="h-8 w-auto object-contain rounded-md" />
               </div>
               <div className="strategly-card h-14 w-14 flex items-center justify-center bg-foreground border-foreground">
-                <svg viewBox="0 0 24 24" className="w-5 h-5 text-background" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+                <svg viewBox="0 0 24 24" className="w-5 h-5 text-background" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" /></svg>
               </div>
               <div className="strategly-card h-14 w-14 flex items-center justify-center bg-success border-success">
                 <span className="text-success-foreground text-lg font-bold">₪</span>
@@ -205,8 +205,8 @@ const Index = () => {
       <footer className="border-t-2 border-foreground/10 text-center py-5 text-sm text-muted-foreground bg-card" role="contentinfo">
         <p className="font-medium">© {new Date().getFullYear()} דיירקט פיקס — תיקוני אייפון עד הבית</p>
       </footer>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Index;
