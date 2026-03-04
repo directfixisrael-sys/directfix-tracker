@@ -178,7 +178,7 @@ const CustomerTracker = () => {
     );
   }
 
-  const showTechnicianTracker = currentOrder.status === 'on_the_way' && currentOrder.technicianName;
+  const showTechnicianTracker = currentOrder.status === 'on_the_way';
   const showRepairInProgress = (currentOrder.status === 'in_progress' || currentOrder.status === 'arrived') && currentOrder.technicianName;
   const showAccessories = currentOrder.status !== 'completed';
   const showRating = currentOrder.status === 'completed';
