@@ -940,6 +940,8 @@ const AdminPanel = () => {
       case 'bundles':
         return <BundleManagement />;
 
+      case 'announcements':
+        return <AnnouncementsManagement />;
       case 'feedback':
         const ordersWithFeedback = orders.filter(o => o.rating);
         const avgRating = ordersWithFeedback.length > 0 
