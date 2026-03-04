@@ -77,6 +77,7 @@ const PriceManagement = () => {
     compatible_screen_price: 0,
     battery_price: 0,
     back_glass_price: 0,
+    charging_price: 0,
     is_active: true,
     min_lead_hours: 0,
   });
