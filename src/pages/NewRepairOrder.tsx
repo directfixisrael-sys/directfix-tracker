@@ -1358,10 +1358,13 @@ const NewRepairOrder = () => {
 
             <div className="space-y-3">
               {repairTypes.filter(repair => {
-                // Hide back glass repair for models with no back glass price
-                if (repair.name.includes('גב') && selectedModel && selectedModel.back_glass_price <= 0) return false;
-                // Hide charging repair for models with no charging price
-                if (repair.name.includes('טעינה') && selectedModel && (selectedModel.charging_price || 0) <= 0) return false;
+                if (!selectedModel) return true;
+                // Hide any repair type where price is 0
+                if (repair.name.includes('מסך מקורי') && selectedModel.original_screen_price <= 0) return false;
+                if (repair.name.includes('מסך תואם') && selectedModel.compatible_screen_price <= 0) return false;
+                if (repair.name.includes('סוללה') && selectedModel.battery_price <= 0) return false;
+                if (repair.name.includes('גב') && selectedModel.back_glass_price <= 0) return false;
+                if (repair.name.includes('טעינה') && (selectedModel.charging_price || 0) <= 0) return false;
                 return true;
               }).map((repair, index) => {
             const isPhoneOnly = repair.is_phone_only;

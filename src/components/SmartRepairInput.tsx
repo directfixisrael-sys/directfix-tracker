@@ -111,7 +111,15 @@ const ResultsCard = ({
 
       {matchedRepairs.length > 0 ? (
         <div className="space-y-1.5">
-          {matchedRepairs.map(repair => {
+          {matchedRepairs.filter(repair => {
+            if (!repair || !matchedModel) return !!repair;
+            if (repair.name.includes('מסך מקורי') && matchedModel.original_screen_price <= 0) return false;
+            if (repair.name.includes('מסך תואם') && matchedModel.compatible_screen_price <= 0) return false;
+            if (repair.name.includes('סוללה') && matchedModel.battery_price <= 0) return false;
+            if (repair.name.includes('גב') && matchedModel.back_glass_price <= 0) return false;
+            if (repair.name.includes('טעינה') && (matchedModel.charging_price || 0) <= 0) return false;
+            return true;
+          }).map(repair => {
             if (!repair) return null;
             let price = 0;
             if (matchedModel) {
