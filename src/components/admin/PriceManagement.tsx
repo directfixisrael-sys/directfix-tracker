@@ -444,7 +444,12 @@ const PriceManagement = () => {
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold truncate">{model.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold truncate">{model.name}</p>
+                      {model.series && (
+                        <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">{model.series}</span>
+                      )}
+                    </div>
                     <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                       <span>מסך מקורי: ₪{model.original_screen_price}</span>
                       <span>מסך תואם: ₪{model.compatible_screen_price}</span>
