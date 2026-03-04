@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import MinimalFooter from "./components/MinimalFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { VisitorTracker } from "./components/VisitorTracker";
+import AnnouncementBanner from "./components/AnnouncementBanner";
 
 import { captureLeadSource } from "./lib/leadSource";
 
