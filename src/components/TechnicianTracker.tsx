@@ -1,3 +1,4 @@
+import { useState, useEffect, useMemo } from 'react';
 import { MapPin, Navigation } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -18,6 +19,53 @@ const extractCity = (address: string): string => {
     }
   }
   return address.split(' ').pop() || '';
+};
+
+// Extract ETA time from Waze share text
+const extractWazeEta = (wazeText: string): string | null => {
+  const match = wazeText.match(/(?:אגיע בשעה|arrive at)\s*(\d{1,2}:\d{2})/i);
+  return match ? match[1] : null;
+};
+
+// Calculate remaining seconds until ETA
+const getSecondsUntilEta = (etaTime: string): number => {
+  const now = new Date();
+  const [hours, minutes] = etaTime.split(':').map(Number);
+  const eta = new Date();
+  eta.setHours(hours, minutes, 0, 0);
+  
+  // If ETA is earlier than now, it might be tomorrow
+  if (eta.getTime() < now.getTime() - 60000) {
+    eta.setDate(eta.getDate() + 1);
+  }
+  
+  return Math.max(0, Math.floor((eta.getTime() - now.getTime()) / 1000));
+};
+
+// Countdown hook
+const useCountdown = (wazeLink?: string) => {
+  const etaTime = useMemo(() => {
+    if (!wazeLink) return null;
+    return extractWazeEta(wazeLink);
+  }, [wazeLink]);
+
+  const [secondsLeft, setSecondsLeft] = useState(() => 
+    etaTime ? getSecondsUntilEta(etaTime) : 0
+  );
+
+  useEffect(() => {
+    if (!etaTime) return;
+    
+    setSecondsLeft(getSecondsUntilEta(etaTime));
+    
+    const interval = setInterval(() => {
+      setSecondsLeft(getSecondsUntilEta(etaTime));
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [etaTime]);
+
+  return { etaTime, secondsLeft, hasEta: !!etaTime && secondsLeft > 0 };
 };
 
 // Custom scooter SVG component
@@ -55,7 +103,61 @@ const TechnicianScooter = () => (
   </svg>
 );
 
+// Countdown display component
+const CountdownTimer = ({ secondsLeft, etaTime }: { secondsLeft: number; etaTime: string }) => {
+  const minutes = Math.floor(secondsLeft / 60);
+  const seconds = secondsLeft % 60;
+  
+  // Calculate progress (assume max 60 min trip)
+  const progress = Math.max(0, Math.min(100, 100 - (secondsLeft / 3600) * 100));
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-5 text-primary-foreground">
+      {/* Animated background pulse */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse" />
+      
+      <div className="relative z-10">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50" />
+            <span className="text-sm font-medium opacity-90">הטכנאי בדרך אליך</span>
+          </div>
+          <span className="text-xs opacity-70">הגעה ב-{etaTime}</span>
+        </div>
+
+        {/* Big countdown */}
+        <div className="flex items-center justify-center gap-1 my-4">
+          <div className="flex items-baseline gap-1">
+            <span className="text-6xl font-extrabold tabular-nums tracking-tight">
+              {String(minutes).padStart(2, '0')}
+            </span>
+            <span className="text-2xl font-bold opacity-60 animate-pulse">:</span>
+            <span className="text-6xl font-extrabold tabular-nums tracking-tight">
+              {String(seconds).padStart(2, '0')}
+            </span>
+          </div>
+        </div>
+        <p className="text-center text-sm font-medium opacity-80 mb-4">דקות עד הגעת הטכנאי</p>
+
+        {/* Progress bar */}
+        <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-white/80 rounded-full transition-all duration-1000 ease-linear"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <div className="flex justify-between mt-1.5">
+          <span className="text-[10px] opacity-50">יצא לדרך</span>
+          <span className="text-[10px] opacity-50">הגעה</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, wazeLink }: TechnicianTrackerProps) => {
+  const { etaTime, secondsLeft, hasEta } = useCountdown(wazeLink);
+
   // Extract Waze URL from shared text
   const extractWazeUrl = (text: string): string | null => {
     const urlMatch = text.match(/https:\/\/waze\.com\/ul[^\s]*/);
@@ -154,7 +256,12 @@ const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, 
   );
 
   return (
-    <div className="wolt-card-elevated overflow-hidden animate-slide-up">
+    <div className="wolt-card-elevated overflow-hidden animate-slide-up space-y-4">
+      {/* Countdown timer */}
+      {hasEta && (
+        <CountdownTimer secondsLeft={secondsLeft} etaTime={etaTime!} />
+      )}
+
       <CityIllustration />
 
       {/* Info section */}
@@ -164,11 +271,15 @@ const TechnicianTracker = ({ technicianName, estimatedArrival, customerAddress, 
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
             <span className="text-sm font-semibold text-primary">בדרך אליך</span>
           </div>
-          {estimatedArrival && (
+          {(hasEta && etaTime) ? (
+            <div className="bg-primary/10 text-primary px-4 py-2 rounded-full">
+              <span className="font-bold text-lg">{etaTime}</span>
+            </div>
+          ) : estimatedArrival ? (
             <div className="bg-primary/10 text-primary px-4 py-2 rounded-full">
               <span className="font-bold text-lg">{estimatedArrival}</span>
             </div>
-          )}
+          ) : null}
         </div>
 
         <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-xl">
