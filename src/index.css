@@ -253,10 +253,19 @@
     padding: 0 4px;
   }
 
+  :is(.dark) .text-highlight {
+    background: linear-gradient(180deg, transparent 55%, hsl(45, 90%, 45% / 0.5) 55%);
+  }
+
   .text-highlight-box {
     @apply inline-block px-3 py-1 rounded-lg font-bold;
     background-color: hsl(45, 95%, 72%);
-    color: hsl(var(--foreground));
+    color: hsl(220, 25%, 12%);
+  }
+
+  :is(.dark) .text-highlight-box {
+    background-color: hsl(45, 90%, 55%);
+    color: hsl(225, 15%, 10%);
   }
 
   /* Strategly-style section backgrounds */
