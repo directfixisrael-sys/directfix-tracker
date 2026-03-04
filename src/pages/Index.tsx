@@ -22,7 +22,7 @@ const Index = () => {
 
       {/* Strategly-style Navbar */}
       <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b-2 border-foreground/10" role="banner">
-        <nav className="max-w-2xl mx-auto flex items-center justify-between px-4 h-14" aria-label="ניווט ראשי">
+        <nav className="max-w-3xl mx-auto flex items-center justify-between px-4 h-14" aria-label="ניווט ראשי">
           <div className="flex items-center gap-2">
             <a
               href="tel:033106020"
@@ -42,7 +42,7 @@ const Index = () => {
         
         {/* Hero Section - Cream Background */}
         <section className="section-cream border-b-2 border-foreground/10">
-          <div className="max-w-2xl mx-auto px-6 py-12 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-12 text-center">
             <div className="mb-6 animate-fade-in">
               <Logo size="lg" clickable={false} className="justify-center mb-5" />
               <h1 className="text-4xl font-extrabold text-foreground tracking-tight leading-tight mb-3">
@@ -80,7 +80,7 @@ const Index = () => {
 
         {/* How it works - Video Section */}
         <section className="section-peach border-b-2 border-foreground/10">
-          <div className="max-w-2xl mx-auto px-6 py-10 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
               <span className="text-highlight">איך השירות עובד?</span>
             </h2>
@@ -101,7 +101,7 @@ const Index = () => {
         </section>
 
         <section className="section-lavender border-b-2 border-foreground/10">
-          <div className="max-w-2xl mx-auto px-6 py-10 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
               <span className="text-highlight">למה לבחור בנו?</span>
             </h2>
@@ -135,7 +135,7 @@ const Index = () => {
 
         {/* Reviews Section - Mint */}
         <section className="section-mint border-b-2 border-foreground/10">
-          <div className="max-w-2xl mx-auto px-6 py-10 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
               <span className="text-highlight">מה הלקוחות אומרים</span>
             </h2>
@@ -176,7 +176,7 @@ const Index = () => {
 
         {/* Payment Section - Peach */}
         <section className="section-peach">
-          <div className="max-w-2xl mx-auto px-6 py-10 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
               <span className="text-highlight">אמצעי תשלום</span>
             </h2>
