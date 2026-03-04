@@ -42,20 +42,20 @@ const Index = () => {
         
         {/* Hero Section - Cream Background */}
         <section className="section-cream border-b-2 border-foreground/10">
-          <div className="max-w-3xl mx-auto px-6 py-12 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-12 lg:py-20 text-center">
             <div className="mb-6 animate-fade-in">
               <Logo size="lg" clickable={false} className="justify-center mb-5" />
               <h1 className="text-4xl font-extrabold text-foreground tracking-tight leading-tight mb-3">
                 תיקוני אייפון עם{' '}
                 <span className="text-highlight-box">החברה המובילה בישראל</span>
               </h1>
-              <p className="text-muted-foreground text-lg mt-3 max-w-xs mx-auto leading-relaxed">
+              <p className="text-muted-foreground text-lg mt-3 max-w-sm mx-auto leading-relaxed">
                 טכנאי מגיע עד אליך. מהיר, מקצועי, עם אחריות מלאה.
               </p>
             </div>
 
             {/* CTAs */}
-            <div className="space-y-3 max-w-sm mx-auto animate-fade-in" style={{ animationDelay: '150ms' }}>
+            <div className="space-y-3 max-w-md mx-auto animate-fade-in" style={{ animationDelay: '150ms' }}>
               <Button 
                 size="lg" 
                 className="w-full h-14 text-lg font-extrabold rounded-2xl gap-2 border-2 border-foreground/10 shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:shadow-[6px_6px_0_0_hsl(var(--foreground)/0.12)] hover:-translate-y-0.5 transition-all duration-200"
@@ -80,13 +80,13 @@ const Index = () => {
 
         {/* How it works - Video Section */}
         <section className="section-peach border-b-2 border-foreground/10">
-          <div className="max-w-3xl mx-auto px-6 py-10 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-10 lg:py-16 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
               <span className="text-highlight">איך השירות עובד?</span>
             </h2>
             <p className="text-muted-foreground mb-6 text-base">צפו בסרטון קצר ותבינו כמה זה פשוט</p>
             
-            <div className="relative max-w-md mx-auto animate-fade-in" style={{ animationDelay: '180ms' }}>
+            <div className="relative max-w-lg mx-auto animate-fade-in" style={{ animationDelay: '180ms' }}>
               {/* Blur glow behind */}
               <div className="absolute -inset-4 bg-primary/20 rounded-3xl blur-2xl" />
               <div className="absolute -inset-2 bg-primary/10 rounded-3xl blur-xl" />
@@ -101,7 +101,7 @@ const Index = () => {
         </section>
 
         <section className="section-lavender border-b-2 border-foreground/10">
-          <div className="max-w-3xl mx-auto px-6 py-10 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-10 lg:py-16 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
               <span className="text-highlight">למה לבחור בנו?</span>
             </h2>
@@ -135,7 +135,7 @@ const Index = () => {
 
         {/* Reviews Section - Mint */}
         <section className="section-mint border-b-2 border-foreground/10">
-          <div className="max-w-3xl mx-auto px-6 py-10 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-10 lg:py-16 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
               <span className="text-highlight">מה הלקוחות אומרים</span>
             </h2>
@@ -176,7 +176,7 @@ const Index = () => {
 
         {/* Payment Section - Peach */}
         <section className="section-peach">
-          <div className="max-w-3xl mx-auto px-6 py-10 text-center">
+          <div className="max-w-3xl mx-auto px-6 py-10 lg:py-16 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
               <span className="text-highlight">אמצעי תשלום</span>
             </h2>
