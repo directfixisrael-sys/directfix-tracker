@@ -1742,9 +1742,9 @@ const NewRepairOrder = () => {
                     <CheckCircle2 className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm">{isGiftOrder ? 'תשלום מראש מהשולח' : 'תשלום בסיום התיקון בלבד'}</p>
+                    <p className="font-semibold text-sm">{isGiftOrder ? 'תשלום מאובטח באתר' : 'תשלום בסיום התיקון בלבד'}</p>
                     <p className="text-muted-foreground text-xs mt-0.5">
-                      {isGiftOrder ? 'נציג ייצור קשר לגביית התשלום לפני ההגעה' : 'מזומן, אשראי או ביט'}
+                      {isGiftOrder ? 'Apple Pay, Google Pay, אשראי או Bit — לפני הגעת הטכנאי' : 'מזומן, אשראי או ביט'}
                     </p>
                   </div>
                 </div>
