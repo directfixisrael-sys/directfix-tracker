@@ -50,7 +50,8 @@ import {
   Wrench,
   CalendarPlus,
   Sparkles,
-  Image
+  Image,
+  Megaphone
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
