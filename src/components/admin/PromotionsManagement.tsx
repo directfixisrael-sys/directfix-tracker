@@ -176,6 +176,7 @@ const PromotionsManagement = () => {
       end_date: '',
       is_active: true,
       value: '',
+      display_mode: 'both',
     });
     setEditingPromotion(null);
   };
