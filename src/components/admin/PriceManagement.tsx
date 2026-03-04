@@ -643,18 +643,34 @@ const PriceManagement = () => {
               {!isCreatingNewSeries ? (
                 <div className="space-y-2">
                   <div className="flex flex-wrap gap-2">
-                    {Array.from(new Set(models.map(m => m.series).filter(Boolean))).sort().map(series => (
+                    {getOrderedSeries().map(series => (
                       <button
                         key={series}
                         type="button"
+                        data-series={series}
+                        draggable
+                        onDragStart={() => setDraggedSeries(series)}
+                        onDragOver={(e) => { e.preventDefault(); if (draggedSeries && draggedSeries !== series) setDragOverSeries(series); }}
+                        onDrop={() => handleSeriesDrop(series)}
+                        onDragEnd={() => { setDraggedSeries(null); setDragOverSeries(null); }}
+                        onTouchStart={(e) => handleTouchStart(e, series)}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
                         onClick={() => setModelForm({ ...modelForm, series })}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-grab active:cursor-grabbing ${
                           modelForm.series === series
                             ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted hover:bg-muted/80 text-foreground'
+                            : dragOverSeries === series
+                              ? 'bg-primary/20 ring-2 ring-primary ring-dashed'
+                              : draggedSeries === series
+                                ? 'opacity-50 bg-muted text-foreground'
+                                : 'bg-muted hover:bg-muted/80 text-foreground'
                         }`}
                       >
-                        {series}
+                        <span className="flex items-center gap-1">
+                          <GripVertical className="w-3 h-3 opacity-40" />
+                          {series}
+                        </span>
                       </button>
                     ))}
                   </div>
