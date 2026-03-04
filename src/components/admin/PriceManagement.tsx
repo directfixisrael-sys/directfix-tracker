@@ -253,6 +253,7 @@ const PriceManagement = () => {
             battery_price: modelForm.battery_price,
             back_glass_price: modelForm.back_glass_price,
             is_active: modelForm.is_active,
+            min_lead_hours: modelForm.min_lead_hours,
           })
           .eq('id', editingModel.id);
 
