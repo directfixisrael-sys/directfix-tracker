@@ -2080,7 +2080,7 @@ const NewRepairOrder = () => {
               {completedOrderNumber && <p className="text-sm font-semibold text-foreground mb-1">הזמנה #{completedOrderNumber}</p>}
               <p className="text-muted-foreground text-sm">
                 {isGiftOrder 
-                  ? 'נציג שלנו ייצור איתכם קשר בהקדם לגביית התשלום ותיאום ההגעה'
+                  ? 'התשלום התקבל! נתאם הגעה למקבל המתנה ונשלח אישור במייל'
                   : 'ניצור איתך קשר לאישור המועד'}
               </p>
             </div>
