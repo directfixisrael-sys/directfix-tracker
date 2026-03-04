@@ -55,7 +55,7 @@ const Index = () => {
             </div>
 
             {/* CTAs */}
-            <div className="space-y-3 max-w-sm mx-auto animate-fade-in" style={{ animationDelay: '150ms' }}>
+            <div className="space-y-3 max-w-md mx-auto animate-fade-in" style={{ animationDelay: '150ms' }}>
               <Button 
                 size="lg" 
                 className="w-full h-14 text-lg font-extrabold rounded-2xl gap-2 border-2 border-foreground/10 shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:shadow-[6px_6px_0_0_hsl(var(--foreground)/0.12)] hover:-translate-y-0.5 transition-all duration-200"
