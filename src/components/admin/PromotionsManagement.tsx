@@ -192,6 +192,7 @@ const PromotionsManagement = () => {
       end_date: promotion.end_date || '',
       is_active: promotion.is_active,
       value: promotion.value ? String(promotion.value) : '',
+      display_mode: (promotion as any).display_mode || 'both',
     });
     setIsDialogOpen(true);
   };
