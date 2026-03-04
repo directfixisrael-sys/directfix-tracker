@@ -862,6 +862,48 @@ const NewRepairOrder = () => {
   const removeImage = (index: number) => {
     setDeviceImages(prev => prev.filter((_, i) => i !== index));
   };
+  const sendOrderNotifications = async (orderResult: any, repairDescription: string, scheduleNote: string) => {
+    try {
+      const allRepairNames = getAllRepairNames();
+      const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
+      const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
+      const leadSrc = getLeadSource();
+      await supabase.functions.invoke('send-order-notifications', {
+        body: {
+          customerName: customerName.trim(),
+          customerPhone: customerPhone.trim(),
+          customerAddress: customerAddress.trim(),
+          deviceType: selectedModel?.name || '',
+          repairType: repairTypeForNotification + colorNote,
+          repairPrice: getFinalPrice(),
+          scheduledTime: scheduleNote,
+          notes: customerNotes.trim(),
+          customerEmail: customerEmail.trim() || undefined,
+          orderNumber: orderResult?.order_number || undefined,
+          promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
+          leadSource: leadSrc.source,
+          leadSourceDetails: leadSrc,
+        }
+      });
+      console.log('Notifications sent successfully');
+    } catch (notificationError) {
+      console.error('Error sending notifications:', notificationError);
+    }
+  };
+
+  const handleGiftPaymentSuccess = async () => {
+    if (giftOrderResult?.id) {
+      await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', giftOrderResult.id);
+    }
+    const scheduleNote = formatSelectedDateTime();
+    const allRepairNames = getAllRepairNames();
+    const repairDescription = selectedBundleAddon && currentBundle 
+      ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה)` 
+      : allRepairNames.join(' + ');
+    await sendOrderNotifications(giftOrderResult, repairDescription, scheduleNote);
+    goToStep('success');
+  };
+
   const handleSubmit = async () => {
     if (!customerName.trim() || !customerPhone.trim() || !customerAddress.trim()) {
       toast.error('אנא מלא את כל השדות');
