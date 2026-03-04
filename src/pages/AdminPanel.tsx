@@ -1784,6 +1784,10 @@ const AdminPanel = () => {
                 <Package className="w-4 h-4" />
                 <span>חבילות</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('announcements')} className={cn("gap-3 py-3", activeTab === 'announcements' && "text-primary font-medium")}>
+                <Megaphone className="w-4 h-4" />
+                <span>הודעות והתראות</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('settings')} className={cn("gap-3 py-3", activeTab === 'settings' && "text-primary font-medium")}>
                 <Settings className="w-4 h-4" />
                 <span>הגדרות</span>
