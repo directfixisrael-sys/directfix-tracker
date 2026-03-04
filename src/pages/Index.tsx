@@ -22,7 +22,7 @@ const Index = () => {
 
       {/* Strategly-style Navbar */}
       <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b-2 border-foreground/10" role="banner">
-        <nav className="max-w-2xl mx-auto flex items-center justify-between px-4 h-14" aria-label="ניווט ראשי">
+        <nav className="max-w-3xl mx-auto flex items-center justify-between px-4 h-14" aria-label="ניווט ראשי">
           <div className="flex items-center gap-2">
             <a
               href="tel:033106020"
