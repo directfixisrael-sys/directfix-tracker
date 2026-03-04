@@ -514,10 +514,12 @@ const NewRepairOrder = () => {
     const isCompatibleScreen = repair.name.includes('מסך תואם');
     const isBattery = repair.name.includes('סוללה');
     const isBackGlass = repair.name.includes('גב');
+    const isCharging = repair.name.includes('טעינה');
     if (isOriginalScreen) return selectedModel.original_screen_price;
     if (isCompatibleScreen) return selectedModel.compatible_screen_price;
     if (isBattery) return selectedModel.battery_price;
     if (isBackGlass) return selectedModel.back_glass_price;
+    if (isCharging) return selectedModel.charging_price;
     return 0;
   };
   const getPrice = () => {
