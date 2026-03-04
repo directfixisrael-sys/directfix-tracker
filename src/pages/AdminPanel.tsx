@@ -51,7 +51,8 @@ import {
   CalendarPlus,
   Sparkles,
   Image,
-  Megaphone
+  Megaphone,
+  Bell
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
