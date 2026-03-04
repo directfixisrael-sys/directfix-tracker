@@ -946,38 +946,53 @@ const NewRepairOrder = () => {
 
       // Send notifications (email + WhatsApp)
       try {
-        const repairTypeForNotification = selectedBundleAddon && currentBundle ? `${allRepairNames.join(' + ')} + החלפת סוללה (חבילה -${currentBundle.discount_percent}%)` : allRepairNames.join(' + ');
-        const colorNote = selectedBackColor ? ` (צבע: ${selectedBackColor})` : '';
-        const leadSource = getLeadSource();
-        await supabase.functions.invoke('send-order-notifications', {
-          body: {
-            customerName: customerName.trim(),
-            customerPhone: customerPhone.trim(),
-            customerAddress: customerAddress.trim(),
-            deviceType: selectedModel?.name || '',
-            repairType: repairTypeForNotification + colorNote,
-            repairPrice: getFinalPrice(),
-            scheduledTime: scheduleNote,
-            notes: customerNotes.trim(),
-            customerEmail: customerEmail.trim() || undefined,
-            orderNumber: orderResult?.order_number || undefined,
-            promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
-            leadSource: leadSource.source,
-            leadSourceDetails: leadSource,
+      // For gift orders: create PayPlus payment link and go to payment step
+      if (isGiftOrder) {
+        try {
+          const { data: payData, error: payError } = await supabase.functions.invoke('payplus-create-payment', {
+            body: {
+              amount: getFinalPrice(),
+              description: `תיקון ${selectedModel?.name || ''} - ${repairDescription} (הזמנת מתנה)`,
+              customerName: giftSenderName.trim(),
+              customerPhone: giftSenderPhone.trim(),
+              customerEmail: customerEmail.trim() || undefined,
+              orderId: orderResult?.id || '',
+              moreInfo: `הזמנה #${orderResult?.order_number || ''}`,
+            }
+          });
+          if (payError || !payData?.paymentLink) {
+            throw new Error(payData?.error || 'Failed to create payment link');
           }
-        });
-        console.log('Notifications sent successfully');
-      } catch (notificationError) {
-        console.error('Error sending notifications:', notificationError);
-        // Don't fail the order if notifications fail
+          setGiftPaymentUrl(payData.paymentLink);
+          setGiftOrderResult(orderResult);
+          setCompletedOrderNumber(orderResult?.order_number || null);
+          // Update order with payment link
+          if (orderResult?.id) {
+            await supabase.from('orders').update({ 
+              payment_link: payData.paymentLink,
+              payment_status: 'pending'
+            }).eq('id', orderResult.id);
+          }
+          goToStep('gift_payment');
+        } catch (payError) {
+          console.error('Error creating payment:', payError);
+          toast.error('שגיאה ביצירת קישור תשלום, ההזמנה נשמרה ונציג ייצור קשר');
+          // Fallback: send notifications and go to success
+          await sendOrderNotifications(orderResult, repairDescription, scheduleNote);
+          setCompletedOrderNumber(orderResult?.order_number || null);
+          goToStep('success');
+        }
+        // Track
+        trackPurchase(getFinalPrice());
+        gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
+      } else {
+        // Regular flow: send notifications immediately
+        await sendOrderNotifications(orderResult, repairDescription, scheduleNote);
+        trackPurchase(getFinalPrice());
+        gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
+        setCompletedOrderNumber(orderResult?.order_number || null);
+        goToStep('success');
       }
-
-      // Track Facebook Pixel Purchase event
-      trackPurchase(getFinalPrice());
-      // Track Google Analytics conversion
-      gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
-      setCompletedOrderNumber(orderResult?.order_number || null);
-      goToStep('success');
     } catch (error) {
       toast.error('אירעה שגיאה, נסה שוב');
     } finally {
