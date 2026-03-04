@@ -41,6 +41,7 @@ interface IphoneModel {
   compatible_screen_price: number;
   battery_price: number;
   back_glass_price: number;
+  charging_price: number;
   is_active: boolean;
   sort_order: number;
   series: string;
@@ -76,6 +77,7 @@ const PriceManagement = () => {
     compatible_screen_price: 0,
     battery_price: 0,
     back_glass_price: 0,
+    charging_price: 0,
     is_active: true,
     min_lead_hours: 0,
   });
@@ -208,6 +210,7 @@ const PriceManagement = () => {
         compatible_screen_price: model.compatible_screen_price,
         battery_price: model.battery_price,
         back_glass_price: model.back_glass_price,
+        charging_price: model.charging_price || 0,
         is_active: model.is_active,
         min_lead_hours: model.min_lead_hours || 0,
       });
@@ -220,6 +223,7 @@ const PriceManagement = () => {
         compatible_screen_price: 0,
         battery_price: 0,
         back_glass_price: 0,
+        charging_price: 0,
         is_active: true,
         min_lead_hours: 0,
       });
@@ -252,6 +256,7 @@ const PriceManagement = () => {
             compatible_screen_price: modelForm.compatible_screen_price,
             battery_price: modelForm.battery_price,
             back_glass_price: modelForm.back_glass_price,
+            charging_price: modelForm.charging_price,
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
           })
@@ -270,6 +275,7 @@ const PriceManagement = () => {
             compatible_screen_price: modelForm.compatible_screen_price,
             battery_price: modelForm.battery_price,
             back_glass_price: modelForm.back_glass_price,
+            charging_price: modelForm.charging_price,
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
             sort_order: maxOrder + 1,
@@ -538,6 +544,7 @@ const PriceManagement = () => {
                       <span>מסך תואם: ₪{model.compatible_screen_price}</span>
                       <span>סוללה: ₪{model.battery_price}</span>
                       {model.back_glass_price > 0 && <span>גב: ₪{model.back_glass_price}</span>}
+                      {model.charging_price > 0 && <span>טעינה: ₪{model.charging_price}</span>}
                       {model.min_lead_hours > 0 && <span className="text-warning">⏰ {model.min_lead_hours} שעות מראש</span>}
                     </div>
                   </div>
@@ -760,7 +767,19 @@ const PriceManagement = () => {
                   value={modelForm.back_glass_price}
                   onChange={(e) => setModelForm({ ...modelForm, back_glass_price: Number(e.target.value) })}
                 />
-              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">תיקון טעינה (₪)</label>
+              <Input
+                type="number"
+                placeholder="0 = לא מוצג"
+                value={modelForm.charging_price}
+                onChange={(e) => setModelForm({ ...modelForm, charging_price: Number(e.target.value) })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {modelForm.charging_price > 0 ? 'תיקון טעינה יוצג ללקוח' : 'תיקון טעינה לא יוצג (מחיר 0)'}
+              </p>
+            </div>
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">מרווח הזמנה מינימלי (שעות)</label>
