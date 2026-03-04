@@ -1737,7 +1737,7 @@ const AdminPanel = () => {
               <button 
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
-                  ['live', 'analytics', 'messages', 'feedback', 'promotions', 'settings'].includes(activeTab)
+                  ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'bundles', 'settings'].includes(activeTab)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground"
                 )}
@@ -1771,6 +1771,14 @@ const AdminPanel = () => {
               <DropdownMenuItem onClick={() => setActiveTab('promotions')} className={cn("gap-3 py-3", activeTab === 'promotions' && "text-primary font-medium")}>
                 <Gift className="w-4 h-4" />
                 <span>מבצעים</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('prices')} className={cn("gap-3 py-3", activeTab === 'prices' && "text-primary font-medium")}>
+                <DollarSign className="w-4 h-4" />
+                <span>מחירון</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('bundles')} className={cn("gap-3 py-3", activeTab === 'bundles' && "text-primary font-medium")}>
+                <Package className="w-4 h-4" />
+                <span>חבילות</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('settings')} className={cn("gap-3 py-3", activeTab === 'settings' && "text-primary font-medium")}>
                 <Settings className="w-4 h-4" />
