@@ -251,10 +251,12 @@
     @apply relative inline-block;
     background: linear-gradient(180deg, transparent 55%, hsl(45, 95%, 70%) 55%);
     padding: 0 4px;
+    color: hsl(220, 25%, 12%);
   }
 
   :is(.dark) .text-highlight {
-    background: linear-gradient(180deg, transparent 55%, hsl(45, 90%, 45% / 0.5) 55%);
+    background: linear-gradient(180deg, transparent 55%, hsl(45, 85%, 50% / 0.4) 55%);
+    color: hsl(210, 15%, 93%);
   }
 
   .text-highlight-box {
