@@ -119,6 +119,7 @@ const ResultsCard = ({
               else if (repair.name.includes('מסך תואם')) price = matchedModel.compatible_screen_price;
               else if (repair.name.includes('סוללה')) price = matchedModel.battery_price;
               else if (repair.name.includes('גב')) price = matchedModel.back_glass_price;
+              else if (repair.name.includes('טעינה')) price = matchedModel.charging_price || 0;
             }
             return (
               <Button
