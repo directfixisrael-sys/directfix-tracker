@@ -310,7 +310,6 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
       devices: Object.entries(deviceCounts).map(([device, count]) => ({ device, count })).sort((a, b) => b.count - a.count),
     };
   }, [allVisits, dateRange]);
-  };
 
   const formatDuration = (seconds: number) => {
     if (seconds < 60) return `${Math.round(seconds)} שניות`;
