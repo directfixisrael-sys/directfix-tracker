@@ -161,6 +161,7 @@ const LiveVisitorsCard = ({ activeViewers }: { activeViewers: any[] }) => {
 const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const { visits: allVisits, loading: visitsLoading } = useSiteVisits(168); // 7 days
   const [dateRange, setDateRange] = useState<DateRange>({
     from: startOfMonth(new Date()),
     to: endOfDay(new Date()),
