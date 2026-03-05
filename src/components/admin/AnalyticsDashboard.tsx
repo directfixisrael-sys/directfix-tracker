@@ -748,6 +748,114 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
         </Card>
       </div>
 
+      {/* ===== SITE VISITS ANALYTICS ===== */}
+      <Card className="p-5">
+        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+          <History className="w-5 h-5 text-primary" />
+          פירוט ביקורים באתר
+          <span className="text-xs text-muted-foreground font-normal mr-auto">
+            {allVisits.length} ביקורים (7 ימים אחרונים)
+          </span>
+        </h3>
+
+        {/* Hourly chart */}
+        {(() => {
+          const filteredVisits = allVisits.filter(v => {
+            const d = new Date(v.created_at);
+            return isWithinInterval(d, { start: dateRange.from, end: dateRange.to });
+          });
+          const hourlyData: Record<string, number> = {};
+          filteredVisits.forEach(v => {
+            const d = new Date(v.created_at);
+            const key = format(d, 'dd/MM HH:00', { locale: he });
+            hourlyData[key] = (hourlyData[key] || 0) + 1;
+          });
+          const chartData = Object.entries(hourlyData)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([time, count]) => ({ time, count }));
+
+          return chartData.length > 0 ? (
+            <div className="h-44 mb-5">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="visitsGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} interval="preserveStartEnd" />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} allowDecimals={false} />
+                  <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }} />
+                  <Area type="monotone" dataKey="count" name="ביקורים" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#visitsGrad)" dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          ) : null;
+        })()}
+
+        {/* Visits table */}
+        {visitsLoading ? (
+          <div className="text-center py-8 text-muted-foreground text-sm">טוען נתונים...</div>
+        ) : allVisits.length > 0 ? (
+          <div className="overflow-x-auto max-h-96">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-right">תאריך ושעה</TableHead>
+                  <TableHead className="text-right">עמוד</TableHead>
+                  <TableHead className="text-right">מקור</TableHead>
+                  <TableHead className="text-right">הפניה</TableHead>
+                  <TableHead className="text-right">מכשיר</TableHead>
+                  <TableHead className="text-right">שפה</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {allVisits
+                  .filter(v => {
+                    const d = new Date(v.created_at);
+                    return isWithinInterval(d, { start: dateRange.from, end: dateRange.to });
+                  })
+                  .slice(0, 200)
+                  .map((visit) => {
+                    const d = new Date(visit.created_at);
+                    const referrerHost = visit.referrer ? (() => {
+                      try { return new URL(visit.referrer).hostname; } catch { return visit.referrer; }
+                    })() : null;
+                    return (
+                      <TableRow key={visit.id}>
+                        <TableCell className="text-xs whitespace-nowrap">
+                          {format(d, 'dd/MM/yy HH:mm', { locale: he })}
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {PAGE_NAMES[visit.page] || visit.page}
+                        </TableCell>
+                        <TableCell className="text-xs font-medium text-primary">
+                          {visit.lead_source || 'ישיר'}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground truncate max-w-[120px]">
+                          {referrerHost || '—'}
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {visit.device_type === 'mobile' ? '📱 נייד' : visit.device_type === 'desktop' ? '🖥️ מחשב' : visit.device_type === 'tablet' ? '📱 טאבלט' : '—'}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {visit.language?.split('-')[0] || '—'}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>אין נתוני ביקורים עדיין</p>
+            <p className="text-xs mt-1">ביקורים חדשים יתחילו להופיע כאן</p>
+          </div>
+        )}
+      </Card>
+
       {/* Rating Stats */}
       <Card className="p-4">
         <h3 className="font-semibold mb-4">דירוג ממוצע</h3>
