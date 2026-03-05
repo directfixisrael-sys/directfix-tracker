@@ -182,6 +182,7 @@ export const VisitorTracker = () => {
     };
 
     updatePresence();
+    persistVisit(getVisitorId(), location.pathname, null);
     gaPageView(location.pathname);
   }, [location.pathname]);
 
