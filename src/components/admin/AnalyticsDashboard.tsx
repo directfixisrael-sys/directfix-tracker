@@ -280,34 +280,36 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
     ? (ratedOrders.reduce((sum, o) => sum + (o.rating || 0), 0) / ratedOrders.length).toFixed(1)
     : '--';
 
-  // Mock analytics data (in real app, this would come from an analytics API)
-  const analyticsData: AnalyticsData = {
-    visitors: { total: 25, data: [] },
-    pageviews: { total: 61, data: [] },
-    pageviewsPerVisit: { average: 2.44, data: [] },
-    sessionDuration: { average: 95, data: [] },
-    bounceRate: { average: 56, data: [] },
-    topPages: [
-      { path: '/track', count: 16 },
-      { path: '/order', count: 13 },
-      { path: '/', count: 10 },
-      { path: '/admin', count: 1 },
-    ],
-    topSources: (() => {
-      const sources: Record<string, number> = {};
-      filteredOrders.forEach(o => {
-        const src = o.leadSource || 'ישיר';
-        sources[src] = (sources[src] || 0) + 1;
-      });
-      return Object.entries(sources)
-        .map(([source, count]) => ({ source, count }))
-        .sort((a, b) => b.count - a.count);
-    })(),
-    devices: [
-      { device: 'mobile', count: 17 },
-      { device: 'desktop', count: 7 },
-      { device: 'tablet', count: 1 },
-    ],
+  // Analytics data from real visits
+  const analyticsData: AnalyticsData = useMemo(() => {
+    const periodVisits = allVisits.filter(v => {
+      const d = new Date(v.created_at);
+      return isWithinInterval(d, { start: dateRange.from, end: dateRange.to });
+    });
+    const uniqueVisitors = new Set(periodVisits.map(v => v.visitor_id)).size;
+    
+    const pageCounts: Record<string, number> = {};
+    const sourceCounts: Record<string, number> = {};
+    const deviceCounts: Record<string, number> = {};
+    periodVisits.forEach(v => {
+      pageCounts[v.page] = (pageCounts[v.page] || 0) + 1;
+      const src = v.lead_source || 'ישיר';
+      sourceCounts[src] = (sourceCounts[src] || 0) + 1;
+      const dev = v.device_type || 'mobile';
+      deviceCounts[dev] = (deviceCounts[dev] || 0) + 1;
+    });
+
+    return {
+      visitors: { total: uniqueVisitors, data: [] },
+      pageviews: { total: periodVisits.length, data: [] },
+      pageviewsPerVisit: { average: uniqueVisitors > 0 ? periodVisits.length / uniqueVisitors : 0, data: [] },
+      sessionDuration: { average: 0, data: [] },
+      bounceRate: { average: 0, data: [] },
+      topPages: Object.entries(pageCounts).map(([path, count]) => ({ path, count })).sort((a, b) => b.count - a.count),
+      topSources: Object.entries(sourceCounts).map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count),
+      devices: Object.entries(deviceCounts).map(([device, count]) => ({ device, count })).sort((a, b) => b.count - a.count),
+    };
+  }, [allVisits, dateRange]);
   };
 
   const formatDuration = (seconds: number) => {
