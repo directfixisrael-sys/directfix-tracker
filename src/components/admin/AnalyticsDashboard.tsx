@@ -12,15 +12,18 @@ import {
   RefreshCw,
   DollarSign,
   BarChart3,
-  Target
+  Target,
+  History
 } from 'lucide-react';
 import { RepairOrder } from '@/types/repair';
 import { cn } from '@/lib/utils';
 import DateRangePicker, { DateRange } from './DateRangePicker';
 import { subDays, startOfDay, endOfDay, isWithinInterval, format, eachDayOfInterval, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { he } from 'date-fns/locale';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend, AreaChart, Area } from 'recharts';
 import { useLiveVisitors } from '@/hooks/useLiveVisitors';
+import { useSiteVisits, SiteVisit } from '@/hooks/useSiteVisits';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface AnalyticsDashboardProps {
   orders: RepairOrder[];
