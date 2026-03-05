@@ -537,6 +537,45 @@ export type Database = {
         }
         Relationships: []
       }
+      site_visits: {
+        Row: {
+          created_at: string
+          device_type: string | null
+          id: string
+          language: string | null
+          lead_source: string | null
+          page: string
+          referrer: string | null
+          step: string | null
+          user_agent: string | null
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          language?: string | null
+          lead_source?: string | null
+          page: string
+          referrer?: string | null
+          step?: string | null
+          user_agent?: string | null
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          language?: string | null
+          lead_source?: string | null
+          page?: string
+          referrer?: string | null
+          step?: string | null
+          user_agent?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
