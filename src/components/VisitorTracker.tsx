@@ -5,6 +5,27 @@ import { gaPageView } from '@/lib/gtag';
 import { getLeadSource } from '@/lib/leadSource';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
+const getDeviceType = (ua: string): string => {
+  if (/tablet|ipad/i.test(ua)) return 'tablet';
+  if (/mobile|android|iphone/i.test(ua)) return 'mobile';
+  return 'desktop';
+};
+
+// Persist visit to DB (fire-and-forget)
+const persistVisit = (visitorId: string, page: string, step: string | null) => {
+  const leadSource = getLeadSource();
+  supabase.from('site_visits').insert({
+    visitor_id: visitorId,
+    page,
+    step,
+    lead_source: leadSource.source || null,
+    referrer: document.referrer || null,
+    user_agent: navigator.userAgent,
+    language: navigator.language,
+    device_type: getDeviceType(navigator.userAgent),
+  } as any).then(() => {});
+};
+
 // Generate a unique visitor ID for this session
 const getVisitorId = () => {
   let visitorId = sessionStorage.getItem('visitor_id');
@@ -161,6 +182,7 @@ export const VisitorTracker = () => {
     };
 
     updatePresence();
+    persistVisit(getVisitorId(), location.pathname, null);
     gaPageView(location.pathname);
   }, [location.pathname]);
 

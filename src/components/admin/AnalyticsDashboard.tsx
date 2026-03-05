@@ -12,15 +12,18 @@ import {
   RefreshCw,
   DollarSign,
   BarChart3,
-  Target
+  Target,
+  History
 } from 'lucide-react';
 import { RepairOrder } from '@/types/repair';
 import { cn } from '@/lib/utils';
 import DateRangePicker, { DateRange } from './DateRangePicker';
 import { subDays, startOfDay, endOfDay, isWithinInterval, format, eachDayOfInterval, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { he } from 'date-fns/locale';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend, AreaChart, Area } from 'recharts';
 import { useLiveVisitors } from '@/hooks/useLiveVisitors';
+import { useSiteVisits, SiteVisit } from '@/hooks/useSiteVisits';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface AnalyticsDashboardProps {
   orders: RepairOrder[];
@@ -158,6 +161,7 @@ const LiveVisitorsCard = ({ activeViewers }: { activeViewers: any[] }) => {
 const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const { visits: allVisits, loading: visitsLoading } = useSiteVisits(168); // 7 days
   const [dateRange, setDateRange] = useState<DateRange>({
     from: startOfMonth(new Date()),
     to: endOfDay(new Date()),
@@ -276,34 +280,36 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
     ? (ratedOrders.reduce((sum, o) => sum + (o.rating || 0), 0) / ratedOrders.length).toFixed(1)
     : '--';
 
-  // Mock analytics data (in real app, this would come from an analytics API)
-  const analyticsData: AnalyticsData = {
-    visitors: { total: 25, data: [] },
-    pageviews: { total: 61, data: [] },
-    pageviewsPerVisit: { average: 2.44, data: [] },
-    sessionDuration: { average: 95, data: [] },
-    bounceRate: { average: 56, data: [] },
-    topPages: [
-      { path: '/track', count: 16 },
-      { path: '/order', count: 13 },
-      { path: '/', count: 10 },
-      { path: '/admin', count: 1 },
-    ],
-    topSources: (() => {
-      const sources: Record<string, number> = {};
-      filteredOrders.forEach(o => {
-        const src = o.leadSource || 'ישיר';
-        sources[src] = (sources[src] || 0) + 1;
-      });
-      return Object.entries(sources)
-        .map(([source, count]) => ({ source, count }))
-        .sort((a, b) => b.count - a.count);
-    })(),
-    devices: [
-      { device: 'mobile', count: 17 },
-      { device: 'desktop', count: 7 },
-      { device: 'tablet', count: 1 },
-    ],
+  // Analytics data from real visits
+  const analyticsData: AnalyticsData = useMemo(() => {
+    const periodVisits = allVisits.filter(v => {
+      const d = new Date(v.created_at);
+      return isWithinInterval(d, { start: dateRange.from, end: dateRange.to });
+    });
+    const uniqueVisitors = new Set(periodVisits.map(v => v.visitor_id)).size;
+    
+    const pageCounts: Record<string, number> = {};
+    const sourceCounts: Record<string, number> = {};
+    const deviceCounts: Record<string, number> = {};
+    periodVisits.forEach(v => {
+      pageCounts[v.page] = (pageCounts[v.page] || 0) + 1;
+      const src = v.lead_source || 'ישיר';
+      sourceCounts[src] = (sourceCounts[src] || 0) + 1;
+      const dev = v.device_type || 'mobile';
+      deviceCounts[dev] = (deviceCounts[dev] || 0) + 1;
+    });
+
+    return {
+      visitors: { total: uniqueVisitors, data: [] },
+      pageviews: { total: periodVisits.length, data: [] },
+      pageviewsPerVisit: { average: uniqueVisitors > 0 ? periodVisits.length / uniqueVisitors : 0, data: [] },
+      sessionDuration: { average: 0, data: [] },
+      bounceRate: { average: 0, data: [] },
+      topPages: Object.entries(pageCounts).map(([path, count]) => ({ path, count })).sort((a, b) => b.count - a.count),
+      topSources: Object.entries(sourceCounts).map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count),
+      devices: Object.entries(deviceCounts).map(([device, count]) => ({ device, count })).sort((a, b) => b.count - a.count),
+    };
+  }, [allVisits, dateRange]);
   };
 
   const formatDuration = (seconds: number) => {
@@ -743,6 +749,114 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
           </div>
         </Card>
       </div>
+
+      {/* ===== SITE VISITS ANALYTICS ===== */}
+      <Card className="p-5">
+        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+          <History className="w-5 h-5 text-primary" />
+          פירוט ביקורים באתר
+          <span className="text-xs text-muted-foreground font-normal mr-auto">
+            {allVisits.length} ביקורים (7 ימים אחרונים)
+          </span>
+        </h3>
+
+        {/* Hourly chart */}
+        {(() => {
+          const filteredVisits = allVisits.filter(v => {
+            const d = new Date(v.created_at);
+            return isWithinInterval(d, { start: dateRange.from, end: dateRange.to });
+          });
+          const hourlyData: Record<string, number> = {};
+          filteredVisits.forEach(v => {
+            const d = new Date(v.created_at);
+            const key = format(d, 'dd/MM HH:00', { locale: he });
+            hourlyData[key] = (hourlyData[key] || 0) + 1;
+          });
+          const chartData = Object.entries(hourlyData)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([time, count]) => ({ time, count }));
+
+          return chartData.length > 0 ? (
+            <div className="h-44 mb-5">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="visitsGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} interval="preserveStartEnd" />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} allowDecimals={false} />
+                  <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }} />
+                  <Area type="monotone" dataKey="count" name="ביקורים" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#visitsGrad)" dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          ) : null;
+        })()}
+
+        {/* Visits table */}
+        {visitsLoading ? (
+          <div className="text-center py-8 text-muted-foreground text-sm">טוען נתונים...</div>
+        ) : allVisits.length > 0 ? (
+          <div className="overflow-x-auto max-h-96">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-right">תאריך ושעה</TableHead>
+                  <TableHead className="text-right">עמוד</TableHead>
+                  <TableHead className="text-right">מקור</TableHead>
+                  <TableHead className="text-right">הפניה</TableHead>
+                  <TableHead className="text-right">מכשיר</TableHead>
+                  <TableHead className="text-right">שפה</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {allVisits
+                  .filter(v => {
+                    const d = new Date(v.created_at);
+                    return isWithinInterval(d, { start: dateRange.from, end: dateRange.to });
+                  })
+                  .slice(0, 200)
+                  .map((visit) => {
+                    const d = new Date(visit.created_at);
+                    const referrerHost = visit.referrer ? (() => {
+                      try { return new URL(visit.referrer).hostname; } catch { return visit.referrer; }
+                    })() : null;
+                    return (
+                      <TableRow key={visit.id}>
+                        <TableCell className="text-xs whitespace-nowrap">
+                          {format(d, 'dd/MM/yy HH:mm', { locale: he })}
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {PAGE_NAMES[visit.page] || visit.page}
+                        </TableCell>
+                        <TableCell className="text-xs font-medium text-primary">
+                          {visit.lead_source || 'ישיר'}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground truncate max-w-[120px]">
+                          {referrerHost || '—'}
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {visit.device_type === 'mobile' ? '📱 נייד' : visit.device_type === 'desktop' ? '🖥️ מחשב' : visit.device_type === 'tablet' ? '📱 טאבלט' : '—'}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {visit.language?.split('-')[0] || '—'}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>אין נתוני ביקורים עדיין</p>
+            <p className="text-xs mt-1">ביקורים חדשים יתחילו להופיע כאן</p>
+          </div>
+        )}
+      </Card>
 
       {/* Rating Stats */}
       <Card className="p-4">

@@ -11,12 +11,17 @@ import {
   TrendingUp,
   Users,
   Clock,
-  Zap
+  Zap,
+  History
 } from 'lucide-react';
 import { useLiveVisitors, Visitor } from '@/hooks/useLiveVisitors';
+import { useSiteVisits } from '@/hooks/useSiteVisits';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { format } from 'date-fns';
+import { he } from 'date-fns/locale';
 
 // ── Activity feed types ────────────────────────────────────
 interface ActivityEvent {
@@ -46,17 +51,6 @@ const STEP_NAMES: Record<string, string> = {
   success: '✅ הזמנה הושלמה!',
 };
 
-const FUNNEL_STEPS = ['model', 'repair', 'bundle', 'price', 'schedule', 'details', 'success'] as const;
-const FUNNEL_LABELS: Record<string, string> = {
-  model: 'בחירת דגם',
-  repair: 'בחירת תיקון',
-  bundle: 'חבילת תיקון',
-  price: 'אישור מחיר',
-  schedule: 'קביעת תור',
-  details: 'פרטי לקוח',
-  success: 'הזמנה הושלמה',
-};
-
 const getDeviceIcon = (ua?: string) => {
   if (!ua) return <Smartphone className="w-4 h-4" />;
   if (/tablet|ipad/i.test(ua)) return <Tablet className="w-4 h-4" />;
@@ -69,6 +63,13 @@ const getDeviceName = (ua?: string) => {
   if (/tablet|ipad/i.test(ua)) return 'טאבלט';
   if (/mobile|android|iphone/i.test(ua)) return 'נייד';
   return 'מחשב';
+};
+
+const getDeviceEmoji = (dt?: string | null) => {
+  if (dt === 'tablet') return '📱';
+  if (dt === 'mobile') return '📱';
+  if (dt === 'desktop') return '🖥️';
+  return '📱';
 };
 
 const EVENT_ICONS: Record<string, React.ReactNode> = {
@@ -100,6 +101,7 @@ const EVENT_TEXT: Record<string, string> = {
 
 const LiveView = () => {
   const { totalVisitors, visitorsByPage, visitorsBySource, visitors } = useLiveVisitors();
+  const { visits: historicalVisits, loading: historyLoading } = useSiteVisits(12);
   const [activityFeed, setActivityFeed] = useState<ActivityEvent[]>([]);
   const [liveGraphData, setLiveGraphData] = useState<{ time: string; visitors: number }[]>([]);
   const prevVisitorsRef = useRef<Visitor[]>([]);
@@ -111,13 +113,11 @@ const LiveView = () => {
       const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
       setLiveGraphData(prev => {
         const newData = [...prev, { time: timeStr, visitors: totalVisitors }];
-        return newData.slice(-30); // Keep last 30 data points (5 minutes)
+        return newData.slice(-30);
         });
     };
 
-    // Initial point
     addDataPoint();
-
     const interval = setInterval(addDataPoint, 10000);
     return () => clearInterval(interval);
   }, [totalVisitors]);
@@ -127,21 +127,18 @@ const LiveView = () => {
     const prevIds = new Set(prevVisitorsRef.current.map(v => v.visitorId));
     const currentIds = new Set(visitors.map(v => v.visitorId));
 
-    // New visitors
     visitors.forEach(v => {
       if (!prevIds.has(v.visitorId)) {
         addEvent({ type: 'visitor_joined', visitorId: v.visitorId, page: v.page });
       }
     });
 
-    // Left visitors
     prevVisitorsRef.current.forEach(v => {
       if (!currentIds.has(v.visitorId)) {
         addEvent({ type: 'visitor_left', visitorId: v.visitorId });
       }
     });
 
-    // Page changes
     visitors.forEach(v => {
       const prev = prevVisitorsRef.current.find(p => p.visitorId === v.visitorId);
       if (prev && prev.page !== v.page) {
@@ -155,7 +152,7 @@ const LiveView = () => {
     prevVisitorsRef.current = [...visitors];
   }, [visitors]);
 
-  // Listen for custom activity events from the site
+  // Listen for custom activity events
   useEffect(() => {
     const channel = supabase.channel('live-activity-events');
     
@@ -190,6 +187,19 @@ const LiveView = () => {
     return `לפני ${Math.floor(seconds / 3600)} שעות`;
   };
 
+  // Hourly breakdown from historical visits
+  const hourlyBreakdown = useMemo(() => {
+    const hours: Record<string, number> = {};
+    historicalVisits.forEach(v => {
+      const d = new Date(v.created_at);
+      const key = `${d.getHours().toString().padStart(2, '0')}:00`;
+      hours[key] = (hours[key] || 0) + 1;
+    });
+    return Object.entries(hours)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([hour, count]) => ({ hour, count }));
+  }, [historicalVisits]);
+
   // Re-render for time-ago updates
   const [, setTick] = useState(0);
   useEffect(() => {
@@ -217,7 +227,7 @@ const LiveView = () => {
         </div>
       </Card>
 
-      {/* ===== LIVE GRAPH - Shopify Style ===== */}
+      {/* ===== LIVE GRAPH ===== */}
       <Card className="p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-bold text-lg flex items-center gap-2">
@@ -235,38 +245,10 @@ const LiveView = () => {
                   <stop offset="95%" stopColor="hsl(var(--success))" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <XAxis 
-                dataKey="time" 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-                interval="preserveStartEnd"
-              />
-              <YAxis 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-                allowDecimals={false}
-                domain={[0, 'auto']}
-              />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '12px',
-                  fontSize: '12px',
-                }}
-                labelStyle={{ color: 'hsl(var(--muted-foreground))' }}
-              />
-              <Area
-                type="monotone"
-                dataKey="visitors"
-                stroke="hsl(var(--success))"
-                strokeWidth={2.5}
-                fill="url(#liveGradient)"
-                dot={false}
-                animationDuration={500}
-              />
+              <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} interval="preserveStartEnd" />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} allowDecimals={false} domain={[0, 'auto']} />
+              <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }} />
+              <Area type="monotone" dataKey="visitors" stroke="hsl(var(--success))" strokeWidth={2.5} fill="url(#liveGradient)" dot={false} animationDuration={500} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -284,18 +266,21 @@ const LiveView = () => {
           {visitors.length > 0 ? (
             <div className="space-y-3 max-h-80 overflow-y-auto">
               {visitors.map((v, i) => (
-                <div 
-                  key={v.visitorId} 
-                  className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl animate-fade-in"
-                >
+                <div key={v.visitorId} className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl animate-fade-in">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                     {getDeviceIcon(v.userAgent)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                      <div className={cn(
+                        "w-2 h-2 rounded-full",
+                        v.isOnline ? "bg-success animate-pulse" : "bg-muted-foreground"
+                      )} />
                       <span className="font-medium text-sm">מבקר #{i + 1}</span>
                       <span className="text-xs text-muted-foreground">{getDeviceName(v.userAgent)}</span>
+                      {!v.isOnline && (
+                        <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">עזב</span>
+                      )}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                       <span className="text-xs text-primary font-medium">
@@ -320,13 +305,13 @@ const LiveView = () => {
           ) : (
             <div className="text-center py-12 text-muted-foreground">
               <Eye className="w-10 h-10 mx-auto mb-3 opacity-30" />
-              <p>אין גולשים כרגע באתר</p>
+              <p>אין גולשים ב-30 דקות אחרונות</p>
               <p className="text-xs mt-1">ברגע שמישהו ייכנס, הוא יופיע כאן</p>
             </div>
           )}
         </Card>
 
-        {/* ===== LIVE ACTIVITY FEED - Shopify Style ===== */}
+        {/* ===== LIVE ACTIVITY FEED ===== */}
         <Card className="p-5">
           <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
             <Zap className="w-5 h-5 text-warning" />
@@ -336,14 +321,8 @@ const LiveView = () => {
           {activityFeed.length > 0 ? (
             <div className="space-y-2 max-h-80 overflow-y-auto">
               {activityFeed.map((event) => (
-                <div 
-                  key={event.id} 
-                  className="flex items-start gap-3 p-3 rounded-xl border border-border/50 animate-fade-in hover:bg-muted/30 transition-colors"
-                >
-                  <div className={cn(
-                    "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5",
-                    EVENT_COLORS[event.type]
-                  )}>
+                <div key={event.id} className="flex items-start gap-3 p-3 rounded-xl border border-border/50 animate-fade-in hover:bg-muted/30 transition-colors">
+                  <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5", EVENT_COLORS[event.type])}>
                     {EVENT_ICONS[event.type]}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -353,9 +332,7 @@ const LiveView = () => {
                         <span className="text-primary font-bold"> {PAGE_NAMES[event.page] || event.page}</span>
                       )}
                     </p>
-                    {event.detail && (
-                      <p className="text-xs text-muted-foreground mt-0.5">{event.detail}</p>
-                    )}
+                    {event.detail && <p className="text-xs text-muted-foreground mt-0.5">{event.detail}</p>}
                     <p className="text-[10px] text-muted-foreground mt-1">{timeAgo(event.timestamp)}</p>
                   </div>
                 </div>
@@ -373,7 +350,6 @@ const LiveView = () => {
 
       {/* ===== BREAKDOWN CARDS ===== */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {/* By Page */}
         {Object.entries(visitorsByPage).map(([page, count]) => (
           <Card key={page} className="p-4 text-center">
             <p className="text-2xl font-bold text-primary">{count}</p>
@@ -386,8 +362,6 @@ const LiveView = () => {
           </Card>
         )}
       </div>
-
-      {/* Funnel removed */}
 
       {/* ===== SOURCE BREAKDOWN ===== */}
       {Object.keys(visitorsBySource).length > 0 && (
@@ -418,6 +392,88 @@ const LiveView = () => {
           </div>
         </Card>
       )}
+
+      {/* ===== 12-HOUR VISITOR HISTORY ===== */}
+      <Card className="p-5">
+        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+          <History className="w-5 h-5 text-primary" />
+          היסטוריית ביקורים - 12 שעות אחרונות
+          <span className="text-xs text-muted-foreground font-normal mr-auto">
+            {historicalVisits.length} ביקורים
+          </span>
+        </h3>
+
+        {/* Hourly chart */}
+        {hourlyBreakdown.length > 0 && (
+          <div className="h-36 mb-5">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={hourlyBreakdown}>
+                <defs>
+                  <linearGradient id="historyGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} allowDecimals={false} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }} />
+                <Area type="monotone" dataKey="count" name="ביקורים" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#historyGradient)" dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Visits table */}
+        {historyLoading ? (
+          <div className="text-center py-8 text-muted-foreground text-sm">טוען היסטוריה...</div>
+        ) : historicalVisits.length > 0 ? (
+          <div className="overflow-x-auto max-h-96">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-right">שעה</TableHead>
+                  <TableHead className="text-right">עמוד</TableHead>
+                  <TableHead className="text-right">מקור</TableHead>
+                  <TableHead className="text-right">הפניה</TableHead>
+                  <TableHead className="text-right">מכשיר</TableHead>
+                  <TableHead className="text-right">שפה</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {historicalVisits.slice(0, 100).map((visit) => {
+                  const d = new Date(visit.created_at);
+                  const referrerHost = visit.referrer ? (() => {
+                    try { return new URL(visit.referrer).hostname; } catch { return visit.referrer; }
+                  })() : null;
+                  return (
+                    <TableRow key={visit.id}>
+                      <TableCell className="text-xs whitespace-nowrap">
+                        {format(d, 'HH:mm dd/MM', { locale: he })}
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        {PAGE_NAMES[visit.page] || visit.page}
+                        {visit.step && <span className="text-primary mr-1">({STEP_NAMES[visit.step]?.replace(/^.+\s/, '') || visit.step})</span>}
+                      </TableCell>
+                      <TableCell className="text-xs font-medium text-primary">{visit.lead_source || 'ישיר'}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground truncate max-w-[120px]">
+                        {referrerHost || '—'}
+                      </TableCell>
+                      <TableCell className="text-xs">{getDeviceEmoji(visit.device_type)} {visit.device_type === 'mobile' ? 'נייד' : visit.device_type === 'desktop' ? 'מחשב' : visit.device_type === 'tablet' ? 'טאבלט' : '—'}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{visit.language?.split('-')[0] || '—'}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            <History className="w-10 h-10 mx-auto mb-3 opacity-30" />
+            <p>אין היסטוריית ביקורים עדיין</p>
+            <p className="text-xs mt-1">ביקורים חדשים יתחילו להופיע כאן</p>
+          </div>
+        )}
+      </Card>
     </div>
   );
 };
