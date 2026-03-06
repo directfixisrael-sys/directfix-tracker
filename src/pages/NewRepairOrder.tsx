@@ -218,24 +218,7 @@ const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
   ],
 };
 
-// Info descriptions for repair types (more professional)
-const repairInfoDescriptions: Record<string, {
-  title: string;
-  description: string;
-}> = {
-  'מסך מקורי': {
-    title: 'מסך מקורי Apple',
-    description: 'מסך מקורי מבית Apple עם איכות תצוגה מעולה, צבעים מדויקים כמו מהמפעל, תמיכה מלאה ב-True Tone וכיול אוטומטי. כולל אחריות יצרן מלאה.'
-  },
-  'מסך תואם': {
-    title: 'מסך תואם איכותי',
-    description: 'מסך איכותי מתוצרת צד שלישי במחיר משתלם. איכות תצוגה טובה מאוד המתאימה לשימוש יומיומי. פתרון חסכוני עם יחס מחיר-ביצועים מצוין.'
-  },
-  'סוללה מקורית': {
-    title: 'סוללה מקורית Apple',
-    description: 'סוללה מקורית עם 100% בריאות סוללה. ללא התראות "חלק לא מקורי" במערכת. ביצועים מקסימליים וחיי סוללה ארוכים כמו מכשיר חדש.'
-  }
-};
+// Info descriptions are now loaded from the database (repair_types.info_title / info_description)
 
 // Schedule configuration
 const weekdaySlots = ['9:00-11:00', '11:00-13:00', '13:00-17:00', '17:00-20:00', '20:00-22:00'];
