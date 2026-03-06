@@ -24,14 +24,15 @@ import {
   Plus, 
   Pencil, 
   Trash2, 
-  Smartphone, 
-  Battery, 
-  Phone,
+  Smartphone,
+  Battery,
   Search,
   Loader2,
   GripVertical,
   Save
 } from 'lucide-react';
+import { REPAIR_ICON_OPTIONS, getRepairIconComponent } from '@/lib/repairIcons';
+import IconPickerField from '@/components/IconPickerField';
 import { toast } from 'sonner';
 
 interface IphoneModel {
@@ -441,13 +442,7 @@ const PriceManagement = () => {
     model.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const getRepairIcon = (icon: string) => {
-    switch (icon) {
-      case 'battery': return Battery;
-      case 'phone': return Phone;
-      default: return Smartphone;
-    }
-  };
+  const getRepairIcon = getRepairIconComponent;
 
   if (isLoading) {
     return (
@@ -836,24 +831,10 @@ const PriceManagement = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">אייקון</label>
-              <div className="flex gap-2">
-                {[
-                  { id: 'smartphone', icon: Smartphone, label: 'מסך' },
-                  { id: 'battery', icon: Battery, label: 'סוללה' },
-                  { id: 'phone', icon: Phone, label: 'טלפון' },
-                ].map(({ id, icon: Icon, label }) => (
-                  <Button
-                    key={id}
-                    type="button"
-                    variant={repairForm.icon === id ? 'default' : 'outline'}
-                    onClick={() => setRepairForm({ ...repairForm, icon: id })}
-                    className="flex-1 gap-2"
-                  >
-                    <Icon className="w-4 h-4" />
-                    {label}
-                  </Button>
-                ))}
-              </div>
+              <IconPickerField 
+                value={repairForm.icon} 
+                onChange={(icon) => setRepairForm({ ...repairForm, icon })} 
+              />
             </div>
             <div className="flex items-center justify-between">
               <div>

@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send, Zap } from 'lucide-react';
+import { getRepairIconComponent } from '@/lib/repairIcons';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -1048,16 +1049,7 @@ const NewRepairOrder = () => {
   const handleTrackOrder = () => {
     navigate('/track');
   };
-  const getRepairIcon = (icon: string) => {
-    switch (icon) {
-      case 'battery':
-        return Battery;
-      case 'phone':
-        return Phone;
-      default:
-        return Smartphone;
-    }
-  };
+  const getRepairIcon = getRepairIconComponent;
   const toggleTheme = () => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
   };
