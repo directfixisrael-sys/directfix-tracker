@@ -259,6 +259,9 @@ interface RepairType {
   icon: string;
   is_phone_only: boolean;
 }
+
+// Price lookup map: modelId -> repairTypeId -> price
+type PriceMap = Record<string, Record<string, number>>;
 interface Promotion {
   id: string;
   title: string;
@@ -292,6 +295,7 @@ const NewRepairOrder = () => {
   const [hourlyBlocks, setHourlyBlocks] = useState<{ date: string; start_time: string; end_time: string }[]>([]);
   const [activePromotion, setActivePromotion] = useState<Promotion | null>(null);
   const [repairBundles, setRepairBundles] = useState<RepairBundle[]>([]);
+  const [priceMap, setPriceMap] = useState<PriceMap>({});
   const [selectedBundleAddon, setSelectedBundleAddon] = useState<boolean>(false);
   const [currentBundle, setCurrentBundle] = useState<RepairBundle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -410,9 +414,17 @@ const NewRepairOrder = () => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [modelsRes, repairsRes, blockedRes, bundlesRes] = await Promise.all([supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), supabase.from('blocked_dates').select('date, start_time, end_time'), supabase.from('repair_bundles').select('*').eq('is_active', true)]);
+        const [modelsRes, repairsRes, blockedRes, bundlesRes, pricesRes] = await Promise.all([supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), supabase.from('blocked_dates').select('date, start_time, end_time'), supabase.from('repair_bundles').select('*').eq('is_active', true), supabase.from('model_repair_prices').select('*')]);
         if (modelsRes.data) setModels(modelsRes.data);
         if (repairsRes.data) setRepairTypes(repairsRes.data);
+        if (pricesRes.data) {
+          const map: PriceMap = {};
+          pricesRes.data.forEach((p: any) => {
+            if (!map[p.model_id]) map[p.model_id] = {};
+            map[p.model_id][p.repair_type_id] = p.price;
+          });
+          setPriceMap(map);
+        }
         if (blockedRes.data) {
           setBlockedDates(blockedRes.data.filter(d => !d.start_time).map(d => d.date));
           setHourlyBlocks(
@@ -509,19 +521,10 @@ const NewRepairOrder = () => {
     return true;
   };
   const filteredModels = models.filter(model => model.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  const getRepairPrice = (repair: RepairType) => {
-    if (!selectedModel) return 0;
-    const isOriginalScreen = repair.name.includes('מסך מקורי');
-    const isCompatibleScreen = repair.name.includes('מסך תואם');
-    const isBattery = repair.name.includes('סוללה');
-    const isBackGlass = repair.name.includes('גב');
-    const isCharging = repair.name.includes('טעינה');
-    if (isOriginalScreen) return selectedModel.original_screen_price;
-    if (isCompatibleScreen) return selectedModel.compatible_screen_price;
-    if (isBattery) return selectedModel.battery_price;
-    if (isBackGlass) return selectedModel.back_glass_price;
-    if (isCharging) return selectedModel.charging_price || 0;
-    return 0;
+  const getRepairPrice = (repair: RepairType, model?: IphoneModel | null) => {
+    const m = model || selectedModel;
+    if (!m) return 0;
+    return priceMap[m.id]?.[repair.id] || 0;
   };
   const getPrice = () => {
     if (!selectedModel || !selectedRepair) return 0;
@@ -540,9 +543,15 @@ const NewRepairOrder = () => {
   };
   const getBundleAddonPrice = () => {
     if (!selectedModel || !selectedBundleAddon || !currentBundle) return 0;
-    const basePrice = selectedModel.battery_price;
+    const batteryRepair = repairTypes.find(r => r.name.includes('סוללה'));
+    const basePrice = batteryRepair ? getRepairPrice(batteryRepair) : 0;
     const discountedPrice = Math.round(basePrice * (1 - currentBundle.discount_percent / 100));
     return discountedPrice;
+  };
+  const getBatteryBasePrice = () => {
+    if (!selectedModel) return 0;
+    const batteryRepair = repairTypes.find(r => r.name.includes('סוללה'));
+    return batteryRepair ? getRepairPrice(batteryRepair) : 0;
   };
   const getTotalPrice = () => {
     return getPrice() + getBundleAddonPrice() + getAdditionalRepairsTotal() - getMultiRepairDiscount();
@@ -589,13 +598,7 @@ const NewRepairOrder = () => {
       setSelectedRepair(repair);
 
       // Track AddToCart
-      const isOriginalScreen = repair.name.includes('מסך מקורי');
-      const isCompatibleScreen = repair.name.includes('מסך תואם');
-      const isBattery = repair.name.includes('סוללה');
-      const isBackGlass = repair.name.includes('גב');
-      const isCharging = repair.name.includes('טעינה');
-      let repairPrice = 0;
-      if (isOriginalScreen) repairPrice = model.original_screen_price;else if (isCompatibleScreen) repairPrice = model.compatible_screen_price;else if (isBattery) repairPrice = model.battery_price;else if (isBackGlass) repairPrice = model.back_glass_price;else if (isCharging) repairPrice = model.charging_price || 0;
+      const repairPrice = getRepairPrice(repair, model);
       trackAddToCart(repair.name, repairPrice);
       gaSelectRepair(repair.name, repairPrice);
       // Check bundle
@@ -645,11 +648,7 @@ const NewRepairOrder = () => {
 
     // Track AddToCart event for Facebook Pixel
     if (selectedModel) {
-      const isOriginalScreen = repair.name.includes('מסך מקורי');
-      const isCompatibleScreen = repair.name.includes('מסך תואם');
-      const isBattery = repair.name.includes('סוללה');
-      let repairPrice = 0;
-      if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;else if (isBattery) repairPrice = selectedModel.battery_price;
+      const repairPrice = getRepairPrice(repair);
       trackAddToCart(repair.name, repairPrice);
       gaSelectRepair(repair.name, repairPrice);
     }
@@ -711,8 +710,9 @@ const NewRepairOrder = () => {
     if (!selectedBackColor || !selectedRepair || !selectedModel) return;
     
     // Track
-    trackAddToCart(selectedRepair.name, selectedModel.back_glass_price);
-    gaSelectRepair(selectedRepair.name, selectedModel.back_glass_price);
+    const backPrice = getRepairPrice(selectedRepair);
+    trackAddToCart(selectedRepair.name, backPrice);
+    gaSelectRepair(selectedRepair.name, backPrice);
     
     setShowBackColorPicker(false);
     goToStep('price');
@@ -936,7 +936,7 @@ const NewRepairOrder = () => {
         : allRepairNames.join(' + ');
       const notes = [`הזמנה מהאתר - ${repairDescription}`, `מועד מבוקש: ${scheduleNote}`];
       if (selectedBundleAddon && currentBundle && selectedModel) {
-        notes.push(`חבילת תיקון: ${currentBundle.name} - סוללה ב-${currentBundle.discount_percent}% הנחה (₪${getBundleAddonPrice()} במקום ₪${selectedModel.battery_price})`);
+        notes.push(`חבילת תיקון: ${currentBundle.name} - סוללה ב-${currentBundle.discount_percent}% הנחה (₪${getBundleAddonPrice()} במקום ₪${getBatteryBasePrice()})`);
       }
       // Add back color notes for all repairs
       additionalRepairs.forEach(ar => {
@@ -1314,7 +1314,7 @@ const NewRepairOrder = () => {
 
 
             {/* Smart AI Search */}
-            <SmartRepairInput models={models} repairTypes={repairTypes} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
+            <SmartRepairInput models={models} repairTypes={repairTypes} priceMap={priceMap} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
 
             <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => setSelectedModel(model)} onConfirm={model => handleModelSelect(model)} />
 
@@ -1352,11 +1352,8 @@ const NewRepairOrder = () => {
               {repairTypes.filter(repair => {
                 if (!selectedModel) return true;
                 // Hide any repair type where price is 0
-                if (repair.name.includes('מסך מקורי') && selectedModel.original_screen_price <= 0) return false;
-                if (repair.name.includes('מסך תואם') && selectedModel.compatible_screen_price <= 0) return false;
-                if (repair.name.includes('סוללה') && selectedModel.battery_price <= 0) return false;
-                if (repair.name.includes('גב') && selectedModel.back_glass_price <= 0) return false;
-                if (repair.name.includes('טעינה') && (selectedModel.charging_price || 0) <= 0) return false;
+                const price = getRepairPrice(repair);
+                if (price <= 0 && !repair.is_phone_only && !repair.name.includes('אחר')) return false;
                 return true;
               }).map((repair, index) => {
             const isPhoneOnly = repair.is_phone_only;
@@ -1367,7 +1364,7 @@ const NewRepairOrder = () => {
             const isCharging = repair.name.includes('טעינה');
             let price = 0;
             if (selectedModel) {
-              if (isOriginalScreen) price = selectedModel.original_screen_price;else if (isCompatibleScreen) price = selectedModel.compatible_screen_price;else if (isBattery) price = selectedModel.battery_price;else if (isBackGlass) price = selectedModel.back_glass_price;else if (isCharging) price = selectedModel.charging_price || 0;
+              price = getRepairPrice(repair);
             }
             const infoKey = isOriginalScreen ? 'מסך מקורי' : isCompatibleScreen ? 'מסך תואם' : isBattery ? 'סוללה מקורית' : null;
             const info = infoKey ? repairInfoDescriptions[infoKey] : null;
@@ -1569,8 +1566,8 @@ const NewRepairOrder = () => {
                     <span className="text-amber-500">{currentBundle.discount_percent}% הנחה!</span>
                   </p>
                   <div className="flex items-center justify-center gap-2">
-                    <span className="text-muted-foreground line-through text-sm">₪{selectedModel.battery_price}</span>
-                    <span className="text-2xl font-bold text-success">₪{Math.round(selectedModel.battery_price * (1 - currentBundle.discount_percent / 100))}</span>
+                    <span className="text-muted-foreground line-through text-sm">₪{getBatteryBasePrice()}</span>
+                    <span className="text-2xl font-bold text-success">₪{Math.round(getBatteryBasePrice() * (1 - currentBundle.discount_percent / 100))}</span>
                   </div>
                 </div>
 
@@ -1640,7 +1637,7 @@ const NewRepairOrder = () => {
                       <span className="text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full">-{currentBundle.discount_percent}%</span>
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs line-through text-muted-foreground">₪{selectedModel.battery_price}</span>
+                      <span className="text-xs line-through text-muted-foreground">₪{getBatteryBasePrice()}</span>
                       <span className="font-semibold text-success">₪{getBundleAddonPrice()}</span>
                     </div>
                   </div>}

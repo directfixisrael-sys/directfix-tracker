@@ -49,6 +49,12 @@ interface IphoneModel {
   min_lead_hours: number;
 }
 
+interface ModelRepairPrice {
+  model_id: string;
+  repair_type_id: string;
+  price: number;
+}
+
 interface RepairType {
   id: string;
   name: string;
@@ -65,6 +71,7 @@ const PriceManagement = () => {
   const [activeTab, setActiveTab] = useState<TabType>('models');
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
+  const [modelRepairPrices, setModelRepairPrices] = useState<ModelRepairPrice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -74,14 +81,10 @@ const PriceManagement = () => {
   const [modelForm, setModelForm] = useState({
     name: '',
     series: '',
-    original_screen_price: 0,
-    compatible_screen_price: 0,
-    battery_price: 0,
-    back_glass_price: 0,
-    charging_price: 0,
     is_active: true,
     min_lead_hours: 0,
   });
+  const [repairPriceForm, setRepairPriceForm] = useState<Record<string, number>>({});
   const [newSeriesName, setNewSeriesName] = useState('');
   const [isCreatingNewSeries, setIsCreatingNewSeries] = useState(false);
 
@@ -185,19 +188,27 @@ const PriceManagement = () => {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [modelsRes, repairsRes] = await Promise.all([
+      const [modelsRes, repairsRes, pricesRes] = await Promise.all([
         supabase.from('iphone_models').select('*').order('sort_order'),
         supabase.from('repair_types').select('*').order('sort_order'),
+        supabase.from('model_repair_prices').select('*'),
       ]);
 
       if (modelsRes.data) setModels(modelsRes.data);
       if (repairsRes.data) setRepairTypes(repairsRes.data);
+      if (pricesRes.data) setModelRepairPrices(pricesRes.data);
     } catch (error) {
       console.error('Error loading data:', error);
       toast.error('שגיאה בטעינת הנתונים');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Helper to get price for a model+repair from the junction table
+  const getModelRepairPrice = (modelId: string, repairTypeId: string): number => {
+    const entry = modelRepairPrices.find(p => p.model_id === modelId && p.repair_type_id === repairTypeId);
+    return entry?.price || 0;
   };
 
   // Model functions
@@ -207,27 +218,27 @@ const PriceManagement = () => {
       setModelForm({
         name: model.name,
         series: model.series,
-        original_screen_price: model.original_screen_price,
-        compatible_screen_price: model.compatible_screen_price,
-        battery_price: model.battery_price,
-        back_glass_price: model.back_glass_price,
-        charging_price: model.charging_price || 0,
         is_active: model.is_active,
         min_lead_hours: model.min_lead_hours || 0,
       });
+      // Load prices for this model from junction table
+      const prices: Record<string, number> = {};
+      repairTypes.forEach(rt => {
+        prices[rt.id] = getModelRepairPrice(model.id, rt.id);
+      });
+      setRepairPriceForm(prices);
     } else {
       setEditingModel(null);
       setModelForm({
         name: '',
         series: '',
-        original_screen_price: 0,
-        compatible_screen_price: 0,
-        battery_price: 0,
-        back_glass_price: 0,
-        charging_price: 0,
         is_active: true,
         min_lead_hours: 0,
       });
+      // Initialize all prices to 0
+      const prices: Record<string, number> = {};
+      repairTypes.forEach(rt => { prices[rt.id] = 0; });
+      setRepairPriceForm(prices);
     }
     setIsCreatingNewSeries(false);
     setNewSeriesName('');
@@ -247,43 +258,53 @@ const PriceManagement = () => {
     }
 
     try {
+      let modelId: string;
+      
       if (editingModel) {
         const { error } = await supabase
           .from('iphone_models')
           .update({
             name: modelForm.name.trim(),
             series: finalSeries,
-            original_screen_price: modelForm.original_screen_price,
-            compatible_screen_price: modelForm.compatible_screen_price,
-            battery_price: modelForm.battery_price,
-            back_glass_price: modelForm.back_glass_price,
-            charging_price: modelForm.charging_price,
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
           })
           .eq('id', editingModel.id);
 
         if (error) throw error;
+        modelId = editingModel.id;
         toast.success('הדגם עודכן בהצלחה');
       } else {
         const maxOrder = Math.max(...models.map(m => m.sort_order), 0);
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('iphone_models')
           .insert({
             name: modelForm.name.trim(),
             series: finalSeries,
-            original_screen_price: modelForm.original_screen_price,
-            compatible_screen_price: modelForm.compatible_screen_price,
-            battery_price: modelForm.battery_price,
-            back_glass_price: modelForm.back_glass_price,
-            charging_price: modelForm.charging_price,
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
             sort_order: maxOrder + 1,
-          });
+          })
+          .select('id')
+          .single();
 
         if (error) throw error;
+        modelId = data.id;
         toast.success('הדגם נוסף בהצלחה');
+      }
+
+      // Save repair prices to junction table
+      const upserts = Object.entries(repairPriceForm).map(([repairTypeId, price]) => ({
+        model_id: modelId,
+        repair_type_id: repairTypeId,
+        price: price || 0,
+      }));
+
+      if (upserts.length > 0) {
+        const { error: priceError } = await supabase
+          .from('model_repair_prices')
+          .upsert(upserts, { onConflict: 'model_id,repair_type_id' });
+        if (priceError) throw priceError;
       }
 
       setIsModelDialogOpen(false);
@@ -535,11 +556,11 @@ const PriceManagement = () => {
                       )}
                     </div>
                     <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                      <span>מסך מקורי: ₪{model.original_screen_price}</span>
-                      <span>מסך תואם: ₪{model.compatible_screen_price}</span>
-                      <span>סוללה: ₪{model.battery_price}</span>
-                      {model.back_glass_price > 0 && <span>גב: ₪{model.back_glass_price}</span>}
-                      {model.charging_price > 0 && <span>טעינה: ₪{model.charging_price}</span>}
+                      {repairTypes.filter(rt => rt.is_active).map(rt => {
+                        const price = getModelRepairPrice(model.id, rt.id);
+                        if (price <= 0) return null;
+                        return <span key={rt.id}>{rt.name}: ₪{price}</span>;
+                      })}
                       {model.min_lead_hours > 0 && <span className="text-warning">⏰ {model.min_lead_hours} שעות מראש</span>}
                     </div>
                   </div>
@@ -728,53 +749,29 @@ const PriceManagement = () => {
                 onChange={(e) => setModelForm({ ...modelForm, name: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">מסך מקורי (₪)</label>
-                <Input
-                  type="number"
-                  value={modelForm.original_screen_price}
-                  onChange={(e) => setModelForm({ ...modelForm, original_screen_price: Number(e.target.value) })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">מסך תואם (₪)</label>
-                <Input
-                  type="number"
-                  value={modelForm.compatible_screen_price}
-                  onChange={(e) => setModelForm({ ...modelForm, compatible_screen_price: Number(e.target.value) })}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">סוללה מקורית (₪)</label>
-                <Input
-                  type="number"
-                  value={modelForm.battery_price}
-                  onChange={(e) => setModelForm({ ...modelForm, battery_price: Number(e.target.value) })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">גב מקורי (₪)</label>
-                <Input
-                  type="number"
-                  value={modelForm.back_glass_price}
-                  onChange={(e) => setModelForm({ ...modelForm, back_glass_price: Number(e.target.value) })}
-                />
-            </div>
+            {/* Dynamic repair price fields */}
             <div>
-              <label className="block text-sm font-medium mb-2">תיקון טעינה (₪)</label>
-              <Input
-                type="number"
-                placeholder="0 = לא מוצג"
-                value={modelForm.charging_price}
-                onChange={(e) => setModelForm({ ...modelForm, charging_price: Number(e.target.value) })}
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                {modelForm.charging_price > 0 ? 'תיקון טעינה יוצג ללקוח' : 'תיקון טעינה לא יוצג (מחיר 0)'}
-              </p>
-            </div>
+              <label className="block text-sm font-medium mb-2">מחירי תיקונים (₪)</label>
+              <p className="text-xs text-muted-foreground mb-3">מחיר 0 = לא יוצג ללקוח</p>
+              <div className="grid grid-cols-2 gap-3">
+                {repairTypes.filter(rt => rt.is_active).map(rt => {
+                  const Icon = getRepairIcon(rt.icon);
+                  return (
+                    <div key={rt.id}>
+                      <label className="flex items-center gap-1.5 text-xs font-medium mb-1 text-muted-foreground">
+                        <Icon className="w-3.5 h-3.5" />
+                        {rt.name}
+                      </label>
+                      <Input
+                        type="number"
+                        placeholder="0"
+                        value={repairPriceForm[rt.id] || 0}
+                        onChange={(e) => setRepairPriceForm({ ...repairPriceForm, [rt.id]: Number(e.target.value) })}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">מרווח הזמנה מינימלי (שעות)</label>

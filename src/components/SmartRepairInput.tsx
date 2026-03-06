@@ -22,6 +22,7 @@ interface SmartRepairInputProps {
     name: string;
     is_phone_only: boolean;
   }>;
+  priceMap?: Record<string, Record<string, number>>;
   onModelAndRepairFound: (modelName: string, repairName: string) => void;
   onModelFound: (modelName: string) => void;
   inline?: boolean;
@@ -85,12 +86,14 @@ const ResultsCard = ({
   result,
   matchedModel,
   matchedRepairs,
+  priceMap,
   onSelectOption,
   onSelectModelOnly,
 }: {
   result: AIResult;
   matchedModel: SmartRepairInputProps['models'][0] | undefined;
   matchedRepairs: Array<SmartRepairInputProps['repairTypes'][0] | undefined>;
+  priceMap?: Record<string, Record<string, number>>;
   onSelectOption: (name: string) => void;
   onSelectModelOnly: () => void;
 }) => (
@@ -113,22 +116,12 @@ const ResultsCard = ({
         <div className="space-y-1.5">
           {matchedRepairs.filter(repair => {
             if (!repair || !matchedModel) return !!repair;
-            if (repair.name.includes('מסך מקורי') && matchedModel.original_screen_price <= 0) return false;
-            if (repair.name.includes('מסך תואם') && matchedModel.compatible_screen_price <= 0) return false;
-            if (repair.name.includes('סוללה') && matchedModel.battery_price <= 0) return false;
-            if (repair.name.includes('גב') && matchedModel.back_glass_price <= 0) return false;
-            if (repair.name.includes('טעינה') && (matchedModel.charging_price || 0) <= 0) return false;
+            const price = priceMap?.[matchedModel.id]?.[repair.id] || 0;
+            if (price <= 0 && !repair.is_phone_only && !repair.name.includes('אחר')) return false;
             return true;
           }).map(repair => {
             if (!repair) return null;
-            let price = 0;
-            if (matchedModel) {
-              if (repair.name.includes('מסך מקורי')) price = matchedModel.original_screen_price;
-              else if (repair.name.includes('מסך תואם')) price = matchedModel.compatible_screen_price;
-              else if (repair.name.includes('סוללה')) price = matchedModel.battery_price;
-              else if (repair.name.includes('גב')) price = matchedModel.back_glass_price;
-              else if (repair.name.includes('טעינה')) price = matchedModel.charging_price || 0;
-            }
+            const price = matchedModel ? (priceMap?.[matchedModel.id]?.[repair.id] || 0) : 0;
             return (
               <Button
                 key={repair.id}
@@ -171,6 +164,7 @@ const ResultsCard = ({
 const SmartRepairInput = ({
   models,
   repairTypes,
+  priceMap,
   onModelAndRepairFound,
   onModelFound,
   inline = false,
@@ -231,6 +225,7 @@ const SmartRepairInput = ({
               result={result}
               matchedModel={matchedModel}
               matchedRepairs={matchedRepairs}
+              priceMap={priceMap}
               onSelectOption={handleSelectOption}
               onSelectModelOnly={handleSelectModelOnly}
             />
@@ -288,6 +283,7 @@ const SmartRepairInput = ({
                 result={result}
                 matchedModel={matchedModel}
                 matchedRepairs={matchedRepairs}
+                priceMap={priceMap}
                 onSelectOption={handleSelectOption}
                 onSelectModelOnly={handleSelectModelOnly}
               />

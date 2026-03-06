@@ -250,6 +250,48 @@ export type Database = {
           },
         ]
       }
+      model_repair_prices: {
+        Row: {
+          created_at: string
+          id: string
+          model_id: string
+          price: number
+          repair_type_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          model_id: string
+          price?: number
+          repair_type_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          model_id?: string
+          price?: number
+          repair_type_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_repair_prices_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "iphone_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "model_repair_prices_repair_type_id_fkey"
+            columns: ["repair_type_id"]
+            isOneToOne: false
+            referencedRelation: "repair_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           accessories: Json
