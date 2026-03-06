@@ -936,7 +936,7 @@ const NewRepairOrder = () => {
         : allRepairNames.join(' + ');
       const notes = [`הזמנה מהאתר - ${repairDescription}`, `מועד מבוקש: ${scheduleNote}`];
       if (selectedBundleAddon && currentBundle && selectedModel) {
-        notes.push(`חבילת תיקון: ${currentBundle.name} - סוללה ב-${currentBundle.discount_percent}% הנחה (₪${getBundleAddonPrice()} במקום ₪${selectedModel.battery_price})`);
+        notes.push(`חבילת תיקון: ${currentBundle.name} - סוללה ב-${currentBundle.discount_percent}% הנחה (₪${getBundleAddonPrice()} במקום ₪${getBatteryBasePrice()})`);
       }
       // Add back color notes for all repairs
       additionalRepairs.forEach(ar => {
