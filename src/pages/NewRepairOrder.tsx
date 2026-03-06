@@ -1048,16 +1048,7 @@ const NewRepairOrder = () => {
   const handleTrackOrder = () => {
     navigate('/track');
   };
-  const getRepairIcon = (icon: string) => {
-    switch (icon) {
-      case 'battery':
-        return Battery;
-      case 'phone':
-        return Phone;
-      default:
-        return Smartphone;
-    }
-  };
+  const getRepairIcon = getRepairIconComponent;
   const toggleTheme = () => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
   };
