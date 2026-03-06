@@ -225,6 +225,7 @@ const SmartRepairInput = ({
               result={result}
               matchedModel={matchedModel}
               matchedRepairs={matchedRepairs}
+              priceMap={priceMap}
               onSelectOption={handleSelectOption}
               onSelectModelOnly={handleSelectModelOnly}
             />
