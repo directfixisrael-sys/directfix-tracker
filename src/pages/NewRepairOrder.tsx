@@ -521,19 +521,10 @@ const NewRepairOrder = () => {
     return true;
   };
   const filteredModels = models.filter(model => model.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  const getRepairPrice = (repair: RepairType) => {
-    if (!selectedModel) return 0;
-    const isOriginalScreen = repair.name.includes('מסך מקורי');
-    const isCompatibleScreen = repair.name.includes('מסך תואם');
-    const isBattery = repair.name.includes('סוללה');
-    const isBackGlass = repair.name.includes('גב');
-    const isCharging = repair.name.includes('טעינה');
-    if (isOriginalScreen) return selectedModel.original_screen_price;
-    if (isCompatibleScreen) return selectedModel.compatible_screen_price;
-    if (isBattery) return selectedModel.battery_price;
-    if (isBackGlass) return selectedModel.back_glass_price;
-    if (isCharging) return selectedModel.charging_price || 0;
-    return 0;
+  const getRepairPrice = (repair: RepairType, model?: IphoneModel | null) => {
+    const m = model || selectedModel;
+    if (!m) return 0;
+    return priceMap[m.id]?.[repair.id] || 0;
   };
   const getPrice = () => {
     if (!selectedModel || !selectedRepair) return 0;
