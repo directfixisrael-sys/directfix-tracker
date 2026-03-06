@@ -1637,7 +1637,7 @@ const NewRepairOrder = () => {
                       <span className="text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full">-{currentBundle.discount_percent}%</span>
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs line-through text-muted-foreground">₪{selectedModel.battery_price}</span>
+                      <span className="text-xs line-through text-muted-foreground">₪{getBatteryBasePrice()}</span>
                       <span className="font-semibold text-success">₪{getBundleAddonPrice()}</span>
                     </div>
                   </div>}
