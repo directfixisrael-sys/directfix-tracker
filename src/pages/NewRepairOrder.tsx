@@ -1352,11 +1352,8 @@ const NewRepairOrder = () => {
               {repairTypes.filter(repair => {
                 if (!selectedModel) return true;
                 // Hide any repair type where price is 0
-                if (repair.name.includes('מסך מקורי') && selectedModel.original_screen_price <= 0) return false;
-                if (repair.name.includes('מסך תואם') && selectedModel.compatible_screen_price <= 0) return false;
-                if (repair.name.includes('סוללה') && selectedModel.battery_price <= 0) return false;
-                if (repair.name.includes('גב') && selectedModel.back_glass_price <= 0) return false;
-                if (repair.name.includes('טעינה') && (selectedModel.charging_price || 0) <= 0) return false;
+                const price = getRepairPrice(repair);
+                if (price <= 0 && !repair.is_phone_only && !repair.name.includes('אחר')) return false;
                 return true;
               }).map((repair, index) => {
             const isPhoneOnly = repair.is_phone_only;
@@ -1367,7 +1364,7 @@ const NewRepairOrder = () => {
             const isCharging = repair.name.includes('טעינה');
             let price = 0;
             if (selectedModel) {
-              if (isOriginalScreen) price = selectedModel.original_screen_price;else if (isCompatibleScreen) price = selectedModel.compatible_screen_price;else if (isBattery) price = selectedModel.battery_price;else if (isBackGlass) price = selectedModel.back_glass_price;else if (isCharging) price = selectedModel.charging_price || 0;
+              price = getRepairPrice(repair);
             }
             const infoKey = isOriginalScreen ? 'מסך מקורי' : isCompatibleScreen ? 'מסך תואם' : isBattery ? 'סוללה מקורית' : null;
             const info = infoKey ? repairInfoDescriptions[infoKey] : null;
