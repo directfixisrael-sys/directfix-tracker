@@ -1342,9 +1342,7 @@ const NewRepairOrder = () => {
                 return true;
               }).map((repair, index) => {
             const isPhoneOnly = repair.is_phone_only;
-            const isOriginalScreen = repair.name.includes('מסך מקורי');
-            const isCompatibleScreen = repair.name.includes('מסך תואם');
-            const isBattery = repair.name.includes('סוללה');
+            const isBackGlass = repair.name.includes('גב');
             const isBackGlass = repair.name.includes('גב');
             const isCharging = repair.name.includes('טעינה');
             let price = 0;
