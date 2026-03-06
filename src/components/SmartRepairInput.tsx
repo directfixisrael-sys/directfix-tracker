@@ -22,6 +22,7 @@ interface SmartRepairInputProps {
     name: string;
     is_phone_only: boolean;
   }>;
+  priceMap?: Record<string, Record<string, number>>;
   onModelAndRepairFound: (modelName: string, repairName: string) => void;
   onModelFound: (modelName: string) => void;
   inline?: boolean;
