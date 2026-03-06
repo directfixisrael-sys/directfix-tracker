@@ -710,8 +710,9 @@ const NewRepairOrder = () => {
     if (!selectedBackColor || !selectedRepair || !selectedModel) return;
     
     // Track
-    trackAddToCart(selectedRepair.name, selectedModel.back_glass_price);
-    gaSelectRepair(selectedRepair.name, selectedModel.back_glass_price);
+    const backPrice = getRepairPrice(selectedRepair);
+    trackAddToCart(selectedRepair.name, backPrice);
+    gaSelectRepair(selectedRepair.name, backPrice);
     
     setShowBackColorPicker(false);
     goToStep('price');
