@@ -17,3 +17,9 @@ verify_jwt = false
 
 [functions.payplus-create-payment]
 verify_jwt = false
+
+[functions.notify-customer-message]
+verify_jwt = false
+
+[functions.parse-repair-request]
+verify_jwt = false
