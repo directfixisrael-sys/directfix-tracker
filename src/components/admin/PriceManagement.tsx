@@ -357,6 +357,8 @@ const PriceManagement = () => {
         icon: 'smartphone',
         is_phone_only: false,
         is_active: true,
+        info_title: '',
+        info_description: '',
       });
     }
     setIsRepairDialogOpen(true);
