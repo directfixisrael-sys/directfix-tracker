@@ -205,6 +205,12 @@ const PriceManagement = () => {
     }
   };
 
+  // Helper to get price for a model+repair from the junction table
+  const getModelRepairPrice = (modelId: string, repairTypeId: string): number => {
+    const entry = modelRepairPrices.find(p => p.model_id === modelId && p.repair_type_id === repairTypeId);
+    return entry?.price || 0;
+  };
+
   // Model functions
   const openModelDialog = (model?: IphoneModel) => {
     if (model) {
@@ -212,27 +218,27 @@ const PriceManagement = () => {
       setModelForm({
         name: model.name,
         series: model.series,
-        original_screen_price: model.original_screen_price,
-        compatible_screen_price: model.compatible_screen_price,
-        battery_price: model.battery_price,
-        back_glass_price: model.back_glass_price,
-        charging_price: model.charging_price || 0,
         is_active: model.is_active,
         min_lead_hours: model.min_lead_hours || 0,
       });
+      // Load prices for this model from junction table
+      const prices: Record<string, number> = {};
+      repairTypes.forEach(rt => {
+        prices[rt.id] = getModelRepairPrice(model.id, rt.id);
+      });
+      setRepairPriceForm(prices);
     } else {
       setEditingModel(null);
       setModelForm({
         name: '',
         series: '',
-        original_screen_price: 0,
-        compatible_screen_price: 0,
-        battery_price: 0,
-        back_glass_price: 0,
-        charging_price: 0,
         is_active: true,
         min_lead_hours: 0,
       });
+      // Initialize all prices to 0
+      const prices: Record<string, number> = {};
+      repairTypes.forEach(rt => { prices[rt.id] = 0; });
+      setRepairPriceForm(prices);
     }
     setIsCreatingNewSeries(false);
     setNewSeriesName('');
@@ -252,43 +258,53 @@ const PriceManagement = () => {
     }
 
     try {
+      let modelId: string;
+      
       if (editingModel) {
         const { error } = await supabase
           .from('iphone_models')
           .update({
             name: modelForm.name.trim(),
             series: finalSeries,
-            original_screen_price: modelForm.original_screen_price,
-            compatible_screen_price: modelForm.compatible_screen_price,
-            battery_price: modelForm.battery_price,
-            back_glass_price: modelForm.back_glass_price,
-            charging_price: modelForm.charging_price,
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
           })
           .eq('id', editingModel.id);
 
         if (error) throw error;
+        modelId = editingModel.id;
         toast.success('הדגם עודכן בהצלחה');
       } else {
         const maxOrder = Math.max(...models.map(m => m.sort_order), 0);
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('iphone_models')
           .insert({
             name: modelForm.name.trim(),
             series: finalSeries,
-            original_screen_price: modelForm.original_screen_price,
-            compatible_screen_price: modelForm.compatible_screen_price,
-            battery_price: modelForm.battery_price,
-            back_glass_price: modelForm.back_glass_price,
-            charging_price: modelForm.charging_price,
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
             sort_order: maxOrder + 1,
-          });
+          })
+          .select('id')
+          .single();
 
         if (error) throw error;
+        modelId = data.id;
         toast.success('הדגם נוסף בהצלחה');
+      }
+
+      // Save repair prices to junction table
+      const upserts = Object.entries(repairPriceForm).map(([repairTypeId, price]) => ({
+        model_id: modelId,
+        repair_type_id: repairTypeId,
+        price: price || 0,
+      }));
+
+      if (upserts.length > 0) {
+        const { error: priceError } = await supabase
+          .from('model_repair_prices')
+          .upsert(upserts, { onConflict: 'model_id,repair_type_id' });
+        if (priceError) throw priceError;
       }
 
       setIsModelDialogOpen(false);
