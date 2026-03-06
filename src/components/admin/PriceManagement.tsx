@@ -71,6 +71,7 @@ const PriceManagement = () => {
   const [activeTab, setActiveTab] = useState<TabType>('models');
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
+  const [modelRepairPrices, setModelRepairPrices] = useState<ModelRepairPrice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -80,14 +81,10 @@ const PriceManagement = () => {
   const [modelForm, setModelForm] = useState({
     name: '',
     series: '',
-    original_screen_price: 0,
-    compatible_screen_price: 0,
-    battery_price: 0,
-    back_glass_price: 0,
-    charging_price: 0,
     is_active: true,
     min_lead_hours: 0,
   });
+  const [repairPriceForm, setRepairPriceForm] = useState<Record<string, number>>({});
   const [newSeriesName, setNewSeriesName] = useState('');
   const [isCreatingNewSeries, setIsCreatingNewSeries] = useState(false);
 
