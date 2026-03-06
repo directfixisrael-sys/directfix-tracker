@@ -380,6 +380,8 @@ const PriceManagement = () => {
             icon: repairForm.icon,
             is_phone_only: repairForm.is_phone_only,
             is_active: repairForm.is_active,
+            info_title: repairForm.info_title.trim(),
+            info_description: repairForm.info_description.trim(),
           })
           .eq('id', editingRepair.id);
 
