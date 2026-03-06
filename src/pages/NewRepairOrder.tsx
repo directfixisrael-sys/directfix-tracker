@@ -218,24 +218,7 @@ const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
   ],
 };
 
-// Info descriptions for repair types (more professional)
-const repairInfoDescriptions: Record<string, {
-  title: string;
-  description: string;
-}> = {
-  'מסך מקורי': {
-    title: 'מסך מקורי Apple',
-    description: 'מסך מקורי מבית Apple עם איכות תצוגה מעולה, צבעים מדויקים כמו מהמפעל, תמיכה מלאה ב-True Tone וכיול אוטומטי. כולל אחריות יצרן מלאה.'
-  },
-  'מסך תואם': {
-    title: 'מסך תואם איכותי',
-    description: 'מסך איכותי מתוצרת צד שלישי במחיר משתלם. איכות תצוגה טובה מאוד המתאימה לשימוש יומיומי. פתרון חסכוני עם יחס מחיר-ביצועים מצוין.'
-  },
-  'סוללה מקורית': {
-    title: 'סוללה מקורית Apple',
-    description: 'סוללה מקורית עם 100% בריאות סוללה. ללא התראות "חלק לא מקורי" במערכת. ביצועים מקסימליים וחיי סוללה ארוכים כמו מכשיר חדש.'
-  }
-};
+// Info descriptions are now loaded from the database (repair_types.info_title / info_description)
 
 // Schedule configuration
 const weekdaySlots = ['9:00-11:00', '11:00-13:00', '13:00-17:00', '17:00-20:00', '20:00-22:00'];
@@ -258,6 +241,8 @@ interface RepairType {
   description: string | null;
   icon: string;
   is_phone_only: boolean;
+  info_title?: string;
+  info_description?: string;
 }
 
 // Price lookup map: modelId -> repairTypeId -> price
@@ -1357,17 +1342,13 @@ const NewRepairOrder = () => {
                 return true;
               }).map((repair, index) => {
             const isPhoneOnly = repair.is_phone_only;
-            const isOriginalScreen = repair.name.includes('מסך מקורי');
-            const isCompatibleScreen = repair.name.includes('מסך תואם');
-            const isBattery = repair.name.includes('סוללה');
             const isBackGlass = repair.name.includes('גב');
             const isCharging = repair.name.includes('טעינה');
             let price = 0;
             if (selectedModel) {
               price = getRepairPrice(repair);
             }
-            const infoKey = isOriginalScreen ? 'מסך מקורי' : isCompatibleScreen ? 'מסך תואם' : isBattery ? 'סוללה מקורית' : null;
-            const info = infoKey ? repairInfoDescriptions[infoKey] : null;
+            const info = repair.info_title && repair.info_description ? { title: repair.info_title, description: repair.info_description } : null;
             const IconComponent = getRepairIconComponent(repair.icon);
             return <div key={repair.id}>
                     <Card onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 hover:-translate-y-0.5 ${

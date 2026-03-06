@@ -63,6 +63,8 @@ interface RepairType {
   is_phone_only: boolean;
   is_active: boolean;
   sort_order: number;
+  info_title: string;
+  info_description: string;
 }
 
 type TabType = 'models' | 'repairs';
@@ -174,6 +176,8 @@ const PriceManagement = () => {
     icon: 'smartphone',
     is_phone_only: false,
     is_active: true,
+    info_title: '',
+    info_description: '',
   });
   
   // Delete dialog state
@@ -344,6 +348,8 @@ const PriceManagement = () => {
         icon: repair.icon,
         is_phone_only: repair.is_phone_only,
         is_active: repair.is_active,
+        info_title: repair.info_title || '',
+        info_description: repair.info_description || '',
       });
     } else {
       setEditingRepair(null);
@@ -353,6 +359,8 @@ const PriceManagement = () => {
         icon: 'smartphone',
         is_phone_only: false,
         is_active: true,
+        info_title: '',
+        info_description: '',
       });
     }
     setIsRepairDialogOpen(true);
@@ -374,6 +382,8 @@ const PriceManagement = () => {
             icon: repairForm.icon,
             is_phone_only: repairForm.is_phone_only,
             is_active: repairForm.is_active,
+            info_title: repairForm.info_title.trim(),
+            info_description: repairForm.info_description.trim(),
           })
           .eq('id', editingRepair.id);
 
@@ -390,6 +400,8 @@ const PriceManagement = () => {
             is_phone_only: repairForm.is_phone_only,
             is_active: repairForm.is_active,
             sort_order: maxOrder + 1,
+            info_title: repairForm.info_title.trim(),
+            info_description: repairForm.info_description.trim(),
           });
 
         if (error) throw error;
@@ -824,6 +836,23 @@ const PriceManagement = () => {
                 placeholder="תיאור קצר של התיקון"
                 value={repairForm.description}
                 onChange={(e) => setRepairForm({ ...repairForm, description: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">כותרת הסבר (סימן שאלה ❓)</label>
+              <Input
+                placeholder="לדוגמה: מסך מקורי Apple"
+                value={repairForm.info_title}
+                onChange={(e) => setRepairForm({ ...repairForm, info_title: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">ריק = לא יוצג סימן שאלה ללקוח</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">תוכן הסבר (סימן שאלה ❓)</label>
+              <Input
+                placeholder="הסבר מפורט שיוצג כשהלקוח לוחץ על סימן השאלה"
+                value={repairForm.info_description}
+                onChange={(e) => setRepairForm({ ...repairForm, info_description: e.target.value })}
               />
             </div>
             <div>
