@@ -648,11 +648,7 @@ const NewRepairOrder = () => {
 
     // Track AddToCart event for Facebook Pixel
     if (selectedModel) {
-      const isOriginalScreen = repair.name.includes('מסך מקורי');
-      const isCompatibleScreen = repair.name.includes('מסך תואם');
-      const isBattery = repair.name.includes('סוללה');
-      let repairPrice = 0;
-      if (isOriginalScreen) repairPrice = selectedModel.original_screen_price;else if (isCompatibleScreen) repairPrice = selectedModel.compatible_screen_price;else if (isBattery) repairPrice = selectedModel.battery_price;
+      const repairPrice = getRepairPrice(repair);
       trackAddToCart(repair.name, repairPrice);
       gaSelectRepair(repair.name, repairPrice);
     }
