@@ -116,12 +116,12 @@ const ResultsCard = ({
         <div className="space-y-1.5">
           {matchedRepairs.filter(repair => {
             if (!repair || !matchedModel) return !!repair;
-            const price = props.priceMap?.[matchedModel.id]?.[repair.id] || 0;
+            const price = priceMap?.[matchedModel.id]?.[repair.id] || 0;
             if (price <= 0 && !repair.is_phone_only && !repair.name.includes('אחר')) return false;
             return true;
           }).map(repair => {
             if (!repair) return null;
-            const price = matchedModel ? (props.priceMap?.[matchedModel.id]?.[repair.id] || 0) : 0;
+            const price = matchedModel ? (priceMap?.[matchedModel.id]?.[repair.id] || 0) : 0;
             return (
               <Button
                 key={repair.id}
