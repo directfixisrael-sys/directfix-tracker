@@ -63,6 +63,8 @@ interface RepairType {
   is_phone_only: boolean;
   is_active: boolean;
   sort_order: number;
+  info_title: string;
+  info_description: string;
 }
 
 type TabType = 'models' | 'repairs';
