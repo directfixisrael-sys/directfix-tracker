@@ -1351,7 +1351,7 @@ const NewRepairOrder = () => {
             if (selectedModel) {
               price = getRepairPrice(repair);
             }
-            const info = (repair as any).info_title && (repair as any).info_description ? { title: (repair as any).info_title, description: (repair as any).info_description } : null;
+            const info = repair.info_title && repair.info_description ? { title: repair.info_title, description: repair.info_description } : null;
             const IconComponent = getRepairIconComponent(repair.icon);
             return <div key={repair.id}>
                     <Card onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 hover:-translate-y-0.5 ${
