@@ -749,53 +749,29 @@ const PriceManagement = () => {
                 onChange={(e) => setModelForm({ ...modelForm, name: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">מסך מקורי (₪)</label>
-                <Input
-                  type="number"
-                  value={modelForm.original_screen_price}
-                  onChange={(e) => setModelForm({ ...modelForm, original_screen_price: Number(e.target.value) })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">מסך תואם (₪)</label>
-                <Input
-                  type="number"
-                  value={modelForm.compatible_screen_price}
-                  onChange={(e) => setModelForm({ ...modelForm, compatible_screen_price: Number(e.target.value) })}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">סוללה מקורית (₪)</label>
-                <Input
-                  type="number"
-                  value={modelForm.battery_price}
-                  onChange={(e) => setModelForm({ ...modelForm, battery_price: Number(e.target.value) })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">גב מקורי (₪)</label>
-                <Input
-                  type="number"
-                  value={modelForm.back_glass_price}
-                  onChange={(e) => setModelForm({ ...modelForm, back_glass_price: Number(e.target.value) })}
-                />
-            </div>
+            {/* Dynamic repair price fields */}
             <div>
-              <label className="block text-sm font-medium mb-2">תיקון טעינה (₪)</label>
-              <Input
-                type="number"
-                placeholder="0 = לא מוצג"
-                value={modelForm.charging_price}
-                onChange={(e) => setModelForm({ ...modelForm, charging_price: Number(e.target.value) })}
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                {modelForm.charging_price > 0 ? 'תיקון טעינה יוצג ללקוח' : 'תיקון טעינה לא יוצג (מחיר 0)'}
-              </p>
-            </div>
+              <label className="block text-sm font-medium mb-2">מחירי תיקונים (₪)</label>
+              <p className="text-xs text-muted-foreground mb-3">מחיר 0 = לא יוצג ללקוח</p>
+              <div className="grid grid-cols-2 gap-3">
+                {repairTypes.filter(rt => rt.is_active).map(rt => {
+                  const Icon = getRepairIcon(rt.icon);
+                  return (
+                    <div key={rt.id}>
+                      <label className="flex items-center gap-1.5 text-xs font-medium mb-1 text-muted-foreground">
+                        <Icon className="w-3.5 h-3.5" />
+                        {rt.name}
+                      </label>
+                      <Input
+                        type="number"
+                        placeholder="0"
+                        value={repairPriceForm[rt.id] || 0}
+                        onChange={(e) => setRepairPriceForm({ ...repairPriceForm, [rt.id]: Number(e.target.value) })}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">מרווח הזמנה מינימלי (שעות)</label>
