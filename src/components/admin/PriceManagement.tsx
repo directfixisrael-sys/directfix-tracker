@@ -49,6 +49,12 @@ interface IphoneModel {
   min_lead_hours: number;
 }
 
+interface ModelRepairPrice {
+  model_id: string;
+  repair_type_id: string;
+  price: number;
+}
+
 interface RepairType {
   id: string;
   name: string;
