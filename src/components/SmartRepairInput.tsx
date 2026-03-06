@@ -86,12 +86,14 @@ const ResultsCard = ({
   result,
   matchedModel,
   matchedRepairs,
+  priceMap,
   onSelectOption,
   onSelectModelOnly,
 }: {
   result: AIResult;
   matchedModel: SmartRepairInputProps['models'][0] | undefined;
   matchedRepairs: Array<SmartRepairInputProps['repairTypes'][0] | undefined>;
+  priceMap?: Record<string, Record<string, number>>;
   onSelectOption: (name: string) => void;
   onSelectModelOnly: () => void;
 }) => (
