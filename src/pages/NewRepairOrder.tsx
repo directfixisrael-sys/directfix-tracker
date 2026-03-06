@@ -1343,7 +1343,6 @@ const NewRepairOrder = () => {
               }).map((repair, index) => {
             const isPhoneOnly = repair.is_phone_only;
             const isBackGlass = repair.name.includes('גב');
-            const isBackGlass = repair.name.includes('גב');
             const isCharging = repair.name.includes('טעינה');
             let price = 0;
             if (selectedModel) {
