@@ -543,9 +543,15 @@ const NewRepairOrder = () => {
   };
   const getBundleAddonPrice = () => {
     if (!selectedModel || !selectedBundleAddon || !currentBundle) return 0;
-    const basePrice = selectedModel.battery_price;
+    const batteryRepair = repairTypes.find(r => r.name.includes('סוללה'));
+    const basePrice = batteryRepair ? getRepairPrice(batteryRepair) : 0;
     const discountedPrice = Math.round(basePrice * (1 - currentBundle.discount_percent / 100));
     return discountedPrice;
+  };
+  const getBatteryBasePrice = () => {
+    if (!selectedModel) return 0;
+    const batteryRepair = repairTypes.find(r => r.name.includes('סוללה'));
+    return batteryRepair ? getRepairPrice(batteryRepair) : 0;
   };
   const getTotalPrice = () => {
     return getPrice() + getBundleAddonPrice() + getAdditionalRepairsTotal() - getMultiRepairDiscount();
