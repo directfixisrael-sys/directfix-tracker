@@ -1566,8 +1566,8 @@ const NewRepairOrder = () => {
                     <span className="text-amber-500">{currentBundle.discount_percent}% הנחה!</span>
                   </p>
                   <div className="flex items-center justify-center gap-2">
-                    <span className="text-muted-foreground line-through text-sm">₪{selectedModel.battery_price}</span>
-                    <span className="text-2xl font-bold text-success">₪{Math.round(selectedModel.battery_price * (1 - currentBundle.discount_percent / 100))}</span>
+                    <span className="text-muted-foreground line-through text-sm">₪{getBatteryBasePrice()}</span>
+                    <span className="text-2xl font-bold text-success">₪{Math.round(getBatteryBasePrice() * (1 - currentBundle.discount_percent / 100))}</span>
                   </div>
                 </div>
 
