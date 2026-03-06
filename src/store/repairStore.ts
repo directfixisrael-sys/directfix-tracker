@@ -255,6 +255,20 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
       } catch (e) {
         console.error('Error sending push notification:', e);
       }
+
+      // Send email notification (throttled server-side)
+      try {
+        await supabase.functions.invoke('notify-customer-message', {
+          body: {
+            orderId,
+            customerName: order?.customerName || 'לקוח',
+            message,
+            orderNumber: order?.orderNumber,
+          },
+        });
+      } catch (e) {
+        console.error('Error sending email notification:', e);
+      }
     }
   },
 
