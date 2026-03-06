@@ -398,6 +398,8 @@ const PriceManagement = () => {
             is_phone_only: repairForm.is_phone_only,
             is_active: repairForm.is_active,
             sort_order: maxOrder + 1,
+            info_title: repairForm.info_title.trim(),
+            info_description: repairForm.info_description.trim(),
           });
 
         if (error) throw error;
