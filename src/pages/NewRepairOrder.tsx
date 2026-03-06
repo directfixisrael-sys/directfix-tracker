@@ -1368,14 +1368,7 @@ const NewRepairOrder = () => {
             }
             const infoKey = isOriginalScreen ? 'מסך מקורי' : isCompatibleScreen ? 'מסך תואם' : isBattery ? 'סוללה מקורית' : null;
             const info = infoKey ? repairInfoDescriptions[infoKey] : null;
-            const getIcon = () => {
-              if (isOriginalScreen || isCompatibleScreen) return Smartphone;
-              if (isBattery) return Battery;
-              if (isBackGlass) return FlipVertical;
-              if (isCharging) return Zap;
-              return Phone;
-            };
-            const IconComponent = getIcon();
+            const IconComponent = getRepairIconComponent(repair.icon);
             return <div key={repair.id}>
                     <Card onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 hover:-translate-y-0.5 ${
                       showBackColorPicker && isBackGlass 
