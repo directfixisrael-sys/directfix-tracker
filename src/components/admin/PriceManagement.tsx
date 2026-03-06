@@ -346,6 +346,8 @@ const PriceManagement = () => {
         icon: repair.icon,
         is_phone_only: repair.is_phone_only,
         is_active: repair.is_active,
+        info_title: (repair as any).info_title || '',
+        info_description: (repair as any).info_description || '',
       });
     } else {
       setEditingRepair(null);
