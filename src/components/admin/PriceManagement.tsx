@@ -441,13 +441,7 @@ const PriceManagement = () => {
     model.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const getRepairIcon = (icon: string) => {
-    switch (icon) {
-      case 'battery': return Battery;
-      case 'phone': return Phone;
-      default: return Smartphone;
-    }
-  };
+  const getRepairIcon = getRepairIconComponent;
 
   if (isLoading) {
     return (
