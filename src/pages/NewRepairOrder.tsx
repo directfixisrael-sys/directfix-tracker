@@ -259,6 +259,9 @@ interface RepairType {
   icon: string;
   is_phone_only: boolean;
 }
+
+// Price lookup map: modelId -> repairTypeId -> price
+type PriceMap = Record<string, Record<string, number>>;
 interface Promotion {
   id: string;
   title: string;
