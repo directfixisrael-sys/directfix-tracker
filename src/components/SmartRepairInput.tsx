@@ -164,6 +164,7 @@ const ResultsCard = ({
 const SmartRepairInput = ({
   models,
   repairTypes,
+  priceMap,
   onModelAndRepairFound,
   onModelFound,
   inline = false,
