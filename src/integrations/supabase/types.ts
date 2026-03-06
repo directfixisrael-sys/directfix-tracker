@@ -549,6 +549,8 @@ export type Database = {
           description: string | null
           icon: string
           id: string
+          info_description: string
+          info_title: string
           is_active: boolean
           is_phone_only: boolean
           name: string
@@ -560,6 +562,8 @@ export type Database = {
           description?: string | null
           icon?: string
           id?: string
+          info_description?: string
+          info_title?: string
           is_active?: boolean
           is_phone_only?: boolean
           name: string
@@ -571,6 +575,8 @@ export type Database = {
           description?: string | null
           icon?: string
           id?: string
+          info_description?: string
+          info_title?: string
           is_active?: boolean
           is_phone_only?: boolean
           name?: string
