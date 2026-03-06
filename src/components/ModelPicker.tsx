@@ -149,17 +149,22 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
               ))}
             </div>
 
-            {/* Show more button with fade */}
-            {hasMany && !isExpanded && !isSearching && filteredModels.length > INITIAL_VISIBLE && (
+            {/* Show more / Show less button */}
+            {hasMany && !isSearching && filteredModels.length > INITIAL_VISIBLE && (
               <div className="relative">
-                {/* Fade overlay */}
-                <div className="absolute -top-10 left-0 right-0 h-10 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />
+                {!isExpanded && (
+                  <div className="absolute -top-10 left-0 right-0 h-10 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />
+                )}
                 <button
-                  onClick={() => setExpandedSeries(prev => new Set(prev).add(activeSeries!))}
+                  onClick={() => setExpandedSeries(prev => {
+                    const n = new Set(prev);
+                    if (isExpanded) n.delete(activeSeries!); else n.add(activeSeries!);
+                    return n;
+                  })}
                   className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
                 >
-                  <span>עוד {filteredModels.length - INITIAL_VISIBLE} דגמים</span>
-                  <ChevronDown className="w-4 h-4" />
+                  <span>{isExpanded ? 'הצג פחות' : `עוד ${filteredModels.length - INITIAL_VISIBLE} דגמים`}</span>
+                  <ChevronDown className={cn("w-4 h-4 transition-transform", isExpanded && "rotate-180")} />
                 </button>
               </div>
             )}
