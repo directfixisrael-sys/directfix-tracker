@@ -556,11 +556,11 @@ const PriceManagement = () => {
                       )}
                     </div>
                     <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                      <span>מסך מקורי: ₪{model.original_screen_price}</span>
-                      <span>מסך תואם: ₪{model.compatible_screen_price}</span>
-                      <span>סוללה: ₪{model.battery_price}</span>
-                      {model.back_glass_price > 0 && <span>גב: ₪{model.back_glass_price}</span>}
-                      {model.charging_price > 0 && <span>טעינה: ₪{model.charging_price}</span>}
+                      {repairTypes.filter(rt => rt.is_active).map(rt => {
+                        const price = getModelRepairPrice(model.id, rt.id);
+                        if (price <= 0) return null;
+                        return <span key={rt.id}>{rt.name}: ₪{price}</span>;
+                      })}
                       {model.min_lead_hours > 0 && <span className="text-warning">⏰ {model.min_lead_hours} שעות מראש</span>}
                     </div>
                   </div>
