@@ -188,13 +188,15 @@ const PriceManagement = () => {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [modelsRes, repairsRes] = await Promise.all([
+      const [modelsRes, repairsRes, pricesRes] = await Promise.all([
         supabase.from('iphone_models').select('*').order('sort_order'),
         supabase.from('repair_types').select('*').order('sort_order'),
+        supabase.from('model_repair_prices').select('*'),
       ]);
 
       if (modelsRes.data) setModels(modelsRes.data);
       if (repairsRes.data) setRepairTypes(repairsRes.data);
+      if (pricesRes.data) setModelRepairPrices(pricesRes.data);
     } catch (error) {
       console.error('Error loading data:', error);
       toast.error('שגיאה בטעינת הנתונים');
