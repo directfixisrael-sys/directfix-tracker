@@ -827,6 +827,23 @@ const PriceManagement = () => {
               />
             </div>
             <div>
+              <label className="block text-sm font-medium mb-2">כותרת הסבר (סימן שאלה ❓)</label>
+              <Input
+                placeholder="לדוגמה: מסך מקורי Apple"
+                value={repairForm.info_title}
+                onChange={(e) => setRepairForm({ ...repairForm, info_title: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">ריק = לא יוצג סימן שאלה ללקוח</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">תוכן הסבר (סימן שאלה ❓)</label>
+              <Input
+                placeholder="הסבר מפורט שיוצג כשהלקוח לוחץ על סימן השאלה"
+                value={repairForm.info_description}
+                onChange={(e) => setRepairForm({ ...repairForm, info_description: e.target.value })}
+              />
+            </div>
+            <div>
               <label className="block text-sm font-medium mb-2">אייקון</label>
               <IconPickerField 
                 value={repairForm.icon} 
