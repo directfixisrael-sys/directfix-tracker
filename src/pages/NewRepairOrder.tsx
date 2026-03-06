@@ -241,6 +241,8 @@ interface RepairType {
   description: string | null;
   icon: string;
   is_phone_only: boolean;
+  info_title?: string;
+  info_description?: string;
 }
 
 // Price lookup map: modelId -> repairTypeId -> price
