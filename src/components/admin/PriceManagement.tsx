@@ -24,14 +24,12 @@ import {
   Plus, 
   Pencil, 
   Trash2, 
-  Smartphone, 
-  Battery, 
-  Phone,
   Search,
   Loader2,
   GripVertical,
   Save
 } from 'lucide-react';
+import { REPAIR_ICON_OPTIONS, getRepairIconComponent } from '@/lib/repairIcons';
 import { toast } from 'sonner';
 
 interface IphoneModel {
