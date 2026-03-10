@@ -2068,6 +2068,18 @@ const AdminPanel = () => {
                 <Bell className="w-4 h-4" />
                 <span>תזכורות</span>
               </button>
+              <button 
+                onClick={() => setActiveTab('loyalty')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'loyalty' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Star className="w-4 h-4" />
+                <span>נאמנות</span>
+              </button>
             </div>
           )}
         </nav>
