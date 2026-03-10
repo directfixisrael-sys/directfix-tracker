@@ -220,6 +220,7 @@ export type Database = {
           customer_phone: string
           id: string
           is_returning_customer: boolean
+          last_step: string
           privacy_accepted: boolean
           updated_at: string
         }
@@ -230,6 +231,7 @@ export type Database = {
           customer_phone: string
           id?: string
           is_returning_customer?: boolean
+          last_step?: string
           privacy_accepted?: boolean
           updated_at?: string
         }
@@ -240,6 +242,7 @@ export type Database = {
           customer_phone?: string
           id?: string
           is_returning_customer?: boolean
+          last_step?: string
           privacy_accepted?: boolean
           updated_at?: string
         }

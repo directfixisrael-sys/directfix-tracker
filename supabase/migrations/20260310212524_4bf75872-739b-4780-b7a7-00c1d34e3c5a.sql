@@ -1,0 +1,1 @@
+ALTER TABLE public.leads ADD COLUMN last_step text NOT NULL DEFAULT 'intro';
