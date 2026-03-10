@@ -522,3 +522,13 @@
 .animate-marquee {
   animation: marquee 20s linear infinite;
 }
+
+@property --ai-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes ai-spin {
+  to { --ai-angle: 360deg; }
+}
