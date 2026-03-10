@@ -234,7 +234,7 @@ const ConsultationBooking = () => {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-6" dir="rtl">
         <div className="text-center max-w-sm animate-scale-in">
-          <div className="text-6xl mb-4">{isPaid && paymentSuccess ? '🎉' : '✅'}</div>
+          <div className="text-6xl mb-4">{isPaid && paymentSuccess ? '!' : '✓'}</div>
           <h1 className="text-2xl font-extrabold mb-2">
             {isPaid && paymentSuccess ? 'התשלום בוצע בהצלחה!' : 'הבקשה התקבלה!'}
           </h1>
