@@ -250,7 +250,7 @@ const CustomerTracker = () => {
         {/* Welcome */}
         <div className="animate-slide-down text-center pt-2 pb-3">
           <p className="text-muted-foreground text-sm">שלום,</p>
-          <h1 className="text-2xl font-bold text-foreground">{currentOrder.customerName} 👋</h1>
+          <h1 className="text-2xl font-bold text-foreground">{currentOrder.customerName}</h1>
         </div>
 
         {/* Payment pending notification */}
