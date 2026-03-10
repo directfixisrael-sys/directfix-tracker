@@ -1215,7 +1215,7 @@ const NewRepairOrder = () => {
       {/* Promotion Strip */}
       {activePromotion && (activePromotion.display_mode === 'banner' || activePromotion.display_mode === 'both') && <div className="bg-foreground text-background text-center py-2.5 text-xs font-bold tracking-wide border-b-2 border-foreground/10">
           <span>{getPromotionIcon(activePromotion.icon)} {activePromotion.title} — {activePromotion.description}</span>
-          {activePromotion.value && activePromotion.value > 0 && <span className="mr-1 font-bold"> | חינם! 🎉</span>}
+          {activePromotion.value && activePromotion.value > 0 && <span className="mr-1 font-bold"> | חינם!</span>}
         </div>}
 
       {/* Header - Clean & Minimal */}
