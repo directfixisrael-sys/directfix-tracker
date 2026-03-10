@@ -1970,7 +1970,7 @@ const NewRepairOrder = () => {
                 isGiftOrder ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
               }`}>
                 {isGiftOrder ? <Gift className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
-                {isGiftOrder ? 'תיקון במתנה 🎁' : 'פרטים אחרונים'}
+                {isGiftOrder ? 'תיקון במתנה' : 'פרטים אחרונים'}
               </div>
               <h2 className="text-3xl font-extrabold mb-1">{isGiftOrder ? 'פרטי המתנה' : 'לאן נגיע?'}</h2>
               <p className="text-muted-foreground">{isGiftOrder ? 'מלאו את פרטי השולח ומקבל המתנה' : 'מלאו את הפרטים ואנחנו בדרך'}</p>
