@@ -308,6 +308,18 @@ const NewRepairOrder = () => {
   const [customerNotes, setCustomerNotes] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
 
+  const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
+
+  // Update lead step tracking
+  const updateLeadStep = async (stepName: string) => {
+    if (!currentLeadId) return;
+    try {
+      await supabase.from('leads').update({ last_step: stepName }).eq('id', currentLeadId);
+    } catch (e) {
+      console.error('Error updating lead step:', e);
+    }
+  };
+
   // Sync intro fields to customer fields and save lead
   const handleIntroDismiss = async () => {
     if (introName.trim()) setCustomerName(introName.trim());
@@ -328,12 +340,14 @@ const NewRepairOrder = () => {
 
     // Save lead to DB
     try {
-      await supabase.from('leads').insert({
+      const { data: leadData } = await supabase.from('leads').insert({
         customer_name: introName.trim(),
         customer_phone: normalizedPhone,
         privacy_accepted: introPrivacy,
         is_returning_customer: isReturning,
-      });
+        last_step: 'בחירת דגם',
+      }).select('id').single();
+      if (leadData) setCurrentLeadId(leadData.id);
     } catch (e) {
       console.error('Error saving lead:', e);
     }
@@ -591,14 +605,24 @@ const NewRepairOrder = () => {
     if (selectedRepair) names.push(selectedRepair.name);
     return names;
   };
+  const stepLabels: Record<Step, string> = {
+    model: 'בחירת דגם',
+    repair: 'בחירת תיקון',
+    bundle: 'חבילה',
+    price: 'אישור מחיר',
+    schedule: 'תיאום מועד',
+    details: 'מילוי פרטים',
+    gift_payment: 'תשלום',
+    success: 'הושלם',
+  };
+
   const goToStep = (newStep: Step) => {
     setIsAnimating(true);
+    updateLeadStep(stepLabels[newStep]);
     setTimeout(() => {
       setStep(newStep);
       setIsAnimating(false);
-      // Broadcast step change for live tracking
       window.dispatchEvent(new CustomEvent('repair-step-change', { detail: { step: newStep } }));
-      // Scroll to top using ref
       if (contentRef.current) {
         contentRef.current.scrollTop = 0;
       }
