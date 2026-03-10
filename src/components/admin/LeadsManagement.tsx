@@ -21,6 +21,7 @@ interface Lead {
 
 const LeadsManagement = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [filter, setFilter] = useState<'active' | 'converted' | 'returning'>('active');
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -57,14 +58,20 @@ const LeadsManagement = () => {
     toast.success('סומן כהזמנה');
   };
 
-  const filtered = leads.filter(l => 
-    !l.converted && (
-      l.customer_name.includes(search) || 
-      l.customer_phone.includes(search)
-    )
-  );
+  const searchMatch = (l: Lead) =>
+    l.customer_name.includes(search) || l.customer_phone.includes(search);
 
-  const convertedLeads = leads.filter(l => l.converted);
+  const filtered = leads.filter(l => {
+    if (!searchMatch(l)) return false;
+    if (filter === 'active') return !l.converted;
+    if (filter === 'converted') return l.converted;
+    if (filter === 'returning') return l.is_returning_customer;
+    return true;
+  });
+
+  const activeCount = leads.filter(l => !l.converted).length;
+  const convertedCount = leads.filter(l => l.converted).length;
+  const returningCount = leads.filter(l => l.is_returning_customer).length;
 
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
@@ -79,18 +86,27 @@ const LeadsManagement = () => {
         />
       </div>
 
-      {/* Stats */}
+      {/* Stats - clickable filters */}
       <div className="grid grid-cols-3 gap-3">
-        <Card className="p-3 text-center">
-          <p className="text-2xl font-bold text-foreground">{filtered.length}</p>
+        <Card
+          className={`p-3 text-center cursor-pointer transition-all ${filter === 'active' ? 'ring-2 ring-primary' : 'opacity-70'}`}
+          onClick={() => setFilter('active')}
+        >
+          <p className="text-2xl font-bold text-foreground">{activeCount}</p>
           <p className="text-xs text-muted-foreground">לידים פעילים</p>
         </Card>
-        <Card className="p-3 text-center">
-          <p className="text-2xl font-bold text-success">{convertedLeads.length}</p>
+        <Card
+          className={`p-3 text-center cursor-pointer transition-all ${filter === 'converted' ? 'ring-2 ring-success' : 'opacity-70'}`}
+          onClick={() => setFilter('converted')}
+        >
+          <p className="text-2xl font-bold text-success">{convertedCount}</p>
           <p className="text-xs text-muted-foreground">הומרו להזמנה</p>
         </Card>
-        <Card className="p-3 text-center">
-          <p className="text-2xl font-bold text-warning">{leads.filter(l => l.is_returning_customer).length}</p>
+        <Card
+          className={`p-3 text-center cursor-pointer transition-all ${filter === 'returning' ? 'ring-2 ring-warning' : 'opacity-70'}`}
+          onClick={() => setFilter('returning')}
+        >
+          <p className="text-2xl font-bold text-warning">{returningCount}</p>
           <p className="text-xs text-muted-foreground">לקוחות חוזרים</p>
         </Card>
       </div>
