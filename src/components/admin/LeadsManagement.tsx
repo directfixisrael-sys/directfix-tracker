@@ -86,18 +86,27 @@ const LeadsManagement = () => {
         />
       </div>
 
-      {/* Stats */}
+      {/* Stats - clickable filters */}
       <div className="grid grid-cols-3 gap-3">
-        <Card className="p-3 text-center">
-          <p className="text-2xl font-bold text-foreground">{filtered.length}</p>
+        <Card
+          className={`p-3 text-center cursor-pointer transition-all ${filter === 'active' ? 'ring-2 ring-primary' : 'opacity-70'}`}
+          onClick={() => setFilter('active')}
+        >
+          <p className="text-2xl font-bold text-foreground">{activeCount}</p>
           <p className="text-xs text-muted-foreground">לידים פעילים</p>
         </Card>
-        <Card className="p-3 text-center">
-          <p className="text-2xl font-bold text-success">{convertedLeads.length}</p>
+        <Card
+          className={`p-3 text-center cursor-pointer transition-all ${filter === 'converted' ? 'ring-2 ring-success' : 'opacity-70'}`}
+          onClick={() => setFilter('converted')}
+        >
+          <p className="text-2xl font-bold text-success">{convertedCount}</p>
           <p className="text-xs text-muted-foreground">הומרו להזמנה</p>
         </Card>
-        <Card className="p-3 text-center">
-          <p className="text-2xl font-bold text-warning">{leads.filter(l => l.is_returning_customer).length}</p>
+        <Card
+          className={`p-3 text-center cursor-pointer transition-all ${filter === 'returning' ? 'ring-2 ring-warning' : 'opacity-70'}`}
+          onClick={() => setFilter('returning')}
+        >
+          <p className="text-2xl font-bold text-warning">{returningCount}</p>
           <p className="text-xs text-muted-foreground">לקוחות חוזרים</p>
         </Card>
       </div>
