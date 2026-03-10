@@ -15,6 +15,7 @@ interface Lead {
   privacy_accepted: boolean;
   is_returning_customer: boolean;
   converted: boolean;
+  last_step: string;
   created_at: string;
 }
 
