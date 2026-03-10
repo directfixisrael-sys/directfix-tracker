@@ -1256,54 +1256,60 @@ const NewRepairOrder = () => {
             {/* Quick Intro Card - Name & Phone */}
             {showIntroCard && (
               <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" onClick={(e) => { if (e.target === e.currentTarget && introName.trim() && introPhone.trim()) handleIntroDismiss(); }}>
-                <div className="w-full max-w-sm bg-card rounded-t-3xl sm:rounded-3xl p-6 pb-8 shadow-2xl animate-slide-up border-t-2 border-primary/20 sm:border-2">
-                  <div className="w-12 h-1 bg-muted-foreground/20 rounded-full mx-auto mb-5 sm:hidden" />
+              <div className="w-full max-w-sm bg-card rounded-t-3xl sm:rounded-2xl p-5 pb-6 shadow-2xl animate-slide-up border-t-2 border-primary/20 sm:border-2">
+                  <div className="w-10 h-1 bg-muted-foreground/20 rounded-full mx-auto mb-4 sm:hidden" />
                   
-                  <div className="text-center mb-6">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Zap className="w-8 h-8 text-primary" />
-                    </div>
-                    <h2 className="text-2xl font-extrabold text-foreground">בואו נתחיל! ⚡</h2>
-                    <p className="text-sm text-muted-foreground mt-1">שם וטלפון — וישר לבחירת הדגם</p>
+                  <div className="text-center mb-4">
+                    <h2 className="text-lg font-bold text-foreground">בואו נתחיל ⚡</h2>
+                    <p className="text-xs text-muted-foreground">שם וטלפון — וישר לבחירת הדגם</p>
                   </div>
 
-                  <div className="space-y-3">
-                    <div>
-                      <Input
-                        placeholder="השם שלכם *"
-                        value={introName}
-                        onChange={(e) => setIntroName(e.target.value)}
-                        className="h-13 text-base rounded-2xl border-2 border-border focus:border-primary transition-colors"
-                        autoFocus
-                      />
-                    </div>
-                    <div>
-                      <Input
-                        placeholder="מספר טלפון *"
-                        value={introPhone}
-                        onChange={(e) => setIntroPhone(formatPhone(e.target.value))}
-                        type="tel"
-                        dir="ltr"
-                        className="h-13 text-base rounded-2xl text-right border-2 border-border focus:border-primary transition-colors tracking-wider"
-                      />
-                    </div>
+                  <div className="space-y-2.5">
+                    <Input
+                      placeholder="השם שלכם *"
+                      value={introName}
+                      onChange={(e) => setIntroName(e.target.value)}
+                      className="h-11 text-sm rounded-xl"
+                      autoFocus
+                    />
+                    <Input
+                      placeholder="050-0000000 *"
+                      value={introPhone}
+                      onChange={(e) => setIntroPhone(formatPhone(e.target.value))}
+                      type="tel"
+                      dir="ltr"
+                      className="h-11 text-sm rounded-xl text-right tracking-wider"
+                    />
                   </div>
+
+                  <label className="flex items-start gap-2.5 mt-3 cursor-pointer">
+                    <Checkbox checked={introPrivacy} onCheckedChange={checked => setIntroPrivacy(checked === true)} className="mt-0.5 w-4 h-4" />
+                    <span className="text-[11px] text-muted-foreground leading-relaxed">
+                      אני מאשר/ת שקראתי והסכמתי ל<span className="text-primary font-medium">מדיניות הפרטיות</span> ו<span className="text-primary font-medium">תנאי השימוש</span>, ומאשר/ת יצירת קשר לתיאום התיקון
+                    </span>
+                  </label>
 
                   <Button
                     onClick={handleIntroDismiss}
-                    disabled={!introName.trim() || introPhone.length < 9}
-                    className="w-full h-14 text-base font-bold rounded-2xl mt-5 shadow-lg"
+                    disabled={!introName.trim() || introPhone.length < 9 || !introPrivacy}
+                    className="w-full h-12 text-sm font-bold rounded-xl mt-4"
                   >
                     יאללה, בואו נתחיל! 🚀
                   </Button>
-
-                  <p className="text-center text-[11px] text-muted-foreground mt-3">
-                    הפרטים ישמשו ליצירת קשר ותיאום התיקון
-                  </p>
                 </div>
               </div>
             )}
 
+            {/* Returning customer banner */}
+            {isReturningCustomer && !showIntroCard && (
+              <div className="bg-success/10 border border-success/30 rounded-2xl p-3 flex items-center gap-3 animate-fade-in">
+                <Gift className="w-5 h-5 text-success flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-foreground">ברוכים השבים! 🎉</p>
+                  <p className="text-xs text-muted-foreground">מגן מסך פרימיום במתנה על תיקון חוזר</p>
+                </div>
+              </div>
+            )}
 
             {/* Show cart if adding more repairs */}
             {additionalRepairs.length > 0 && renderRepairCart()}
