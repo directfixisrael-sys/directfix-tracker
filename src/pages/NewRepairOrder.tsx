@@ -275,6 +275,9 @@ const NewRepairOrder = () => {
     setTheme
   } = useTheme();
   const [step, setStep] = useState<Step>('model');
+  const [showIntroCard, setShowIntroCard] = useState(true);
+  const [introName, setIntroName] = useState('');
+  const [introPhone, setIntroPhone] = useState('');
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
