@@ -1324,7 +1324,7 @@ const NewRepairOrder = () => {
           <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none animate-fade-in">
             <div className="absolute inset-0 bg-primary/10 backdrop-blur-sm animate-fade-in" />
             <div className="relative flex flex-col items-center gap-4 animate-scale-in">
-              <div className="text-8xl animate-bounce-slow">🎁</div>
+              <Gift className="w-16 h-16 text-primary animate-bounce-slow" />
               <p className="text-2xl font-extrabold text-primary drop-shadow-lg">מצב מתנה!</p>
               {[...Array(12)].map((_, i) => (
                 <Heart
