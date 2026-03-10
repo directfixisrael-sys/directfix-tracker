@@ -2223,7 +2223,7 @@ const NewRepairOrder = () => {
                       <Gift className="w-3.5 h-3.5" />
                       {activePromotion.description}
                     </span>
-                    <span className="font-bold text-success text-xs">חינם! 🎉</span>
+                    <span className="font-bold text-success text-xs">חינם!</span>
                   </div>}
                 <div className="flex justify-between pt-2 border-t border-border">
                   <span className="font-bold">סה״כ</span>
