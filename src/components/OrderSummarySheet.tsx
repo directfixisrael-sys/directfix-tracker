@@ -41,13 +41,13 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
 
   const getPromotionIcon = (icon: string | null) => {
     switch (icon) {
-      case 'gift': return '🎁';
-      case 'tag': return '🏷️';
-      case 'sparkles': return '✨';
-      case 'percent': return '💯';
-      case 'fire': return '🔥';
-      case 'star': return '⭐';
-      default: return '🎁';
+      case 'gift': return '';
+      case 'tag': return '';
+      case 'sparkles': return '';
+      case 'percent': return '';
+      case 'fire': return '';
+      case 'star': return '';
+      default: return '';
     }
   };
 
