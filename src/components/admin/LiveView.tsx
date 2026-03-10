@@ -42,13 +42,13 @@ const PAGE_NAMES: Record<string, string> = {
 };
 
 const STEP_NAMES: Record<string, string> = {
-  model: '📱 בחירת דגם',
-  repair: '🔧 בחירת תיקון',
-  bundle: '📦 חבילת תיקון',
-  price: '💰 אישור מחיר',
-  schedule: '📅 קביעת תור',
-  details: '📝 פרטי לקוח',
-  success: '✅ הזמנה הושלמה!',
+  model: 'בחירת דגם',
+  repair: 'בחירת תיקון',
+  bundle: 'חבילת תיקון',
+  price: 'אישור מחיר',
+  schedule: 'קביעת תור',
+  details: 'פרטי לקוח',
+  success: 'הזמנה הושלמה!',
 };
 
 const getDeviceIcon = (ua?: string) => {
@@ -66,10 +66,10 @@ const getDeviceName = (ua?: string) => {
 };
 
 const getDeviceEmoji = (dt?: string | null) => {
-  if (dt === 'tablet') return '📱';
-  if (dt === 'mobile') return '📱';
-  if (dt === 'desktop') return '🖥️';
-  return '📱';
+  if (dt === 'tablet') return 'טאבלט';
+  if (dt === 'mobile') return 'נייד';
+  if (dt === 'desktop') return 'מחשב';
+  return 'נייד';
 };
 
 const EVENT_ICONS: Record<string, React.ReactNode> = {
@@ -94,7 +94,7 @@ const EVENT_TEXT: Record<string, string> = {
   page_view: 'צפה בעמוד',
   order_started: 'התחיל הזמנה',
   model_selected: 'בחר דגם',
-  order_completed: 'סיים הזמנה! 🎉',
+  order_completed: 'סיים הזמנה!',
   visitor_joined: 'נכנס לאתר',
   visitor_left: 'עזב את האתר',
 };

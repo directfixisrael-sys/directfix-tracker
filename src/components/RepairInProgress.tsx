@@ -123,7 +123,7 @@ const RepairInProgress = ({ technicianName, deviceType }: RepairInProgressProps)
 
         <div className="mt-4 p-4 bg-success/10 rounded-xl border border-success/20">
           <p className="text-sm text-success font-medium text-center">
-            🔧 הטכנאי עובד על המכשיר שלך כרגע
+            הטכנאי עובד על המכשיר שלך כרגע
           </p>
           <p className="text-xs text-muted-foreground text-center mt-1">
             נעדכן אותך ברגע שיסיים

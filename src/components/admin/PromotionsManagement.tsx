@@ -25,12 +25,12 @@ interface Promotion {
 }
 
 const iconOptions = [
-  { value: 'gift', label: 'מתנה', icon: '🎁' },
-  { value: 'tag', label: 'תגית', icon: '🏷️' },
-  { value: 'sparkles', label: 'כוכבים', icon: '✨' },
-  { value: 'percent', label: 'אחוזים', icon: '💯' },
-  { value: 'fire', label: 'אש', icon: '🔥' },
-  { value: 'star', label: 'כוכב', icon: '⭐' },
+  { value: 'gift', label: 'מתנה', icon: 'Gift' },
+  { value: 'tag', label: 'תגית', icon: 'Tag' },
+  { value: 'sparkles', label: 'כוכבים', icon: 'Sparkles' },
+  { value: 'percent', label: 'אחוזים', icon: 'Percent' },
+  { value: 'fire', label: 'אש', icon: 'Fire' },
+  { value: 'star', label: 'כוכב', icon: 'Star' },
 ];
 
 const PromotionsManagement = () => {
@@ -199,7 +199,7 @@ const PromotionsManagement = () => {
   };
 
   const getIconEmoji = (iconValue: string | null) => {
-    return iconOptions.find(i => i.value === iconValue)?.icon || '🎁';
+    return iconOptions.find(i => i.value === iconValue)?.icon || '';
   };
 
   if (isLoading) {

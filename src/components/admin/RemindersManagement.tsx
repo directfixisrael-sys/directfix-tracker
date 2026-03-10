@@ -170,7 +170,7 @@ const RemindersManagement = () => {
       return;
     }
 
-    toast.success(newCompleted ? '✅ המשימה סומנה כבוצעה' : 'המשימה הוחזרה לפעילה');
+    toast.success(newCompleted ? 'המשימה סומנה כבוצעה' : 'המשימה הוחזרה לפעילה');
     loadReminders();
   };
 
@@ -197,7 +197,7 @@ const RemindersManagement = () => {
     
     const formatDate = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
     
-    const title = encodeURIComponent(`📋 ${reminder.task_name} - ${reminder.customer_name}`);
+    const title = encodeURIComponent(`${reminder.task_name} - ${reminder.customer_name}`);
     const details = encodeURIComponent(
       `נושא: ${reminder.subject}\nלקוח: ${reminder.customer_name}\nטלפון: ${reminder.customer_phone}\n${reminder.notes ? `הערות: ${reminder.notes}` : ''}`
     );
@@ -237,7 +237,7 @@ const RemindersManagement = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold">📋 תזכורות ומשימות</h2>
+          <h2 className="text-xl font-bold">תזכורות ומשימות</h2>
           <p className="text-sm text-muted-foreground">
             {pendingCount} ממתינות
             {overdueCount > 0 && (
@@ -277,7 +277,7 @@ const RemindersManagement = () => {
             {filter === 'completed' ? 'אין משימות שהושלמו' : 'אין תזכורות'}
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
-            {filter === 'pending' ? 'מעולה! אין משימות ממתינות 🎉' : 'צור את התזכורת הראשונה'}
+            {filter === 'pending' ? 'מעולה! אין משימות ממתינות' : 'צור את התזכורת הראשונה'}
           </p>
           {filter !== 'completed' && (
             <Button onClick={() => handleOpenDialog()}>צור תזכורת</Button>
@@ -326,7 +326,7 @@ const RemindersManagement = () => {
                   </div>
                   
                   {reminder.subject && (
-                    <p className="text-sm text-muted-foreground mb-1.5">📌 {reminder.subject}</p>
+                    <p className="text-sm text-muted-foreground mb-1.5">{reminder.subject}</p>
                   )}
 
                   <div className="flex flex-wrap items-center gap-3 text-sm">
@@ -395,7 +395,7 @@ const RemindersManagement = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{editingReminder ? '✏️ עריכת תזכורת' : '🔔 תזכורת חדשה'}</DialogTitle>
+            <DialogTitle>{editingReminder ? 'עריכת תזכורת' : 'תזכורת חדשה'}</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">

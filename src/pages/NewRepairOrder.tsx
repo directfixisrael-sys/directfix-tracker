@@ -359,7 +359,7 @@ const NewRepairOrder = () => {
     }
 
     if (isReturning) {
-      toast.success(`ברוכים השבים ${introName.trim()}! 🎉 מגן מסך במתנה!`);
+      toast.success(`ברוכים השבים ${introName.trim()}! מגן מסך במתנה!`);
     }
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
@@ -445,19 +445,19 @@ const NewRepairOrder = () => {
   const getPromotionIcon = (icon: string | null) => {
     switch (icon) {
       case 'gift':
-        return '🎁';
+        return '';
       case 'tag':
-        return '🏷️';
+        return '';
       case 'sparkles':
-        return '✨';
+        return '';
       case 'percent':
-        return '💯';
+        return '';
       case 'fire':
-        return '🔥';
+        return '';
       case 'star':
-        return '⭐';
+        return '';
       default:
-        return '🎁';
+        return '';
     }
   };
 
@@ -998,7 +998,7 @@ const NewRepairOrder = () => {
         : allRepairNames.join(' + ');
       const notes = [`הזמנה מהאתר - ${repairDescription}`, `מועד מבוקש: ${scheduleNote}`];
       if (isReturningCustomer) {
-        notes.push('🎁 לקוח חוזר — מגן מסך פרימיום במתנה');
+        notes.push('לקוח חוזר — מגן מסך פרימיום במתנה');
       }
       if (selectedBundleAddon && currentBundle && selectedModel) {
         notes.push(`חבילת תיקון: ${currentBundle.name} - סוללה ב-${currentBundle.discount_percent}% הנחה (₪${getBundleAddonPrice()} במקום ₪${getBatteryBasePrice()})`);
@@ -1034,7 +1034,7 @@ const NewRepairOrder = () => {
         notes.push(`תמונות מכשיר: ${deviceImages.length} תמונות צורפו`);
       }
       if (isGiftOrder) {
-        notes.push(`🎁 הזמנת מתנה — שולח: ${giftSenderName.trim()}, טלפון שולח: ${giftSenderPhone.trim()}`);
+        notes.push(`הזמנת מתנה — שולח: ${giftSenderName.trim()}, טלפון שולח: ${giftSenderPhone.trim()}`);
         if (giftMessage.trim()) {
           notes.push(`ברכה: ${giftMessage.trim()}`);
         }
@@ -1144,7 +1144,7 @@ const NewRepairOrder = () => {
   // Shared cart display for additional repairs
   const renderRepairCart = () => (
     <div className="space-y-3">
-      <p className="text-xs font-semibold text-muted-foreground">🛒 תיקונים שנבחרו:</p>
+      <p className="text-xs font-semibold text-muted-foreground">תיקונים שנבחרו:</p>
       {additionalRepairs.map((ar, idx) => (
         <Card key={idx} className="p-4 rounded-2xl border border-border/60">
           <div className="flex items-center justify-between gap-3">
@@ -1170,7 +1170,7 @@ const NewRepairOrder = () => {
       <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }} onClick={(e) => { if (e.target === e.currentTarget && introName.trim() && introPhone.trim()) handleIntroDismiss(); }}>
         <div className="w-[calc(100%-2rem)] max-w-md bg-card rounded-2xl p-7 pb-8 shadow-2xl animate-scale-in border-2 border-primary/20">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-extrabold text-foreground">בואו נתחיל ⚡</h2>
+            <h2 className="text-2xl font-extrabold text-foreground">בואו נתחיל</h2>
             <p className="text-base text-muted-foreground mt-2">שם וטלפון — וישר לבחירת הדגם</p>
           </div>
 
@@ -1204,7 +1204,7 @@ const NewRepairOrder = () => {
             disabled={!introName.trim() || introPhone.length < 9 || !introPrivacy}
             className="w-full h-12 text-sm font-bold rounded-xl mt-4"
           >
-            יאללה, בואו נתחיל! 🚀
+            יאללה, בואו נתחיל!
           </Button>
         </div>
       </div>
@@ -1215,7 +1215,7 @@ const NewRepairOrder = () => {
       {/* Promotion Strip */}
       {activePromotion && (activePromotion.display_mode === 'banner' || activePromotion.display_mode === 'both') && <div className="bg-foreground text-background text-center py-2.5 text-xs font-bold tracking-wide border-b-2 border-foreground/10">
           <span>{getPromotionIcon(activePromotion.icon)} {activePromotion.title} — {activePromotion.description}</span>
-          {activePromotion.value && activePromotion.value > 0 && <span className="mr-1 font-bold"> | חינם! 🎉</span>}
+          {activePromotion.value && activePromotion.value > 0 && <span className="mr-1 font-bold"> | חינם!</span>}
         </div>}
 
       {/* Header - Clean & Minimal */}
@@ -1324,7 +1324,7 @@ const NewRepairOrder = () => {
           <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none animate-fade-in">
             <div className="absolute inset-0 bg-primary/10 backdrop-blur-sm animate-fade-in" />
             <div className="relative flex flex-col items-center gap-4 animate-scale-in">
-              <div className="text-8xl animate-bounce-slow">🎁</div>
+              <Gift className="w-16 h-16 text-primary animate-bounce-slow" />
               <p className="text-2xl font-extrabold text-primary drop-shadow-lg">מצב מתנה!</p>
               {[...Array(12)].map((_, i) => (
                 <Heart
@@ -1348,7 +1348,7 @@ const NewRepairOrder = () => {
               <div className="bg-success/10 border border-success/30 rounded-2xl p-3 flex items-center gap-3 animate-fade-in">
                 <Gift className="w-5 h-5 text-success flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-foreground">ברוכים השבים! 🎉</p>
+                  <p className="text-sm font-semibold text-foreground">ברוכים השבים!</p>
                   <p className="text-xs text-muted-foreground">מגן מסך פרימיום במתנה על תיקון חוזר</p>
                 </div>
               </div>
@@ -1363,10 +1363,10 @@ const NewRepairOrder = () => {
                 {additionalRepairs.length > 0 ? 'בחרו דגם לתיקון הנוסף' : (() => {
                   const hour = new Date().getHours();
                   const greeting = hour >= 5 && hour < 12 ? 'בוקר טוב' : hour >= 12 && hour < 17 ? 'צהריים טובים' : hour >= 17 && hour < 21 ? 'ערב טוב' : 'לילה טוב';
-                  return introName ? `${greeting} ${introName}, איך נוכל לעזור? 🔧` : 'מה נתקן היום?';
+                  return introName ? `${greeting} ${introName}, איך נוכל לעזור?` : 'מה נתקן היום?';
                 })()}
               </h1>
-              <p className="text-muted-foreground text-sm">בחרו את הדגם שלכם ונתחיל ✨</p>
+              <p className="text-muted-foreground text-sm">בחרו את הדגם שלכם ונתחיל</p>
               <div className="flex items-center justify-center gap-4 mt-4">
                 <Dialog>
                   <DialogTrigger asChild>
@@ -1614,7 +1614,7 @@ const NewRepairOrder = () => {
 
                   <div className="mt-4 p-3 bg-muted/60 rounded-xl">
                     <p className="text-sm text-muted-foreground text-center">
-                      📞 נקבל את הפרטים ונחזור אליכם בהקדם לתיאום וסיכום מחיר
+                      נקבל את הפרטים ונחזור אליכם בהקדם לתיאום וסיכום מחיר
                     </p>
                   </div>
 
@@ -1650,7 +1650,7 @@ const NewRepairOrder = () => {
                   </div>
                 </div>
               </div>
-              <h2 className="font-bold mb-2 text-xl">הצעה מיוחדת! 🎉</h2>
+              <h2 className="font-bold mb-2 text-xl">הצעה מיוחדת!</h2>
               <p className="text-muted-foreground text-sm">מצאנו לך מבצע משתלם</p>
             </div>
 
@@ -1684,7 +1684,7 @@ const NewRepairOrder = () => {
                 </div>
 
                 <p className="text-xs text-muted-foreground">
-                  💡 רוב הלקוחות שמחליפים מסך מוסיפים גם סוללה חדשה
+                  רוב הלקוחות שמחליפים מסך מוסיפים גם סוללה חדשה
                 </p>
               </div>
             </Card>
@@ -1701,7 +1701,7 @@ const NewRepairOrder = () => {
             </div>
 
             <p className="text-center text-xs text-muted-foreground">
-              🔋 סוללה מקורית עם 100% בריאות
+              סוללה מקורית עם 100% בריאות
             </p>
           </div>}
 
@@ -1758,7 +1758,7 @@ const NewRepairOrder = () => {
                 {getMultiRepairDiscount() > 0 && (
                   <div className="flex justify-between items-center text-sm bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg p-2 -mx-1">
                     <span className="text-success font-medium flex items-center gap-1.5">
-                      🎉 15% הנחה על התיקון הזול
+                      15% הנחה על התיקון הזול
                     </span>
                     <span className="font-bold text-success">-₪{getMultiRepairDiscount()}</span>
                   </div>
@@ -1776,7 +1776,7 @@ const NewRepairOrder = () => {
                         <span className="text-muted-foreground text-xs">שווי הטבה</span>
                         <div className="flex items-center gap-2">
                           <span className="line-through text-xs text-muted-foreground">₪{activePromotion.value}</span>
-                          <span className="font-bold text-success">חינם! 🎉</span>
+                          <span className="font-bold text-success">חינם!</span>
                         </div>
                       </div>}
                   </div>}
@@ -1793,7 +1793,7 @@ const NewRepairOrder = () => {
                 {/* Image Upload - Inline */}
                 <div className="border-t border-border pt-3">
                   <label className="block text-xs font-medium mb-2 text-muted-foreground">
-                    📸 רוצה לצרף תמונה של המכשיר? (לא חובה)
+                    רוצה לצרף תמונה של המכשיר? (לא חובה)
                   </label>
                   {deviceImages.length > 0 && <div className="flex gap-2 mb-2 flex-wrap">
                       {deviceImages.map((img, idx) => <div key={idx} className="relative w-14 h-14 rounded-lg overflow-hidden border border-border">
@@ -1840,10 +1840,10 @@ const NewRepairOrder = () => {
                     </div>
                   </div>
                   {appliedCoupon && <div className="text-xs text-success mt-1 text-left">
-                      🎉 חיסכת ₪{getDiscount()} עם קופון {appliedCoupon.code}!
+                      חיסכת ₪{getDiscount()} עם קופון {appliedCoupon.code}!
                     </div>}
                   {selectedBundleAddon && currentBundle && <div className="text-xs text-amber-500 mt-1 text-left">
-                      🔋 כולל סוללה בהנחה של {currentBundle.discount_percent}%
+                      כולל סוללה בהנחה של {currentBundle.discount_percent}%
                     </div>}
                 </div>
               </div>
@@ -1970,7 +1970,7 @@ const NewRepairOrder = () => {
                 isGiftOrder ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
               }`}>
                 {isGiftOrder ? <Gift className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
-                {isGiftOrder ? 'תיקון במתנה 🎁' : 'פרטים אחרונים'}
+                {isGiftOrder ? 'תיקון במתנה' : 'פרטים אחרונים'}
               </div>
               <h2 className="text-3xl font-extrabold mb-1">{isGiftOrder ? 'פרטי המתנה' : 'לאן נגיע?'}</h2>
               <p className="text-muted-foreground">{isGiftOrder ? 'מלאו את פרטי השולח ומקבל המתנה' : 'מלאו את הפרטים ואנחנו בדרך'}</p>
@@ -2097,7 +2097,7 @@ const NewRepairOrder = () => {
               </div>
               {getMultiRepairDiscount() > 0 && (
                 <div className="flex justify-between items-center text-base bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg p-2">
-                  <span className="text-success font-medium">🎉 15% הנחה על התיקון הזול</span>
+                  <span className="text-success font-medium">15% הנחה על התיקון הזול</span>
                   <span className="font-bold text-success">-₪{getMultiRepairDiscount()}</span>
                 </div>
               )}
@@ -2126,7 +2126,7 @@ const NewRepairOrder = () => {
                 <CreditCard className="w-4 h-4" />
                 תשלום מאובטח
               </div>
-              <h2 className="text-3xl font-extrabold mb-1">💳 תשלום להזמנת המתנה</h2>
+              <h2 className="text-3xl font-extrabold mb-1">תשלום להזמנת המתנה</h2>
               <p className="text-muted-foreground">השלימו את התשלום כדי לאשר את ההזמנה</p>
               {completedOrderNumber && <p className="text-sm font-semibold text-foreground mt-1">הזמנה #{completedOrderNumber}</p>}
             </div>
@@ -2160,7 +2160,7 @@ const NewRepairOrder = () => {
 
             <div className="bg-muted/50 rounded-xl p-4 space-y-3">
               <p className="text-sm text-muted-foreground text-center">
-                🔒 התשלום מתבצע בסביבה מאובטחת ומוצפנת
+                התשלום מתבצע בסביבה מאובטחת ומוצפנת
               </p>
               <Button onClick={handleGiftPaymentSuccess} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg">
                 <CheckCircle2 className="w-5 h-5 ml-2" />
@@ -2181,16 +2181,16 @@ const NewRepairOrder = () => {
                     <CheckCircle2 className="w-10 h-10 text-success-foreground" />
                   </div>
                 </div>
-                <div className="absolute -top-1 -right-1 text-3xl animate-bounce">🎉</div>
-                <div className="absolute -bottom-1 -left-1 text-3xl animate-bounce" style={{
+                <Sparkles className="absolute -top-1 -right-1 w-7 h-7 text-primary animate-bounce" />
+                <Sparkles className="absolute -bottom-1 -left-1 w-7 h-7 text-primary animate-bounce" style={{
               animationDelay: '100ms'
-            }}>✨</div>
+            }} />
               </div>
             </div>
 
             <div>
               <h2 className="text-2xl font-bold mb-1 text-success">
-                {isGiftOrder ? '🎁 הזמנת המתנה התקבלה!' : 'ההזמנה התקבלה!'}
+                {isGiftOrder ? 'הזמנת המתנה התקבלה!' : 'ההזמנה התקבלה!'}
               </h2>
               {completedOrderNumber && <p className="text-sm font-semibold text-foreground mb-1">הזמנה #{completedOrderNumber}</p>}
               <p className="text-muted-foreground text-sm">
@@ -2223,7 +2223,7 @@ const NewRepairOrder = () => {
                       <Gift className="w-3.5 h-3.5" />
                       {activePromotion.description}
                     </span>
-                    <span className="font-bold text-success text-xs">חינם! 🎉</span>
+                    <span className="font-bold text-success text-xs">חינם!</span>
                   </div>}
                 <div className="flex justify-between pt-2 border-t border-border">
                   <span className="font-bold">סה״כ</span>
@@ -2245,12 +2245,12 @@ const NewRepairOrder = () => {
             <div className="bg-muted/50 rounded-xl p-4">
               <p className="text-sm text-muted-foreground mb-3">תוכלו לעקוב אחרי סטטוס התיקון בזמן אמת</p>
               <Button onClick={handleTrackOrder} className="w-full h-12 text-base rounded-xl">
-                📍 מעקב אחר ההזמנה שלי
+                מעקב אחר ההזמנה שלי
               </Button>
             </div>
 
             {customerEmail && <div className="bg-primary/5 border border-primary/20 rounded-xl p-3">
-              <p className="text-sm text-foreground">📧 פרטי ההזמנה נשלחו לאימייל <span className="font-semibold" dir="ltr">{customerEmail}</span></p>
+              <p className="text-sm text-foreground">פרטי ההזמנה נשלחו לאימייל <span className="font-semibold" dir="ltr">{customerEmail}</span></p>
               <p className="text-xs text-muted-foreground mt-1">מומלץ לבדוק גם בתיבת הספאם</p>
             </div>}
             
@@ -2317,7 +2317,7 @@ const NewRepairOrder = () => {
               {isSubmitting ? <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   שולח...
-                </div> : isGiftOrder ? '💳 המשך לתשלום' : 'שלח הזמנה'}
+                </div> : isGiftOrder ? 'המשך לתשלום' : 'שלח הזמנה'}
             </Button>}
         </div>}
     </div>

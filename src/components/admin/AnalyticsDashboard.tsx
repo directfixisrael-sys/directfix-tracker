@@ -63,9 +63,9 @@ const LiveVisitorsCard = ({ activeViewers }: { activeViewers: any[] }) => {
   // Determine device type from userAgent
   const getDevice = (ua?: string) => {
     if (!ua) return 'לא ידוע';
-    if (/mobile|android|iphone/i.test(ua)) return '📱 נייד';
-    if (/tablet|ipad/i.test(ua)) return '📱 טאבלט';
-    return '🖥️ מחשב';
+    if (/mobile|android|iphone/i.test(ua)) return 'נייד';
+    if (/tablet|ipad/i.test(ua)) return 'טאבלט';
+    return 'מחשב';
   };
   
   return (
@@ -141,7 +141,7 @@ const LiveVisitorsCard = ({ activeViewers }: { activeViewers: any[] }) => {
       {/* Order viewers */}
       {activeViewers.length > 0 && (
         <div className="mt-4 pt-4 border-t border-border">
-          <p className="text-xs text-muted-foreground mb-2">👁️ לקוחות צופים בהזמנות:</p>
+          <p className="text-xs text-muted-foreground mb-2">לקוחות צופים בהזמנות:</p>
           <div className="flex flex-wrap gap-2">
             {activeViewers.map(viewer => (
               <span 
@@ -324,10 +324,10 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
 
   const getDeviceIcon = (device: string) => {
     switch (device) {
-      case 'mobile': return '📱';
-      case 'desktop': return '🖥️';
-      case 'tablet': return '📱';
-      default: return '📱';
+      case 'mobile': return 'נייד';
+      case 'desktop': return 'מחשב';
+      case 'tablet': return 'טאבלט';
+      default: return 'נייד';
     }
   };
 
@@ -838,7 +838,7 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
                           {referrerHost || '—'}
                         </TableCell>
                         <TableCell className="text-xs">
-                          {visit.device_type === 'mobile' ? '📱 נייד' : visit.device_type === 'desktop' ? '🖥️ מחשב' : visit.device_type === 'tablet' ? '📱 טאבלט' : '—'}
+                          {visit.device_type === 'mobile' ? 'נייד' : visit.device_type === 'desktop' ? 'מחשב' : visit.device_type === 'tablet' ? 'טאבלט' : '—'}
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground">
                           {visit.language?.split('-')[0] || '—'}
@@ -871,7 +871,7 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
                   Number(avgRating) >= star ? "text-warning" : "text-muted"
                 )}
               >
-                ⭐
+                ★
               </span>
             ))}
           </div>

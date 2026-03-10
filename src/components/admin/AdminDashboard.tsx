@@ -31,10 +31,10 @@ const PAGE_NAMES: Record<string, string> = {
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(var(--warning))', 'hsl(var(--success))', 'hsl(var(--destructive))', '#8b5cf6', '#ec4899'];
 
 const getDevice = (ua?: string) => {
-  if (!ua) return '📱 נייד';
-  if (/mobile|android|iphone/i.test(ua)) return '📱 נייד';
-  if (/tablet|ipad/i.test(ua)) return '📱 טאבלט';
-  return '🖥️ מחשב';
+  if (!ua) return 'נייד';
+  if (/mobile|android|iphone/i.test(ua)) return 'נייד';
+  if (/tablet|ipad/i.test(ua)) return 'טאבלט';
+  return 'מחשב';
 };
 
 const formatCurrency = (amount: number) =>

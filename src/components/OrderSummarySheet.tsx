@@ -41,13 +41,13 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
 
   const getPromotionIcon = (icon: string | null) => {
     switch (icon) {
-      case 'gift': return '🎁';
-      case 'tag': return '🏷️';
-      case 'sparkles': return '✨';
-      case 'percent': return '💯';
-      case 'fire': return '🔥';
-      case 'star': return '⭐';
-      default: return '🎁';
+      case 'gift': return '';
+      case 'tag': return '';
+      case 'sparkles': return '';
+      case 'percent': return '';
+      case 'fire': return '';
+      case 'star': return '';
+      default: return '';
     }
   };
 
@@ -108,7 +108,7 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
                 <div className="flex items-center gap-2 mt-1 mr-12">
                   <span className="text-xs text-muted-foreground">שווי:</span>
                   <span className="line-through text-xs text-muted-foreground">₪{activePromotion.value}</span>
-                  <span className="text-xs font-bold text-success">חינם! 🎉</span>
+                  <span className="text-xs font-bold text-success">חינם!</span>
                 </div>
               )}
             </div>
@@ -148,7 +148,7 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
                   {activePromotion.value && activePromotion.value > 0 && (
                     <span className="line-through text-muted-foreground text-xs">₪{activePromotion.value}</span>
                   )}
-                  <span className="font-bold text-success">חינם! 🎉</span>
+                  <span className="font-bold text-success">חינם!</span>
                 </div>
               </div>
             )}

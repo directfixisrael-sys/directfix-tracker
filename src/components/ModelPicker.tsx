@@ -82,7 +82,7 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
     <div className="space-y-3" role="region" aria-label="בחירת דגם מכשיר">
       {!activeSeries && (
         <p className="text-center text-muted-foreground text-sm" id="model-picker-hint">
-          בחרו סדרה ☝️
+          בחרו סדרה
         </p>
       )}
 
@@ -171,7 +171,7 @@ const ModelPicker = ({ models, selectedModel, onSelect, onConfirm }: ModelPicker
 
             {isSearching && filteredModels.length === 0 && (
               <p className="text-center text-muted-foreground text-sm py-3">
-                לא נמצאו דגמים תואמים 🔍
+                לא נמצאו דגמים תואמים
               </p>
             )}
           </div>

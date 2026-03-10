@@ -106,7 +106,7 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
 
           <div className="px-5 py-4 border-b border-primary/10 flex items-center gap-2">
             <Gift className="w-5 h-5 text-primary" />
-            <h4 className="text-sm font-bold text-foreground">שירות תיקון במתנה 🎁</h4>
+            <h4 className="text-sm font-bold text-foreground">שירות תיקון במתנה</h4>
           </div>
 
           <div className="px-5 py-4 space-y-4">
@@ -129,7 +129,7 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
           <div className="px-5 py-3 bg-primary/10 border-t border-primary/15 flex items-center gap-2">
             <CreditCard className="w-4 h-4 text-primary flex-shrink-0" />
             <p className="text-xs font-medium text-foreground">
-              💳 התשלום באשראי מתבצע <strong>לפני</strong> הגעת הטכנאי — כך מקבל המתנה לא צריך לשלם כלום!
+              התשלום באשראי מתבצע <strong>לפני</strong> הגעת הטכנאי — כך מקבל המתנה לא צריך לשלם כלום!
             </p>
           </div>
         </div>

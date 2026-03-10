@@ -39,7 +39,7 @@ const RatingPrompt = ({ onRate, currentRating, currentFeedback }: RatingPromptPr
         <PartyPopper className="w-8 h-8 text-success" />
       </div>
       
-      <h3 className="text-xl font-bold text-foreground mb-2">התיקון הושלם! 🎉</h3>
+      <h3 className="text-xl font-bold text-foreground mb-2">התיקון הושלם!</h3>
       <p className="text-muted-foreground text-sm mb-6">
         תודה שבחרתם בדיירקט פיקס
       </p>
@@ -94,7 +94,7 @@ const RatingPrompt = ({ onRate, currentRating, currentFeedback }: RatingPromptPr
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             placeholder={selectedRating >= 4 
-              ? "מילה טובה תמיד משמחת... 💚" 
+              ? "מילה טובה תמיד משמחת..." 
               : "ספרו לנו מה קרה, נשתדל להשתפר..."
             }
             className="min-h-[100px] text-right"
@@ -136,7 +136,7 @@ const RatingPrompt = ({ onRate, currentRating, currentFeedback }: RatingPromptPr
           
           {selectedRating >= 4 ? (
             <div className="space-y-4">
-              <p className="text-success font-semibold">תודה רבה! 💚</p>
+              <p className="text-success font-semibold">תודה רבה!</p>
               <p className="text-sm text-muted-foreground">
                 נשמח אם תשתפו את החוויה גם בגוגל
               </p>

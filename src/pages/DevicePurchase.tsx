@@ -283,7 +283,7 @@ const DevicePurchase = () => {
         'מקדמה: ₪500',
       ];
       if (isGiftOrder) {
-        notes.push(`🎁 הזמנת מתנה מ: ${giftSenderName} (${giftSenderPhone})`);
+        notes.push(`הזמנת מתנה מ: ${giftSenderName} (${giftSenderPhone})`);
         if (giftMessage) notes.push(`ברכה: ${giftMessage}`);
       }
 
@@ -321,7 +321,7 @@ const DevicePurchase = () => {
       if (paymentError || !paymentData?.success) {
         console.error('Payment error:', paymentError || paymentData?.error);
         // Still notify about the order even if payment fails
-        toast({ title: 'ההזמנה נשמרה! 📱', description: 'לא הצלחנו לפתוח דף תשלום. נציג ייצור איתך קשר.' });
+        toast({ title: 'ההזמנה נשמרה!', description: 'לא הצלחנו לפתוח דף תשלום. נציג ייצור איתך קשר.' });
         return;
       }
 
@@ -794,7 +794,7 @@ const DevicePurchase = () => {
             </Card>
 
             <p className="text-center text-xs text-muted-foreground">
-              🔒 תשלום מאובטח · נציג ייצור איתכם קשר תוך שעה
+              תשלום מאובטח · נציג ייצור איתכם קשר תוך שעה
             </p>
           </div>
         )}

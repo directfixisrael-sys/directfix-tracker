@@ -839,7 +839,7 @@ const PriceManagement = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">כותרת הסבר (סימן שאלה ❓)</label>
+              <label className="block text-sm font-medium mb-2">כותרת הסבר (סימן שאלה)</label>
               <Input
                 placeholder="לדוגמה: מסך מקורי Apple"
                 value={repairForm.info_title}
@@ -848,7 +848,7 @@ const PriceManagement = () => {
               <p className="text-xs text-muted-foreground mt-1">ריק = לא יוצג סימן שאלה ללקוח</p>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">תוכן הסבר (סימן שאלה ❓)</label>
+              <label className="block text-sm font-medium mb-2">תוכן הסבר (סימן שאלה)</label>
               <Input
                 placeholder="הסבר מפורט שיוצג כשהלקוח לוחץ על סימן השאלה"
                 value={repairForm.info_description}

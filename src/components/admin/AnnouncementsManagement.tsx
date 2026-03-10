@@ -27,9 +27,9 @@ interface Announcement {
 }
 
 const PLACEMENTS = [
-  { value: 'header_banner', label: 'באנר עליון (הדר)', icon: '📢' },
-  { value: 'popup', label: 'חלון קופץ (פופאפ)', icon: '💬' },
-  { value: 'toast', label: 'התראה צפה (טוסט)', icon: '🔔' },
+  { value: 'header_banner', label: 'באנר עליון (הדר)', icon: '' },
+  { value: 'popup', label: 'חלון קופץ (פופאפ)', icon: '' },
+  { value: 'toast', label: 'התראה צפה (טוסט)', icon: '' },
 ];
 
 const COLORS = [
@@ -106,7 +106,7 @@ const AnnouncementsManagement = () => {
   };
 
   const getPlacementLabel = (p: string) => PLACEMENTS.find(pl => pl.value === p)?.label || p;
-  const getPlacementIcon = (p: string) => PLACEMENTS.find(pl => pl.value === p)?.icon || '📢';
+  const getPlacementIcon = (p: string) => PLACEMENTS.find(pl => pl.value === p)?.icon || '';
   const getColorInfo = (c: string) => COLORS.find(cl => cl.value === c) || COLORS[0];
 
   if (isLoading) {

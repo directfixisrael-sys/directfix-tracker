@@ -68,11 +68,11 @@ const GiftPromoPopup = ({ promotionTitle, promotionDescription, promotionIcon, o
 
   const getIcon = () => {
     switch (promotionIcon) {
-      case 'gift': return '🎁';
-      case 'tag': return '🏷️';
-      case 'sparkles': return '✨';
-      case 'fire': return '🔥';
-      default: return '🎁';
+      case 'gift': return '';
+      case 'tag': return '';
+      case 'sparkles': return '';
+      case 'fire': return '';
+      default: return '';
     }
   };
 
@@ -168,7 +168,7 @@ const GiftPromoPopup = ({ promotionTitle, promotionDescription, promotionIcon, o
                 </div>
 
                 <div>
-                  <p className="text-sm font-bold text-primary mb-1">🔥 מבצע החודש</p>
+                  <p className="text-sm font-bold text-primary mb-1">מבצע החודש</p>
                   <h3 className="text-2xl font-extrabold text-foreground mb-2">{promotionTitle}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">{promotionDescription}</p>
                 </div>
@@ -211,7 +211,7 @@ const GiftPromoPopup = ({ promotionTitle, promotionDescription, promotionIcon, o
                 <div className="mx-auto w-24 h-24 bg-gradient-to-br from-success/20 to-emerald-400/20 rounded-full flex items-center justify-center">
                   <PartyPopper className="w-12 h-12 text-success" />
                 </div>
-                <p className="text-xl font-extrabold text-foreground">מדהים! 🎉</p>
+                <p className="text-xl font-extrabold text-foreground">מדהים!</p>
                 <p className="text-muted-foreground">המתנה שלך נשמרה בהצלחה</p>
               </div>
             )}
@@ -223,7 +223,7 @@ const GiftPromoPopup = ({ promotionTitle, promotionDescription, promotionIcon, o
                   <Check className="w-10 h-10 text-success" strokeWidth={3} />
                 </div>
                 <div>
-                  <p className="text-lg font-extrabold text-foreground">המתנה שלך מובטחת ✅</p>
+                  <p className="text-lg font-extrabold text-foreground">המתנה שלך מובטחת</p>
                   <p className="text-sm text-muted-foreground mt-1">רק נשאר לבחור דגם ולהשלים את ההזמנה</p>
                 </div>
               </div>

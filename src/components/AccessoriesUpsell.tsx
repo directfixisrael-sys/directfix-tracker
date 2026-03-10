@@ -136,7 +136,7 @@ const AccessoriesUpsell = ({ accessories, onToggle, disabled }: AccessoriesUpsel
         {/* Urgency message */}
         <div className="mt-4 text-center">
           <p className="text-xs text-muted-foreground">
-            ⚡ המחירים המיוחדים תקפים רק להזמנה הנוכחית
+            המחירים המיוחדים תקפים רק להזמנה הנוכחית
           </p>
         </div>
       </div>
