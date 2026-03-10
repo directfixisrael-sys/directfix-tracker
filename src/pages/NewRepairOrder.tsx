@@ -2245,7 +2245,7 @@ const NewRepairOrder = () => {
             <div className="bg-muted/50 rounded-xl p-4">
               <p className="text-sm text-muted-foreground mb-3">תוכלו לעקוב אחרי סטטוס התיקון בזמן אמת</p>
               <Button onClick={handleTrackOrder} className="w-full h-12 text-base rounded-xl">
-                📍 מעקב אחר ההזמנה שלי
+                מעקב אחר ההזמנה שלי
               </Button>
             </div>
 
