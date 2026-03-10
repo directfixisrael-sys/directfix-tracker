@@ -1650,7 +1650,7 @@ const NewRepairOrder = () => {
                   </div>
                 </div>
               </div>
-              <h2 className="font-bold mb-2 text-xl">הצעה מיוחדת! 🎉</h2>
+              <h2 className="font-bold mb-2 text-xl">הצעה מיוחדת!</h2>
               <p className="text-muted-foreground text-sm">מצאנו לך מבצע משתלם</p>
             </div>
 
