@@ -992,7 +992,17 @@ const NewRepairOrder = () => {
         deviceImages: deviceImages.length > 0 ? deviceImages : [],
       } as any);
 
-      // For gift orders: create PayPlus payment link and go to payment step
+      // Deduct loyalty points if redeemed
+      if (loyaltyRedeemed && loyaltyDiscount > 0 && orderResult?.id) {
+        await supabase.from('loyalty_points').insert({
+          customer_phone: customerPhone.trim(),
+          points: -(loyaltyDiscount * 10),
+          type: 'redeemed',
+          order_id: orderResult.id,
+          description: `מימוש ₪${loyaltyDiscount} הנחה בהזמנה #${orderResult.order_number}`,
+        });
+      }
+
       // For gift orders: create PayPlus payment link and go to payment step
       if (isGiftOrder) {
         try {
