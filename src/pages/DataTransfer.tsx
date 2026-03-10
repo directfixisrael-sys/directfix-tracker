@@ -575,7 +575,7 @@ const DataTransfer = () => {
               <CheckCircle2 className="w-14 h-14 text-green-500" />
             </div>
             <div>
-              <h2 className="text-3xl font-extrabold mb-2">ההזמנה התקבלה! 🎉</h2>
+              <h2 className="text-3xl font-extrabold mb-2">ההזמנה התקבלה!</h2>
               {completedOrderNumber && (
                 <p className="text-muted-foreground">מספר הזמנה: <span className="font-bold text-foreground">#{completedOrderNumber}</span></p>
               )}

@@ -130,7 +130,7 @@ const ConsultationBooking = () => {
       ].filter(Boolean);
 
       if (consultationType === 'paid') {
-        notes.push('⚠️ ממתין לתשלום');
+        notes.push('ממתין לתשלום');
       }
 
       const orderData = await addOrder({

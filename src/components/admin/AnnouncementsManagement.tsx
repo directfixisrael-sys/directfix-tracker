@@ -106,7 +106,7 @@ const AnnouncementsManagement = () => {
   };
 
   const getPlacementLabel = (p: string) => PLACEMENTS.find(pl => pl.value === p)?.label || p;
-  const getPlacementIcon = (p: string) => PLACEMENTS.find(pl => pl.value === p)?.icon || '📢';
+  const getPlacementIcon = (p: string) => PLACEMENTS.find(pl => pl.value === p)?.icon || '';
   const getColorInfo = (c: string) => COLORS.find(cl => cl.value === c) || COLORS[0];
 
   if (isLoading) {

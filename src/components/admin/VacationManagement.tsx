@@ -302,7 +302,7 @@ const VacationManagement = () => {
                     <p className="font-medium">{formatDate(blockedDate.date)}</p>
                     {blockedDate.start_time && blockedDate.end_time && (
                       <p className="text-sm text-orange-600 font-medium">
-                        🕐 {formatTime(blockedDate.start_time)} - {formatTime(blockedDate.end_time)}
+                        {formatTime(blockedDate.start_time)} - {formatTime(blockedDate.end_time)}
                       </p>
                     )}
                     {!blockedDate.start_time && (

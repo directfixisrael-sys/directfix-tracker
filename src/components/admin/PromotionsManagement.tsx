@@ -199,7 +199,7 @@ const PromotionsManagement = () => {
   };
 
   const getIconEmoji = (iconValue: string | null) => {
-    return iconOptions.find(i => i.value === iconValue)?.icon || '🎁';
+    return iconOptions.find(i => i.value === iconValue)?.icon || '';
   };
 
   if (isLoading) {

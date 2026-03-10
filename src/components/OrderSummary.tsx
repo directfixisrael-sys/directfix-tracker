@@ -137,7 +137,7 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
               {activePromotion.value && activePromotion.value > 0 && (
                 <span className="line-through text-muted-foreground text-sm">₪{activePromotion.value}</span>
               )}
-              <span className="font-bold text-success text-lg">חינם! 🎉</span>
+              <span className="font-bold text-success text-lg">חינם!</span>
             </div>
           </div>
         )}

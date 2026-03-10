@@ -136,7 +136,7 @@ const RatingPrompt = ({ onRate, currentRating, currentFeedback }: RatingPromptPr
           
           {selectedRating >= 4 ? (
             <div className="space-y-4">
-              <p className="text-success font-semibold">תודה רבה! 💚</p>
+              <p className="text-success font-semibold">תודה רבה!</p>
               <p className="text-sm text-muted-foreground">
                 נשמח אם תשתפו את החוויה גם בגוגל
               </p>

@@ -154,7 +154,7 @@ const ResultsCard = ({
 
       {!matchedModel && !matchedRepairs.length && (
         <p className="text-xs text-muted-foreground text-center">
-          לא מצאתי התאמה, בחר ידנית מהרשימה 👇
+          לא מצאתי התאמה, בחר ידנית מהרשימה
         </p>
       )}
     </div>
