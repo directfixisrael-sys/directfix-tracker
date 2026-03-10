@@ -416,8 +416,14 @@ const NewRepairOrder = () => {
   }, [isGiftOrder]);
   const [giftClaimed, setGiftClaimed] = useState(false);
 
-  // Broadcast initial step on mount
+  // Force scroll to top on mount
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0;
+    }
     window.dispatchEvent(new CustomEvent('repair-step-change', { detail: { step: 'model' } }));
   }, []);
 
