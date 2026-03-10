@@ -308,6 +308,18 @@ const NewRepairOrder = () => {
   const [customerNotes, setCustomerNotes] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
 
+  const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
+
+  // Update lead step tracking
+  const updateLeadStep = async (stepName: string) => {
+    if (!currentLeadId) return;
+    try {
+      await supabase.from('leads').update({ last_step: stepName }).eq('id', currentLeadId);
+    } catch (e) {
+      console.error('Error updating lead step:', e);
+    }
+  };
+
   // Sync intro fields to customer fields and save lead
   const handleIntroDismiss = async () => {
     if (introName.trim()) setCustomerName(introName.trim());
@@ -328,12 +340,14 @@ const NewRepairOrder = () => {
 
     // Save lead to DB
     try {
-      await supabase.from('leads').insert({
+      const { data: leadData } = await supabase.from('leads').insert({
         customer_name: introName.trim(),
         customer_phone: normalizedPhone,
         privacy_accepted: introPrivacy,
         is_returning_customer: isReturning,
-      });
+        last_step: 'בחירת דגם',
+      }).select('id').single();
+      if (leadData) setCurrentLeadId(leadData.id);
     } catch (e) {
       console.error('Error saving lead:', e);
     }
