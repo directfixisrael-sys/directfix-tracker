@@ -27,9 +27,9 @@ interface Announcement {
 }
 
 const PLACEMENTS = [
-  { value: 'header_banner', label: 'באנר עליון (הדר)', icon: '📢' },
-  { value: 'popup', label: 'חלון קופץ (פופאפ)', icon: '💬' },
-  { value: 'toast', label: 'התראה צפה (טוסט)', icon: '🔔' },
+  { value: 'header_banner', label: 'באנר עליון (הדר)', icon: '' },
+  { value: 'popup', label: 'חלון קופץ (פופאפ)', icon: '' },
+  { value: 'toast', label: 'התראה צפה (טוסט)', icon: '' },
 ];
 
 const COLORS = [
