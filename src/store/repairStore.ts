@@ -175,6 +175,11 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
     return get().orders.find(o => o.customerPhone.replace(/\D/g, '') === normalizedPhone);
   },
 
+  findAllOrdersByPhone: (phone) => {
+    const normalizedPhone = phone.replace(/\D/g, '');
+    return get().orders.filter(o => o.customerPhone.replace(/\D/g, '') === normalizedPhone);
+  },
+
   toggleAccessory: async (orderId, accessoryId) => {
     const order = get().orders.find(o => o.id === orderId);
     if (!order) return;
