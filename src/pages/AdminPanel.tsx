@@ -74,6 +74,7 @@ import AdminDashboard from '@/components/admin/AdminDashboard';
 import LiveView from '@/components/admin/LiveView';
 import AnnouncementsManagement from '@/components/admin/AnnouncementsManagement';
 import RemindersManagement from '@/components/admin/RemindersManagement';
+import LoyaltyManagement from '@/components/admin/LoyaltyManagement';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -964,6 +965,9 @@ const AdminPanel = () => {
 
       case 'announcements':
         return <AnnouncementsManagement />;
+
+      case 'loyalty':
+        return <LoyaltyManagement />;
       case 'feedback':
         const ordersWithFeedback = orders.filter(o => o.rating);
         const avgRating = ordersWithFeedback.length > 0 
@@ -1769,7 +1773,7 @@ const AdminPanel = () => {
               <button 
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
-                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'bundles', 'settings', 'announcements', 'coupons'].includes(activeTab)
+                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'bundles', 'settings', 'announcements', 'coupons', 'loyalty'].includes(activeTab)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground"
                 )}
@@ -1819,6 +1823,10 @@ const AdminPanel = () => {
               <DropdownMenuItem onClick={() => setActiveTab('coupons')} className={cn("gap-3 py-3", activeTab === 'coupons' && "text-primary font-medium")}>
                 <CreditCard className="w-4 h-4" />
                 <span>קופונים</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('loyalty')} className={cn("gap-3 py-3", activeTab === 'loyalty' && "text-primary font-medium")}>
+                <Star className="w-4 h-4" />
+                <span>נאמנות</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('settings')} className={cn("gap-3 py-3", activeTab === 'settings' && "text-primary font-medium")}>
                 <Settings className="w-4 h-4" />
@@ -1918,7 +1926,7 @@ const AdminPanel = () => {
             onClick={() => setSettingsSubOpen(!settingsSubOpen)}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              ['customers', 'messages', 'prices', 'feedback', 'promotions', 'coupons', 'bundles', 'settings', 'announcements', 'reminders'].includes(activeTab)
+              ['customers', 'messages', 'prices', 'feedback', 'promotions', 'coupons', 'bundles', 'settings', 'announcements', 'reminders', 'loyalty'].includes(activeTab)
                 ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                 : "text-sidebar-foreground hover:bg-sidebar-accent/50"
             )}
@@ -2060,6 +2068,18 @@ const AdminPanel = () => {
                 <Bell className="w-4 h-4" />
                 <span>תזכורות</span>
               </button>
+              <button 
+                onClick={() => setActiveTab('loyalty')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'loyalty' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Star className="w-4 h-4" />
+                <span>נאמנות</span>
+              </button>
             </div>
           )}
         </nav>
@@ -2095,6 +2115,7 @@ const AdminPanel = () => {
               {activeTab === 'bundles' && 'ניהול חבילות תיקון'}
               {activeTab === 'announcements' && 'הודעות והתראות'}
               {activeTab === 'reminders' && 'תזכורות ומשימות'}
+              {activeTab === 'loyalty' && 'תוכנית נאמנות'}
             </h1>
             <p className="text-xs md:text-sm text-muted-foreground">
               {activeTab === 'orders' && `${orders.length} הזמנות`}
