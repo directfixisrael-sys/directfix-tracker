@@ -212,6 +212,44 @@ export type Database = {
         }
         Relationships: []
       }
+      loyalty_points: {
+        Row: {
+          created_at: string
+          customer_phone: string
+          description: string
+          id: string
+          order_id: string | null
+          points: number
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          customer_phone: string
+          description?: string
+          id?: string
+          order_id?: string | null
+          points: number
+          type?: string
+        }
+        Update: {
+          created_at?: string
+          customer_phone?: string
+          description?: string
+          id?: string
+          order_id?: string | null
+          points?: number
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_points_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           id: string
