@@ -1361,7 +1361,11 @@ const NewRepairOrder = () => {
             {/* Hero Welcome Section */}
             <div className="text-center py-4">
               <h1 className="text-4xl font-extrabold mb-3 tracking-tight">
-                {additionalRepairs.length > 0 ? 'בחרו דגם לתיקון הנוסף' : introName ? `${introName}, מה נתקן? 🔧` : 'מה נתקן היום?'}
+                {additionalRepairs.length > 0 ? 'בחרו דגם לתיקון הנוסף' : (() => {
+                  const hour = new Date().getHours();
+                  const greeting = hour >= 5 && hour < 12 ? 'בוקר טוב' : hour >= 12 && hour < 17 ? 'צהריים טובים' : hour >= 17 && hour < 21 ? 'ערב טוב' : 'לילה טוב';
+                  return introName ? `${greeting} ${introName}, איך נוכל לעזור? 🔧` : 'מה נתקן היום?';
+                })()}
               </h1>
               <p className="text-muted-foreground text-sm">בחרו דגם ונגיע אליכם תוך שעה*</p>
               <div className="flex items-center justify-center gap-4 mt-4">
