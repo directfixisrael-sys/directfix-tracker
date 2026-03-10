@@ -106,7 +106,7 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
 
           <div className="px-5 py-4 border-b border-primary/10 flex items-center gap-2">
             <Gift className="w-5 h-5 text-primary" />
-            <h4 className="text-sm font-bold text-foreground">שירות תיקון במתנה 🎁</h4>
+            <h4 className="text-sm font-bold text-foreground">שירות תיקון במתנה</h4>
           </div>
 
           <div className="px-5 py-4 space-y-4">

@@ -223,7 +223,7 @@ const GiftPromoPopup = ({ promotionTitle, promotionDescription, promotionIcon, o
                   <Check className="w-10 h-10 text-success" strokeWidth={3} />
                 </div>
                 <div>
-                  <p className="text-lg font-extrabold text-foreground">המתנה שלך מובטחת ✅</p>
+                  <p className="text-lg font-extrabold text-foreground">המתנה שלך מובטחת</p>
                   <p className="text-sm text-muted-foreground mt-1">רק נשאר לבחור דגם ולהשלים את ההזמנה</p>
                 </div>
               </div>

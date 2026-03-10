@@ -794,7 +794,7 @@ const DevicePurchase = () => {
             </Card>
 
             <p className="text-center text-xs text-muted-foreground">
-              🔒 תשלום מאובטח · נציג ייצור איתכם קשר תוך שעה
+              תשלום מאובטח · נציג ייצור איתכם קשר תוך שעה
             </p>
           </div>
         )}
