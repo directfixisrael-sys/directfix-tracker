@@ -1367,7 +1367,7 @@ const NewRepairOrder = () => {
                   return introName ? `${greeting} ${introName}, איך נוכל לעזור? 🔧` : 'מה נתקן היום?';
                 })()}
               </h1>
-              <p className="text-muted-foreground text-sm">בחרו דגם ונגיע אליכם תוך שעה*</p>
+              <p className="text-muted-foreground text-sm">בחרו את הדגם שלכם ונתחיל ✨</p>
               <div className="flex items-center justify-center gap-4 mt-4">
                 <Dialog>
                   <DialogTrigger asChild>
