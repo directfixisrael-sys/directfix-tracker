@@ -1139,8 +1139,7 @@ const NewRepairOrder = () => {
       {step === 'repair' && selectedRepair === null && <div className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full flex items-center justify-center animate-pulse">
           <span className="text-destructive-foreground text-xs font-bold">!</span>
         </div>}
-    </div>
-    </>;
+    </div>;
 
   // Shared cart display for additional repairs
   const renderRepairCart = () => (
