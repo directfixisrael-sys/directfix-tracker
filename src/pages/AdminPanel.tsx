@@ -1403,7 +1403,7 @@ const AdminPanel = () => {
                         <div className="mt-3 p-2 bg-success/10 rounded-lg">
                           <p className="text-sm text-success font-medium">✓ קישור וויז פעיל</p>
                           {extractedEta && (
-                            <p className="text-sm font-semibold text-foreground mt-1">🕐 הגעה משוערת: {extractedEta}</p>
+                            <p className="text-sm font-semibold text-foreground mt-1">הגעה משוערת: {extractedEta}</p>
                           )}
                           <p className="text-xs text-muted-foreground mt-1 truncate" dir="ltr">
                             {selectedOrder.wazeLink?.match(/https:\/\/waze\.com\/ul[^\s]*/)?.[0] || 'קישור פעיל'}
