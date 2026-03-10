@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import OrderPageSkeleton from '@/components/OrderPageSkeleton';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1077,14 +1078,7 @@ const NewRepairOrder = () => {
 
 
   if (isLoading) {
-    return <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto animate-pulse">
-            <Wrench className="w-8 h-8 text-primary" />
-          </div>
-          <p className="text-muted-foreground text-sm font-medium">טוען...</p>
-        </div>
-      </div>;
+    return <OrderPageSkeleton />;
   }
   return <div className="min-h-screen bg-background flex flex-col" lang="he">
       {/* Skip to content */}
