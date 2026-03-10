@@ -277,7 +277,7 @@ const RemindersManagement = () => {
             {filter === 'completed' ? 'אין משימות שהושלמו' : 'אין תזכורות'}
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
-            {filter === 'pending' ? 'מעולה! אין משימות ממתינות 🎉' : 'צור את התזכורת הראשונה'}
+            {filter === 'pending' ? 'מעולה! אין משימות ממתינות' : 'צור את התזכורת הראשונה'}
           </p>
           {filter !== 'completed' && (
             <Button onClick={() => handleOpenDialog()}>צור תזכורת</Button>
