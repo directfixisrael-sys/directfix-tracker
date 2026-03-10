@@ -130,20 +130,38 @@ const CustomerTracker = () => {
 
     await new Promise(resolve => setTimeout(resolve, 600));
 
-    const order = findOrderByPhone(phone);
-    if (order) {
-      setCurrentOrder(order);
+    const allOrders = findAllOrdersByPhone(phone);
+    if (allOrders.length > 1) {
+      // Multiple orders - show history list
+      setPhoneOrders(allOrders);
+      setShowHistory(true);
+      setCurrentOrder(null);
       setError('');
-      // Show privacy modal if not accepted yet
+    } else if (allOrders.length === 1) {
+      // Single order - go directly
+      setCurrentOrder(allOrders[0]);
+      setPhoneOrders(allOrders);
+      setShowHistory(false);
+      setError('');
       if (!hasAcceptedPrivacy) {
         setShowPrivacyModal(true);
       }
     } else {
       setError('לא נמצאה הזמנה עם מספר הטלפון הזה. וודאו שהמספר נכון או צרו קשר עם התמיכה.');
       setCurrentOrder(null);
+      setPhoneOrders([]);
+      setShowHistory(false);
     }
     
     setIsSearching(false);
+  };
+
+  const handleSelectOrder = (order: RepairOrder) => {
+    setCurrentOrder(order);
+    setShowHistory(false);
+    if (!hasAcceptedPrivacy) {
+      setShowPrivacyModal(true);
+    }
   };
 
   const handlePrivacyAccept = () => {
