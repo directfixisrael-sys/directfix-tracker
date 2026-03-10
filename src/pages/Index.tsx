@@ -47,7 +47,7 @@ const Index = () => {
               <Logo size="lg" clickable={false} className="justify-center mb-5" />
               <h1 className="text-4xl font-extrabold text-foreground tracking-tight leading-tight mb-3">
                 תיקוני אייפון עם{' '}
-                <span className="text-highlight-box text-3xl">החברה המובילה בישראל</span>
+                <span className="text-primary font-extrabold text-3xl">החברה המובילה בישראל</span>
               </h1>
               <p className="text-muted-foreground mt-3 max-w-xs mx-auto leading-relaxed text-sm">
                 טכנאי מגיע עד אליך. מהיר, מקצועי, עם אחריות מלאה.
@@ -82,7 +82,7 @@ const Index = () => {
         <section className="section-peach border-b-2 border-foreground/10">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
-              <span className="text-highlight text-3xl text-secondary-foreground bg-primary-foreground">איך השירות עובד?</span>
+              <span className="text-3xl text-foreground">איך השירות עובד?</span>
             </h2>
             <p className="text-muted-foreground mb-6 text-base">צפו בסרטון קצר ותבינו כמה זה פשוט</p>
             
@@ -103,7 +103,7 @@ const Index = () => {
         <section className="section-lavender border-b-2 border-foreground/10">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
-              <span className="text-highlight">למה לבחור בנו?</span>
+              <span className="text-foreground">למה לבחור בנו?</span>
             </h2>
             <p className="text-muted-foreground mb-8 text-base">15+ שנות ניסיון ואלפי לקוחות מרוצים</p>
             
@@ -137,7 +137,7 @@ const Index = () => {
         <section className="section-mint border-b-2 border-foreground/10">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
-              <span className="text-highlight">מה הלקוחות אומרים</span>
+              <span className="text-foreground">מה הלקוחות אומרים</span>
             </h2>
             
             <div className="flex items-center justify-center gap-3 flex-wrap animate-fade-in" style={{ animationDelay: '250ms' }}>
@@ -178,7 +178,7 @@ const Index = () => {
         <section className="section-peach">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
-              <span className="text-highlight">אמצעי תשלום</span>
+              <span className="text-foreground">אמצעי תשלום</span>
             </h2>
             <div className="flex items-center justify-center gap-3 animate-fade-in" style={{ animationDelay: '300ms' }}>
               <div className="strategly-card h-14 w-18 flex items-center justify-center p-2">
