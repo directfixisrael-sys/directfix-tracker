@@ -212,6 +212,39 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          converted: boolean
+          created_at: string
+          customer_name: string
+          customer_phone: string
+          id: string
+          is_returning_customer: boolean
+          privacy_accepted: boolean
+          updated_at: string
+        }
+        Insert: {
+          converted?: boolean
+          created_at?: string
+          customer_name: string
+          customer_phone: string
+          id?: string
+          is_returning_customer?: boolean
+          privacy_accepted?: boolean
+          updated_at?: string
+        }
+        Update: {
+          converted?: boolean
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          is_returning_customer?: boolean
+          privacy_accepted?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       loyalty_points: {
         Row: {
           created_at: string
