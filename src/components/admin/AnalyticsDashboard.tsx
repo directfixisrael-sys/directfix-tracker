@@ -324,10 +324,10 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
 
   const getDeviceIcon = (device: string) => {
     switch (device) {
-      case 'mobile': return '📱';
-      case 'desktop': return '🖥️';
-      case 'tablet': return '📱';
-      default: return '📱';
+      case 'mobile': return 'נייד';
+      case 'desktop': return 'מחשב';
+      case 'tablet': return 'טאבלט';
+      default: return 'נייד';
     }
   };
 
