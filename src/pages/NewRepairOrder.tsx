@@ -29,6 +29,7 @@ import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { getLeadSource } from '@/lib/leadSource';
 import GiftOrderToggle from '@/components/GiftOrderToggle';
 import LoyaltyPointsBadge from '@/components/LoyaltyPointsBadge';
+import LoyaltyExplainer from '@/components/LoyaltyExplainer';
 
 // iPhone back glass colors per model family
 const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
