@@ -838,7 +838,7 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
                           {referrerHost || '—'}
                         </TableCell>
                         <TableCell className="text-xs">
-                          {visit.device_type === 'mobile' ? '📱 נייד' : visit.device_type === 'desktop' ? '🖥️ מחשב' : visit.device_type === 'tablet' ? '📱 טאבלט' : '—'}
+                          {visit.device_type === 'mobile' ? 'נייד' : visit.device_type === 'desktop' ? 'מחשב' : visit.device_type === 'tablet' ? 'טאבלט' : '—'}
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground">
                           {visit.language?.split('-')[0] || '—'}
