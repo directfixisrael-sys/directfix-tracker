@@ -294,6 +294,11 @@ const CustomerTracker = () => {
           />
         )}
 
+        {/* Warranty Certificate - show when completed */}
+        {showRating && (
+          <WarrantyCertificate order={currentOrder} />
+        )}
+
         {/* Invoice download - show below rating when completed */}
         {showRating && currentOrder.invoiceLink && (
           <div className="glass-card rounded-xl p-5 animate-fade-in">
