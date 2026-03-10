@@ -2160,7 +2160,7 @@ const NewRepairOrder = () => {
 
             <div className="bg-muted/50 rounded-xl p-4 space-y-3">
               <p className="text-sm text-muted-foreground text-center">
-                🔒 התשלום מתבצע בסביבה מאובטחת ומוצפנת
+                התשלום מתבצע בסביבה מאובטחת ומוצפנת
               </p>
               <Button onClick={handleGiftPaymentSuccess} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg">
                 <CheckCircle2 className="w-5 h-5 ml-2" />
