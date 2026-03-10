@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone, Play } from 'lucide-react';
 import { useState } from 'react';
 import Logo from '@/components/Logo';
-import LoyaltyExplainer from '@/components/LoyaltyExplainer';
 import paymentBit from '@/assets/payment-bit.png';
 import paymentPaybox from '@/assets/payment-paybox.png';
 import paymentVisa from '@/assets/payment-visa.png';
@@ -172,13 +171,6 @@ const Index = () => {
                 <span className="text-base font-extrabold">9.94</span>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Loyalty Section */}
-        <section className="section-cream border-b-2 border-foreground/10">
-          <div className="max-w-2xl mx-auto px-6 py-10">
-            <LoyaltyExplainer variant="section" />
           </div>
         </section>
 

@@ -28,8 +28,6 @@ import GiftPromoPopup from '@/components/GiftPromoPopup';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { getLeadSource } from '@/lib/leadSource';
 import GiftOrderToggle from '@/components/GiftOrderToggle';
-import LoyaltyPointsBadge from '@/components/LoyaltyPointsBadge';
-import LoyaltyExplainer from '@/components/LoyaltyExplainer';
 
 // iPhone back glass colors per model family
 const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
@@ -315,10 +313,6 @@ const NewRepairOrder = () => {
     discount_value: number;
   } | null>(null);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
-
-  // Loyalty points
-  const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
-  const [loyaltyRedeemed, setLoyaltyRedeemed] = useState(false);
 
   // Image upload
   const [deviceImages, setDeviceImages] = useState<string[]>([]);
@@ -819,13 +813,7 @@ const NewRepairOrder = () => {
     return appliedCoupon.discount_value;
   };
   const getFinalPrice = () => {
-    return Math.max(0, getTotalPrice() - getDiscount() - loyaltyDiscount);
-  };
-
-  const handleLoyaltyRedeem = (discount: number) => {
-    setLoyaltyDiscount(discount);
-    setLoyaltyRedeemed(true);
-    toast.success(`הנחת נאמנות של ₪${discount} הופעלה!`);
+    return Math.max(0, getTotalPrice() - getDiscount());
   };
 
   // Image upload
@@ -963,9 +951,6 @@ const NewRepairOrder = () => {
           }).eq('code', appliedCoupon.code);
         }
       }
-      if (loyaltyRedeemed && loyaltyDiscount > 0) {
-        notes.push(`⭐ הנחת נאמנות: -₪${loyaltyDiscount} (מימוש ${loyaltyDiscount * 10} נקודות)`);
-      }
       if (deviceImages.length > 0) {
         notes.push(`תמונות מכשיר: ${deviceImages.length} תמונות צורפו`);
       }
@@ -993,17 +978,7 @@ const NewRepairOrder = () => {
         deviceImages: deviceImages.length > 0 ? deviceImages : [],
       } as any);
 
-      // Deduct loyalty points if redeemed
-      if (loyaltyRedeemed && loyaltyDiscount > 0 && orderResult?.id) {
-        await supabase.from('loyalty_points').insert({
-          customer_phone: customerPhone.trim(),
-          points: -(loyaltyDiscount * 10),
-          type: 'redeemed',
-          order_id: orderResult.id,
-          description: `מימוש ₪${loyaltyDiscount} הנחה בהזמנה #${orderResult.order_number}`,
-        });
-      }
-
+      // For gift orders: create PayPlus payment link and go to payment step
       // For gift orders: create PayPlus payment link and go to payment step
       if (isGiftOrder) {
         try {
@@ -1321,9 +1296,6 @@ const NewRepairOrder = () => {
             <SmartRepairInput models={models} repairTypes={repairTypes} priceMap={priceMap} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
 
             <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => setSelectedModel(model)} onConfirm={model => handleModelSelect(model)} />
-
-            {/* Loyalty Explainer */}
-            <LoyaltyExplainer variant="compact" />
 
             {/* Testimonials Slider */}
             <TestimonialsSlider />
@@ -1715,31 +1687,16 @@ const NewRepairOrder = () => {
                     </div>}
                 </div>
 
-                {/* Loyalty Points Section */}
-                {customerPhone.length >= 9 && (
-                  <div className="border-t border-border pt-3">
-                    <LoyaltyPointsBadge
-                      customerPhone={customerPhone}
-                      variant="order"
-                      onRedeem={handleLoyaltyRedeem}
-                      redeemed={loyaltyRedeemed}
-                    />
-                  </div>
-                )}
-
                 <div className="border-t border-border pt-3 mt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-bold">סה"כ</span>
                     <div className="text-right">
-                      {(appliedCoupon || loyaltyRedeemed) && <span className="text-muted-foreground line-through text-sm mr-2">₪{getTotalPrice()}</span>}
+                      {appliedCoupon && <span className="text-muted-foreground line-through text-sm mr-2">₪{getTotalPrice()}</span>}
                       <span className="text-xl font-bold text-primary">₪{getFinalPrice()}</span>
                     </div>
                   </div>
                   {appliedCoupon && <div className="text-xs text-success mt-1 text-left">
                       🎉 חיסכת ₪{getDiscount()} עם קופון {appliedCoupon.code}!
-                    </div>}
-                  {loyaltyRedeemed && <div className="text-xs text-amber-500 mt-1 text-left">
-                      ⭐ הנחת נאמנות: -₪{loyaltyDiscount}
                     </div>}
                   {selectedBundleAddon && currentBundle && <div className="text-xs text-amber-500 mt-1 text-left">
                       🔋 כולל סוללה בהנחה של {currentBundle.discount_percent}%

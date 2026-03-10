@@ -6,11 +6,11 @@ interface RepairStore {
   orders: RepairOrder[];
   messages: ChatMessage[];
   currentOrder: RepairOrder | null;
-  activeTab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders' | 'loyalty';
+  activeTab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders';
   isLoading: boolean;
   
   // Tab actions
-  setActiveTab: (tab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders' | 'loyalty') => void;
+  setActiveTab: (tab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders') => void;
   
   // Data loading
   loadOrders: () => Promise<void>;
@@ -325,26 +325,6 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
 
     if (error) {
       console.error('Error updating status:', error);
-    }
-
-    // Auto-award 50 loyalty points when order is completed
-    if (status === 'completed' && order.customerPhone) {
-      // Check if points were already awarded for this order
-      const { data: existing } = await supabase
-        .from('loyalty_points')
-        .select('id')
-        .eq('order_id', orderId)
-        .eq('type', 'earned');
-      
-      if (!existing || existing.length === 0) {
-        await supabase.from('loyalty_points').insert({
-          customer_phone: order.customerPhone,
-          points: 50,
-          type: 'earned',
-          order_id: orderId,
-          description: `50 נקודות על תיקון #${order.orderNumber}`,
-        });
-      }
     }
   },
 
