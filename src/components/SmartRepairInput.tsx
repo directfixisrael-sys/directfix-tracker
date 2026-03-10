@@ -238,14 +238,17 @@ const SmartRepairInput = ({
   // Mobile: button that opens dialog
   return (
     <>
-      <Button
-        onClick={() => setIsOpen(true)}
-        className="w-full h-12 rounded-xl gap-2.5 justify-center text-base font-semibold shadow-md"
-      >
-        <Sparkles className="w-5 h-5" />
-        <span>חיפוש חכם עם AI</span>
-        <Search className="w-4 h-4 opacity-70" />
-      </Button>
+      <div className="relative group">
+        <div className="absolute -inset-0.5 rounded-2xl bg-[conic-gradient(from_var(--ai-angle),hsl(var(--primary)),hsl(280_80%_60%),hsl(200_90%_60%),hsl(var(--primary)))] opacity-75 blur-sm animate-[ai-spin_3s_linear_infinite] group-hover:opacity-100 transition-opacity" style={{ '--ai-angle': '0deg' } as React.CSSProperties} />
+        <Button
+          onClick={() => setIsOpen(true)}
+          className="relative w-full h-12 rounded-xl gap-2.5 justify-center text-base font-semibold shadow-md bg-primary hover:bg-primary/90"
+        >
+          <Sparkles className="w-5 h-5" />
+          <span>חיפוש חכם עם AI</span>
+          <Search className="w-4 h-4 opacity-70" />
+        </Button>
+      </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="max-w-sm">
