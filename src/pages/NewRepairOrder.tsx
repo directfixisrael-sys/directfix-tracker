@@ -1363,7 +1363,7 @@ const NewRepairOrder = () => {
                 {additionalRepairs.length > 0 ? 'בחרו דגם לתיקון הנוסף' : (() => {
                   const hour = new Date().getHours();
                   const greeting = hour >= 5 && hour < 12 ? 'בוקר טוב' : hour >= 12 && hour < 17 ? 'צהריים טובים' : hour >= 17 && hour < 21 ? 'ערב טוב' : 'לילה טוב';
-                  return introName ? `${greeting} ${introName}, איך נוכל לעזור? 🔧` : 'מה נתקן היום?';
+                  return introName ? `${greeting} ${introName}, איך נוכל לעזור?` : 'מה נתקן היום?';
                 })()}
               </h1>
               <p className="text-muted-foreground text-sm">בחרו את הדגם שלכם ונתחיל ✨</p>
