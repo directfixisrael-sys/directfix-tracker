@@ -521,6 +521,8 @@ const AdminPanel = () => {
     switch (activeTab) {
       case 'dashboard':
         return <AdminDashboard orders={orders} />;
+      case 'leads':
+        return <LeadsManagement />;
       case 'live':
         return <LiveView />;
       case 'messages':
