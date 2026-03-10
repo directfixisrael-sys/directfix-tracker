@@ -315,6 +315,10 @@ const NewRepairOrder = () => {
   } | null>(null);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
+  // Loyalty points
+  const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
+  const [loyaltyRedeemed, setLoyaltyRedeemed] = useState(false);
+
   // Image upload
   const [deviceImages, setDeviceImages] = useState<string[]>([]);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
