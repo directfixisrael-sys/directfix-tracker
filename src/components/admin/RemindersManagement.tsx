@@ -197,7 +197,7 @@ const RemindersManagement = () => {
     
     const formatDate = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
     
-    const title = encodeURIComponent(`📋 ${reminder.task_name} - ${reminder.customer_name}`);
+    const title = encodeURIComponent(`${reminder.task_name} - ${reminder.customer_name}`);
     const details = encodeURIComponent(
       `נושא: ${reminder.subject}\nלקוח: ${reminder.customer_name}\nטלפון: ${reminder.customer_phone}\n${reminder.notes ? `הערות: ${reminder.notes}` : ''}`
     );
