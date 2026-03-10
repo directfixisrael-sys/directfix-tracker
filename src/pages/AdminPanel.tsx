@@ -1905,6 +1905,18 @@ const AdminPanel = () => {
             )}
           </button>
           <button 
+            onClick={() => setActiveTab('leads')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'leads' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <Users className="w-5 h-5" />
+            <span>לידים</span>
+          </button>
+          <button 
             onClick={() => setActiveTab('analytics')}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
