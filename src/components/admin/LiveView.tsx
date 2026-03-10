@@ -42,13 +42,13 @@ const PAGE_NAMES: Record<string, string> = {
 };
 
 const STEP_NAMES: Record<string, string> = {
-  model: '📱 בחירת דגם',
-  repair: '🔧 בחירת תיקון',
-  bundle: '📦 חבילת תיקון',
-  price: '💰 אישור מחיר',
-  schedule: '📅 קביעת תור',
-  details: '📝 פרטי לקוח',
-  success: '✅ הזמנה הושלמה!',
+  model: 'בחירת דגם',
+  repair: 'בחירת תיקון',
+  bundle: 'חבילת תיקון',
+  price: 'אישור מחיר',
+  schedule: 'קביעת תור',
+  details: 'פרטי לקוח',
+  success: 'הזמנה הושלמה!',
 };
 
 const getDeviceIcon = (ua?: string) => {
