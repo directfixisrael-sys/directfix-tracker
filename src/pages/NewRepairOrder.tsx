@@ -1321,6 +1321,9 @@ const NewRepairOrder = () => {
 
             <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => setSelectedModel(model)} onConfirm={model => handleModelSelect(model)} />
 
+            {/* Loyalty Explainer */}
+            <LoyaltyExplainer variant="compact" />
+
             {/* Testimonials Slider */}
             <TestimonialsSlider />
 
