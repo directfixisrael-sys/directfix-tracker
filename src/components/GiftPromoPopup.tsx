@@ -211,7 +211,7 @@ const GiftPromoPopup = ({ promotionTitle, promotionDescription, promotionIcon, o
                 <div className="mx-auto w-24 h-24 bg-gradient-to-br from-success/20 to-emerald-400/20 rounded-full flex items-center justify-center">
                   <PartyPopper className="w-12 h-12 text-success" />
                 </div>
-                <p className="text-xl font-extrabold text-foreground">מדהים! 🎉</p>
+                <p className="text-xl font-extrabold text-foreground">מדהים!</p>
                 <p className="text-muted-foreground">המתנה שלך נשמרה בהצלחה</p>
               </div>
             )}
