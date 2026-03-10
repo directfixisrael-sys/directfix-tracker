@@ -28,6 +28,8 @@ const CustomerTracker = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [phoneOrders, setPhoneOrders] = useState<RepairOrder[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
   const [hasAcceptedPrivacy, setHasAcceptedPrivacy] = useState(() => {
     return localStorage.getItem('privacy_consent_accepted') === 'true';
   });
