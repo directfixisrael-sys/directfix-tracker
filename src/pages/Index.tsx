@@ -137,7 +137,7 @@ const Index = () => {
         <section className="section-mint border-b-2 border-foreground/10">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
-              <span className="text-highlight">מה הלקוחות אומרים</span>
+              <span className="text-foreground">מה הלקוחות אומרים</span>
             </h2>
             
             <div className="flex items-center justify-center gap-3 flex-wrap animate-fade-in" style={{ animationDelay: '250ms' }}>
