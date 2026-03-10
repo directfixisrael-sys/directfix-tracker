@@ -1067,6 +1067,11 @@ const NewRepairOrder = () => {
         trackPurchase(getFinalPrice());
         gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
         setCompletedOrderNumber(orderResult?.order_number || null);
+        
+        // Mark lead as converted
+        const normalizedPhone = customerPhone.replace(/\D/g, '');
+        await supabase.from('leads').update({ converted: true }).eq('customer_phone', normalizedPhone);
+        
         goToStep('success');
       }
     } catch (error) {
