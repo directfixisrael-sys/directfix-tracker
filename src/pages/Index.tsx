@@ -175,6 +175,13 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Loyalty Section */}
+        <section className="section-cream border-b-2 border-foreground/10">
+          <div className="max-w-2xl mx-auto px-6 py-10">
+            <LoyaltyExplainer variant="section" />
+          </div>
+        </section>
+
         {/* Payment Section - Peach */}
         <section className="section-peach">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
