@@ -278,6 +278,8 @@ const NewRepairOrder = () => {
   const [showIntroCard, setShowIntroCard] = useState(true);
   const [introName, setIntroName] = useState('');
   const [introPhone, setIntroPhone] = useState('');
+  const [introPrivacy, setIntroPrivacy] = useState(false);
+  const [isReturningCustomer, setIsReturningCustomer] = useState(false);
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
@@ -306,11 +308,39 @@ const NewRepairOrder = () => {
   const [customerNotes, setCustomerNotes] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
 
-  // Sync intro fields to customer fields
-  const handleIntroDismiss = () => {
+  // Sync intro fields to customer fields and save lead
+  const handleIntroDismiss = async () => {
     if (introName.trim()) setCustomerName(introName.trim());
     if (introPhone.trim()) setCustomerPhone(introPhone.trim());
     setShowIntroCard(false);
+
+    const normalizedPhone = introPhone.replace(/\D/g, '');
+    
+    // Check if returning customer
+    const { data: existingOrders } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('customer_phone', normalizedPhone)
+      .limit(1);
+    
+    const isReturning = !!(existingOrders && existingOrders.length > 0);
+    setIsReturningCustomer(isReturning);
+
+    // Save lead to DB
+    try {
+      await supabase.from('leads').insert({
+        customer_name: introName.trim(),
+        customer_phone: normalizedPhone,
+        privacy_accepted: introPrivacy,
+        is_returning_customer: isReturning,
+      });
+    } catch (e) {
+      console.error('Error saving lead:', e);
+    }
+
+    if (isReturning) {
+      toast.success(`ברוכים השבים ${introName.trim()}! 🎉 מגן מסך במתנה!`);
+    }
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptContact, setAcceptContact] = useState(false);
