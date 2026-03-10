@@ -141,7 +141,7 @@ const LiveVisitorsCard = ({ activeViewers }: { activeViewers: any[] }) => {
       {/* Order viewers */}
       {activeViewers.length > 0 && (
         <div className="mt-4 pt-4 border-t border-border">
-          <p className="text-xs text-muted-foreground mb-2">👁️ לקוחות צופים בהזמנות:</p>
+          <p className="text-xs text-muted-foreground mb-2">לקוחות צופים בהזמנות:</p>
           <div className="flex flex-wrap gap-2">
             {activeViewers.map(viewer => (
               <span 
