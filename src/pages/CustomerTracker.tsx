@@ -190,21 +190,30 @@ const CustomerTracker = () => {
     ? messages.filter(m => m.orderId === currentOrder.id)
     : [];
 
-  // Phone input screen
+  // Phone input screen or history list
   if (!currentOrder) {
     return (
       <div className="min-h-screen bg-background" lang="he">
-        <Header />
+        <Header showBackButton={showHistory} onBack={() => { setShowHistory(false); setPhoneOrders([]); }} />
         <main className="container py-8 px-4" role="main" aria-label="מעקב הזמנות - חיפוש">
-          <div className="max-w-sm mx-auto text-center mb-8 animate-slide-down">
-            <Logo size="md" clickable={false} className="justify-center mb-4" />
-            <p className="text-muted-foreground text-sm">מעקב אחר התיקון שלכם בזמן אמת</p>
-          </div>
-          <PhoneInput 
-            onSubmit={handleSearch}
-            isLoading={isSearching}
-            error={error}
-          />
+          {showHistory && phoneOrders.length > 0 ? (
+            <RepairHistoryList 
+              orders={phoneOrders} 
+              onSelectOrder={handleSelectOrder} 
+            />
+          ) : (
+            <>
+              <div className="max-w-sm mx-auto text-center mb-8 animate-slide-down">
+                <Logo size="md" clickable={false} className="justify-center mb-4" />
+                <p className="text-muted-foreground text-sm">מעקב אחר התיקון שלכם בזמן אמת</p>
+              </div>
+              <PhoneInput 
+                onSubmit={handleSearch}
+                isLoading={isSearching}
+                error={error}
+              />
+            </>
+          )}
         </main>
       </div>
     );
