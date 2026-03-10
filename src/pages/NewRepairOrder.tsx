@@ -1793,7 +1793,7 @@ const NewRepairOrder = () => {
                 {/* Image Upload - Inline */}
                 <div className="border-t border-border pt-3">
                   <label className="block text-xs font-medium mb-2 text-muted-foreground">
-                    📸 רוצה לצרף תמונה של המכשיר? (לא חובה)
+                    רוצה לצרף תמונה של המכשיר? (לא חובה)
                   </label>
                   {deviceImages.length > 0 && <div className="flex gap-2 mb-2 flex-wrap">
                       {deviceImages.map((img, idx) => <div key={idx} className="relative w-14 h-14 rounded-lg overflow-hidden border border-border">
