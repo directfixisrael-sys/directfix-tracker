@@ -13,10 +13,13 @@ import OrderSummary from '@/components/OrderSummary';
 import OrderSummarySheet from '@/components/OrderSummarySheet';
 import StickyHeader from '@/components/StickyHeader';
 import PrivacyConsentModal from '@/components/PrivacyConsentModal';
+import RepairHistoryList from '@/components/RepairHistoryList';
+import WarrantyCertificate from '@/components/WarrantyCertificate';
 import { useRepairStore } from '@/store/repairStore';
 import Logo from '@/components/Logo';
 import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { RepairOrder } from '@/types/repair';
 
 const CustomerTracker = () => {
   const [searchParams] = useSearchParams();
