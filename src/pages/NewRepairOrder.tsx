@@ -2366,6 +2366,7 @@ const NewRepairOrder = () => {
                 </div> : isGiftOrder ? '💳 המשך לתשלום' : 'שלח הזמנה'}
             </Button>}
         </div>}
-    </div>;
+    </div>
+  </>;
 };
 export default NewRepairOrder;
