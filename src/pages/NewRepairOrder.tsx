@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import OrderPageSkeleton from '@/components/OrderPageSkeleton';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
