@@ -359,7 +359,7 @@ const NewRepairOrder = () => {
     }
 
     if (isReturning) {
-      toast.success(`ברוכים השבים ${introName.trim()}! 🎉 מגן מסך במתנה!`);
+      toast.success(`ברוכים השבים ${introName.trim()}! מגן מסך במתנה!`);
     }
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
