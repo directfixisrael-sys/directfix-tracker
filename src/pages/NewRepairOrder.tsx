@@ -2181,10 +2181,10 @@ const NewRepairOrder = () => {
                     <CheckCircle2 className="w-10 h-10 text-success-foreground" />
                   </div>
                 </div>
-                <div className="absolute -top-1 -right-1 text-3xl animate-bounce">🎉</div>
-                <div className="absolute -bottom-1 -left-1 text-3xl animate-bounce" style={{
+                <Sparkles className="absolute -top-1 -right-1 w-7 h-7 text-primary animate-bounce" />
+                <Sparkles className="absolute -bottom-1 -left-1 w-7 h-7 text-primary animate-bounce" style={{
               animationDelay: '100ms'
-            }}>✨</div>
+            }} />
               </div>
             </div>
 
