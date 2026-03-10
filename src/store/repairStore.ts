@@ -20,6 +20,7 @@ interface RepairStore {
   // Customer actions
   setCurrentOrder: (order: RepairOrder | null) => void;
   findOrderByPhone: (phone: string) => RepairOrder | undefined;
+  findAllOrdersByPhone: (phone: string) => RepairOrder[];
   toggleAccessory: (orderId: string, accessoryId: string) => Promise<void>;
   setWantsPromotions: (orderId: string, wants: boolean) => Promise<void>;
   setRating: (orderId: string, rating: number, feedback?: string) => Promise<void>;
