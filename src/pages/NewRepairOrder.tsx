@@ -1840,7 +1840,7 @@ const NewRepairOrder = () => {
                     </div>
                   </div>
                   {appliedCoupon && <div className="text-xs text-success mt-1 text-left">
-                      🎉 חיסכת ₪{getDiscount()} עם קופון {appliedCoupon.code}!
+                      חיסכת ₪{getDiscount()} עם קופון {appliedCoupon.code}!
                     </div>}
                   {selectedBundleAddon && currentBundle && <div className="text-xs text-amber-500 mt-1 text-left">
                       🔋 כולל סוללה בהנחה של {currentBundle.discount_percent}%
