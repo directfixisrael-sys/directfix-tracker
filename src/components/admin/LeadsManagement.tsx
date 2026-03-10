@@ -130,6 +130,11 @@ const LeadsManagement = () => {
                     <Clock className="w-3 h-3" />
                     {format(new Date(lead.created_at), 'dd/MM HH:mm', { locale: he })}
                   </p>
+                  {lead.last_step && lead.last_step !== 'intro' && (
+                    <span className="inline-block text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-medium mt-1">
+                      עצר ב: {lead.last_step}
+                    </span>
+                  )}
                 </div>
                 <div className="flex gap-1">
                   <Button
