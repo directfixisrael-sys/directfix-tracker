@@ -174,8 +174,16 @@ const CustomerTracker = () => {
   };
 
   const handleBack = () => {
-    setCurrentOrder(null);
-    navigate('/track');
+    if (showHistory || phoneOrders.length <= 1) {
+      setCurrentOrder(null);
+      setShowHistory(false);
+      setPhoneOrders([]);
+      navigate('/track');
+    } else {
+      // Go back to history list
+      setCurrentOrder(null);
+      setShowHistory(true);
+    }
   };
 
   const orderMessages = currentOrder 
