@@ -170,7 +170,7 @@ const RemindersManagement = () => {
       return;
     }
 
-    toast.success(newCompleted ? '✅ המשימה סומנה כבוצעה' : 'המשימה הוחזרה לפעילה');
+    toast.success(newCompleted ? 'המשימה סומנה כבוצעה' : 'המשימה הוחזרה לפעילה');
     loadReminders();
   };
 
