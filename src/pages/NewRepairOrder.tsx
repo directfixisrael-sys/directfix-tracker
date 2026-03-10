@@ -305,6 +305,13 @@ const NewRepairOrder = () => {
   const [customerAddress, setCustomerAddress] = useState('');
   const [customerNotes, setCustomerNotes] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
+
+  // Sync intro fields to customer fields
+  const handleIntroDismiss = () => {
+    if (introName.trim()) setCustomerName(introName.trim());
+    if (introPhone.trim()) setCustomerPhone(introPhone.trim());
+    setShowIntroCard(false);
+  };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptContact, setAcceptContact] = useState(false);
 
