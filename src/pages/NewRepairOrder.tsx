@@ -29,6 +29,7 @@ import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { getLeadSource } from '@/lib/leadSource';
 import GiftOrderToggle from '@/components/GiftOrderToggle';
 import LoyaltyPointsBadge from '@/components/LoyaltyPointsBadge';
+import LoyaltyExplainer from '@/components/LoyaltyExplainer';
 
 // iPhone back glass colors per model family
 const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
@@ -1320,6 +1321,9 @@ const NewRepairOrder = () => {
             <SmartRepairInput models={models} repairTypes={repairTypes} priceMap={priceMap} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
 
             <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => setSelectedModel(model)} onConfirm={model => handleModelSelect(model)} />
+
+            {/* Loyalty Explainer */}
+            <LoyaltyExplainer variant="compact" />
 
             {/* Testimonials Slider */}
             <TestimonialsSlider />
