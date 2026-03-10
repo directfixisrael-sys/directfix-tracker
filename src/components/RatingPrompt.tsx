@@ -94,7 +94,7 @@ const RatingPrompt = ({ onRate, currentRating, currentFeedback }: RatingPromptPr
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             placeholder={selectedRating >= 4 
-              ? "מילה טובה תמיד משמחת... 💚" 
+              ? "מילה טובה תמיד משמחת..." 
               : "ספרו לנו מה קרה, נשתדל להשתפר..."
             }
             className="min-h-[100px] text-right"
