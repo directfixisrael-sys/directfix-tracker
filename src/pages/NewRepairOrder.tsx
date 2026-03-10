@@ -1144,7 +1144,7 @@ const NewRepairOrder = () => {
   // Shared cart display for additional repairs
   const renderRepairCart = () => (
     <div className="space-y-3">
-      <p className="text-xs font-semibold text-muted-foreground">🛒 תיקונים שנבחרו:</p>
+      <p className="text-xs font-semibold text-muted-foreground">תיקונים שנבחרו:</p>
       {additionalRepairs.map((ar, idx) => (
         <Card key={idx} className="p-4 rounded-2xl border border-border/60">
           <div className="flex items-center justify-between gap-3">
