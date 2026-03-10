@@ -168,7 +168,7 @@ const GiftPromoPopup = ({ promotionTitle, promotionDescription, promotionIcon, o
                 </div>
 
                 <div>
-                  <p className="text-sm font-bold text-primary mb-1">🔥 מבצע החודש</p>
+                  <p className="text-sm font-bold text-primary mb-1">מבצע החודש</p>
                   <h3 className="text-2xl font-extrabold text-foreground mb-2">{promotionTitle}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">{promotionDescription}</p>
                 </div>
