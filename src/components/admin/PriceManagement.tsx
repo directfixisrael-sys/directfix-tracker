@@ -839,7 +839,7 @@ const PriceManagement = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">כותרת הסבר (סימן שאלה ❓)</label>
+              <label className="block text-sm font-medium mb-2">כותרת הסבר (סימן שאלה)</label>
               <Input
                 placeholder="לדוגמה: מסך מקורי Apple"
                 value={repairForm.info_title}
