@@ -2250,7 +2250,7 @@ const NewRepairOrder = () => {
             </div>
 
             {customerEmail && <div className="bg-primary/5 border border-primary/20 rounded-xl p-3">
-              <p className="text-sm text-foreground">📧 פרטי ההזמנה נשלחו לאימייל <span className="font-semibold" dir="ltr">{customerEmail}</span></p>
+              <p className="text-sm text-foreground">פרטי ההזמנה נשלחו לאימייל <span className="font-semibold" dir="ltr">{customerEmail}</span></p>
               <p className="text-xs text-muted-foreground mt-1">מומלץ לבדוק גם בתיבת הספאם</p>
             </div>}
             
