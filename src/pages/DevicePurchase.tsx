@@ -321,7 +321,7 @@ const DevicePurchase = () => {
       if (paymentError || !paymentData?.success) {
         console.error('Payment error:', paymentError || paymentData?.error);
         // Still notify about the order even if payment fails
-        toast({ title: 'ההזמנה נשמרה! 📱', description: 'לא הצלחנו לפתוח דף תשלום. נציג ייצור איתך קשר.' });
+        toast({ title: 'ההזמנה נשמרה!', description: 'לא הצלחנו לפתוח דף תשלום. נציג ייצור איתך קשר.' });
         return;
       }
 
