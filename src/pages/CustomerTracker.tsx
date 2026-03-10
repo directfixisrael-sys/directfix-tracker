@@ -17,6 +17,7 @@ import { useRepairStore } from '@/store/repairStore';
 import Logo from '@/components/Logo';
 import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import LoyaltyPointsBadge from '@/components/LoyaltyPointsBadge';
 
 const CustomerTracker = () => {
   const [searchParams] = useSearchParams();
@@ -341,6 +342,12 @@ const CustomerTracker = () => {
             </a>
           </div>
         )}
+
+        {/* Loyalty Points */}
+        <LoyaltyPointsBadge 
+          customerPhone={currentOrder.customerPhone}
+          variant="tracker"
+        />
 
         {/* Promotions */}
         <PromotionsOptIn
