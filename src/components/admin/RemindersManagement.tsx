@@ -326,7 +326,7 @@ const RemindersManagement = () => {
                   </div>
                   
                   {reminder.subject && (
-                    <p className="text-sm text-muted-foreground mb-1.5">📌 {reminder.subject}</p>
+                    <p className="text-sm text-muted-foreground mb-1.5">{reminder.subject}</p>
                   )}
 
                   <div className="flex flex-wrap items-center gap-3 text-sm">
