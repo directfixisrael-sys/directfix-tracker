@@ -1701,7 +1701,7 @@ const NewRepairOrder = () => {
             </div>
 
             <p className="text-center text-xs text-muted-foreground">
-              🔋 סוללה מקורית עם 100% בריאות
+              סוללה מקורית עם 100% בריאות
             </p>
           </div>}
 
