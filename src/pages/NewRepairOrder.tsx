@@ -1776,7 +1776,7 @@ const NewRepairOrder = () => {
                         <span className="text-muted-foreground text-xs">שווי הטבה</span>
                         <div className="flex items-center gap-2">
                           <span className="line-through text-xs text-muted-foreground">₪{activePromotion.value}</span>
-                          <span className="font-bold text-success">חינם! 🎉</span>
+                          <span className="font-bold text-success">חינם!</span>
                         </div>
                       </div>}
                   </div>}
