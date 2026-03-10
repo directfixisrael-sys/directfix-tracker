@@ -1782,6 +1782,10 @@ const AdminPanel = () => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="end" className="w-48 bg-popover border border-border shadow-lg z-[60] mb-2">
+              <DropdownMenuItem onClick={() => setActiveTab('leads')} className={cn("gap-3 py-3", activeTab === 'leads' && "text-primary font-medium")}>
+                <Users className="w-4 h-4" />
+                <span>לידים</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('live')} className={cn("gap-3 py-3", activeTab === 'live' && "text-success font-medium")}>
                 <Eye className="w-4 h-4" />
                 <span>לייב</span>
