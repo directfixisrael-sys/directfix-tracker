@@ -1221,7 +1221,58 @@ const NewRepairOrder = () => {
         )}
 
         {/* Step 1: Select Model - Enhanced Welcome */}
-        {step === 'model' && <div className="space-y-8 animate-fade-in py-0">
+        {step === 'model' && <div className="space-y-8 animate-fade-in py-0 relative">
+
+            {/* Quick Intro Card - Name & Phone */}
+            {showIntroCard && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" onClick={(e) => { if (e.target === e.currentTarget && introName.trim() && introPhone.trim()) handleIntroDismiss(); }}>
+                <div className="w-full max-w-sm bg-card rounded-t-3xl sm:rounded-3xl p-6 pb-8 shadow-2xl animate-slide-up border-t-2 border-primary/20 sm:border-2">
+                  <div className="w-12 h-1 bg-muted-foreground/20 rounded-full mx-auto mb-5 sm:hidden" />
+                  
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Zap className="w-8 h-8 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-extrabold text-foreground">בואו נתחיל! ⚡</h2>
+                    <p className="text-sm text-muted-foreground mt-1">שם וטלפון — וישר לבחירת הדגם</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <Input
+                        placeholder="השם שלכם *"
+                        value={introName}
+                        onChange={(e) => setIntroName(e.target.value)}
+                        className="h-13 text-base rounded-2xl border-2 border-border focus:border-primary transition-colors"
+                        autoFocus
+                      />
+                    </div>
+                    <div>
+                      <Input
+                        placeholder="מספר טלפון *"
+                        value={introPhone}
+                        onChange={(e) => setIntroPhone(formatPhone(e.target.value))}
+                        type="tel"
+                        dir="ltr"
+                        className="h-13 text-base rounded-2xl text-right border-2 border-border focus:border-primary transition-colors tracking-wider"
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={handleIntroDismiss}
+                    disabled={!introName.trim() || introPhone.length < 9}
+                    className="w-full h-14 text-base font-bold rounded-2xl mt-5 shadow-lg"
+                  >
+                    יאללה, בואו נתחיל! 🚀
+                  </Button>
+
+                  <p className="text-center text-[11px] text-muted-foreground mt-3">
+                    הפרטים ישמשו ליצירת קשר ותיאום התיקון
+                  </p>
+                </div>
+              </div>
+            )}
 
 
             {/* Show cart if adding more repairs */}
@@ -1230,7 +1281,7 @@ const NewRepairOrder = () => {
             {/* Hero Welcome Section */}
             <div className="text-center py-4">
               <h1 className="text-4xl font-extrabold mb-3 tracking-tight">
-                {additionalRepairs.length > 0 ? 'בחרו דגם לתיקון הנוסף' : 'מה נתקן היום?'}
+                {additionalRepairs.length > 0 ? 'בחרו דגם לתיקון הנוסף' : introName ? `${introName}, מה נתקן? 🔧` : 'מה נתקן היום?'}
               </h1>
               <p className="text-muted-foreground text-sm">בחרו דגם ונגיע אליכם תוך שעה*</p>
               <div className="flex items-center justify-center gap-4 mt-4">
