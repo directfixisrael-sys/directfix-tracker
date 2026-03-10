@@ -962,6 +962,9 @@ const NewRepairOrder = () => {
           }).eq('code', appliedCoupon.code);
         }
       }
+      if (loyaltyRedeemed && loyaltyDiscount > 0) {
+        notes.push(`⭐ הנחת נאמנות: -₪${loyaltyDiscount} (מימוש ${loyaltyDiscount * 10} נקודות)`);
+      }
       if (deviceImages.length > 0) {
         notes.push(`תמונות מכשיר: ${deviceImages.length} תמונות צורפו`);
       }
