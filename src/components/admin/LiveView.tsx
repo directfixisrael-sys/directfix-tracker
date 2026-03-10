@@ -66,10 +66,10 @@ const getDeviceName = (ua?: string) => {
 };
 
 const getDeviceEmoji = (dt?: string | null) => {
-  if (dt === 'tablet') return '📱';
-  if (dt === 'mobile') return '📱';
-  if (dt === 'desktop') return '🖥️';
-  return '📱';
+  if (dt === 'tablet') return 'טאבלט';
+  if (dt === 'mobile') return 'נייד';
+  if (dt === 'desktop') return 'מחשב';
+  return 'נייד';
 };
 
 const EVENT_ICONS: Record<string, React.ReactNode> = {
