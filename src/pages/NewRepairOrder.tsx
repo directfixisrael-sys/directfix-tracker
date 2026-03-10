@@ -1034,7 +1034,7 @@ const NewRepairOrder = () => {
         notes.push(`תמונות מכשיר: ${deviceImages.length} תמונות צורפו`);
       }
       if (isGiftOrder) {
-        notes.push(`🎁 הזמנת מתנה — שולח: ${giftSenderName.trim()}, טלפון שולח: ${giftSenderPhone.trim()}`);
+        notes.push(`הזמנת מתנה — שולח: ${giftSenderName.trim()}, טלפון שולח: ${giftSenderPhone.trim()}`);
         if (giftMessage.trim()) {
           notes.push(`ברכה: ${giftMessage.trim()}`);
         }
