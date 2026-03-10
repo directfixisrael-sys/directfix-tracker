@@ -1348,7 +1348,7 @@ const NewRepairOrder = () => {
               <div className="bg-success/10 border border-success/30 rounded-2xl p-3 flex items-center gap-3 animate-fade-in">
                 <Gift className="w-5 h-5 text-success flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-foreground">ברוכים השבים! 🎉</p>
+                  <p className="text-sm font-semibold text-foreground">ברוכים השבים!</p>
                   <p className="text-xs text-muted-foreground">מגן מסך פרימיום במתנה על תיקון חוזר</p>
                 </div>
               </div>
