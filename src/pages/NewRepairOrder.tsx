@@ -1297,53 +1297,6 @@ const NewRepairOrder = () => {
         {/* Step 1: Select Model - Enhanced Welcome */}
         {step === 'model' && <div className="space-y-8 animate-fade-in py-0 relative">
 
-            {/* Quick Intro Card - Name & Phone */}
-            {showIntroCard && (
-              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" onClick={(e) => { if (e.target === e.currentTarget && introName.trim() && introPhone.trim()) handleIntroDismiss(); }}>
-              <div className="w-full max-w-sm bg-card rounded-t-3xl sm:rounded-2xl p-5 pb-6 shadow-2xl animate-slide-up border-t-2 border-primary/20 sm:border-2">
-                  <div className="w-10 h-1 bg-muted-foreground/20 rounded-full mx-auto mb-4 sm:hidden" />
-                  
-                  <div className="text-center mb-4">
-                    <h2 className="text-lg font-bold text-foreground">בואו נתחיל ⚡</h2>
-                    <p className="text-xs text-muted-foreground">שם וטלפון — וישר לבחירת הדגם</p>
-                  </div>
-
-                  <div className="space-y-2.5">
-                    <Input
-                      placeholder="השם שלכם *"
-                      value={introName}
-                      onChange={(e) => setIntroName(e.target.value)}
-                      className="h-11 text-sm rounded-xl"
-                      autoFocus
-                    />
-                    <Input
-                      placeholder="050-0000000 *"
-                      value={introPhone}
-                      onChange={(e) => setIntroPhone(formatPhone(e.target.value))}
-                      type="tel"
-                      dir="ltr"
-                      className="h-11 text-sm rounded-xl text-right tracking-wider"
-                    />
-                  </div>
-
-                  <label className="flex items-start gap-2.5 mt-3 cursor-pointer">
-                    <Checkbox checked={introPrivacy} onCheckedChange={checked => setIntroPrivacy(checked === true)} className="mt-0.5 w-4 h-4" />
-                    <span className="text-[11px] text-muted-foreground leading-relaxed">
-                      אני מאשר/ת שקראתי והסכמתי ל<span className="text-primary font-medium">מדיניות הפרטיות</span> ו<span className="text-primary font-medium">תנאי השימוש</span>, ומאשר/ת יצירת קשר לתיאום התיקון
-                    </span>
-                  </label>
-
-                  <Button
-                    onClick={handleIntroDismiss}
-                    disabled={!introName.trim() || introPhone.length < 9 || !introPrivacy}
-                    className="w-full h-12 text-sm font-bold rounded-xl mt-4"
-                  >
-                    יאללה, בואו נתחיל! 🚀
-                  </Button>
-                </div>
-              </div>
-            )}
-
             {/* Returning customer banner */}
             {isReturningCustomer && !showIntroCard && (
               <div className="bg-success/10 border border-success/30 rounded-2xl p-3 flex items-center gap-3 animate-fade-in">
