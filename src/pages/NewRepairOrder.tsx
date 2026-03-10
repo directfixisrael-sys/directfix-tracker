@@ -1698,16 +1698,31 @@ const NewRepairOrder = () => {
                     </div>}
                 </div>
 
+                {/* Loyalty Points Section */}
+                {customerPhone.length >= 9 && (
+                  <div className="border-t border-border pt-3">
+                    <LoyaltyPointsBadge
+                      customerPhone={customerPhone}
+                      variant="order"
+                      onRedeem={handleLoyaltyRedeem}
+                      redeemed={loyaltyRedeemed}
+                    />
+                  </div>
+                )}
+
                 <div className="border-t border-border pt-3 mt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-bold">סה"כ</span>
                     <div className="text-right">
-                      {appliedCoupon && <span className="text-muted-foreground line-through text-sm mr-2">₪{getTotalPrice()}</span>}
+                      {(appliedCoupon || loyaltyRedeemed) && <span className="text-muted-foreground line-through text-sm mr-2">₪{getTotalPrice()}</span>}
                       <span className="text-xl font-bold text-primary">₪{getFinalPrice()}</span>
                     </div>
                   </div>
                   {appliedCoupon && <div className="text-xs text-success mt-1 text-left">
                       🎉 חיסכת ₪{getDiscount()} עם קופון {appliedCoupon.code}!
+                    </div>}
+                  {loyaltyRedeemed && <div className="text-xs text-amber-500 mt-1 text-left">
+                      ⭐ הנחת נאמנות: -₪{loyaltyDiscount}
                     </div>}
                   {selectedBundleAddon && currentBundle && <div className="text-xs text-amber-500 mt-1 text-left">
                       🔋 כולל סוללה בהנחה של {currentBundle.discount_percent}%
