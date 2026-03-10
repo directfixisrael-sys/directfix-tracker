@@ -39,6 +39,7 @@ const CustomerTracker = () => {
     currentOrder,
     setCurrentOrder,
     findOrderByPhone,
+    findAllOrdersByPhone,
     toggleAccessory,
     setWantsPromotions,
     setRating,
