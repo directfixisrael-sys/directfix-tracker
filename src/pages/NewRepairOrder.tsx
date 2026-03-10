@@ -1684,7 +1684,7 @@ const NewRepairOrder = () => {
                 </div>
 
                 <p className="text-xs text-muted-foreground">
-                  💡 רוב הלקוחות שמחליפים מסך מוסיפים גם סוללה חדשה
+                  רוב הלקוחות שמחליפים מסך מוסיפים גם סוללה חדשה
                 </p>
               </div>
             </Card>

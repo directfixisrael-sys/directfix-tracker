@@ -365,7 +365,7 @@ const ConsultationBooking = () => {
 
           {/* Consultation testimonials */}
           <div className="pt-4">
-            <h3 className="text-sm font-bold text-center mb-3 text-muted-foreground">💬 תקלות שנפתרו בשיחות ייעוץ</h3>
+            <h3 className="text-sm font-bold text-center mb-3 text-muted-foreground">תקלות שנפתרו בשיחות ייעוץ</h3>
             <ConsultationReviews />
           </div>
         </div>
