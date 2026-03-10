@@ -283,7 +283,7 @@ const DevicePurchase = () => {
         'מקדמה: ₪500',
       ];
       if (isGiftOrder) {
-        notes.push(`🎁 הזמנת מתנה מ: ${giftSenderName} (${giftSenderPhone})`);
+        notes.push(`הזמנת מתנה מ: ${giftSenderName} (${giftSenderPhone})`);
         if (giftMessage) notes.push(`ברכה: ${giftMessage}`);
       }
 
