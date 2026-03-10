@@ -63,9 +63,9 @@ const LiveVisitorsCard = ({ activeViewers }: { activeViewers: any[] }) => {
   // Determine device type from userAgent
   const getDevice = (ua?: string) => {
     if (!ua) return 'לא ידוע';
-    if (/mobile|android|iphone/i.test(ua)) return '📱 נייד';
-    if (/tablet|ipad/i.test(ua)) return '📱 טאבלט';
-    return '🖥️ מחשב';
+    if (/mobile|android|iphone/i.test(ua)) return 'נייד';
+    if (/tablet|ipad/i.test(ua)) return 'טאבלט';
+    return 'מחשב';
   };
   
   return (
