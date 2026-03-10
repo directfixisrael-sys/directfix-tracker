@@ -1168,18 +1168,18 @@ const NewRepairOrder = () => {
     {/* Quick Intro Card - Rendered at top level via fragment */}
     {showIntroCard && (
       <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }} onClick={(e) => { if (e.target === e.currentTarget && introName.trim() && introPhone.trim()) handleIntroDismiss(); }}>
-        <div className="w-[calc(100%-2rem)] max-w-sm bg-card rounded-2xl p-5 pb-6 shadow-2xl animate-scale-in border-2 border-primary/20">
-          <div className="text-center mb-4">
-            <h2 className="text-lg font-bold text-foreground">בואו נתחיל ⚡</h2>
-            <p className="text-xs text-muted-foreground">שם וטלפון — וישר לבחירת הדגם</p>
+        <div className="w-[calc(100%-2rem)] max-w-sm bg-card rounded-2xl p-6 pb-7 shadow-2xl animate-scale-in border-2 border-primary/20">
+          <div className="text-center mb-5">
+            <h2 className="text-xl font-bold text-foreground">בואו נתחיל ⚡</h2>
+            <p className="text-sm text-muted-foreground mt-1">שם וטלפון — וישר לבחירת הדגם</p>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             <Input
               placeholder="השם שלכם *"
               value={introName}
               onChange={(e) => setIntroName(e.target.value)}
-              className="h-11 text-sm rounded-xl"
+              className="h-14 text-base rounded-xl px-4"
               autoFocus
             />
             <Input
@@ -1188,7 +1188,7 @@ const NewRepairOrder = () => {
               onChange={(e) => setIntroPhone(formatPhone(e.target.value))}
               type="tel"
               dir="ltr"
-              className="h-11 text-sm rounded-xl text-right tracking-wider"
+              className="h-14 text-base rounded-xl px-4 text-right tracking-wider"
             />
           </div>
 
