@@ -1614,7 +1614,7 @@ const NewRepairOrder = () => {
 
                   <div className="mt-4 p-3 bg-muted/60 rounded-xl">
                     <p className="text-sm text-muted-foreground text-center">
-                      📞 נקבל את הפרטים ונחזור אליכם בהקדם לתיאום וסיכום מחיר
+                      נקבל את הפרטים ונחזור אליכם בהקדם לתיאום וסיכום מחיר
                     </p>
                   </div>
 
