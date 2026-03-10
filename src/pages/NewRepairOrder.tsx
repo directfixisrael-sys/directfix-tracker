@@ -998,7 +998,7 @@ const NewRepairOrder = () => {
         : allRepairNames.join(' + ');
       const notes = [`הזמנה מהאתר - ${repairDescription}`, `מועד מבוקש: ${scheduleNote}`];
       if (isReturningCustomer) {
-        notes.push('🎁 לקוח חוזר — מגן מסך פרימיום במתנה');
+        notes.push('לקוח חוזר — מגן מסך פרימיום במתנה');
       }
       if (selectedBundleAddon && currentBundle && selectedModel) {
         notes.push(`חבילת תיקון: ${currentBundle.name} - סוללה ב-${currentBundle.discount_percent}% הנחה (₪${getBundleAddonPrice()} במקום ₪${getBatteryBasePrice()})`);
