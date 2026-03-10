@@ -68,11 +68,11 @@ const GiftPromoPopup = ({ promotionTitle, promotionDescription, promotionIcon, o
 
   const getIcon = () => {
     switch (promotionIcon) {
-      case 'gift': return '🎁';
-      case 'tag': return '🏷️';
-      case 'sparkles': return '✨';
-      case 'fire': return '🔥';
-      default: return '🎁';
+      case 'gift': return '';
+      case 'tag': return '';
+      case 'sparkles': return '';
+      case 'fire': return '';
+      default: return '';
     }
   };
 
