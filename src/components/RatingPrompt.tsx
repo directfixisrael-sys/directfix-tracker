@@ -39,7 +39,7 @@ const RatingPrompt = ({ onRate, currentRating, currentFeedback }: RatingPromptPr
         <PartyPopper className="w-8 h-8 text-success" />
       </div>
       
-      <h3 className="text-xl font-bold text-foreground mb-2">התיקון הושלם! 🎉</h3>
+      <h3 className="text-xl font-bold text-foreground mb-2">התיקון הושלם!</h3>
       <p className="text-muted-foreground text-sm mb-6">
         תודה שבחרתם בדיירקט פיקס
       </p>
