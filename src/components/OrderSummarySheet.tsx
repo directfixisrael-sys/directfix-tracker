@@ -108,7 +108,7 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
                 <div className="flex items-center gap-2 mt-1 mr-12">
                   <span className="text-xs text-muted-foreground">שווי:</span>
                   <span className="line-through text-xs text-muted-foreground">₪{activePromotion.value}</span>
-                  <span className="text-xs font-bold text-success">חינם! 🎉</span>
+                  <span className="text-xs font-bold text-success">חינם!</span>
                 </div>
               )}
             </div>
