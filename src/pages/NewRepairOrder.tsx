@@ -605,14 +605,24 @@ const NewRepairOrder = () => {
     if (selectedRepair) names.push(selectedRepair.name);
     return names;
   };
+  const stepLabels: Record<Step, string> = {
+    model: 'בחירת דגם',
+    repair: 'בחירת תיקון',
+    bundle: 'חבילה',
+    price: 'אישור מחיר',
+    schedule: 'תיאום מועד',
+    details: 'מילוי פרטים',
+    gift_payment: 'תשלום',
+    success: 'הושלם',
+  };
+
   const goToStep = (newStep: Step) => {
     setIsAnimating(true);
+    updateLeadStep(stepLabels[newStep]);
     setTimeout(() => {
       setStep(newStep);
       setIsAnimating(false);
-      // Broadcast step change for live tracking
       window.dispatchEvent(new CustomEvent('repair-step-change', { detail: { step: newStep } }));
-      // Scroll to top using ref
       if (contentRef.current) {
         contentRef.current.scrollTop = 0;
       }
