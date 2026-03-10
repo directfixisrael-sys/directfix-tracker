@@ -78,12 +78,12 @@ export const statusLabels: Record<RepairStatus, string> = {
 };
 
 export const statusIcons: Record<RepairStatus, string> = {
-  pending: '⏳',
+  pending: '',
   confirmed: '✓',
-  technician_assigned: '👨‍🔧',
-  on_the_way: '🏍️',
-  arrived: '📍',
-  in_progress: '🔧',
-  completed: '✅',
-  cancelled: '❌',
+  technician_assigned: '',
+  on_the_way: '',
+  arrived: '',
+  in_progress: '',
+  completed: '✓',
+  cancelled: '✕',
 };

@@ -94,7 +94,7 @@ const EVENT_TEXT: Record<string, string> = {
   page_view: 'צפה בעמוד',
   order_started: 'התחיל הזמנה',
   model_selected: 'בחר דגם',
-  order_completed: 'סיים הזמנה! 🎉',
+  order_completed: 'סיים הזמנה!',
   visitor_joined: 'נכנס לאתר',
   visitor_left: 'עזב את האתר',
 };

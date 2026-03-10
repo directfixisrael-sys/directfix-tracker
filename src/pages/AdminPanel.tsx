@@ -1695,13 +1695,13 @@ const AdminPanel = () => {
             className="bg-card/95 backdrop-blur-sm border border-border rounded-3xl p-8 shadow-2xl text-center pointer-events-auto max-w-xs"
             style={{ animation: 'celebrationPopIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' }}
           >
-            <div className="text-6xl mb-4" style={{ animation: 'celebrationStar 1s ease-in-out infinite' }}>⭐</div>
-            <h2 className="text-2xl font-extrabold text-foreground mb-2">כל הכבוד! 🎉</h2>
+            <div className="text-6xl mb-4" style={{ animation: 'celebrationStar 1s ease-in-out infinite' }}>★</div>
+            <h2 className="text-2xl font-extrabold text-foreground mb-2">כל הכבוד!</h2>
             <p className="text-muted-foreground font-medium">סיימת עוד תיקון בהצלחה!</p>
             <div className="mt-4 flex justify-center gap-2 text-2xl">
-              <span style={{ animation: 'celebrationFloat 1.5s ease-in-out infinite', animationDelay: '0.1s' }}>🌟</span>
-              <span style={{ animation: 'celebrationFloat 1.5s ease-in-out infinite', animationDelay: '0.3s' }}>💪</span>
-              <span style={{ animation: 'celebrationFloat 1.5s ease-in-out infinite', animationDelay: '0.5s' }}>🔧</span>
+              <span style={{ animation: 'celebrationFloat 1.5s ease-in-out infinite', animationDelay: '0.1s' }}>★</span>
+              <span style={{ animation: 'celebrationFloat 1.5s ease-in-out infinite', animationDelay: '0.3s' }}>✦</span>
+              <span style={{ animation: 'celebrationFloat 1.5s ease-in-out infinite', animationDelay: '0.5s' }}>✧</span>
             </div>
           </div>
           <style>{`

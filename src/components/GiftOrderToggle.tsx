@@ -129,7 +129,7 @@ const GiftOrderToggle = ({ isGift, onToggle, label = 'שליחת תיקון במ
           <div className="px-5 py-3 bg-primary/10 border-t border-primary/15 flex items-center gap-2">
             <CreditCard className="w-4 h-4 text-primary flex-shrink-0" />
             <p className="text-xs font-medium text-foreground">
-              💳 התשלום באשראי מתבצע <strong>לפני</strong> הגעת הטכנאי — כך מקבל המתנה לא צריך לשלם כלום!
+              התשלום באשראי מתבצע <strong>לפני</strong> הגעת הטכנאי — כך מקבל המתנה לא צריך לשלם כלום!
             </p>
           </div>
         </div>
