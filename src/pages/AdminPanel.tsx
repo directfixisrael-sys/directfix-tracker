@@ -1250,7 +1250,7 @@ const AdminPanel = () => {
                       </div>
                       {selectedOrder.leadSource && (
                         <div className="col-span-2">
-                          <p className="text-muted-foreground text-sm">📊 מקור הליד</p>
+                          <p className="text-muted-foreground text-sm">מקור הליד</p>
                           <p className="font-medium text-primary text-base">{selectedOrder.leadSource}</p>
                         </div>
                       )}

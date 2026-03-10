@@ -871,7 +871,7 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
                   Number(avgRating) >= star ? "text-warning" : "text-muted"
                 )}
               >
-                ⭐
+                ★
               </span>
             ))}
           </div>

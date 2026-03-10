@@ -395,7 +395,7 @@ const RemindersManagement = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{editingReminder ? '✏️ עריכת תזכורת' : '🔔 תזכורת חדשה'}</DialogTitle>
+            <DialogTitle>{editingReminder ? 'עריכת תזכורת' : 'תזכורת חדשה'}</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
