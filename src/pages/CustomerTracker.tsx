@@ -343,6 +343,12 @@ const CustomerTracker = () => {
           </div>
         )}
 
+        {/* Loyalty Points */}
+        <LoyaltyPointsBadge 
+          customerPhone={currentOrder.customerPhone}
+          variant="tracker"
+        />
+
         {/* Promotions */}
         <PromotionsOptIn
           checked={currentOrder.wantsPromotions}
