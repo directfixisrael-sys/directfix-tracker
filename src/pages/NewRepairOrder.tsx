@@ -2190,7 +2190,7 @@ const NewRepairOrder = () => {
 
             <div>
               <h2 className="text-2xl font-bold mb-1 text-success">
-                {isGiftOrder ? '🎁 הזמנת המתנה התקבלה!' : 'ההזמנה התקבלה!'}
+                {isGiftOrder ? 'הזמנת המתנה התקבלה!' : 'ההזמנה התקבלה!'}
               </h2>
               {completedOrderNumber && <p className="text-sm font-semibold text-foreground mb-1">הזמנה #{completedOrderNumber}</p>}
               <p className="text-muted-foreground text-sm">
