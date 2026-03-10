@@ -326,6 +326,12 @@ const NewRepairOrder = () => {
     if (introPhone.trim()) setCustomerPhone(introPhone.trim());
     setShowIntroCard(false);
 
+    // Scroll to top after dismissing intro
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (contentRef.current) contentRef.current.scrollTop = 0;
+
     const normalizedPhone = introPhone.replace(/\D/g, '');
     
     // Check if returning customer
