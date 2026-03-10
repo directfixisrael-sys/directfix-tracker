@@ -96,7 +96,7 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-xs text-muted-foreground">שווי:</span>
                   <span className="line-through text-sm text-muted-foreground">₪{activePromotion.value}</span>
-                  <span className="text-sm font-bold text-success">חינם! 🎉</span>
+                  <span className="text-sm font-bold text-success">חינם!</span>
                 </div>
               )}
             </div>
