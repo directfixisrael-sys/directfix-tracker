@@ -13,10 +13,13 @@ import OrderSummary from '@/components/OrderSummary';
 import OrderSummarySheet from '@/components/OrderSummarySheet';
 import StickyHeader from '@/components/StickyHeader';
 import PrivacyConsentModal from '@/components/PrivacyConsentModal';
+import RepairHistoryList from '@/components/RepairHistoryList';
+import WarrantyCertificate from '@/components/WarrantyCertificate';
 import { useRepairStore } from '@/store/repairStore';
 import Logo from '@/components/Logo';
 import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { RepairOrder } from '@/types/repair';
 
 const CustomerTracker = () => {
   const [searchParams] = useSearchParams();
@@ -25,6 +28,8 @@ const CustomerTracker = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [phoneOrders, setPhoneOrders] = useState<RepairOrder[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
   const [hasAcceptedPrivacy, setHasAcceptedPrivacy] = useState(() => {
     return localStorage.getItem('privacy_consent_accepted') === 'true';
   });
@@ -34,6 +39,7 @@ const CustomerTracker = () => {
     currentOrder,
     setCurrentOrder,
     findOrderByPhone,
+    findAllOrdersByPhone,
     toggleAccessory,
     setWantsPromotions,
     setRating,
@@ -124,20 +130,38 @@ const CustomerTracker = () => {
 
     await new Promise(resolve => setTimeout(resolve, 600));
 
-    const order = findOrderByPhone(phone);
-    if (order) {
-      setCurrentOrder(order);
+    const allOrders = findAllOrdersByPhone(phone);
+    if (allOrders.length > 1) {
+      // Multiple orders - show history list
+      setPhoneOrders(allOrders);
+      setShowHistory(true);
+      setCurrentOrder(null);
       setError('');
-      // Show privacy modal if not accepted yet
+    } else if (allOrders.length === 1) {
+      // Single order - go directly
+      setCurrentOrder(allOrders[0]);
+      setPhoneOrders(allOrders);
+      setShowHistory(false);
+      setError('');
       if (!hasAcceptedPrivacy) {
         setShowPrivacyModal(true);
       }
     } else {
       setError('לא נמצאה הזמנה עם מספר הטלפון הזה. וודאו שהמספר נכון או צרו קשר עם התמיכה.');
       setCurrentOrder(null);
+      setPhoneOrders([]);
+      setShowHistory(false);
     }
     
     setIsSearching(false);
+  };
+
+  const handleSelectOrder = (order: RepairOrder) => {
+    setCurrentOrder(order);
+    setShowHistory(false);
+    if (!hasAcceptedPrivacy) {
+      setShowPrivacyModal(true);
+    }
   };
 
   const handlePrivacyAccept = () => {
@@ -150,29 +174,46 @@ const CustomerTracker = () => {
   };
 
   const handleBack = () => {
-    setCurrentOrder(null);
-    navigate('/track');
+    if (showHistory || phoneOrders.length <= 1) {
+      setCurrentOrder(null);
+      setShowHistory(false);
+      setPhoneOrders([]);
+      navigate('/track');
+    } else {
+      // Go back to history list
+      setCurrentOrder(null);
+      setShowHistory(true);
+    }
   };
 
   const orderMessages = currentOrder 
     ? messages.filter(m => m.orderId === currentOrder.id)
     : [];
 
-  // Phone input screen
+  // Phone input screen or history list
   if (!currentOrder) {
     return (
       <div className="min-h-screen bg-background" lang="he">
-        <Header />
+        <Header showBackButton={showHistory} onBack={() => { setShowHistory(false); setPhoneOrders([]); }} />
         <main className="container py-8 px-4" role="main" aria-label="מעקב הזמנות - חיפוש">
-          <div className="max-w-sm mx-auto text-center mb-8 animate-slide-down">
-            <Logo size="md" clickable={false} className="justify-center mb-4" />
-            <p className="text-muted-foreground text-sm">מעקב אחר התיקון שלכם בזמן אמת</p>
-          </div>
-          <PhoneInput 
-            onSubmit={handleSearch}
-            isLoading={isSearching}
-            error={error}
-          />
+          {showHistory && phoneOrders.length > 0 ? (
+            <RepairHistoryList 
+              orders={phoneOrders} 
+              onSelectOrder={handleSelectOrder} 
+            />
+          ) : (
+            <>
+              <div className="max-w-sm mx-auto text-center mb-8 animate-slide-down">
+                <Logo size="md" clickable={false} className="justify-center mb-4" />
+                <p className="text-muted-foreground text-sm">מעקב אחר התיקון שלכם בזמן אמת</p>
+              </div>
+              <PhoneInput 
+                onSubmit={handleSearch}
+                isLoading={isSearching}
+                error={error}
+              />
+            </>
+          )}
         </main>
       </div>
     );
@@ -251,6 +292,11 @@ const CustomerTracker = () => {
             currentRating={currentOrder.rating}
             currentFeedback={currentOrder.feedback}
           />
+        )}
+
+        {/* Warranty Certificate - show when completed */}
+        {showRating && (
+          <WarrantyCertificate order={currentOrder} />
         )}
 
         {/* Invoice download - show below rating when completed */}

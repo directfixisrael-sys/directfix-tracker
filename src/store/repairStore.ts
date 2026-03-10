@@ -20,6 +20,7 @@ interface RepairStore {
   // Customer actions
   setCurrentOrder: (order: RepairOrder | null) => void;
   findOrderByPhone: (phone: string) => RepairOrder | undefined;
+  findAllOrdersByPhone: (phone: string) => RepairOrder[];
   toggleAccessory: (orderId: string, accessoryId: string) => Promise<void>;
   setWantsPromotions: (orderId: string, wants: boolean) => Promise<void>;
   setRating: (orderId: string, rating: number, feedback?: string) => Promise<void>;
@@ -172,6 +173,11 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
   findOrderByPhone: (phone) => {
     const normalizedPhone = phone.replace(/\D/g, '');
     return get().orders.find(o => o.customerPhone.replace(/\D/g, '') === normalizedPhone);
+  },
+
+  findAllOrdersByPhone: (phone) => {
+    const normalizedPhone = phone.replace(/\D/g, '');
+    return get().orders.filter(o => o.customerPhone.replace(/\D/g, '') === normalizedPhone);
   },
 
   toggleAccessory: async (orderId, accessoryId) => {
