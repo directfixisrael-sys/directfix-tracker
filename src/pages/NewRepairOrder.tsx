@@ -2126,7 +2126,7 @@ const NewRepairOrder = () => {
                 <CreditCard className="w-4 h-4" />
                 תשלום מאובטח
               </div>
-              <h2 className="text-3xl font-extrabold mb-1">💳 תשלום להזמנת המתנה</h2>
+              <h2 className="text-3xl font-extrabold mb-1">תשלום להזמנת המתנה</h2>
               <p className="text-muted-foreground">השלימו את התשלום כדי לאשר את ההזמנה</p>
               {completedOrderNumber && <p className="text-sm font-semibold text-foreground mt-1">הזמנה #{completedOrderNumber}</p>}
             </div>
