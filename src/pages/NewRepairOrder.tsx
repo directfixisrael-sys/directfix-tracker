@@ -445,19 +445,19 @@ const NewRepairOrder = () => {
   const getPromotionIcon = (icon: string | null) => {
     switch (icon) {
       case 'gift':
-        return '🎁';
+        return '';
       case 'tag':
-        return '🏷️';
+        return '';
       case 'sparkles':
-        return '✨';
+        return '';
       case 'percent':
-        return '💯';
+        return '';
       case 'fire':
-        return '🔥';
+        return '';
       case 'star':
-        return '⭐';
+        return '';
       default:
-        return '🎁';
+        return '';
     }
   };
 
