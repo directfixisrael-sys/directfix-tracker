@@ -1164,7 +1164,52 @@ const NewRepairOrder = () => {
   if (isLoading) {
     return <OrderPageSkeleton />;
   }
-  return <div className="min-h-screen bg-background flex flex-col" lang="he">
+  return <>
+    {/* Quick Intro Card - Rendered at top level via fragment */}
+    {showIntroCard && (
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }} onClick={(e) => { if (e.target === e.currentTarget && introName.trim() && introPhone.trim()) handleIntroDismiss(); }}>
+        <div className="w-[calc(100%-2rem)] max-w-sm bg-card rounded-2xl p-5 pb-6 shadow-2xl animate-scale-in border-2 border-primary/20">
+          <div className="text-center mb-4">
+            <h2 className="text-lg font-bold text-foreground">בואו נתחיל ⚡</h2>
+            <p className="text-xs text-muted-foreground">שם וטלפון — וישר לבחירת הדגם</p>
+          </div>
+
+          <div className="space-y-2.5">
+            <Input
+              placeholder="השם שלכם *"
+              value={introName}
+              onChange={(e) => setIntroName(e.target.value)}
+              className="h-11 text-sm rounded-xl"
+              autoFocus
+            />
+            <Input
+              placeholder="050-0000000 *"
+              value={introPhone}
+              onChange={(e) => setIntroPhone(formatPhone(e.target.value))}
+              type="tel"
+              dir="ltr"
+              className="h-11 text-sm rounded-xl text-right tracking-wider"
+            />
+          </div>
+
+          <label className="flex items-start gap-2.5 mt-3 cursor-pointer">
+            <Checkbox checked={introPrivacy} onCheckedChange={checked => setIntroPrivacy(checked === true)} className="mt-0.5 w-4 h-4" />
+            <span className="text-[11px] text-muted-foreground leading-relaxed">
+              אני מאשר/ת שקראתי והסכמתי ל<span className="text-primary font-medium">מדיניות הפרטיות</span> ו<span className="text-primary font-medium">תנאי השימוש</span>, ומאשר/ת יצירת קשר לתיאום התיקון
+            </span>
+          </label>
+
+          <Button
+            onClick={handleIntroDismiss}
+            disabled={!introName.trim() || introPhone.length < 9 || !introPrivacy}
+            className="w-full h-12 text-sm font-bold rounded-xl mt-4"
+          >
+            יאללה, בואו נתחיל! 🚀
+          </Button>
+        </div>
+      </div>
+    )}
+    <div className="min-h-screen bg-background flex flex-col" lang="he">
       {/* Skip to content */}
       <a href="#order-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-lg">דלג לתוכן הראשי</a>
       {/* Promotion Strip */}
@@ -1229,52 +1274,6 @@ const NewRepairOrder = () => {
       {/* Hidden file input for image upload */}
       <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" aria-label="העלאת תמונות מכשיר" />
 
-      {/* Quick Intro Card - Outside overflow container */}
-      {showIntroCard && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" onClick={(e) => { if (e.target === e.currentTarget && introName.trim() && introPhone.trim()) handleIntroDismiss(); }}>
-          <div className="w-full max-w-sm bg-card rounded-t-3xl sm:rounded-2xl p-5 pb-6 shadow-2xl animate-slide-up border-t-2 border-primary/20 sm:border-2">
-            <div className="w-10 h-1 bg-muted-foreground/20 rounded-full mx-auto mb-4 sm:hidden" />
-            
-            <div className="text-center mb-4">
-              <h2 className="text-lg font-bold text-foreground">בואו נתחיל ⚡</h2>
-              <p className="text-xs text-muted-foreground">שם וטלפון — וישר לבחירת הדגם</p>
-            </div>
-
-            <div className="space-y-2.5">
-              <Input
-                placeholder="השם שלכם *"
-                value={introName}
-                onChange={(e) => setIntroName(e.target.value)}
-                className="h-11 text-sm rounded-xl"
-                autoFocus
-              />
-              <Input
-                placeholder="050-0000000 *"
-                value={introPhone}
-                onChange={(e) => setIntroPhone(formatPhone(e.target.value))}
-                type="tel"
-                dir="ltr"
-                className="h-11 text-sm rounded-xl text-right tracking-wider"
-              />
-            </div>
-
-            <label className="flex items-start gap-2.5 mt-3 cursor-pointer">
-              <Checkbox checked={introPrivacy} onCheckedChange={checked => setIntroPrivacy(checked === true)} className="mt-0.5 w-4 h-4" />
-              <span className="text-[11px] text-muted-foreground leading-relaxed">
-                אני מאשר/ת שקראתי והסכמתי ל<span className="text-primary font-medium">מדיניות הפרטיות</span> ו<span className="text-primary font-medium">תנאי השימוש</span>, ומאשר/ת יצירת קשר לתיאום התיקון
-              </span>
-            </label>
-
-            <Button
-              onClick={handleIntroDismiss}
-              disabled={!introName.trim() || introPhone.length < 9 || !introPrivacy}
-              className="w-full h-12 text-sm font-bold rounded-xl mt-4"
-            >
-              יאללה, בואו נתחיל! 🚀
-            </Button>
-          </div>
-        </div>
-      )}
 
       {/* Content */}
       <main id="order-content" ref={contentRef} role="main" aria-label="טופס הזמנת תיקון" className={`flex-1 p-5 pb-28 overflow-y-auto transition-all duration-300 max-w-3xl mx-auto w-full ${isAnimating ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'}`}>
@@ -2321,6 +2320,7 @@ const NewRepairOrder = () => {
                 </div> : isGiftOrder ? '💳 המשך לתשלום' : 'שלח הזמנה'}
             </Button>}
         </div>}
-    </div>;
+    </div>
+  </>;
 };
 export default NewRepairOrder;
