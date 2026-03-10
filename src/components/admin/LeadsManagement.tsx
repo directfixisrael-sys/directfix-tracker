@@ -20,7 +20,7 @@ interface Lead {
 }
 
 const LeadsManagement = () => {
-  const [leads, setLeads] = useState<Lead[]>([]);
+  const [filter, setFilter] = useState<'active' | 'converted' | 'returning'>('active');
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
