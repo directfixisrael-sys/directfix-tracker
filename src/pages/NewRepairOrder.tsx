@@ -1204,7 +1204,7 @@ const NewRepairOrder = () => {
             disabled={!introName.trim() || introPhone.length < 9 || !introPrivacy}
             className="w-full h-12 text-sm font-bold rounded-xl mt-4"
           >
-            יאללה, בואו נתחיל! 🚀
+            יאללה, בואו נתחיל!
           </Button>
         </div>
       </div>
