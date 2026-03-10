@@ -1170,7 +1170,7 @@ const NewRepairOrder = () => {
       <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }} onClick={(e) => { if (e.target === e.currentTarget && introName.trim() && introPhone.trim()) handleIntroDismiss(); }}>
         <div className="w-[calc(100%-2rem)] max-w-md bg-card rounded-2xl p-7 pb-8 shadow-2xl animate-scale-in border-2 border-primary/20">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-extrabold text-foreground">בואו נתחיל ⚡</h2>
+            <h2 className="text-2xl font-extrabold text-foreground">בואו נתחיל</h2>
             <p className="text-base text-muted-foreground mt-2">שם וטלפון — וישר לבחירת הדגם</p>
           </div>
 
