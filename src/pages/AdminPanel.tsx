@@ -74,6 +74,7 @@ import AdminDashboard from '@/components/admin/AdminDashboard';
 import LiveView from '@/components/admin/LiveView';
 import AnnouncementsManagement from '@/components/admin/AnnouncementsManagement';
 import RemindersManagement from '@/components/admin/RemindersManagement';
+import LeadsManagement from '@/components/admin/LeadsManagement';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -520,6 +521,8 @@ const AdminPanel = () => {
     switch (activeTab) {
       case 'dashboard':
         return <AdminDashboard orders={orders} />;
+      case 'leads':
+        return <LeadsManagement />;
       case 'live':
         return <LiveView />;
       case 'messages':
@@ -1769,7 +1772,7 @@ const AdminPanel = () => {
               <button 
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
-                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'bundles', 'settings', 'announcements', 'coupons'].includes(activeTab)
+                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'bundles', 'settings', 'announcements', 'coupons', 'leads'].includes(activeTab)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground"
                 )}
@@ -1779,6 +1782,10 @@ const AdminPanel = () => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="end" className="w-48 bg-popover border border-border shadow-lg z-[60] mb-2">
+              <DropdownMenuItem onClick={() => setActiveTab('leads')} className={cn("gap-3 py-3", activeTab === 'leads' && "text-primary font-medium")}>
+                <Users className="w-4 h-4" />
+                <span>לידים</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('live')} className={cn("gap-3 py-3", activeTab === 'live' && "text-success font-medium")}>
                 <Eye className="w-4 h-4" />
                 <span>לייב</span>
@@ -1896,6 +1903,18 @@ const AdminPanel = () => {
                 {orders.length}
               </span>
             )}
+          </button>
+          <button 
+            onClick={() => setActiveTab('leads')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'leads' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <Users className="w-5 h-5" />
+            <span>לידים</span>
           </button>
           <button 
             onClick={() => setActiveTab('analytics')}
@@ -2095,6 +2114,7 @@ const AdminPanel = () => {
               {activeTab === 'bundles' && 'ניהול חבילות תיקון'}
               {activeTab === 'announcements' && 'הודעות והתראות'}
               {activeTab === 'reminders' && 'תזכורות ומשימות'}
+              {activeTab === 'leads' && 'לידים'}
             </h1>
             <p className="text-xs md:text-sm text-muted-foreground">
               {activeTab === 'orders' && `${orders.length} הזמנות`}
