@@ -153,7 +153,7 @@ const DataTransfer = () => {
         `מ: ${sourceLabel} → אל: ${targetLabel}`,
       ];
       if (isCrossTransfer) {
-        notes.push('⚠️ העברה בין אנדרואיד לאייפון - וואטסאפ עלול לא לעבור בדרך הרגילה');
+        notes.push('העברה בין אנדרואיד לאייפון - וואטסאפ עלול לא לעבור בדרך הרגילה');
       }
       if (customerNotes.trim()) {
         notes.push(`הערות לקוח: ${customerNotes.trim()}`);
