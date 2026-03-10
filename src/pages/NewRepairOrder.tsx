@@ -818,7 +818,13 @@ const NewRepairOrder = () => {
     return appliedCoupon.discount_value;
   };
   const getFinalPrice = () => {
-    return Math.max(0, getTotalPrice() - getDiscount());
+    return Math.max(0, getTotalPrice() - getDiscount() - loyaltyDiscount);
+  };
+
+  const handleLoyaltyRedeem = (discount: number) => {
+    setLoyaltyDiscount(discount);
+    setLoyaltyRedeemed(true);
+    toast.success(`הנחת נאמנות של ₪${discount} הופעלה!`);
   };
 
   // Image upload
