@@ -28,10 +28,10 @@ const TechnicianRecruitment = () => {
   ];
 
   const floatingIcons = [
-    { Icon: Wrench, size: 'w-10 h-10', position: 'top-[15%] right-[10%]', delay: '0s', bg: 'bg-card' },
-    { Icon: Smartphone, size: 'w-12 h-12', position: 'top-[35%] right-[25%]', delay: '1s', bg: 'bg-card' },
-    { Icon: Shield, size: 'w-9 h-9', position: 'top-[55%] right-[8%]', delay: '2s', bg: 'bg-card' },
-    { Icon: Zap, size: 'w-11 h-11', position: 'top-[70%] right-[22%]', delay: '3s', bg: 'bg-card' },
+    { Icon: Wrench, size: 'w-10 h-10', position: 'top-[15%] right-[10%]', delay: '0s', bg: 'bg-primary' },
+    { Icon: Smartphone, size: 'w-12 h-12', position: 'top-[35%] right-[25%]', delay: '1s', bg: 'bg-primary' },
+    { Icon: Shield, size: 'w-9 h-9', position: 'top-[55%] right-[8%]', delay: '2s', bg: 'bg-primary' },
+    { Icon: Zap, size: 'w-11 h-11', position: 'top-[70%] right-[22%]', delay: '3s', bg: 'bg-primary' },
   ];
 
   const canProceed = () => {
