@@ -300,6 +300,16 @@ const CustomerTracker = () => {
           <WarrantyCertificate order={currentOrder} />
         )}
 
+        {/* Loyalty Points - show when completed */}
+        {showRating && (
+          <LoyaltyPointsDisplay
+            customerPhone={currentOrder.customerPhone}
+            mode="tracker"
+            repairPrice={currentOrder.repairPrice}
+            showTerms
+          />
+        )}
+
         {/* Invoice download - show below rating when completed */}
         {showRating && currentOrder.invoiceLink && (
           <div className="glass-card rounded-xl p-5 animate-fade-in">
