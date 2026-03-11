@@ -13,6 +13,8 @@ interface OrderData {
   repairType: string;
   repairPrice: number;
   scheduledTime: string;
+  scheduledDateISO?: string;
+  scheduledTimeSlot?: string;
   notes: string;
   customerEmail?: string;
   orderNumber?: number;
@@ -41,50 +43,70 @@ async function sendEmail(apiKey: string, from: string, to: string[], subject: st
   return response.json();
 }
 
-// Build a Google Calendar link from the scheduled time string
+// Build a Google Calendar link from the scheduled time
 function buildCalendarLink(orderData: OrderData): string {
-  // Parse Hebrew scheduled time like "יום שני 10/2 בשעות 13:00-17:00"
-  // or simpler formats like "10/2 13:00-17:00"
-  const now = new Date();
-  const year = now.getFullYear();
-  
-  // Extract date part (DD/MM)
-  const dateMatch = orderData.scheduledTime.match(/(\d{1,2})\/(\d{1,2})/);
-  // Extract time range (HH:MM-HH:MM)
-  const timeMatch = orderData.scheduledTime.match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
-  
   let startDate: string;
   let endDate: string;
   
-  if (dateMatch && timeMatch) {
-    const day = dateMatch[1].padStart(2, '0');
-    const month = dateMatch[2].padStart(2, '0');
-    const startTime = timeMatch[1].replace(':', '');
-    const endTime = timeMatch[2].replace(':', '');
+  // Prefer the ISO date + time slot if available (reliable)
+  if (orderData.scheduledDateISO && orderData.scheduledTimeSlot) {
+    const date = new Date(orderData.scheduledDateISO);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     
-    // Format: YYYYMMDDTHHMMSS (in local Israel time)
-    startDate = `${year}${month}${day}T${startTime}00`;
-    endDate = `${year}${month}${day}T${endTime}00`;
+    const timeMatch = orderData.scheduledTimeSlot.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+    if (timeMatch) {
+      const startH = timeMatch[1].padStart(2, '0');
+      const startM = timeMatch[2];
+      const endH = timeMatch[3].padStart(2, '0');
+      const endM = timeMatch[4];
+      startDate = `${year}${month}${day}T${startH}${startM}00`;
+      endDate = `${year}${month}${day}T${endH}${endM}00`;
+    } else {
+      startDate = `${year}${month}${day}T090000`;
+      endDate = `${year}${month}${day}T180000`;
+    }
   } else {
-    // Fallback - create an all-day event for today
-    const todayStr = `${year}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
-    startDate = todayStr;
-    endDate = todayStr;
+    // Fallback: parse Hebrew scheduled time like "יום שני 10/2 בשעות 13:00-17:00"
+    const dateMatch = orderData.scheduledTime.match(/(\d{1,2})\/(\d{1,2})/);
+    const timeMatch = orderData.scheduledTime.match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
+    
+    if (dateMatch && timeMatch) {
+      const now = new Date();
+      const day = dateMatch[1].padStart(2, '0');
+      const month = dateMatch[2].padStart(2, '0');
+      const year = now.getFullYear();
+      // Handle year rollover (e.g., order in Dec for Jan)
+      const orderMonth = parseInt(dateMatch[2]);
+      const currentMonth = now.getMonth() + 1;
+      const adjustedYear = orderMonth < currentMonth - 1 ? year + 1 : year;
+      
+      const startTime = timeMatch[1].replace(':', '');
+      const endTime = timeMatch[2].replace(':', '');
+      startDate = `${adjustedYear}${month}${day}T${startTime}00`;
+      endDate = `${adjustedYear}${month}${day}T${endTime}00`;
+    } else {
+      // Final fallback - all-day event today
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+      startDate = todayStr;
+      endDate = todayStr;
+    }
   }
   
-  const title = encodeURIComponent(`🔧 תיקון ${orderData.deviceType} - ${orderData.repairType}`);
+  const title = encodeURIComponent(`תיקון ${orderData.deviceType} - ${orderData.repairType}`);
   const location = encodeURIComponent(orderData.customerAddress);
   const details = encodeURIComponent(
-    `👤 לקוח: ${orderData.customerName}\n` +
-    `📞 טלפון: ${orderData.customerPhone}\n` +
-    `📱 דגם: ${orderData.deviceType}\n` +
-    `🔧 תיקון: ${orderData.repairType}\n` +
-    `💰 מחיר: ₪${orderData.repairPrice}\n` +
-    (orderData.notes ? `📝 הערות: ${orderData.notes}\n` : '') +
-    (orderData.promotionTitle ? `🎁 מבצע: ${orderData.promotionTitle}` : '')
+    `לקוח: ${orderData.customerName}\n` +
+    `טלפון: ${orderData.customerPhone}\n` +
+    `דגם: ${orderData.deviceType}\n` +
+    `תיקון: ${orderData.repairType}\n` +
+    `מחיר: ₪${orderData.repairPrice}\n` +
+    (orderData.notes ? `הערות: ${orderData.notes}\n` : '') +
+    (orderData.promotionTitle ? `מבצע: ${orderData.promotionTitle}` : '')
   );
   
-  // Use Israel timezone
   const timezone = encodeURIComponent('Asia/Jerusalem');
   
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDate}/${endDate}&details=${details}&location=${location}&ctz=${timezone}`;
