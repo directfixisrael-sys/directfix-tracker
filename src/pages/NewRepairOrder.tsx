@@ -13,6 +13,7 @@ import { getRepairIconComponent } from '@/lib/repairIcons';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
+import CustomerZone from '@/components/CustomerZone';
 import { toast } from 'sonner';
 import Logo from '@/components/Logo';
 import VideoPlayer from '@/components/VideoPlayer';
@@ -1278,6 +1279,7 @@ const NewRepairOrder = () => {
           </div>
 
           <div className="flex items-center gap-1.5">
+            <CustomerZone />
             <a href="tel:033106020" className="h-9 w-9 rounded-xl bg-accent text-accent-foreground flex items-center justify-center transition-colors border-2 border-foreground/10" aria-label="התקשר 033106020">
               <Phone className="w-4 h-4" />
             </a>

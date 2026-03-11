@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import Logo from '@/components/Logo';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
+import CustomerZone from '@/components/CustomerZone';
 import { getLeadSource } from '@/lib/leadSource';
 
 // Schedule configuration - next day only
@@ -240,6 +241,7 @@ const DataTransfer = () => {
             <Logo size="sm" />
           </div>
           <div className="flex items-center gap-1.5">
+            <CustomerZone />
             <a href="tel:033106020" className="h-9 w-9 rounded-2xl bg-accent text-accent-foreground flex items-center justify-center transition-colors" aria-label="התקשר">
               <Phone className="w-4 h-4" />
             </a>
