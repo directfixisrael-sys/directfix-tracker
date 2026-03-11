@@ -293,7 +293,7 @@ const TechnicianRecruitment = () => {
                   <div
                     key={s}
                     className={`h-2 rounded-full transition-all duration-300 ${
-                      s === step ? 'w-8 bg-primary-foreground' : s < step ? 'w-4 bg-primary-foreground/60' : 'w-4 bg-primary-foreground/20'
+                      s === step ? 'w-8 bg-background' : s < step ? 'w-4 bg-background/60' : 'w-4 bg-background/20'
                     }`}
                   />
                 ))}
