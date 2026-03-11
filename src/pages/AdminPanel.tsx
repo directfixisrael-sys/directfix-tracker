@@ -968,6 +968,8 @@ const AdminPanel = () => {
 
       case 'announcements':
         return <AnnouncementsManagement />;
+      case 'loyalty':
+        return <LoyaltyManagement />;
       case 'feedback':
         const ordersWithFeedback = orders.filter(o => o.rating);
         const avgRating = ordersWithFeedback.length > 0 
