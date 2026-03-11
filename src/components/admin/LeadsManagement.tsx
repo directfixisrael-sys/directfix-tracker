@@ -32,9 +32,44 @@ const LeadsManagement = () => {
     const { data, error } = await supabase
       .from('leads')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(500);
     
-    if (data) setLeads(data);
+    if (data) {
+      // Backfill device_type/repair_type from orders for older leads
+      const phonesNeedingData = data
+        .filter(l => !l.device_type && !l.repair_type)
+        .map(l => l.customer_phone);
+      
+      if (phonesNeedingData.length > 0) {
+        const uniquePhones = [...new Set(phonesNeedingData)];
+        const { data: orders } = await supabase
+          .from('orders')
+          .select('customer_phone, device_type, issue_description')
+          .in('customer_phone', uniquePhones)
+          .order('created_at', { ascending: false });
+        
+        if (orders) {
+          const orderMap = new Map<string, { device: string; repair: string }>();
+          orders.forEach(o => {
+            if (!orderMap.has(o.customer_phone)) {
+              orderMap.set(o.customer_phone, { device: o.device_type, repair: o.issue_description });
+            }
+          });
+          
+          data.forEach(l => {
+            if (!l.device_type && !l.repair_type) {
+              const orderInfo = orderMap.get(l.customer_phone);
+              if (orderInfo) {
+                l.device_type = orderInfo.device;
+                l.repair_type = orderInfo.repair;
+              }
+            }
+          });
+        }
+      }
+      setLeads(data as Lead[]);
+    }
     if (error) console.error('Error loading leads:', error);
     setIsLoading(false);
   };
