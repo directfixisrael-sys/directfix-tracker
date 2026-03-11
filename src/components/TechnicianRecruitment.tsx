@@ -158,7 +158,7 @@ const TechnicianRecruitment = () => {
       case 3:
         return (
           <div className="space-y-3 animate-slide-up">
-            <label className="text-sm font-bold text-primary-foreground/90">קורות חיים (לא חובה)</label>
+            <label className="text-sm font-bold text-background/90">קורות חיים (לא חובה)</label>
             <input
               ref={fileInputRef}
               type="file"
