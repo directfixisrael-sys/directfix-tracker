@@ -21,17 +21,17 @@ const TechnicianRecruitment = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const features = [
-    { icon: Zap, text: 'תיקון מהיר תוך שעה' },
-    { icon: Shield, text: 'אחריות מלאה על כל תיקון' },
-    { icon: MapPin, text: 'שירות עד הבית בכל הארץ' },
+    { icon: Zap, text: 'תנאים נוחים' },
+    { icon: Shield, text: 'עבודה בחברה עם וותק וניסיון' },
+    { icon: MapPin, text: 'תהיה בעל הבית של עצמך' },
     { icon: Wrench, text: 'חלפים מקוריים ואיכותיים' },
   ];
 
   const floatingIcons = [
-    { Icon: Wrench, size: 'w-10 h-10', position: 'top-[15%] right-[10%]', delay: '0s', bg: 'bg-card' },
-    { Icon: Smartphone, size: 'w-12 h-12', position: 'top-[35%] right-[25%]', delay: '1s', bg: 'bg-card' },
-    { Icon: Shield, size: 'w-9 h-9', position: 'top-[55%] right-[8%]', delay: '2s', bg: 'bg-card' },
-    { Icon: Zap, size: 'w-11 h-11', position: 'top-[70%] right-[22%]', delay: '3s', bg: 'bg-card' },
+    { Icon: Wrench, size: 'w-10 h-10', position: 'top-[15%] right-[10%]', delay: '0s', bg: 'bg-primary' },
+    { Icon: Smartphone, size: 'w-12 h-12', position: 'top-[35%] right-[25%]', delay: '1s', bg: 'bg-primary' },
+    { Icon: Shield, size: 'w-9 h-9', position: 'top-[55%] right-[8%]', delay: '2s', bg: 'bg-primary' },
+    { Icon: Zap, size: 'w-11 h-11', position: 'top-[70%] right-[22%]', delay: '3s', bg: 'bg-primary' },
   ];
 
   const canProceed = () => {
@@ -103,7 +103,7 @@ const TechnicianRecruitment = () => {
       case 0:
         return (
           <div className="space-y-3 animate-slide-up">
-            <label className="text-sm font-bold text-primary-foreground/90">שם מלא</label>
+            <label className="text-sm font-bold text-background/90">שם מלא</label>
             <Input
               placeholder="הכנס את שמך המלא"
               value={name}
@@ -116,7 +116,7 @@ const TechnicianRecruitment = () => {
       case 1:
         return (
           <div className="space-y-3 animate-slide-up">
-            <label className="text-sm font-bold text-primary-foreground/90">שנות ניסיון</label>
+            <label className="text-sm font-bold text-background/90">שנות ניסיון</label>
             <Input
               placeholder="כמה שנות ניסיון יש לך?"
               value={experience}
@@ -129,7 +129,7 @@ const TechnicianRecruitment = () => {
       case 2:
         return (
           <div className="space-y-3 animate-slide-up">
-            <label className="text-sm font-bold text-primary-foreground/90">פרטי התקשרות</label>
+            <label className="text-sm font-bold text-background/90">פרטי התקשרות</label>
             <div className="relative">
               <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
@@ -158,7 +158,7 @@ const TechnicianRecruitment = () => {
       case 3:
         return (
           <div className="space-y-3 animate-slide-up">
-            <label className="text-sm font-bold text-primary-foreground/90">קורות חיים (לא חובה)</label>
+            <label className="text-sm font-bold text-background/90">קורות חיים (לא חובה)</label>
             <input
               ref={fileInputRef}
               type="file"
@@ -208,7 +208,7 @@ const TechnicianRecruitment = () => {
   return (
     <section className="relative overflow-hidden rounded-3xl mx-4 mb-8">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/70" />
+      <div className="absolute inset-0 bg-gradient-to-br from-foreground via-foreground/95 to-foreground/85" />
       
       <div className="relative grid grid-cols-1 md:grid-cols-2 min-h-[420px]">
         {/* Left side - Floating icons */}
@@ -222,7 +222,7 @@ const TechnicianRecruitment = () => {
                 transform: `rotate(${(i * 15) - 15}deg)`,
               }}
             >
-              <Icon className="w-5 h-5 text-primary" />
+              <Icon className="w-5 h-5 text-primary-foreground" />
             </div>
           ))}
         </div>
@@ -231,21 +231,21 @@ const TechnicianRecruitment = () => {
         <div className="p-8 md:p-12 flex flex-col justify-center">
           {isSubmitted ? (
             <div className="text-center animate-slide-up space-y-4">
-              <div className="w-20 h-20 bg-primary-foreground/20 rounded-full flex items-center justify-center mx-auto">
-                <CheckCircle2 className="w-10 h-10 text-primary-foreground" />
+              <div className="w-20 h-20 bg-background/20 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-10 h-10 text-background" />
               </div>
-              <h3 className="text-2xl font-extrabold text-primary-foreground">הבקשה נשלחה!</h3>
-              <p className="text-primary-foreground/80">תודה {name}, ניצור איתך קשר בהקדם.</p>
+              <h3 className="text-2xl font-extrabold text-background">הבקשה נשלחה!</h3>
+              <p className="text-background/80">תודה {name}, ניצור איתך קשר בהקדם.</p>
             </div>
           ) : !showForm ? (
             <>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-primary-foreground mb-4 leading-tight">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-background mb-4 leading-tight">
                 אתה טכנאי סלולר?
                 <br />
                 הצטרף לצוות דיירקט פיקס!
               </h2>
-              <p className="text-primary-foreground/80 text-lg mb-6">
-                אנחנו מחפשים טכנאים מנוסים ומקצועיים. הצטרף למעבדות המובילה בישראל וקבל עבודה יציבה עם תנאים מעולים.
+              <p className="text-background/80 text-lg mb-6">
+                אנחנו מחפשים טכנאים מנוסים ומקצועיים. הצטרף למעבדה המובילה בישראל.
               </p>
               
               {/* Feature pills */}
@@ -253,10 +253,10 @@ const TechnicianRecruitment = () => {
                 {features.map((f, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-2 bg-primary-foreground/15 border border-primary-foreground/25 rounded-full px-4 py-2"
+                    className="flex items-center gap-2 bg-background/15 border border-background/25 rounded-full px-4 py-2"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-primary-foreground/80" />
-                    <span className="text-sm font-medium text-primary-foreground">{f.text}</span>
+                    <CheckCircle2 className="w-4 h-4 text-background/80" />
+                    <span className="text-sm font-medium text-background">{f.text}</span>
                   </div>
                 ))}
               </div>
@@ -266,20 +266,20 @@ const TechnicianRecruitment = () => {
                 {floatingIcons.map(({ Icon, delay }, i) => (
                   <div
                     key={i}
-                    className="w-12 h-12 bg-card rounded-2xl shadow-lg flex items-center justify-center"
+                    className="w-12 h-12 bg-primary rounded-2xl shadow-lg flex items-center justify-center"
                     style={{
                       animation: `techFloat 6s ease-in-out ${delay} infinite`,
                       transform: `rotate(${(i * 12) - 18}deg)`,
                     }}
                   >
-                    <Icon className="w-5 h-5 text-primary" />
+                    <Icon className="w-5 h-5 text-primary-foreground" />
                   </div>
                 ))}
               </div>
 
               <Button
                 onClick={() => { setShowForm(true); setStep(0); }}
-                className="w-full md:w-auto h-14 px-10 rounded-2xl text-lg font-bold bg-card text-foreground hover:bg-card/90 shadow-xl gap-2"
+                className="w-full md:w-auto h-14 px-10 rounded-2xl text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl gap-2"
               >
                 <ArrowLeft className="w-5 h-5" />
                 הגש בקשה
@@ -293,7 +293,7 @@ const TechnicianRecruitment = () => {
                   <div
                     key={s}
                     className={`h-2 rounded-full transition-all duration-300 ${
-                      s === step ? 'w-8 bg-primary-foreground' : s < step ? 'w-4 bg-primary-foreground/60' : 'w-4 bg-primary-foreground/20'
+                      s === step ? 'w-8 bg-background' : s < step ? 'w-4 bg-background/60' : 'w-4 bg-background/20'
                     }`}
                   />
                 ))}
@@ -306,7 +306,7 @@ const TechnicianRecruitment = () => {
                   <Button
                     variant="outline"
                     onClick={() => setStep(step - 1)}
-                    className="h-12 px-6 rounded-xl bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20"
+                    className="h-12 px-6 rounded-xl bg-background/10 border-background/20 text-background hover:bg-background/20"
                   >
                     חזור
                   </Button>
