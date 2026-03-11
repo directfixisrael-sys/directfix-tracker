@@ -400,6 +400,7 @@ export type Database = {
           updated_at: string
           wants_promotions: boolean
           warranty_expiry: string | null
+          warranty_months: number | null
           waze_link: string | null
         }
         Insert: {
@@ -435,6 +436,7 @@ export type Database = {
           updated_at?: string
           wants_promotions?: boolean
           warranty_expiry?: string | null
+          warranty_months?: number | null
           waze_link?: string | null
         }
         Update: {
@@ -470,6 +472,7 @@ export type Database = {
           updated_at?: string
           wants_promotions?: boolean
           warranty_expiry?: string | null
+          warranty_months?: number | null
           waze_link?: string | null
         }
         Relationships: []

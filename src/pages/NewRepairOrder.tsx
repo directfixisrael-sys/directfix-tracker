@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send, Zap } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send, Zap, Award } from 'lucide-react';
 import { getRepairIconComponent } from '@/lib/repairIcons';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
@@ -28,6 +28,7 @@ import GiftPromoPopup from '@/components/GiftPromoPopup';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { getLeadSource } from '@/lib/leadSource';
 import GiftOrderToggle from '@/components/GiftOrderToggle';
+import LoyaltyPointsDisplay, { getCustomerPoints, calculatePointsFromPrice, calculateDiscountFromPoints } from '@/components/LoyaltyPointsDisplay';
 
 // iPhone back glass colors per model family
 const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
@@ -361,6 +362,13 @@ const NewRepairOrder = () => {
     if (isReturning) {
       toast.success(`ברוכים השבים ${introName.trim()}! מגן מסך במתנה!`);
     }
+
+    // Load loyalty points
+    const pts = await getCustomerPoints(normalizedPhone);
+    if (pts > 0) {
+      setCustomerLoyaltyPoints(pts);
+      setLoyaltyDiscount(calculateDiscountFromPoints(pts));
+    }
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptContact, setAcceptContact] = useState(false);
@@ -396,6 +404,10 @@ const NewRepairOrder = () => {
   const [showGiftBurst, setShowGiftBurst] = useState(false);
   const [giftPaymentUrl, setGiftPaymentUrl] = useState<string | null>(null);
   const [giftOrderResult, setGiftOrderResult] = useState<any>(null);
+
+  // Loyalty points
+  const [customerLoyaltyPoints, setCustomerLoyaltyPoints] = useState(0);
+  const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
 
   const handleGiftToggle = () => {
     const newVal = !isGiftOrder;
@@ -889,8 +901,9 @@ const NewRepairOrder = () => {
     return appliedCoupon.discount_value;
   };
   const getFinalPrice = () => {
-    return Math.max(0, getTotalPrice() - getDiscount());
+    return Math.max(0, getTotalPrice() - getDiscount() - loyaltyDiscount);
   };
+  const getPointsToEarn = () => calculatePointsFromPrice(getFinalPrice());
 
   // Image upload
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1020,7 +1033,7 @@ const NewRepairOrder = () => {
       }
       if (appliedCoupon) {
         notes.push(`קופון: ${appliedCoupon.code} - הנחה של ${appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : `₪${appliedCoupon.discount_value}`}`);
-        // Update coupon usage - fetch current and increment
+        // Update coupon usage
         const {
           data: couponData
         } = await supabase.from('coupons').select('current_uses').eq('code', appliedCoupon.code).single();
@@ -1029,6 +1042,9 @@ const NewRepairOrder = () => {
             current_uses: couponData.current_uses + 1
           }).eq('code', appliedCoupon.code);
         }
+      }
+      if (loyaltyDiscount > 0) {
+        notes.push(`הנחת נקודות נאמנות: -₪${loyaltyDiscount} (${customerLoyaltyPoints} נקודות)`);
       }
       if (deviceImages.length > 0) {
         notes.push(`תמונות מכשיר: ${deviceImages.length} תמונות צורפו`);
@@ -1107,6 +1123,29 @@ const NewRepairOrder = () => {
         // Mark lead as converted
         const normalizedPhone = customerPhone.replace(/\D/g, '');
         await supabase.from('leads').update({ converted: true }).eq('customer_phone', normalizedPhone);
+        
+        // Redeem loyalty points if used
+        if (loyaltyDiscount > 0 && customerLoyaltyPoints > 0) {
+          await supabase.from('loyalty_points').insert({
+            customer_phone: normalizedPhone,
+            points: customerLoyaltyPoints,
+            type: 'redeemed',
+            description: `מימוש נקודות - הזמנה`,
+            order_id: orderResult?.id || null,
+          });
+        }
+        
+        // Award new loyalty points
+        const pointsToEarn = calculatePointsFromPrice(getFinalPrice());
+        if (pointsToEarn > 0) {
+          await supabase.from('loyalty_points').insert({
+            customer_phone: normalizedPhone,
+            points: pointsToEarn,
+            type: 'earned',
+            description: `צבירה מתיקון`,
+            order_id: orderResult?.id || null,
+          });
+        }
         
         goToStep('success');
       }
@@ -1831,16 +1870,41 @@ const NewRepairOrder = () => {
                     </div>}
                 </div>
 
+                {/* Loyalty discount */}
+                {loyaltyDiscount > 0 && (
+                  <div className="flex justify-between items-center text-sm bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-2 -mx-1">
+                    <span className="text-primary font-medium flex items-center gap-1.5">
+                      <Award className="w-4 h-4" />
+                      הנחת נקודות נאמנות ({customerLoyaltyPoints} נק')
+                    </span>
+                    <span className="font-bold text-success">-₪{loyaltyDiscount}</span>
+                  </div>
+                )}
+
+                {/* Points to earn */}
+                {getPointsToEarn() > 0 && (
+                  <div className="flex justify-between items-center text-sm text-primary/80 px-1">
+                    <span className="flex items-center gap-1.5">
+                      <Award className="w-3.5 h-3.5" />
+                      נקודות שתצברו מהזמנה זו
+                    </span>
+                    <span className="font-semibold">+{getPointsToEarn()}</span>
+                  </div>
+                )}
+
                 <div className="border-t border-border pt-3 mt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-bold">סה"כ</span>
                     <div className="text-right">
-                      {appliedCoupon && <span className="text-muted-foreground line-through text-sm mr-2">₪{getTotalPrice()}</span>}
+                      {(appliedCoupon || loyaltyDiscount > 0) && <span className="text-muted-foreground line-through text-sm mr-2">₪{getTotalPrice()}</span>}
                       <span className="text-xl font-bold text-primary">₪{getFinalPrice()}</span>
                     </div>
                   </div>
                   {appliedCoupon && <div className="text-xs text-success mt-1 text-left">
                       חיסכת ₪{getDiscount()} עם קופון {appliedCoupon.code}!
+                    </div>}
+                  {loyaltyDiscount > 0 && <div className="text-xs text-primary mt-1 text-left">
+                      + ₪{loyaltyDiscount} הנחת נקודות נאמנות
                     </div>}
                   {selectedBundleAddon && currentBundle && <div className="text-xs text-amber-500 mt-1 text-left">
                       כולל סוללה בהנחה של {currentBundle.discount_percent}%

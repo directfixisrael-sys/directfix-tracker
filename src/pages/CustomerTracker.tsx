@@ -15,6 +15,7 @@ import StickyHeader from '@/components/StickyHeader';
 import PrivacyConsentModal from '@/components/PrivacyConsentModal';
 import RepairHistoryList from '@/components/RepairHistoryList';
 import WarrantyCertificate from '@/components/WarrantyCertificate';
+import LoyaltyPointsDisplay from '@/components/LoyaltyPointsDisplay';
 import { useRepairStore } from '@/store/repairStore';
 import Logo from '@/components/Logo';
 import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
@@ -297,6 +298,16 @@ const CustomerTracker = () => {
         {/* Warranty Certificate - show when completed */}
         {showRating && (
           <WarrantyCertificate order={currentOrder} />
+        )}
+
+        {/* Loyalty Points - show when completed */}
+        {showRating && (
+          <LoyaltyPointsDisplay
+            customerPhone={currentOrder.customerPhone}
+            mode="tracker"
+            repairPrice={currentOrder.repairPrice}
+            showTerms
+          />
         )}
 
         {/* Invoice download - show below rating when completed */}
