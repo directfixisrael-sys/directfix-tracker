@@ -153,6 +153,18 @@ const LeadsManagement = () => {
                       עצר ב: {lead.last_step}
                     </span>
                   )}
+                  {lead.device_type && (
+                    <span className="inline-flex items-center gap-1 text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full font-medium mt-1 mr-1">
+                      <Smartphone className="w-2.5 h-2.5" />
+                      {lead.device_type}
+                    </span>
+                  )}
+                  {lead.repair_type && (
+                    <span className="inline-flex items-center gap-1 text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full font-medium mt-1 mr-1">
+                      <Wrench className="w-2.5 h-2.5" />
+                      {lead.repair_type}
+                    </span>
+                  )}
                 </div>
                 <div className="flex gap-1">
                   <Button
