@@ -16,6 +16,8 @@ interface Lead {
   is_returning_customer: boolean;
   converted: boolean;
   last_step: string;
+  device_type: string | null;
+  repair_type: string | null;
   created_at: string;
 }
 
