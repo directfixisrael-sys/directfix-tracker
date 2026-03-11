@@ -312,10 +312,10 @@ const NewRepairOrder = () => {
   const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
 
   // Update lead step tracking
-  const updateLeadStep = async (stepName: string) => {
+  const updateLeadStep = async (stepName: string, extra?: Record<string, string>) => {
     if (!currentLeadId) return;
     try {
-      await supabase.from('leads').update({ last_step: stepName }).eq('id', currentLeadId);
+      await supabase.from('leads').update({ last_step: stepName, ...extra }).eq('id', currentLeadId);
     } catch (e) {
       console.error('Error updating lead step:', e);
     }
