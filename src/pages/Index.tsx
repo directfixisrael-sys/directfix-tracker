@@ -24,11 +24,11 @@ const Index = () => {
       <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b-2 border-foreground/10" role="banner">
         <nav className="max-w-2xl mx-auto flex items-center justify-between px-4 h-14" aria-label="ניווט ראשי">
           <div className="flex items-center gap-2">
+            <CustomerZone />
             <a
               href="tel:033106020"
               className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105"
               aria-label="התקשר 033106020">
-              
               <Phone className="w-4 h-4 border-0" />
             </a>
           </div>
