@@ -1124,6 +1124,29 @@ const NewRepairOrder = () => {
         const normalizedPhone = customerPhone.replace(/\D/g, '');
         await supabase.from('leads').update({ converted: true }).eq('customer_phone', normalizedPhone);
         
+        // Redeem loyalty points if used
+        if (loyaltyDiscount > 0 && customerLoyaltyPoints > 0) {
+          await supabase.from('loyalty_points').insert({
+            customer_phone: normalizedPhone,
+            points: customerLoyaltyPoints,
+            type: 'redeemed',
+            description: `מימוש נקודות - הזמנה`,
+            order_id: orderResult?.id || null,
+          });
+        }
+        
+        // Award new loyalty points
+        const pointsToEarn = calculatePointsFromPrice(getFinalPrice());
+        if (pointsToEarn > 0) {
+          await supabase.from('loyalty_points').insert({
+            customer_phone: normalizedPhone,
+            points: pointsToEarn,
+            type: 'earned',
+            description: `צבירה מתיקון`,
+            order_id: orderResult?.id || null,
+          });
+        }
+        
         goToStep('success');
       }
     } catch (error) {
