@@ -161,6 +161,13 @@ const AdminPanel = () => {
     return () => unsubscribe();
   }, []);
 
+  // Scroll to top when switching tabs
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [activeTab]);
+
   // Update selectedOrder when orders change
   useEffect(() => {
     if (selectedOrder) {
