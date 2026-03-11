@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Search, Plus, Minus, Award, Coins } from 'lucide-react';
+import { Search, Plus, Minus, Award, Coins, MessageCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface CustomerPoints {
