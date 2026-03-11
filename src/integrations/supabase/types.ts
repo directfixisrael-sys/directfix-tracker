@@ -218,10 +218,12 @@ export type Database = {
           created_at: string
           customer_name: string
           customer_phone: string
+          device_type: string | null
           id: string
           is_returning_customer: boolean
           last_step: string
           privacy_accepted: boolean
+          repair_type: string | null
           updated_at: string
         }
         Insert: {
@@ -229,10 +231,12 @@ export type Database = {
           created_at?: string
           customer_name: string
           customer_phone: string
+          device_type?: string | null
           id?: string
           is_returning_customer?: boolean
           last_step?: string
           privacy_accepted?: boolean
+          repair_type?: string | null
           updated_at?: string
         }
         Update: {
@@ -240,10 +244,12 @@ export type Database = {
           created_at?: string
           customer_name?: string
           customer_phone?: string
+          device_type?: string | null
           id?: string
           is_returning_customer?: boolean
           last_step?: string
           privacy_accepted?: boolean
+          repair_type?: string | null
           updated_at?: string
         }
         Relationships: []
