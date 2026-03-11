@@ -222,7 +222,7 @@ const TechnicianRecruitment = () => {
                 transform: `rotate(${(i * 15) - 15}deg)`,
               }}
             >
-              <Icon className="w-5 h-5 text-primary" />
+              <Icon className="w-5 h-5 text-primary-foreground" />
             </div>
           ))}
         </div>
