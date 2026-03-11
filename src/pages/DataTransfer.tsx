@@ -242,15 +242,15 @@ const DataTransfer = () => {
           </div>
           <div className="flex items-center gap-1.5">
             <CustomerZone />
-            <a href="tel:033106020" className="h-9 w-9 rounded-2xl bg-accent text-accent-foreground flex items-center justify-center transition-colors" aria-label="התקשר">
-              <Phone className="w-4 h-4" />
-            </a>
             <Button variant="ghost" size="icon" onClick={() => window.dispatchEvent(new CustomEvent('open-accessibility-widget'))} className="h-9 w-9 rounded-2xl" aria-label="נגישות">
               <Accessibility className="w-4 h-4" />
             </Button>
             <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-2xl" aria-label="מצב תצוגה">
               {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
+            <a href="tel:033106020" className="h-9 w-9 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center transition-transform hover:scale-105" aria-label="התקשר">
+              <Phone className="w-4 h-4" />
+            </a>
           </div>
         </nav>
 
