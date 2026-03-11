@@ -1870,16 +1870,41 @@ const NewRepairOrder = () => {
                     </div>}
                 </div>
 
+                {/* Loyalty discount */}
+                {loyaltyDiscount > 0 && (
+                  <div className="flex justify-between items-center text-sm bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-2 -mx-1">
+                    <span className="text-primary font-medium flex items-center gap-1.5">
+                      <Award className="w-4 h-4" />
+                      הנחת נקודות נאמנות ({customerLoyaltyPoints} נק')
+                    </span>
+                    <span className="font-bold text-success">-₪{loyaltyDiscount}</span>
+                  </div>
+                )}
+
+                {/* Points to earn */}
+                {getPointsToEarn() > 0 && (
+                  <div className="flex justify-between items-center text-sm text-primary/80 px-1">
+                    <span className="flex items-center gap-1.5">
+                      <Award className="w-3.5 h-3.5" />
+                      נקודות שתצברו מהזמנה זו
+                    </span>
+                    <span className="font-semibold">+{getPointsToEarn()}</span>
+                  </div>
+                )}
+
                 <div className="border-t border-border pt-3 mt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-bold">סה"כ</span>
                     <div className="text-right">
-                      {appliedCoupon && <span className="text-muted-foreground line-through text-sm mr-2">₪{getTotalPrice()}</span>}
+                      {(appliedCoupon || loyaltyDiscount > 0) && <span className="text-muted-foreground line-through text-sm mr-2">₪{getTotalPrice()}</span>}
                       <span className="text-xl font-bold text-primary">₪{getFinalPrice()}</span>
                     </div>
                   </div>
                   {appliedCoupon && <div className="text-xs text-success mt-1 text-left">
                       חיסכת ₪{getDiscount()} עם קופון {appliedCoupon.code}!
+                    </div>}
+                  {loyaltyDiscount > 0 && <div className="text-xs text-primary mt-1 text-left">
+                      + ₪{loyaltyDiscount} הנחת נקודות נאמנות
                     </div>}
                   {selectedBundleAddon && currentBundle && <div className="text-xs text-amber-500 mt-1 text-left">
                       כולל סוללה בהנחה של {currentBundle.discount_percent}%
