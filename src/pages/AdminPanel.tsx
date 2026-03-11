@@ -2123,6 +2123,7 @@ const AdminPanel = () => {
               {activeTab === 'announcements' && 'הודעות והתראות'}
               {activeTab === 'reminders' && 'תזכורות ומשימות'}
               {activeTab === 'leads' && 'לידים'}
+              {activeTab === 'loyalty' && 'נקודות נאמנות'}
             </h1>
             <p className="text-xs md:text-sm text-muted-foreground">
               {activeTab === 'orders' && `${orders.length} הזמנות`}
