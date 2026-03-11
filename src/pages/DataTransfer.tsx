@@ -241,6 +241,7 @@ const DataTransfer = () => {
             <Logo size="sm" />
           </div>
           <div className="flex items-center gap-1.5">
+            <CustomerZone />
             <a href="tel:033106020" className="h-9 w-9 rounded-2xl bg-accent text-accent-foreground flex items-center justify-center transition-colors" aria-label="התקשר">
               <Phone className="w-4 h-4" />
             </a>
