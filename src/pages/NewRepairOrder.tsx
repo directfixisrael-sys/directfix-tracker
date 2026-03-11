@@ -362,6 +362,13 @@ const NewRepairOrder = () => {
     if (isReturning) {
       toast.success(`ברוכים השבים ${introName.trim()}! מגן מסך במתנה!`);
     }
+
+    // Load loyalty points
+    const pts = await getCustomerPoints(normalizedPhone);
+    if (pts > 0) {
+      setCustomerLoyaltyPoints(pts);
+      setLoyaltyDiscount(calculateDiscountFromPoints(pts));
+    }
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptContact, setAcceptContact] = useState(false);
