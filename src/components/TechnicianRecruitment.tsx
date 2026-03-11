@@ -116,7 +116,7 @@ const TechnicianRecruitment = () => {
       case 1:
         return (
           <div className="space-y-3 animate-slide-up">
-            <label className="text-sm font-bold text-primary-foreground/90">שנות ניסיון</label>
+            <label className="text-sm font-bold text-background/90">שנות ניסיון</label>
             <Input
               placeholder="כמה שנות ניסיון יש לך?"
               value={experience}
