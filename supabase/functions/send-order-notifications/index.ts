@@ -13,6 +13,8 @@ interface OrderData {
   repairType: string;
   repairPrice: number;
   scheduledTime: string;
+  scheduledDateISO?: string;
+  scheduledTimeSlot?: string;
   notes: string;
   customerEmail?: string;
   orderNumber?: number;
