@@ -203,6 +203,9 @@ const Index = () => {
         </section>
       </main>
 
+      {/* Technician Recruitment */}
+      <TechnicianRecruitment />
+
       {/* Footer */}
       <footer className="border-t-2 border-foreground/10 text-center py-5 text-sm text-muted-foreground bg-card" role="contentinfo">
         <p className="font-medium">© {new Date().getFullYear()} דיירקט פיקס — תיקוני אייפון עד הבית</p>
