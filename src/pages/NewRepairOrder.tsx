@@ -1925,7 +1925,7 @@ const NewRepairOrder = () => {
                           </div>
                           <p className="text-xs text-foreground/80">בהזמנה הבאה הזינו את <strong className="text-foreground">מספר הטלפון</strong> — ההנחה תופיע אוטומטית!</p>
                         </div>
-                        <p className="text-[10px] text-muted-foreground/50 leading-relaxed pt-1.5 border-t border-border/30">
+                        <p className="text-xs text-muted-foreground leading-relaxed pt-2 border-t border-border/30">
                           תנאי תוכנית הנאמנות: הנקודות תקפות ל-24 חודשים. החברה רשאית לשנות או לבטל את התוכנית בכל עת בכפוף לחוק. נקודות אינן ניתנות להמרה למזומן.
                         </p>
                       </div>
