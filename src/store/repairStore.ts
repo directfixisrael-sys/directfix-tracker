@@ -10,7 +10,7 @@ interface RepairStore {
   isLoading: boolean;
   
   // Tab actions
-  setActiveTab: (tab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders' | 'leads') => void;
+  setActiveTab: (tab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders' | 'leads' | 'loyalty') => void;
   
   // Data loading
   loadOrders: () => Promise<void>;
