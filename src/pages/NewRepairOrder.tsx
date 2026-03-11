@@ -1280,9 +1280,6 @@ const NewRepairOrder = () => {
 
           <div className="flex items-center gap-1.5">
             <CustomerZone />
-            <a href="tel:033106020" className="h-9 w-9 rounded-xl bg-accent text-accent-foreground flex items-center justify-center transition-colors border-2 border-foreground/10" aria-label="התקשר 033106020">
-              <Phone className="w-4 h-4" />
-            </a>
             <Button variant="ghost" size="icon" onClick={() => {
             const event = new CustomEvent('open-accessibility-widget');
             window.dispatchEvent(event);
@@ -1292,6 +1289,9 @@ const NewRepairOrder = () => {
             <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-xl border-2 border-foreground/10" aria-label={resolvedTheme === 'dark' ? 'עבור למצב בהיר' : 'עבור למצב כהה'}>
               {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
             </Button>
+            <a href="tel:033106020" className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105" aria-label="התקשר 033106020">
+              <Phone className="w-4 h-4" />
+            </a>
           </div>
         </nav>
         

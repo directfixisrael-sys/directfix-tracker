@@ -28,7 +28,7 @@ const Index = () => {
             <CustomerZone />
             <a
               href="tel:033106020"
-              className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105"
+              className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105 order-last"
               aria-label="התקשר 033106020">
               <Phone className="w-4 h-4 border-0" />
             </a>
