@@ -10,6 +10,7 @@ import paymentVisa from '@/assets/payment-visa.png';
 import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
 import VideoPlayer from '@/components/VideoPlayer';
+import TechnicianRecruitment from '@/components/TechnicianRecruitment';
 
 const Index = () => {
   const navigate = useNavigate();
