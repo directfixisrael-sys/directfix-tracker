@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Search, Plus, Minus, Award, Coins } from 'lucide-react';
+import { Search, Plus, Minus, Award, Coins, MessageCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface CustomerPoints {
@@ -181,20 +181,38 @@ const LoyaltyManagement = () => {
             <p>אין לקוחות עם נקודות</p>
           </div>
         ) : (
-          filtered.map(c => (
-            <Card key={c.phone} className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-bold text-foreground">{c.name}</p>
-                  <p className="text-sm text-muted-foreground" dir="ltr">{c.phone}</p>
+          filtered.map(c => {
+            const pointsMsg = c.totalPoints > 0
+              ? `היי ${c.name}! 🎉\nיש לך *${c.totalPoints} נקודות נאמנות* בדיירקט פיקס!\nזה שווה *₪${c.totalValue.toFixed(0)} הנחה* על התיקון הבא שלך 🔧\n\nנשמח לראותך שוב!`
+              : `היי ${c.name}! 🎉\nרצינו לעדכן אותך שיש לך תוכנית נקודות נאמנות בדיירקט פיקס!\nכל 100 ש"ח בתיקון = 10 נקודות 🎯\n\nנשמח לראותך!`;
+            const waLink = `https://wa.me/972${c.phone.replace(/^0/, '')}?text=${encodeURIComponent(pointsMsg)}`;
+            
+            return (
+              <Card key={c.phone} className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-foreground">{c.name}</p>
+                    <p className="text-sm text-muted-foreground" dir="ltr">{c.phone}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <a
+                      href={waLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-9 h-9 rounded-full bg-[#25D366]/10 hover:bg-[#25D366]/20 flex items-center justify-center transition-colors"
+                      title="שלח הודעת וואטסאפ על נקודות"
+                    >
+                      <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                    </a>
+                    <div className="text-left">
+                      <p className="text-xl font-bold text-primary">{c.totalPoints}</p>
+                      <p className="text-xs text-muted-foreground">= ₪{c.totalValue.toFixed(0)}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <p className="text-xl font-bold text-primary">{c.totalPoints}</p>
-                  <p className="text-xs text-muted-foreground">= ₪{c.totalValue.toFixed(0)}</p>
-                </div>
-              </div>
-            </Card>
-          ))
+              </Card>
+            );
+          })
         )}
       </div>
 
