@@ -129,7 +129,7 @@ const TechnicianRecruitment = () => {
       case 2:
         return (
           <div className="space-y-3 animate-slide-up">
-            <label className="text-sm font-bold text-primary-foreground/90">פרטי התקשרות</label>
+            <label className="text-sm font-bold text-background/90">פרטי התקשרות</label>
             <div className="relative">
               <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
