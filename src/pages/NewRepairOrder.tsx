@@ -1033,7 +1033,7 @@ const NewRepairOrder = () => {
       }
       if (appliedCoupon) {
         notes.push(`קופון: ${appliedCoupon.code} - הנחה של ${appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : `₪${appliedCoupon.discount_value}`}`);
-        // Update coupon usage - fetch current and increment
+        // Update coupon usage
         const {
           data: couponData
         } = await supabase.from('coupons').select('current_uses').eq('code', appliedCoupon.code).single();
@@ -1042,6 +1042,9 @@ const NewRepairOrder = () => {
             current_uses: couponData.current_uses + 1
           }).eq('code', appliedCoupon.code);
         }
+      }
+      if (loyaltyDiscount > 0) {
+        notes.push(`הנחת נקודות נאמנות: -₪${loyaltyDiscount} (${customerLoyaltyPoints} נקודות)`);
       }
       if (deviceImages.length > 0) {
         notes.push(`תמונות מכשיר: ${deviceImages.length} תמונות צורפו`);
