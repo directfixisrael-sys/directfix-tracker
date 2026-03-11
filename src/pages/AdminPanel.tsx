@@ -2064,6 +2064,18 @@ const AdminPanel = () => {
                 <span>הודעות והתראות</span>
               </button>
               <button 
+                onClick={() => setActiveTab('loyalty')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'loyalty' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Award className="w-4 h-4" />
+                <span>נקודות נאמנות</span>
+              </button>
+              <button 
                 onClick={() => setActiveTab('settings')}
                 className={cn(
                   "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
