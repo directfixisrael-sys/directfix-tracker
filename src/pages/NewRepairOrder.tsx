@@ -660,6 +660,7 @@ const NewRepairOrder = () => {
   const handleModelSelect = (model: IphoneModel) => {
     setSelectedModel(model);
     gaSelectModel(model.name);
+    updateLeadStep('בחירת תיקון', { device_type: model.name });
     goToStep('repair');
   };
 
