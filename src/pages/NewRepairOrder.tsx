@@ -408,6 +408,7 @@ const NewRepairOrder = () => {
   // Loyalty points
   const [customerLoyaltyPoints, setCustomerLoyaltyPoints] = useState(0);
   const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
+  const [showPointsInfo, setShowPointsInfo] = useState(false);
 
   const handleGiftToggle = () => {
     const newVal = !isGiftOrder;
