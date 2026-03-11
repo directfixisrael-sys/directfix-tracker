@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Phone, User, Clock, Search, Trash2, CheckCircle2, XCircle, Shield } from 'lucide-react';
+import { Phone, User, Clock, Search, Trash2, CheckCircle2, XCircle, Shield, Smartphone, Wrench } from 'lucide-react';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -16,6 +16,8 @@ interface Lead {
   is_returning_customer: boolean;
   converted: boolean;
   last_step: string;
+  device_type: string | null;
+  repair_type: string | null;
   created_at: string;
 }
 
@@ -149,6 +151,18 @@ const LeadsManagement = () => {
                   {lead.last_step && lead.last_step !== 'intro' && (
                     <span className="inline-block text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-medium mt-1">
                       עצר ב: {lead.last_step}
+                    </span>
+                  )}
+                  {lead.device_type && (
+                    <span className="inline-flex items-center gap-1 text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full font-medium mt-1 mr-1">
+                      <Smartphone className="w-2.5 h-2.5" />
+                      {lead.device_type}
+                    </span>
+                  )}
+                  {lead.repair_type && (
+                    <span className="inline-flex items-center gap-1 text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full font-medium mt-1 mr-1">
+                      <Wrench className="w-2.5 h-2.5" />
+                      {lead.repair_type}
                     </span>
                   )}
                 </div>

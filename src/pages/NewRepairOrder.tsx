@@ -312,10 +312,10 @@ const NewRepairOrder = () => {
   const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
 
   // Update lead step tracking
-  const updateLeadStep = async (stepName: string) => {
+  const updateLeadStep = async (stepName: string, extra?: Record<string, string>) => {
     if (!currentLeadId) return;
     try {
-      await supabase.from('leads').update({ last_step: stepName }).eq('id', currentLeadId);
+      await supabase.from('leads').update({ last_step: stepName, ...extra }).eq('id', currentLeadId);
     } catch (e) {
       console.error('Error updating lead step:', e);
     }
@@ -660,6 +660,7 @@ const NewRepairOrder = () => {
   const handleModelSelect = (model: IphoneModel) => {
     setSelectedModel(model);
     gaSelectModel(model.name);
+    updateLeadStep('בחירת תיקון', { device_type: model.name });
     goToStep('repair');
   };
 
@@ -719,6 +720,7 @@ const NewRepairOrder = () => {
     
     setSelectedRepair(repair);
     setShowBackColorPicker(false);
+    updateLeadStep('אישור מחיר', { repair_type: repair.name });
 
     // Track AddToCart event for Facebook Pixel
     if (selectedModel) {
