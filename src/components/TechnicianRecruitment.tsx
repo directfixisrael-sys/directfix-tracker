@@ -103,7 +103,7 @@ const TechnicianRecruitment = () => {
       case 0:
         return (
           <div className="space-y-3 animate-slide-up">
-            <label className="text-sm font-bold text-primary-foreground/90">שם מלא</label>
+            <label className="text-sm font-bold text-background/90">שם מלא</label>
             <Input
               placeholder="הכנס את שמך המלא"
               value={name}
