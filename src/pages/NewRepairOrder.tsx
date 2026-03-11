@@ -1900,7 +1900,7 @@ const NewRepairOrder = () => {
                       className="w-full flex items-center justify-between text-xs text-muted-foreground hover:text-foreground transition-colors pt-1 border-t border-primary/10"
                     >
                       <span className="font-medium">איך זה עובד?</span>
-                      <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", showPointsInfo && "rotate-180")} />
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showPointsInfo ? 'rotate-180' : ''}`} />
                     </button>
                     {showPointsInfo && (
                       <div className="text-xs text-muted-foreground leading-relaxed space-y-1.5 animate-slide-up">
