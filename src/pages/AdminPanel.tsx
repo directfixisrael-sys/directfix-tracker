@@ -52,7 +52,8 @@ import {
   Sparkles,
   Image,
   Megaphone,
-  Bell
+  Bell,
+  Award
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
