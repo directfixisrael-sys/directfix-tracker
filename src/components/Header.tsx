@@ -22,14 +22,19 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
     <header className="bg-card/95 backdrop-blur-md border-b-2 border-foreground/10 sticky top-0 z-50 pt-[env(safe-area-inset-top)]" role="banner" aria-label="כותרת עליונה">
       <nav className="container flex items-center justify-between h-14 px-4" aria-label="ניווט ראשי">
         {showBackButton ? (
-          <button 
-            onClick={onBack}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-bold"
-            aria-label="חזור לדף הקודם"
-          >
-            <ArrowRight className="w-4 h-4" />
-            חזור
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={onBack}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-bold"
+              aria-label="חזור לדף הקודם"
+            >
+              <ArrowRight className="w-4 h-4" />
+              חזור
+            </button>
+            <div className="sm:hidden">
+              <CustomerZone />
+            </div>
+          </div>
         ) : (
           <div className="flex items-center gap-2">
             <Button
@@ -41,7 +46,6 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
             >
               {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
-            {/* Customer Zone - mobile */}
             <div className="sm:hidden">
               <CustomerZone />
             </div>
