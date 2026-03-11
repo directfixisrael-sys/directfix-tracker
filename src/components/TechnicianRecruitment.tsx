@@ -306,7 +306,7 @@ const TechnicianRecruitment = () => {
                   <Button
                     variant="outline"
                     onClick={() => setStep(step - 1)}
-                    className="h-12 px-6 rounded-xl bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20"
+                    className="h-12 px-6 rounded-xl bg-background/10 border-background/20 text-background hover:bg-background/20"
                   >
                     חזור
                   </Button>
