@@ -1897,17 +1897,36 @@ const NewRepairOrder = () => {
                     <button
                       type="button"
                       onClick={() => setShowPointsInfo(!showPointsInfo)}
-                      className="w-full flex items-center justify-between text-xs text-muted-foreground hover:text-foreground transition-colors pt-1 border-t border-primary/10"
+                      className="w-full flex items-center justify-between bg-primary/5 hover:bg-primary/10 rounded-lg px-3 py-2 transition-colors"
                     >
-                      <span className="font-medium">איך זה עובד?</span>
-                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showPointsInfo ? 'rotate-180' : ''}`} />
+                      <span className="text-xs font-semibold text-primary flex items-center gap-1.5">
+                        <HelpCircle className="w-3.5 h-3.5" />
+                        איך זה עובד?
+                      </span>
+                      <ChevronDown className={`w-4 h-4 text-primary transition-transform duration-200 ${showPointsInfo ? 'rotate-180' : ''}`} />
                     </button>
                     {showPointsInfo && (
-                      <div className="text-xs text-muted-foreground leading-relaxed space-y-1.5 animate-slide-up">
-                        <p>כל 100 ש"ח בתיקון = 10 נקודות | כל נקודה = 0.50 ש"ח</p>
-                        <p>בהזמנה הבאה הזינו את מספר הטלפון — ההנחה תופיע אוטומטית!</p>
-                        <p className="text-[11px] text-muted-foreground/60 leading-relaxed pt-1">
-                          תנאי תוכנית הנאמנות: הנקודות תקפות ל-24 חודשים מצבירה אחרונה. החברה רשאית לשנות, להשעות או לבטל את התוכנית בכל עת בכפוף לחוק הגנת הצרכן. נקודות אינן ניתנות להמרה למזומן או להעברה.
+                      <div className="bg-card/80 rounded-lg p-3 border border-border/50 space-y-2.5 animate-slide-up">
+                        <div className="flex items-start gap-2.5">
+                          <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-[10px] font-bold text-primary">1</span>
+                          </div>
+                          <p className="text-xs text-foreground/80">כל <strong className="text-foreground">100 ש"ח</strong> בתיקון = <strong className="text-primary">10 נקודות</strong></p>
+                        </div>
+                        <div className="flex items-start gap-2.5">
+                          <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-[10px] font-bold text-primary">2</span>
+                          </div>
+                          <p className="text-xs text-foreground/80">כל נקודה שווה <strong className="text-primary">0.50 ש"ח</strong> הנחה</p>
+                        </div>
+                        <div className="flex items-start gap-2.5">
+                          <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-[10px] font-bold text-primary">3</span>
+                          </div>
+                          <p className="text-xs text-foreground/80">בהזמנה הבאה הזינו את <strong className="text-foreground">מספר הטלפון</strong> — ההנחה תופיע אוטומטית!</p>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground/50 leading-relaxed pt-1.5 border-t border-border/30">
+                          תנאי תוכנית הנאמנות: הנקודות תקפות ל-24 חודשים. החברה רשאית לשנות או לבטל את התוכנית בכל עת בכפוף לחוק. נקודות אינן ניתנות להמרה למזומן.
                         </p>
                       </div>
                     )}
