@@ -231,21 +231,21 @@ const TechnicianRecruitment = () => {
         <div className="p-8 md:p-12 flex flex-col justify-center">
           {isSubmitted ? (
             <div className="text-center animate-slide-up space-y-4">
-              <div className="w-20 h-20 bg-primary-foreground/20 rounded-full flex items-center justify-center mx-auto">
-                <CheckCircle2 className="w-10 h-10 text-primary-foreground" />
+              <div className="w-20 h-20 bg-background/20 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-10 h-10 text-background" />
               </div>
-              <h3 className="text-2xl font-extrabold text-primary-foreground">הבקשה נשלחה!</h3>
-              <p className="text-primary-foreground/80">תודה {name}, ניצור איתך קשר בהקדם.</p>
+              <h3 className="text-2xl font-extrabold text-background">הבקשה נשלחה!</h3>
+              <p className="text-background/80">תודה {name}, ניצור איתך קשר בהקדם.</p>
             </div>
           ) : !showForm ? (
             <>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-primary-foreground mb-4 leading-tight">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-background mb-4 leading-tight">
                 אתה טכנאי סלולר?
                 <br />
                 הצטרף לצוות דיירקט פיקס!
               </h2>
-              <p className="text-primary-foreground/80 text-lg mb-6">
-                אנחנו מחפשים טכנאים מנוסים ומקצועיים. הצטרף למעבדות המובילה בישראל וקבל עבודה יציבה עם תנאים מעולים.
+              <p className="text-background/80 text-lg mb-6">
+                אנחנו מחפשים טכנאים מנוסים ומקצועיים. הצטרף למעבדה המובילה בישראל.
               </p>
               
               {/* Feature pills */}
@@ -253,10 +253,10 @@ const TechnicianRecruitment = () => {
                 {features.map((f, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-2 bg-primary-foreground/15 border border-primary-foreground/25 rounded-full px-4 py-2"
+                    className="flex items-center gap-2 bg-background/15 border border-background/25 rounded-full px-4 py-2"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-primary-foreground/80" />
-                    <span className="text-sm font-medium text-primary-foreground">{f.text}</span>
+                    <CheckCircle2 className="w-4 h-4 text-background/80" />
+                    <span className="text-sm font-medium text-background">{f.text}</span>
                   </div>
                 ))}
               </div>
@@ -266,20 +266,20 @@ const TechnicianRecruitment = () => {
                 {floatingIcons.map(({ Icon, delay }, i) => (
                   <div
                     key={i}
-                    className="w-12 h-12 bg-card rounded-2xl shadow-lg flex items-center justify-center"
+                    className="w-12 h-12 bg-primary rounded-2xl shadow-lg flex items-center justify-center"
                     style={{
                       animation: `techFloat 6s ease-in-out ${delay} infinite`,
                       transform: `rotate(${(i * 12) - 18}deg)`,
                     }}
                   >
-                    <Icon className="w-5 h-5 text-primary" />
+                    <Icon className="w-5 h-5 text-primary-foreground" />
                   </div>
                 ))}
               </div>
 
               <Button
                 onClick={() => { setShowForm(true); setStep(0); }}
-                className="w-full md:w-auto h-14 px-10 rounded-2xl text-lg font-bold bg-card text-foreground hover:bg-card/90 shadow-xl gap-2"
+                className="w-full md:w-auto h-14 px-10 rounded-2xl text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl gap-2"
               >
                 <ArrowLeft className="w-5 h-5" />
                 הגש בקשה
