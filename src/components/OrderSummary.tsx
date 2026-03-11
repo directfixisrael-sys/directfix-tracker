@@ -152,6 +152,16 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
           <span className="font-semibold text-success text-lg">חינם</span>
         </div>
 
+        {/* Loyalty points earned */}
+        {calculatePointsFromPrice(totalPrice) > 0 && (
+          <div className="flex justify-between text-base bg-primary/5 rounded-xl p-3 -mx-1 border border-primary/15">
+            <span className="text-primary flex items-center gap-1.5 font-medium">
+              <Award className="w-4 h-4" />
+              נקודות שנצברו
+            </span>
+            <span className="font-bold text-primary text-lg">{calculatePointsFromPrice(totalPrice)}</span>
+          </div>
+        )}
 
         <div className="flex justify-between pt-4 border-t border-border">
           <span className="font-bold text-foreground text-xl">סה״כ לתשלום</span>
