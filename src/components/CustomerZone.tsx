@@ -172,61 +172,78 @@ const CustomerZone = () => {
               </div>
 
               {/* Loyalty Points Card */}
-              <Card className="p-5 bg-gradient-to-br from-primary/5 via-background to-primary/10 border-2 border-primary/20">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Award className="w-5 h-5 text-primary" />
-                    <span className="font-bold text-foreground">נקודות נאמנות</span>
-                  </div>
-                  <div className="text-left">
-                    <span className="text-3xl font-extrabold text-primary">{points}</span>
+              <Card className="overflow-hidden border-2 border-primary/20">
+                <div className="bg-gradient-to-br from-primary to-primary/80 p-5 text-primary-foreground">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-10 h-10 bg-primary-foreground/20 rounded-full flex items-center justify-center">
+                        <Award className="w-5 h-5" />
+                      </div>
+                      <span className="font-bold text-lg">נקודות נאמנות</span>
+                    </div>
+                    <div className="text-left">
+                      <span className="text-4xl font-extrabold">{points}</span>
+                      <p className="text-xs opacity-80">נקודות</p>
+                    </div>
                   </div>
                 </div>
-                {points > 0 && (
-                  <div className="bg-success/10 border border-success/20 rounded-lg px-3 py-2 text-center mb-3">
-                    <p className="text-sm font-semibold text-success">
-                      שווי ₪{discount.toFixed(0)} הנחה בהזמנה הבאה!
-                    </p>
-                  </div>
-                )}
                 
-                {/* How it works - collapsible */}
-                <button
-                  type="button"
-                  onClick={() => setShowPointsGuide(!showPointsGuide)}
-                  className="w-full flex items-center justify-between bg-primary/5 hover:bg-primary/10 rounded-lg px-3 py-2 transition-colors"
-                >
-                  <span className="text-xs font-semibold text-primary flex items-center gap-1.5">
-                    <HelpCircle className="w-3.5 h-3.5" />
-                    איך זה עובד?
-                  </span>
-                  {showPointsGuide 
-                    ? <ChevronUp className="w-4 h-4 text-primary" /> 
-                    : <ChevronDown className="w-4 h-4 text-primary" />
-                  }
-                </button>
-                {showPointsGuide && (
-                  <div className="mt-2 bg-card/80 rounded-lg p-3 border border-border/50 space-y-2 animate-slide-up">
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-[10px] font-bold text-primary">1</span>
-                      </div>
-                      <p className="text-xs text-foreground/80">כל <strong className="text-foreground">100 ש"ח</strong> בתיקון = <strong className="text-primary">10 נקודות</strong></p>
+                <div className="p-4 space-y-3">
+                  {points > 0 && (
+                    <div className="bg-success/10 border border-success/20 rounded-xl px-4 py-3 text-center">
+                      <p className="text-base font-bold text-success">
+                        🎉 יש לך ₪{discount.toFixed(0)} הנחה!
+                      </p>
+                      <p className="text-xs text-success/70 mt-0.5">מופעל אוטומטית בהזמנה הבאה</p>
                     </div>
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-[10px] font-bold text-primary">2</span>
-                      </div>
-                      <p className="text-xs text-foreground/80">כל נקודה שווה <strong className="text-primary">{POINT_VALUE} ש"ח</strong></p>
+                  )}
+                  
+                  {points === 0 && (
+                    <div className="bg-muted/50 rounded-xl px-4 py-3 text-center">
+                      <p className="text-sm text-muted-foreground">
+                        הזמינו תיקון וצברו נקודות להנחות! 🚀
+                      </p>
                     </div>
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-[10px] font-bold text-primary">3</span>
+                  )}
+
+                  {/* How it works */}
+                  <button
+                    type="button"
+                    onClick={() => setShowPointsGuide(!showPointsGuide)}
+                    className="w-full flex items-center justify-between bg-muted/50 hover:bg-muted rounded-xl px-4 py-2.5 transition-colors"
+                  >
+                    <span className="text-sm font-semibold text-foreground flex items-center gap-2">
+                      <HelpCircle className="w-4 h-4 text-primary" />
+                      איך זה עובד?
+                    </span>
+                    {showPointsGuide 
+                      ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> 
+                      : <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    }
+                  </button>
+                  {showPointsGuide && (
+                    <div className="bg-muted/30 rounded-xl p-4 space-y-3 animate-slide-up">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-primary">1</span>
+                        </div>
+                        <p className="text-sm text-foreground">כל <strong className="text-primary">100 ש"ח</strong> בתיקון = <strong className="text-primary">10 נקודות</strong></p>
                       </div>
-                      <p className="text-xs text-foreground/80">ההנחה מופיעה <strong className="text-foreground">אוטומטית</strong> בהזמנה הבאה!</p>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-primary">2</span>
+                        </div>
+                        <p className="text-sm text-foreground">כל נקודה שווה <strong className="text-primary">{POINT_VALUE} ש"ח</strong> הנחה</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-primary">3</span>
+                        </div>
+                        <p className="text-sm text-foreground">ההנחה מופעלת <strong className="text-primary">אוטומטית</strong> בהזמנה הבאה!</p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </Card>
 
               {/* Repair History */}
