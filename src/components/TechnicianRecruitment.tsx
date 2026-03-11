@@ -21,9 +21,9 @@ const TechnicianRecruitment = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const features = [
-    { icon: Zap, text: 'תיקון מהיר תוך שעה' },
-    { icon: Shield, text: 'אחריות מלאה על כל תיקון' },
-    { icon: MapPin, text: 'שירות עד הבית בכל הארץ' },
+    { icon: Zap, text: 'תנאים נוחים' },
+    { icon: Shield, text: 'עבודה בחברה עם וותק וניסיון' },
+    { icon: MapPin, text: 'תהיה בעל הבית של עצמך' },
     { icon: Wrench, text: 'חלפים מקוריים ואיכותיים' },
   ];
 
