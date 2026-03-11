@@ -208,7 +208,7 @@ const TechnicianRecruitment = () => {
   return (
     <section className="relative overflow-hidden rounded-3xl mx-4 mb-8">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/70" />
+      <div className="absolute inset-0 bg-gradient-to-br from-foreground via-foreground/95 to-foreground/85" />
       
       <div className="relative grid grid-cols-1 md:grid-cols-2 min-h-[420px]">
         {/* Left side - Floating icons */}
