@@ -398,6 +398,10 @@ const NewRepairOrder = () => {
   const [giftPaymentUrl, setGiftPaymentUrl] = useState<string | null>(null);
   const [giftOrderResult, setGiftOrderResult] = useState<any>(null);
 
+  // Loyalty points
+  const [customerLoyaltyPoints, setCustomerLoyaltyPoints] = useState(0);
+  const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
+
   const handleGiftToggle = () => {
     const newVal = !isGiftOrder;
     setIsGiftOrder(newVal);
