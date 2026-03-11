@@ -3,6 +3,7 @@ import { ArrowRight, Moon, Sun, Phone, Accessibility, Menu, X } from 'lucide-rea
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/ThemeProvider';
 import Logo from '@/components/Logo';
+import CustomerZone from '@/components/CustomerZone';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -30,19 +31,26 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
             חזור
           </button>
         ) : (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-10 w-10 rounded-xl border-2 border-foreground/10 sm:hidden"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="תפריט"
-          >
-            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 rounded-xl border-2 border-foreground/10 sm:hidden"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="תפריט"
+            >
+              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
+            {/* Customer Zone - mobile */}
+            <div className="sm:hidden">
+              <CustomerZone />
+            </div>
+          </div>
         )}
 
         {/* Desktop actions */}
         <div className="hidden sm:flex items-center gap-2" role="toolbar" aria-label="פעולות מהירות">
+          <CustomerZone />
           <a
             href="tel:033106020"
             className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105"
