@@ -13,6 +13,7 @@ import { getRepairIconComponent } from '@/lib/repairIcons';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
+import CustomerZone from '@/components/CustomerZone';
 import { toast } from 'sonner';
 import Logo from '@/components/Logo';
 import VideoPlayer from '@/components/VideoPlayer';
