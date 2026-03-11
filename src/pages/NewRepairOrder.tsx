@@ -962,6 +962,8 @@ const NewRepairOrder = () => {
           repairType: repairTypeForNotification + colorNote,
           repairPrice: getFinalPrice(),
           scheduledTime: scheduleNote,
+          scheduledDateISO: selectedDate ? selectedDate.toISOString() : undefined,
+          scheduledTimeSlot: selectedTimeSlot || undefined,
           notes: customerNotes.trim(),
           customerEmail: customerEmail.trim() || undefined,
           orderNumber: orderResult?.order_number || undefined,
