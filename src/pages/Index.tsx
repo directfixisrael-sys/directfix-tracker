@@ -10,6 +10,7 @@ import paymentVisa from '@/assets/payment-visa.png';
 import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
 import VideoPlayer from '@/components/VideoPlayer';
+import TechnicianRecruitment from '@/components/TechnicianRecruitment';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -201,6 +202,9 @@ const Index = () => {
           </div>
         </section>
       </main>
+
+      {/* Technician Recruitment */}
+      <TechnicianRecruitment />
 
       {/* Footer */}
       <footer className="border-t-2 border-foreground/10 text-center py-5 text-sm text-muted-foreground bg-card" role="contentinfo">
