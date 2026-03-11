@@ -1777,6 +1777,17 @@ const AdminPanel = () => {
             <Bell className="w-5 h-5" />
             <span className="text-[10px]">תזכורות</span>
           </button>
+          {/* Loyalty */}
+          <button 
+            onClick={() => setActiveTab('loyalty')}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors relative min-w-[56px]",
+              activeTab === 'loyalty' ? "bg-primary/10 text-primary" : "text-muted-foreground"
+            )}
+          >
+            <Award className="w-5 h-5" />
+            <span className="text-[10px]">נאמנות</span>
+          </button>
           {/* More menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
