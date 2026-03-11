@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send, Zap, Award } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send, Zap, Award, ChevronDown } from 'lucide-react';
 import { getRepairIconComponent } from '@/lib/repairIcons';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
@@ -408,6 +408,7 @@ const NewRepairOrder = () => {
   // Loyalty points
   const [customerLoyaltyPoints, setCustomerLoyaltyPoints] = useState(0);
   const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
+  const [showPointsInfo, setShowPointsInfo] = useState(false);
 
   const handleGiftToggle = () => {
     const newVal = !isGiftOrder;
@@ -1893,14 +1894,23 @@ const NewRepairOrder = () => {
                       </span>
                       <span className="font-bold text-primary text-lg">+{getPointsToEarn()}</span>
                     </div>
-                    <div className="text-xs text-muted-foreground leading-relaxed space-y-1 pt-1 border-t border-primary/10">
-                      <p className="font-medium text-foreground/80">איך זה עובד?</p>
-                      <p>כל 100 ש"ח בתיקון = 10 נקודות | כל נקודה = 0.50 ש"ח</p>
-                      <p>בהזמנה הבאה הזינו את מספר הטלפון — ההנחה תופיע אוטומטית!</p>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
-                      תנאי תוכנית הנאמנות: הנקודות תקפות ל-24 חודשים מצבירה אחרונה. החברה רשאית לשנות, להשעות או לבטל את התוכנית בכל עת בכפוף לחוק הגנת הצרכן. נקודות אינן ניתנות להמרה למזומן או להעברה. מימוש כפוף לתנאי ההזמנה.
-                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowPointsInfo(!showPointsInfo)}
+                      className="w-full flex items-center justify-between text-xs text-muted-foreground hover:text-foreground transition-colors pt-1 border-t border-primary/10"
+                    >
+                      <span className="font-medium">איך זה עובד?</span>
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showPointsInfo ? 'rotate-180' : ''}`} />
+                    </button>
+                    {showPointsInfo && (
+                      <div className="text-xs text-muted-foreground leading-relaxed space-y-1.5 animate-slide-up">
+                        <p>כל 100 ש"ח בתיקון = 10 נקודות | כל נקודה = 0.50 ש"ח</p>
+                        <p>בהזמנה הבאה הזינו את מספר הטלפון — ההנחה תופיע אוטומטית!</p>
+                        <p className="text-[11px] text-muted-foreground/60 leading-relaxed pt-1">
+                          תנאי תוכנית הנאמנות: הנקודות תקפות ל-24 חודשים מצבירה אחרונה. החברה רשאית לשנות, להשעות או לבטל את התוכנית בכל עת בכפוף לחוק הגנת הצרכן. נקודות אינן ניתנות להמרה למזומן או להעברה.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
 
