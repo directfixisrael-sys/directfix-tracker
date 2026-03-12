@@ -7,11 +7,21 @@ import { Phone, Mail, Upload, CheckCircle2, Wrench, Smartphone, Shield, Zap, Map
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+const serviceAreas = [
+  { id: 'sharon', label: 'השרון', emoji: '🏖️' },
+  { id: 'center', label: 'המרכז', emoji: '🏙️' },
+  { id: 'gush_dan', label: 'גוש דן', emoji: '🌆' },
+  { id: 'south', label: 'הדרום', emoji: '🏜️' },
+  { id: 'north', label: 'הצפון', emoji: '🌿' },
+  { id: 'jerusalem', label: 'ירושלים והסביבה', emoji: '🕌' },
+];
+
 const TechnicianRecruitment = () => {
   const [showForm, setShowForm] = useState(false);
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
   const [experience, setExperience] = useState('');
+  const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -19,6 +29,8 @@ const TechnicianRecruitment = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const totalSteps = 6; // 0-5
 
   const features = [
     { icon: Zap, text: 'תנאים נוחים' },
@@ -34,19 +46,26 @@ const TechnicianRecruitment = () => {
     { Icon: Zap, size: 'w-11 h-11', position: 'top-[70%] right-[22%]', delay: '3s', bg: 'bg-primary' },
   ];
 
+  const toggleArea = (id: string) => {
+    setSelectedAreas(prev => 
+      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+    );
+  };
+
   const canProceed = () => {
     switch (step) {
       case 0: return name.trim().length >= 2;
       case 1: return experience.trim().length > 0;
-      case 2: return phone.replace(/\D/g, '').length >= 9 && email.includes('@');
-      case 3: return true; // resume is optional
-      case 4: return privacyAccepted;
+      case 2: return selectedAreas.length > 0;
+      case 3: return phone.replace(/\D/g, '').length >= 9 && email.includes('@');
+      case 4: return true; // resume is optional
+      case 5: return privacyAccepted;
       default: return false;
     }
   };
 
   const handleNext = () => {
-    if (step < 4) setStep(step + 1);
+    if (step < totalSteps - 1) setStep(step + 1);
   };
 
   const handleSubmit = async () => {
@@ -75,12 +94,15 @@ const TechnicianRecruitment = () => {
         }
       }
 
+      const areaLabels = selectedAreas.map(id => serviceAreas.find(a => a.id === id)?.label || id);
+
       await supabase.functions.invoke('send-technician-application', {
         body: {
           name: name.trim(),
           experience: experience.trim(),
           phone: phone.trim(),
           email: email.trim(),
+          serviceAreas: areaLabels,
           resumeUrl,
           resumeFileName,
         },
@@ -129,6 +151,33 @@ const TechnicianRecruitment = () => {
       case 2:
         return (
           <div className="space-y-3 animate-slide-up">
+            <label className="text-sm font-bold text-background/90">אזור שירות</label>
+            <p className="text-xs text-background/60">באילו אזורים תוכל לתת שירות? (ניתן לבחור מספר אזורים)</p>
+            <div className="grid grid-cols-2 gap-2">
+              {serviceAreas.map((area) => {
+                const isSelected = selectedAreas.includes(area.id);
+                return (
+                  <button
+                    key={area.id}
+                    onClick={() => toggleArea(area.id)}
+                    className={`flex items-center gap-2 px-3 py-3 rounded-xl border-2 transition-all text-sm font-medium ${
+                      isSelected
+                        ? 'border-primary bg-primary/20 text-foreground shadow-sm'
+                        : 'border-background/20 bg-card/80 text-foreground hover:border-primary/40'
+                    }`}
+                  >
+                    <span className="text-lg">{area.emoji}</span>
+                    <span>{area.label}</span>
+                    {isSelected && <CheckCircle2 className="w-4 h-4 text-primary mr-auto" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      case 3:
+        return (
+          <div className="space-y-3 animate-slide-up">
             <label className="text-sm font-bold text-background/90">פרטי התקשרות</label>
             <div className="relative">
               <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -155,7 +204,7 @@ const TechnicianRecruitment = () => {
             </div>
           </div>
         );
-      case 3:
+      case 4:
         return (
           <div className="space-y-3 animate-slide-up">
             <label className="text-sm font-bold text-background/90">קורות חיים (לא חובה)</label>
@@ -185,7 +234,7 @@ const TechnicianRecruitment = () => {
             </button>
           </div>
         );
-      case 4:
+      case 5:
         return (
           <div className="space-y-4 animate-slide-up">
             <div className="flex items-start gap-3 bg-card rounded-xl p-4">
@@ -289,7 +338,7 @@ const TechnicianRecruitment = () => {
             <div className="space-y-5">
               {/* Progress dots */}
               <div className="flex items-center gap-2 mb-2">
-                {[0, 1, 2, 3, 4].map((s) => (
+                {Array.from({ length: totalSteps }).map((_, s) => (
                   <div
                     key={s}
                     className={`h-2 rounded-full transition-all duration-300 ${
@@ -311,7 +360,7 @@ const TechnicianRecruitment = () => {
                     חזור
                   </Button>
                 )}
-                {step < 4 ? (
+                {step < totalSteps - 1 ? (
                   <Button
                     onClick={handleNext}
                     disabled={!canProceed()}
