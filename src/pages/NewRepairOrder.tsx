@@ -267,7 +267,7 @@ interface RepairBundle {
   addon_repair_type: string;
   discount_percent: number;
 }
-type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'gift_payment' | 'success';
+type Step = 'model' | 'repair' | 'bundle' | 'points' | 'price' | 'schedule' | 'details' | 'gift_payment' | 'success';
 const NewRepairOrder = () => {
   const navigate = useNavigate();
   const {
