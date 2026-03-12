@@ -636,6 +636,7 @@ const NewRepairOrder = () => {
     model: 'בחירת דגם',
     repair: 'בחירת תיקון',
     bundle: 'חבילה',
+    points: 'נקודות',
     price: 'אישור מחיר',
     schedule: 'תיאום מועד',
     details: 'מילוי פרטים',
