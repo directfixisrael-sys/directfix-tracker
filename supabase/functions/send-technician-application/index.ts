@@ -10,6 +10,7 @@ interface ApplicationData {
   experience: string;
   phone: string;
   email: string;
+  serviceAreas?: string[];
   resumeUrl?: string;
   resumeFileName?: string;
 }
@@ -40,6 +41,10 @@ serve(async (req: Request) => {
       throw new Error("RESEND_API_KEY not configured");
     }
 
+    const areasHtml = data.serviceAreas && data.serviceAreas.length > 0
+      ? data.serviceAreas.join(', ')
+      : 'לא צוין';
+
     const html = `
 <!DOCTYPE html>
 <html dir="rtl" lang="he">
@@ -59,6 +64,7 @@ serve(async (req: Request) => {
         <h2 style="margin: 0 0 15px 0; color: #333; font-size: 18px;">פרטי המועמד</h2>
         <p style="margin: 8px 0; color: #555;"><strong>שם מלא:</strong> ${data.name}</p>
         <p style="margin: 8px 0; color: #555;"><strong>שנות ניסיון:</strong> ${data.experience}</p>
+        <p style="margin: 8px 0; color: #555;"><strong>אזורי שירות:</strong> ${areasHtml}</p>
         <p style="margin: 8px 0; color: #555;"><strong>טלפון:</strong> <a href="tel:${data.phone}" style="color: #0d64f4;">${data.phone}</a></p>
         <p style="margin: 8px 0; color: #555;"><strong>אימייל:</strong> <a href="mailto:${data.email}" style="color: #0d64f4;">${data.email}</a></p>
       </div>

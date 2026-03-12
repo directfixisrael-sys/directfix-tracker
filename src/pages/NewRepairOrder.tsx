@@ -30,6 +30,7 @@ import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { getLeadSource } from '@/lib/leadSource';
 import GiftOrderToggle from '@/components/GiftOrderToggle';
 import LoyaltyPointsDisplay, { getCustomerPoints, calculatePointsFromPrice, calculateDiscountFromPoints } from '@/components/LoyaltyPointsDisplay';
+import PointsEarnedAnimation from '@/components/PointsEarnedAnimation';
 
 // iPhone back glass colors per model family
 const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
@@ -266,7 +267,7 @@ interface RepairBundle {
   addon_repair_type: string;
   discount_percent: number;
 }
-type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'gift_payment' | 'success';
+type Step = 'model' | 'repair' | 'bundle' | 'points' | 'price' | 'schedule' | 'details' | 'gift_payment' | 'success';
 const NewRepairOrder = () => {
   const navigate = useNavigate();
   const {
@@ -635,6 +636,7 @@ const NewRepairOrder = () => {
     model: 'בחירת דגם',
     repair: 'בחירת תיקון',
     bundle: 'חבילה',
+    points: 'נקודות',
     price: 'אישור מחיר',
     schedule: 'תיאום מועד',
     details: 'מילוי פרטים',
@@ -686,7 +688,7 @@ const NewRepairOrder = () => {
         setSelectedBundleAddon(false);
         goToStep('bundle');
       } else {
-        goToStep('price');
+        goToStep('points');
       }
     }
   };
@@ -739,7 +741,7 @@ const NewRepairOrder = () => {
       setSelectedBundleAddon(false);
       goToStep('bundle');
     } else {
-      goToStep('price');
+      goToStep('points');
     }
   };
   
@@ -793,12 +795,12 @@ const NewRepairOrder = () => {
     gaSelectRepair(selectedRepair.name, backPrice);
     
     setShowBackColorPicker(false);
-    goToStep('price');
+    goToStep('points');
   };
   const handleBundleDecision = (acceptBundle: boolean) => {
     setSelectedBundleAddon(acceptBundle);
     if (currentBundle) gaBundleDecision(acceptBundle, currentBundle.name);
-    goToStep('price');
+    goToStep('points');
   };
   const handlePriceConfirm = () => {
     gaConfirmPrice(getTotalPrice());
@@ -1271,9 +1273,9 @@ const NewRepairOrder = () => {
             if (step === 'model') {
               if (additionalRepairs.length > 0) goToStep('price');
               else navigate('/');
-            } else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
+            } else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'points') {
               if (currentBundle) goToStep('bundle');else goToStep('repair');
-            } else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
+            } else if (step === 'price') goToStep('points');else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
           }} className="h-10 w-10 rounded-xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors border-2 border-foreground/10" aria-label="חזור לשלב הקודם">
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -1750,6 +1752,14 @@ const NewRepairOrder = () => {
               סוללה מקורית עם 100% בריאות
             </p>
           </div>}
+
+        {/* Step 2.7: Points Earned Animation */}
+        {step === 'points' && (
+          <PointsEarnedAnimation
+            repairPrice={getTotalPrice()}
+            onContinue={() => goToStep('price')}
+          />
+        )}
 
         {/* Step 3: Price Confirmation */}
         {step === 'price' && <div className="space-y-5 animate-fade-in">
