@@ -1753,6 +1753,14 @@ const NewRepairOrder = () => {
             </p>
           </div>}
 
+        {/* Step 2.7: Points Earned Animation */}
+        {step === 'points' && (
+          <PointsEarnedAnimation
+            repairPrice={getTotalPrice()}
+            onContinue={() => goToStep('price')}
+          />
+        )}
+
         {/* Step 3: Price Confirmation */}
         {step === 'price' && <div className="space-y-5 animate-fade-in">
             <div className="text-center mb-5">
