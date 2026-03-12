@@ -741,7 +741,7 @@ const NewRepairOrder = () => {
       setSelectedBundleAddon(false);
       goToStep('bundle');
     } else {
-      goToStep('price');
+      goToStep('points');
     }
   };
   
