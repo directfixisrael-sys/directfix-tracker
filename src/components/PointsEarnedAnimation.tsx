@@ -107,18 +107,24 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         </div>
       </div>
 
-      {/* Sticky CTA */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/80 backdrop-blur-md border-t border-border/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-        <div className="max-w-3xl mx-auto">
-          <Button
-            onClick={onContinue}
-            className="w-full h-14 text-base font-bold rounded-2xl shadow-lg gap-2"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            המשך להזמנה
-          </Button>
-        </div>
-      </div>
+      {/* Spacer for sticky CTA */}
+      <div className="h-24" />
+
+      {/* Sticky CTA via portal so it's not trapped in overflow container */}
+      {createPortal(
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+          <div className="max-w-3xl mx-auto">
+            <Button
+              onClick={onContinue}
+              className="w-full h-14 text-base font-bold rounded-2xl shadow-lg gap-2"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              המשך להזמנה
+            </Button>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };
