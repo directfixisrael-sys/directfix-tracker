@@ -800,7 +800,7 @@ const NewRepairOrder = () => {
   const handleBundleDecision = (acceptBundle: boolean) => {
     setSelectedBundleAddon(acceptBundle);
     if (currentBundle) gaBundleDecision(acceptBundle, currentBundle.name);
-    goToStep('price');
+    goToStep('points');
   };
   const handlePriceConfirm = () => {
     gaConfirmPrice(getTotalPrice());
