@@ -795,7 +795,7 @@ const NewRepairOrder = () => {
     gaSelectRepair(selectedRepair.name, backPrice);
     
     setShowBackColorPicker(false);
-    goToStep('price');
+    goToStep('points');
   };
   const handleBundleDecision = (acceptBundle: boolean) => {
     setSelectedBundleAddon(acceptBundle);
