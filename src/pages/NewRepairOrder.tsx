@@ -1273,9 +1273,9 @@ const NewRepairOrder = () => {
             if (step === 'model') {
               if (additionalRepairs.length > 0) goToStep('price');
               else navigate('/');
-            } else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
+            } else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'points') {
               if (currentBundle) goToStep('bundle');else goToStep('repair');
-            } else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
+            } else if (step === 'price') goToStep('points');else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
           }} className="h-10 w-10 rounded-xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors border-2 border-foreground/10" aria-label="חזור לשלב הקודם">
               <ArrowRight className="w-4 h-4" />
             </button>
