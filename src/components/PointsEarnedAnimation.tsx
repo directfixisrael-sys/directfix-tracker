@@ -59,14 +59,14 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
   return (
     <div className="space-y-5 animate-fade-in py-4 text-center">
       {/* Shimmering Club Card */}
-      <div className="relative flex justify-center mb-1">
-        <div className="absolute w-64 h-40 bg-primary/20 rounded-3xl blur-3xl animate-pulse" />
+      <div className="relative flex justify-center mb-3">
+        <div className="absolute w-80 h-48 bg-primary/20 rounded-3xl blur-3xl animate-pulse" />
         <div
           className={`relative transition-all duration-1000 ${
             cardAnimated ? 'scale-100 opacity-100 rotate-0' : 'scale-75 opacity-0 -rotate-6'
           }`}
         >
-          <div className="relative w-64 mx-auto overflow-hidden rounded-2xl shadow-2xl">
+          <div className="relative w-80 mx-auto overflow-hidden rounded-2xl shadow-2xl">
             <img
               src={clubCardImage}
               alt="DirectFix Club Card"
@@ -76,12 +76,12 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
               style={{ animation: 'shimmer 3s ease-in-out infinite' }}
             />
-            <div className="absolute bottom-2.5 right-2.5 bg-primary/90 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-lg">
-              <Award className="w-3.5 h-3.5 text-primary-foreground" />
-              <span className="text-primary-foreground font-extrabold text-base leading-none">
+            <div className="absolute bottom-3 right-3 bg-primary/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 shadow-lg">
+              <Award className="w-4 h-4 text-primary-foreground" />
+              <span className="text-primary-foreground font-extrabold text-lg leading-none">
                 {displayedPoints}
               </span>
-              <span className="text-primary-foreground/80 text-[9px]">נקודות</span>
+              <span className="text-primary-foreground/80 text-[10px]">נקודות</span>
             </div>
           </div>
         </div>
