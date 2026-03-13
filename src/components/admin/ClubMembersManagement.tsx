@@ -269,6 +269,23 @@ const ClubMembersManagement = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
+      // Save to history
+      const historyEntry = {
+        id: crypto.randomUUID(),
+        subject: broadcastSubject || 'מבצע מיוחד מדיירקט פיקס!',
+        message: broadcastMessage,
+        recipientCount: activeWithEmail.length,
+        sentCount: data?.sent || activeWithEmail.length,
+        failedCount: data?.failed || 0,
+        sentAt: new Date().toISOString(),
+        image: generatedImage,
+      };
+      const stored = localStorage.getItem('club_email_history');
+      const history = stored ? JSON.parse(stored) : [];
+      history.unshift(historyEntry);
+      localStorage.setItem('club_email_history', JSON.stringify(history.slice(0, 50)));
+      setEmailHistory(history.slice(0, 50));
+
       toast({
         title: `המייל נשלח בהצלחה!`,
         description: `נשלח ל-${data?.sent || activeWithEmail.length} חברי מועדון`,
