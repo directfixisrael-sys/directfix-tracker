@@ -21,36 +21,29 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
   return (
     <header className="bg-card/95 backdrop-blur-md border-b-2 border-foreground/10 sticky top-0 z-50 pt-[env(safe-area-inset-top)]" role="banner" aria-label="כותרת עליונה">
       <nav className="container flex items-center justify-between h-14 px-4" aria-label="ניווט ראשי">
-        {showBackButton ? (
-          <div className="flex items-center gap-2">
+        {/* Mobile left buttons - always show profile + menu */}
+        <div className="flex items-center gap-2 sm:hidden">
+          <CustomerZone />
+          {showBackButton ? (
             <button 
               onClick={onBack}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-bold"
+              className="h-10 w-10 rounded-xl bg-muted/80 border-2 border-foreground/10 flex items-center justify-center transition-transform hover:scale-105"
               aria-label="חזור לדף הקודם"
             >
-              <ArrowRight className="w-4 h-4" />
-              חזור
+              <ArrowRight className="w-5 h-5 text-foreground" />
             </button>
-            <div className="sm:hidden">
-              <CustomerZone />
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
+          ) : (
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-xl border-2 border-foreground/10 sm:hidden"
+              className="h-10 w-10 rounded-xl bg-muted/80 border-2 border-foreground/10"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="תפריט"
             >
               {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
-            <div className="sm:hidden">
-              <CustomerZone />
-            </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Desktop actions */}
         <div className="hidden sm:flex items-center gap-2" role="toolbar" aria-label="פעולות מהירות">
