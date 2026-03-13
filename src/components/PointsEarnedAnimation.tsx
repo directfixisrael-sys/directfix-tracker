@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { Award, ArrowLeft, Sparkles, Crown, Tag, Shield, Check, Star, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { calculatePointsFromPrice } from '@/components/LoyaltyPointsDisplay';
