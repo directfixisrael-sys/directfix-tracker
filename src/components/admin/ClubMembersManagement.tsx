@@ -45,7 +45,9 @@ const ClubMembersManagement = () => {
   const [broadcastSubject, setBroadcastSubject] = useState('');
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [generatedPromo, setGeneratedPromo] = useState('');
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [aiPrompt, setAiPrompt] = useState('');
 
   const loadMembers = async () => {
