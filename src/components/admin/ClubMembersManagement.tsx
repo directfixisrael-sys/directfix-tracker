@@ -387,19 +387,34 @@ const ClubMembersManagement = () => {
                 onChange={e => setAiPrompt(e.target.value)}
                 rows={3}
               />
-              <Button 
-                onClick={handleGenerateAI} 
-                disabled={isGeneratingAI || !aiPrompt.trim()}
-                className="w-full gap-2"
-                variant="outline"
-              >
-                {isGeneratingAI ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Sparkles className="w-4 h-4" />
-                )}
-                {isGeneratingAI ? 'מעצב את ההודעה...' : 'עצב עם AI'}
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => handleGenerateAI(false)} 
+                  disabled={isGeneratingAI || isGeneratingImage || !aiPrompt.trim()}
+                  className="flex-1 gap-2"
+                  variant="outline"
+                >
+                  {isGeneratingAI ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-4 h-4" />
+                  )}
+                  {isGeneratingAI ? 'מעצב...' : 'עצב טקסט'}
+                </Button>
+                <Button 
+                  onClick={() => handleGenerateAI(true)} 
+                  disabled={isGeneratingAI || isGeneratingImage || !aiPrompt.trim()}
+                  className="flex-1 gap-2"
+                  variant="outline"
+                >
+                  {isGeneratingImage ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Image className="w-4 h-4" />
+                  )}
+                  {isGeneratingImage ? 'מעצב...' : 'עצב עם תמונה'}
+                </Button>
+              </div>
             </div>
 
             {/* Generated/manual message */}
