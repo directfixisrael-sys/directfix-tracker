@@ -305,6 +305,29 @@ const ClubMembersManagement = () => {
     }
   };
 
+  const handlePreviewEmail = async () => {
+    setIsLoadingPreview(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-club-broadcast-email', {
+        body: {
+          subject: broadcastSubject || 'מבצע מיוחד מדיירקט פיקס!',
+          message: broadcastMessage || 'תוכן ההודעה יופיע כאן...',
+          image: generatedImage,
+          preview: true,
+        }
+      });
+      if (error) throw error;
+      if (data?.html) {
+        setEmailPreviewHtml(data.html);
+      }
+    } catch (err: any) {
+      console.error('Preview error:', err);
+      toast({ title: 'שגיאה בתצוגה מקדימה', variant: 'destructive' });
+    } finally {
+      setIsLoadingPreview(false);
+    }
+  };
+
   const filtered = members.filter(c =>
     c.phone.includes(search) || c.name.includes(search)
   );
