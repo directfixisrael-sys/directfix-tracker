@@ -625,7 +625,7 @@ const ClubMembersManagement = () => {
 
             {/* Subject */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">נושא המייל:</label>
+              <label className="text-sm font-medium text-right block">נושא המייל:</label>
               <Input
                 value={broadcastSubject}
                 onChange={e => setBroadcastSubject(e.target.value)}
