@@ -256,9 +256,9 @@ const ClubMembersManagement = () => {
       return;
     }
 
-    const activeWithEmail = members.filter(m => m.isActive && m.email);
+    const activeWithEmail = members.filter(m => m.isActive && m.email && m.wantsPromotions);
     if (activeWithEmail.length === 0) {
-      toast({ title: 'אין חברי מועדון עם כתובת מייל', variant: 'destructive' });
+      toast({ title: 'אין חברי מועדון שמעוניינים לקבל מיילים', variant: 'destructive' });
       return;
     }
 
