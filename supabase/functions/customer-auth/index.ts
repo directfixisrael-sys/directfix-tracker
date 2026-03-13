@@ -227,7 +227,7 @@ serve(async (req) => {
         );
       }
 
-      const valid = await bcrypt.compare(password, profile.password_hash);
+      const valid = await verifyPassword(password, profile.password_hash);
       if (!valid) {
         return new Response(
           JSON.stringify({ error: "invalid_credentials" }),
