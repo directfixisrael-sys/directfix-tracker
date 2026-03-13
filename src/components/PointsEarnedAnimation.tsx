@@ -58,6 +58,23 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
 
   return (
     <div className="space-y-5 animate-fade-in py-4 text-center">
+      {/* Title - above card */}
+      <div className="space-y-1.5">
+        <div className="inline-flex items-center gap-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full px-4 py-1.5 text-sm font-bold">
+          <Crown className="w-4 h-4" />
+          מועדון הלקוחות של דיירקט פיקס
+        </div>
+        <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full px-3 py-1 text-xs font-bold">
+          הצטרפות בחינם
+        </div>
+        <h2 className="text-2xl font-extrabold text-foreground">
+          הצטרפו וקבלו <span className="text-primary">{pointsToEarn} נקודות!</span>
+        </h2>
+        <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+          חברי המועדון נהנים מהטבות בלעדיות, נקודות נאמנות והנחות מיוחדות
+        </p>
+      </div>
+
       {/* Shimmering Club Card */}
       <div className="relative flex justify-center mb-2">
         <div className="absolute w-72 h-44 bg-primary/20 rounded-3xl blur-3xl animate-pulse" />
@@ -98,23 +115,6 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
             }}
           />
         ))}
-      </div>
-
-      {/* Title */}
-      <div className="space-y-1.5">
-        <div className="inline-flex items-center gap-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full px-4 py-1.5 text-sm font-bold">
-          <Crown className="w-4 h-4" />
-          מועדון הלקוחות של דיירקט פיקס
-        </div>
-        <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full px-3 py-1 text-xs font-bold">
-          הצטרפות בחינם
-        </div>
-        <h2 className="text-2xl font-extrabold text-foreground">
-          הצטרפו וקבלו <span className="text-primary">{pointsToEarn} נקודות!</span>
-        </h2>
-        <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-          חברי המועדון נהנים מהטבות בלעדיות, נקודות נאמנות והנחות מיוחדות
-        </p>
       </div>
 
       {/* Benefits list */}
