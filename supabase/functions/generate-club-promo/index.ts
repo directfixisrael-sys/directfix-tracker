@@ -9,18 +9,18 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { prompt, template } = await req.json();
+    const { prompt, template, generateImage } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `אתה מעצב הודעות שיווקיות עבור דיירקט פיקס - שירות תיקון אייפונים.
+    // Step 1: Generate text message
+    const textSystemPrompt = `אתה מעצב הודעות שיווקיות עבור דיירקט פיקס - שירות תיקון אייפונים.
 צור הודעת WhatsApp מעוצבת ומושכת בעברית.
 השתמש בפורמט WhatsApp (*bold*, _italic_) ובאימוג'ים מתאימים.
 ההודעה צריכה להיות ממותגת עם השם "דיירקט פיקס".
-הקפד על הודעה קצרה, מושכת ומקצועית.
-החזר JSON עם שדות: subject (כותרת קצרה) ו-message (ההודעה המלאה).`;
+הקפד על הודעה קצרה, מושכת ומקצועית.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const textResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
@@ -29,7 +29,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: textSystemPrompt },
           { role: "user", content: `צור הודעה שיווקית על בסיס: ${prompt}${template ? ` (סוג: ${template})` : ''}` },
         ],
         tools: [{
@@ -41,9 +41,10 @@ serve(async (req) => {
               type: "object",
               properties: {
                 subject: { type: "string", description: "Short subject line in Hebrew" },
-                message: { type: "string", description: "Full WhatsApp formatted message in Hebrew with emojis" }
+                message: { type: "string", description: "Full WhatsApp formatted message in Hebrew with emojis" },
+                imagePrompt: { type: "string", description: "A short English prompt to generate a matching promotional banner image. Include: modern phone repair theme, blue brand colors, clean professional design." }
               },
-              required: ["subject", "message"],
+              required: ["subject", "message", "imagePrompt"],
               additionalProperties: false
             }
           }
@@ -52,35 +53,73 @@ serve(async (req) => {
       }),
     });
 
-    if (!response.ok) {
-      if (response.status === 429) {
+    if (!textResponse.ok) {
+      if (textResponse.status === 429) {
         return new Response(JSON.stringify({ error: "יותר מדי בקשות, נסה שוב בעוד רגע" }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" }
         });
       }
-      if (response.status === 402) {
+      if (textResponse.status === 402) {
         return new Response(JSON.stringify({ error: "נדרש טעינת קרדיטים" }), {
           status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" }
         });
       }
-      const t = await response.text();
-      console.error("AI error:", response.status, t);
-      throw new Error("AI gateway error");
+      const t = await textResponse.text();
+      console.error("AI text error:", textResponse.status, t);
+      throw new Error(`AI gateway error: ${textResponse.status}`);
     }
 
-    const result = await response.json();
-    const toolCall = result.choices?.[0]?.message?.tool_calls?.[0];
+    const textResult = await textResponse.json();
+    const toolCall = textResult.choices?.[0]?.message?.tool_calls?.[0];
     
+    let subject = 'מבצע מיוחד';
+    let message = '';
+    let imagePrompt = '';
+
     if (toolCall?.function?.arguments) {
       const parsed = JSON.parse(toolCall.function.arguments);
-      return new Response(JSON.stringify(parsed), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      });
+      subject = parsed.subject || subject;
+      message = parsed.message || '';
+      imagePrompt = parsed.imagePrompt || '';
+    } else {
+      message = textResult.choices?.[0]?.message?.content || '';
     }
 
-    // Fallback
-    const content = result.choices?.[0]?.message?.content || '';
-    return new Response(JSON.stringify({ subject: 'מבצע מיוחד', message: content }), {
+    // Step 2: Generate image if requested
+    let imageBase64 = null;
+    if (generateImage && imagePrompt) {
+      try {
+        const imgResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-3.1-flash-image-preview",
+            messages: [
+              { role: "user", content: imagePrompt + '. Include text "DirectFix" as brand logo. Modern, sleek banner design for WhatsApp, 16:9 aspect ratio.' }
+            ],
+            modalities: ["image", "text"],
+          }),
+        });
+
+        if (imgResponse.ok) {
+          const imgResult = await imgResponse.json();
+          const imgUrl = imgResult.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+          if (imgUrl) {
+            imageBase64 = imgUrl;
+          }
+        } else {
+          console.error("Image generation failed:", imgResponse.status);
+        }
+      } catch (imgErr) {
+        console.error("Image generation error:", imgErr);
+        // Continue without image
+      }
+    }
+
+    return new Response(JSON.stringify({ subject, message, image: imageBase64 }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });
 

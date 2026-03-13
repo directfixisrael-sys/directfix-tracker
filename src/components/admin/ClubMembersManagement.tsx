@@ -45,7 +45,9 @@ const ClubMembersManagement = () => {
   const [broadcastSubject, setBroadcastSubject] = useState('');
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [generatedPromo, setGeneratedPromo] = useState('');
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [aiPrompt, setAiPrompt] = useState('');
 
   const loadMembers = async () => {
@@ -124,24 +126,33 @@ const ClubMembersManagement = () => {
     }
   };
 
-  const handleGenerateAI = async () => {
+  const handleGenerateAI = async (withImage = false) => {
     if (!aiPrompt.trim()) {
       toast({ title: 'נא לכתוב תיאור למבצע', variant: 'destructive' });
       return;
     }
-    setIsGeneratingAI(true);
+    if (withImage) setIsGeneratingImage(true);
+    else setIsGeneratingAI(true);
+    
     try {
       const { data, error } = await supabase.functions.invoke('generate-club-promo', {
-        body: { prompt: aiPrompt, template: selectedTemplate }
+        body: { prompt: aiPrompt, template: selectedTemplate, generateImage: withImage }
       });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      
       setGeneratedPromo(data.message || '');
       setBroadcastMessage(data.message || '');
       setBroadcastSubject(data.subject || '');
+      if (data.image) setGeneratedImage(data.image);
+      
+      toast({ title: withImage ? 'הודעה ותמונה נוצרו בהצלחה' : 'הודעה נוצרה בהצלחה' });
     } catch (err: any) {
-      toast({ title: 'שגיאה ביצירת מבצע', description: err.message, variant: 'destructive' });
+      console.error('AI generation error:', err);
+      toast({ title: 'שגיאה ביצירת מבצע', description: err.message || 'נסה שוב', variant: 'destructive' });
     } finally {
       setIsGeneratingAI(false);
+      setIsGeneratingImage(false);
     }
   };
 
@@ -376,19 +387,34 @@ const ClubMembersManagement = () => {
                 onChange={e => setAiPrompt(e.target.value)}
                 rows={3}
               />
-              <Button 
-                onClick={handleGenerateAI} 
-                disabled={isGeneratingAI || !aiPrompt.trim()}
-                className="w-full gap-2"
-                variant="outline"
-              >
-                {isGeneratingAI ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Sparkles className="w-4 h-4" />
-                )}
-                {isGeneratingAI ? 'מעצב את ההודעה...' : 'עצב עם AI'}
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => handleGenerateAI(false)} 
+                  disabled={isGeneratingAI || isGeneratingImage || !aiPrompt.trim()}
+                  className="flex-1 gap-2"
+                  variant="outline"
+                >
+                  {isGeneratingAI ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-4 h-4" />
+                  )}
+                  {isGeneratingAI ? 'מעצב...' : 'עצב טקסט'}
+                </Button>
+                <Button 
+                  onClick={() => handleGenerateAI(true)} 
+                  disabled={isGeneratingAI || isGeneratingImage || !aiPrompt.trim()}
+                  className="flex-1 gap-2"
+                  variant="outline"
+                >
+                  {isGeneratingImage ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Image className="w-4 h-4" />
+                  )}
+                  {isGeneratingImage ? 'מעצב...' : 'עצב עם תמונה'}
+                </Button>
+              </div>
             </div>
 
             {/* Generated/manual message */}
@@ -411,6 +437,9 @@ const ClubMembersManagement = () => {
                     <img src={directfixLogo} alt="DirectFix" className="w-6 h-6 rounded" />
                     <span className="text-xs font-bold">דיירקט פיקס</span>
                   </div>
+                  {generatedImage && (
+                    <img src={generatedImage} alt="Promo" className="w-full rounded-lg mb-2" />
+                  )}
                   <p className="text-sm whitespace-pre-wrap">{broadcastMessage}</p>
                 </div>
               </Card>
