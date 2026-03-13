@@ -364,7 +364,7 @@ serve(async (req) => {
         );
       }
 
-      const hash = await bcrypt.hash(password);
+      const hash = await hashPassword(password);
 
       await supabase
         .from("customer_profiles")
