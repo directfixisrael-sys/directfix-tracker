@@ -78,6 +78,9 @@ function buildEmailHtml(subject: string, message: string, image: string | null, 
     <p style="color:#555;font-size:11px;margin:8px 0 0;">
       קיבלת את המייל הזה כחבר/ת מועדון DirectFix
     </p>
+    ${phone ? `<p style="color:#555;font-size:11px;margin:8px 0 0;">
+      <a href="${buildUnsubscribeUrl(phone)}" style="color:#888;text-decoration:underline;">לא רוצה לקבל הודעות פרסומיות? לחצו כאן להסרה</a>
+    </p>` : ''}
   </td></tr>
 
 </table>
