@@ -53,7 +53,8 @@ import {
   Image,
   Megaphone,
   Bell,
-  Award
+  Award,
+  Crown
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
@@ -76,7 +77,7 @@ import LiveView from '@/components/admin/LiveView';
 import AnnouncementsManagement from '@/components/admin/AnnouncementsManagement';
 import RemindersManagement from '@/components/admin/RemindersManagement';
 import LeadsManagement from '@/components/admin/LeadsManagement';
-import LoyaltyManagement from '@/components/admin/LoyaltyManagement';
+import ClubMembersManagement from '@/components/admin/ClubMembersManagement';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -977,7 +978,7 @@ const AdminPanel = () => {
       case 'announcements':
         return <AnnouncementsManagement />;
       case 'loyalty':
-        return <LoyaltyManagement />;
+        return <ClubMembersManagement />;
       case 'feedback':
         const ordersWithFeedback = orders.filter(o => o.rating);
         const avgRating = ordersWithFeedback.length > 0 
@@ -1786,7 +1787,7 @@ const AdminPanel = () => {
             )}
           >
             <Award className="w-5 h-5" />
-            <span className="text-[10px]">נאמנות</span>
+            <span className="text-[10px]">מועדון</span>
           </button>
           {/* More menu */}
           <DropdownMenu>
@@ -1850,8 +1851,8 @@ const AdminPanel = () => {
                 <span>קופונים</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('loyalty')} className={cn("gap-3 py-3", activeTab === 'loyalty' && "text-primary font-medium")}>
-                <Award className="w-4 h-4" />
-                <span>נקודות נאמנות</span>
+                <Crown className="w-4 h-4" />
+                <span>חברי מועדון</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('settings')} className={cn("gap-3 py-3", activeTab === 'settings' && "text-primary font-medium")}>
                 <Settings className="w-4 h-4" />
@@ -1884,7 +1885,7 @@ const AdminPanel = () => {
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {/* Main tabs */}
           <button 
             onClick={() => setActiveTab('dashboard')}
@@ -2090,8 +2091,8 @@ const AdminPanel = () => {
                     : "text-sidebar-foreground hover:bg-sidebar-accent/50"
                 )}
               >
-                <Award className="w-4 h-4" />
-                <span>נקודות נאמנות</span>
+                <Crown className="w-4 h-4" />
+                <span>חברי מועדון</span>
               </button>
               <button 
                 onClick={() => setActiveTab('settings')}

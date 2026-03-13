@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Award, ArrowLeft, Sparkles, Crown, Tag, Shield, Check, Star } from 'lucide-react';
+import { Award, ArrowLeft, Sparkles, Crown, Tag, Shield, Check, Star, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { calculatePointsFromPrice } from '@/components/LoyaltyPointsDisplay';
+import { Link } from 'react-router-dom';
 import clubCardImage from '@/assets/club-card.png';
 
 interface PointsEarnedAnimationProps {
@@ -26,10 +26,8 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
       return;
     }
 
-    // Trigger card animation
     setTimeout(() => setCardAnimated(true), 200);
 
-    // Count-up animation
     const duration = 1200;
     const steps = 30;
     const increment = pointsToEarn / steps;
@@ -62,28 +60,22 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
     <div className="space-y-5 animate-fade-in py-4 text-center">
       {/* Shimmering Club Card */}
       <div className="relative flex justify-center mb-2">
-        {/* Glow effect behind card */}
         <div className="absolute w-72 h-44 bg-primary/20 rounded-3xl blur-3xl animate-pulse" />
         <div
           className={`relative transition-all duration-1000 ${
             cardAnimated ? 'scale-100 opacity-100 rotate-0' : 'scale-75 opacity-0 -rotate-6'
           }`}
         >
-          {/* Card container with shimmer */}
           <div className="relative w-72 mx-auto overflow-hidden rounded-2xl shadow-2xl">
             <img
               src={clubCardImage}
               alt="DirectFix Club Card"
               className="w-full h-auto"
             />
-            {/* Shimmer overlay */}
             <div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-              style={{
-                animation: 'shimmer 3s ease-in-out infinite',
-              }}
+              style={{ animation: 'shimmer 3s ease-in-out infinite' }}
             />
-            {/* Points badge on card */}
             <div className="absolute bottom-3 right-3 bg-primary/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-lg">
               <Award className="w-4 h-4 text-primary-foreground" />
               <span className="text-primary-foreground font-extrabold text-lg leading-none">
@@ -94,7 +86,6 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
           </div>
         </div>
 
-        {/* Floating sparkles */}
         {[0, 1, 2, 3, 4].map((i) => (
           <Sparkles
             key={i}
@@ -115,12 +106,53 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
           <Crown className="w-4 h-4" />
           מועדון הלקוחות של דיירקט פיקס
         </div>
+        <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full px-3 py-1 text-xs font-bold">
+          הצטרפות בחינם
+        </div>
         <h2 className="text-2xl font-extrabold text-foreground">
           הצטרפו וקבלו <span className="text-primary">{pointsToEarn} נקודות!</span>
         </h2>
         <p className="text-sm text-muted-foreground max-w-xs mx-auto">
           חברי המועדון נהנים מהטבות בלעדיות, נקודות נאמנות והנחות מיוחדות
         </p>
+      </div>
+
+      {/* Join checkbox - ABOVE benefits */}
+      <div
+        className={`transition-all duration-500 ${
+          showDetails ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      >
+        <button
+          type="button"
+          onClick={() => setJoinClub(!joinClub)}
+          className={`w-full max-w-sm mx-auto flex items-center gap-3 rounded-2xl p-4 border-2 transition-all duration-300 ${
+            joinClub
+              ? 'border-primary bg-primary/5 shadow-[0_0_20px_hsl(var(--primary)/0.15)]'
+              : 'border-foreground/10 bg-card hover:border-foreground/20'
+          }`}
+        >
+          <div
+            className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
+              joinClub
+                ? 'bg-primary border-primary'
+                : 'border-foreground/20 bg-transparent'
+            }`}
+          >
+            {joinClub && <Check className="w-4 h-4 text-primary-foreground" />}
+          </div>
+          <div className="text-right flex-1">
+            <p className="font-bold text-foreground text-sm">
+              {joinClub ? 'מצטרף למועדון!' : 'רוצה להצטרף למועדון דיירקט פיקס'}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {joinClub
+                ? `תקבלו ${pointsToEarn} נקודות (₪${(pointsToEarn * POINT_VALUE).toFixed(0)} הנחה) כבר בהזמנה הבאה`
+                : 'הצטרפות בחינם | בכפוף לתקנון המועדון'
+              }
+            </p>
+          </div>
+        </button>
       </div>
 
       {/* Benefits list */}
@@ -156,48 +188,20 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         </div>
       </div>
 
-      {/* Join checkbox */}
-      <div
-        className={`transition-all duration-500 delay-200 ${
-          showDetails ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}
-      >
-        <button
-          type="button"
-          onClick={() => setJoinClub(!joinClub)}
-          className={`w-full max-w-sm mx-auto flex items-center gap-3 rounded-2xl p-4 border-2 transition-all duration-300 ${
-            joinClub
-              ? 'border-primary bg-primary/5 shadow-[0_0_20px_hsl(var(--primary)/0.15)]'
-              : 'border-foreground/10 bg-card hover:border-foreground/20'
-          }`}
-        >
-          <div
-            className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
-              joinClub
-                ? 'bg-primary border-primary'
-                : 'border-foreground/20 bg-transparent'
-            }`}
-          >
-            {joinClub && <Check className="w-4 h-4 text-primary-foreground" />}
-          </div>
-          <div className="text-right flex-1">
-            <p className="font-bold text-foreground text-sm">
-              {joinClub ? '🎉 מצטרף למועדון!' : 'רוצה להצטרף למועדון דיירקט פיקס'}
-            </p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {joinClub
-                ? `תקבלו ${pointsToEarn} נקודות (₪${(pointsToEarn * POINT_VALUE).toFixed(0)} הנחה) כבר בהזמנה הבאה`
-                : 'בכפוף לתקנון המועדון. ניתן לבטל בכל עת'
-              }
-            </p>
-          </div>
-        </button>
+      {/* Marketing consent note + Terms link */}
+      <div className="max-w-sm mx-auto space-y-2">
+        <p className="text-[11px] text-muted-foreground/70 leading-relaxed text-right px-2">
+          בהצטרפות למועדון אני מאשר/ת לדיירקט פיקס לשלוח לי מבצעים, הנחות, עדכונים וברכות לחגים באמצעות WhatsApp, SMS ואימייל. ניתן לבטל בכל עת.
+        </p>
+        <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+          ההצטרפות בחינם וכפופה ל
+          <Link to="/club-terms" target="_blank" className="text-primary underline hover:text-primary/80 inline-flex items-center gap-0.5 mx-1">
+            תקנון המועדון המלא
+            <ExternalLink className="w-3 h-3" />
+          </Link>
+          | הנקודות תקפות 24 חודשים | תקפות בדיירקט פיקס בלבד
+        </p>
       </div>
-
-      {/* Terms note */}
-      <p className="text-[11px] text-muted-foreground/60 max-w-xs mx-auto leading-relaxed">
-        ההצטרפות למועדון כפופה לתקנון. הנקודות תקפות ל-24 חודשים. החברה רשאית לשנות את התוכנית בכל עת בכפוף לחוק.
-      </p>
 
       {/* Spacer for sticky CTA */}
       <div className="h-24" />
@@ -227,7 +231,6 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         document.body
       )}
 
-      {/* Shimmer keyframe style */}
       <style>{`
         @keyframes shimmer {
           0% { transform: translateX(-100%) rotate(15deg); }

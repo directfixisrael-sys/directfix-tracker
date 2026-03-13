@@ -13,6 +13,7 @@ import DevicePurchase from "./pages/DevicePurchase";
 import ConsultationBooking from "./pages/ConsultationBooking";
 import DataTransfer from "./pages/DataTransfer";
 import NotFound from "./pages/NotFound";
+import ClubTerms from "./pages/ClubTerms";
 import MinimalFooter from "./components/MinimalFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { VisitorTracker } from "./components/VisitorTracker";
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/consultation" element={<ConsultationBooking />} />
             <Route path="/data-transfer" element={<DataTransfer />} />
+            <Route path="/club-terms" element={<ClubTerms />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
