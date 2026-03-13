@@ -170,32 +170,33 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
 
       {/* Sticky CTA with join checkbox via portal */}
       {createPortal(
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-          <div className="max-w-3xl mx-auto space-y-2.5">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+          <div className="max-w-3xl mx-auto space-y-3">
             {/* Join checkbox */}
             <button
               type="button"
               onClick={() => setJoinClub(!joinClub)}
-              className={`w-full flex items-center gap-3 rounded-2xl p-2.5 border-2 transition-all duration-300 ${
+              className={`w-full flex items-center gap-3 rounded-2xl p-3 border-2 transition-all duration-300 ${
                 joinClub
-                  ? 'border-primary bg-primary/5'
-                  : 'border-foreground/10 bg-card hover:border-foreground/20'
+                  ? 'border-amber-500 bg-gradient-to-r from-amber-500/10 to-amber-600/5 shadow-[0_0_15px_rgba(245,158,11,0.15)]'
+                  : 'border-amber-500/30 bg-gradient-to-r from-amber-500/5 to-card hover:border-amber-500/50 hover:shadow-[0_0_10px_rgba(245,158,11,0.1)]'
               }`}
             >
               <div
-                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
+                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
                   joinClub
-                    ? 'bg-primary border-primary'
-                    : 'border-foreground/20 bg-transparent'
+                    ? 'bg-gradient-to-br from-amber-500 to-amber-600 border-amber-500'
+                    : 'border-amber-500/40 bg-transparent'
                 }`}
               >
-                {joinClub && <Check className="w-3 h-3 text-primary-foreground" />}
+                {joinClub && <Check className="w-3.5 h-3.5 text-white" />}
               </div>
               <div className="text-right flex-1">
-                <p className="font-bold text-foreground text-[13px]">
+                <p className="font-bold text-foreground text-sm flex items-center gap-1.5 justify-end">
                   {joinClub ? 'מצטרף למועדון!' : 'רוצה להצטרף למועדון דיירקט פיקס'}
+                  <Crown className="w-4 h-4 text-amber-500" />
                 </p>
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-[11px] text-muted-foreground">
                   {joinClub
                     ? `+${pointsToEarn} נקודות (₪${(pointsToEarn * POINT_VALUE).toFixed(0)} הנחה)`
                     : 'הצטרפות בחינם | בכפוף לתקנון'
@@ -207,7 +208,7 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
             {/* Continue button */}
             <Button
               onClick={() => onContinue(joinClub)}
-              className={`w-full h-12 text-[14px] font-bold rounded-2xl shadow-lg gap-2 transition-all duration-300 ${
+              className={`w-full h-14 text-base font-bold rounded-2xl shadow-lg gap-2 transition-all duration-300 ${
                 joinClub
                   ? 'bg-gradient-to-r from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90'
                   : ''
