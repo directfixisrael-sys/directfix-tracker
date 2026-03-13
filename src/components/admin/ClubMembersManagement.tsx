@@ -427,9 +427,14 @@ const ClubMembersManagement = () => {
                       </p>
                       <p className="text-sm text-muted-foreground" dir="ltr">{c.phone}</p>
                       {c.email && <p className="text-xs text-muted-foreground">{c.email}</p>}
-                      <p className="text-[10px] text-muted-foreground/60">
-                        הצטרף: {new Date(c.joinedAt).toLocaleDateString('he-IL')}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-[10px] text-muted-foreground/60">
+                          הצטרף: {new Date(c.joinedAt).toLocaleDateString('he-IL')}
+                        </p>
+                        {!c.wantsPromotions && (
+                          <span className="text-[10px] bg-destructive/10 text-destructive px-1.5 py-0.5 rounded">הסיר פרסומות</span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
