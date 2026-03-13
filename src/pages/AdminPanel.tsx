@@ -53,7 +53,8 @@ import {
   Image,
   Megaphone,
   Bell,
-  Award
+  Award,
+  Crown
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
