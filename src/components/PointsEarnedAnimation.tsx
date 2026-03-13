@@ -166,7 +166,7 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
       </div>
 
       {/* Spacer for sticky CTA */}
-      <div className="h-36" />
+      <div className="h-24" />
 
       {/* Sticky CTA with join checkbox via portal */}
       {createPortal(
