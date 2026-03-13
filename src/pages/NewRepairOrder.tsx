@@ -1144,8 +1144,22 @@ const NewRepairOrder = () => {
           });
         }
         
-        // Award new loyalty points only if joined club
+        // Award new loyalty points and save club member only if joined club
         if (joinedClub) {
+          // Save as club member (upsert)
+          await supabase.from('club_members').upsert({
+            phone: normalizedPhone,
+            name: customerName,
+            email: customerEmail || null,
+            wants_promotions: true,
+            is_active: true,
+          }, { onConflict: 'phone' });
+
+          // Also update the order as club member
+          if (orderResult?.id) {
+            await supabase.from('orders').update({ is_club_member: true }).eq('id', orderResult.id);
+          }
+
           const pointsToEarn = calculatePointsFromPrice(getFinalPrice());
           if (pointsToEarn > 0) {
             await supabase.from('loyalty_points').insert({
