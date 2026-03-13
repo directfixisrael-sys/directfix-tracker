@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send, Zap, Award, ChevronDown, Crown } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send, Zap, Award, ChevronDown, Crown, Menu } from 'lucide-react';
 import { getRepairIconComponent } from '@/lib/repairIcons';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
@@ -278,6 +278,7 @@ const NewRepairOrder = () => {
     setTheme
   } = useTheme();
   const [step, setStep] = useState<Step>('model');
+  const [orderMenuOpen, setOrderMenuOpen] = useState(false);
   const [showIntroCard, setShowIntroCard] = useState(true);
   const [introName, setIntroName] = useState('');
   const [introPhone, setIntroPhone] = useState('');
@@ -1301,6 +1302,11 @@ const NewRepairOrder = () => {
 
           <div className="flex items-center gap-1.5">
             <CustomerZone />
+            {/* Mobile hamburger menu */}
+            <Button variant="ghost" size="icon" onClick={() => setOrderMenuOpen(!orderMenuOpen)} className="h-10 w-10 rounded-xl bg-muted/80 border-2 border-foreground/10 sm:hidden" aria-label="תפריט">
+              {orderMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
+            {/* Desktop buttons */}
             <Button variant="ghost" size="icon" onClick={() => {
             const event = new CustomEvent('open-accessibility-widget');
             window.dispatchEvent(event);
@@ -1315,6 +1321,39 @@ const NewRepairOrder = () => {
             </a>
           </div>
         </nav>
+
+        {/* Mobile menu dropdown */}
+        {orderMenuOpen && (
+          <div className="sm:hidden bg-card border-t-2 border-foreground/10 animate-slide-down">
+            <div className="flex items-center justify-center gap-4 py-3 px-4">
+              <a
+                href="tel:033106020"
+                className="h-12 w-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105"
+                aria-label="התקשר 033106020"
+                onClick={() => setOrderMenuOpen(false)}
+              >
+                <Phone className="w-5 h-5" />
+              </a>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => { toggleTheme(); setOrderMenuOpen(false); }}
+                className="h-12 w-12 rounded-xl border-2 border-foreground/15"
+              >
+                {resolvedTheme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => { window.dispatchEvent(new CustomEvent('open-accessibility-widget')); setOrderMenuOpen(false); }}
+                className="h-12 w-12 rounded-xl border-2 border-foreground/15"
+                aria-label="נגישות"
+              >
+                <Accessibility className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+        )}
         
         {/* Step Indicator - Pill style */}
         {step !== 'success' && <div className="px-4 pb-3 max-w-5xl mx-auto" role="navigation" aria-label="שלבי ההזמנה">
