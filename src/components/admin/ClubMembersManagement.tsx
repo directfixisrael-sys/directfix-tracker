@@ -20,6 +20,7 @@ interface ClubMember {
   totalValue: number;
   joinedAt: string;
   isActive: boolean;
+  wantsPromotions: boolean;
 }
 
 const POINT_VALUE = 0.5;
