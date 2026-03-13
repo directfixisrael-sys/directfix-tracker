@@ -8,13 +8,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const serviceAreas = [
-  { id: 'sharon', label: 'השרון', emoji: '🏖️' },
-  { id: 'center', label: 'המרכז', emoji: '🏙️' },
-  { id: 'gush_dan', label: 'גוש דן', emoji: '🌆' },
-  { id: 'south', label: 'הדרום', emoji: '🏜️' },
-  { id: 'north', label: 'הצפון', emoji: '🌿' },
-  { id: 'jerusalem', label: 'ירושלים והסביבה', emoji: '🕌' },
-];
+{ id: 'sharon', label: 'השרון', emoji: '🏖️' },
+{ id: 'center', label: 'המרכז', emoji: '🏙️' },
+{ id: 'gush_dan', label: 'גוש דן', emoji: '🌆' },
+{ id: 'south', label: 'הדרום', emoji: '🏜️' },
+{ id: 'north', label: 'הצפון', emoji: '🌿' },
+{ id: 'jerusalem', label: 'ירושלים והסביבה', emoji: '🕌' }];
+
 
 const TechnicianRecruitment = () => {
   const [showForm, setShowForm] = useState(false);
@@ -33,34 +33,34 @@ const TechnicianRecruitment = () => {
   const totalSteps = 6; // 0-5
 
   const features = [
-    { icon: Zap, text: 'תנאים נוחים' },
-    { icon: Shield, text: 'עבודה בחברה עם וותק וניסיון' },
-    { icon: MapPin, text: 'תהיה בעל הבית של עצמך' },
-    { icon: Wrench, text: 'חלפים מקוריים ואיכותיים' },
-  ];
+  { icon: Zap, text: 'תנאים נוחים' },
+  { icon: Shield, text: 'עבודה בחברה עם וותק וניסיון' },
+  { icon: MapPin, text: 'תהיה בעל הבית של עצמך' },
+  { icon: Wrench, text: 'חלפים מקוריים ואיכותיים' }];
+
 
   const floatingIcons = [
-    { Icon: Wrench, size: 'w-10 h-10', position: 'top-[15%] right-[10%]', delay: '0s', bg: 'bg-primary' },
-    { Icon: Smartphone, size: 'w-12 h-12', position: 'top-[35%] right-[25%]', delay: '1s', bg: 'bg-primary' },
-    { Icon: Shield, size: 'w-9 h-9', position: 'top-[55%] right-[8%]', delay: '2s', bg: 'bg-primary' },
-    { Icon: Zap, size: 'w-11 h-11', position: 'top-[70%] right-[22%]', delay: '3s', bg: 'bg-primary' },
-  ];
+  { Icon: Wrench, size: 'w-10 h-10', position: 'top-[15%] right-[10%]', delay: '0s', bg: 'bg-primary' },
+  { Icon: Smartphone, size: 'w-12 h-12', position: 'top-[35%] right-[25%]', delay: '1s', bg: 'bg-primary' },
+  { Icon: Shield, size: 'w-9 h-9', position: 'top-[55%] right-[8%]', delay: '2s', bg: 'bg-primary' },
+  { Icon: Zap, size: 'w-11 h-11', position: 'top-[70%] right-[22%]', delay: '3s', bg: 'bg-primary' }];
+
 
   const toggleArea = (id: string) => {
-    setSelectedAreas(prev => 
-      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+    setSelectedAreas((prev) =>
+    prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
     );
   };
 
   const canProceed = () => {
     switch (step) {
-      case 0: return name.trim().length >= 2;
-      case 1: return experience.trim().length > 0;
-      case 2: return selectedAreas.length > 0;
-      case 3: return phone.replace(/\D/g, '').length >= 9 && email.includes('@');
-      case 4: return true; // resume is optional
-      case 5: return privacyAccepted;
-      default: return false;
+      case 0:return name.trim().length >= 2;
+      case 1:return experience.trim().length > 0;
+      case 2:return selectedAreas.length > 0;
+      case 3:return phone.replace(/\D/g, '').length >= 9 && email.includes('@');
+      case 4:return true; // resume is optional
+      case 5:return privacyAccepted;
+      default:return false;
     }
   };
 
@@ -79,22 +79,22 @@ const TechnicianRecruitment = () => {
       if (resumeFile) {
         resumeFileName = resumeFile.name;
         const filePath = `${Date.now()}_${resumeFile.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('resumes')
-          .upload(filePath, resumeFile);
+        const { data: uploadData, error: uploadError } = await supabase.storage.
+        from('resumes').
+        upload(filePath, resumeFile);
 
         if (uploadError) {
           console.error('Upload error:', uploadError);
           toast.error('שגיאה בהעלאת קורות החיים');
         } else {
-          const { data: urlData } = supabase.storage
-            .from('resumes')
-            .getPublicUrl(filePath);
+          const { data: urlData } = supabase.storage.
+          from('resumes').
+          getPublicUrl(filePath);
           resumeUrl = urlData.publicUrl;
         }
       }
 
-      const areaLabels = selectedAreas.map(id => serviceAreas.find(a => a.id === id)?.label || id);
+      const areaLabels = selectedAreas.map((id) => serviceAreas.find((a) => a.id === id)?.label || id);
 
       await supabase.functions.invoke('send-technician-application', {
         body: {
@@ -104,8 +104,8 @@ const TechnicianRecruitment = () => {
           email: email.trim(),
           serviceAreas: areaLabels,
           resumeUrl,
-          resumeFileName,
-        },
+          resumeFileName
+        }
       });
 
       setIsSubmitted(true);
@@ -120,7 +120,7 @@ const TechnicianRecruitment = () => {
 
   const renderFormStep = () => {
     const inputClass = "h-14 text-lg rounded-xl bg-card border-2 border-primary/20 focus:border-primary";
-    
+
     switch (step) {
       case 0:
         return (
@@ -131,10 +131,10 @@ const TechnicianRecruitment = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={inputClass}
-              autoFocus
-            />
-          </div>
-        );
+              autoFocus />
+            
+          </div>);
+
       case 1:
         return (
           <div className="space-y-3 animate-slide-up">
@@ -144,10 +144,10 @@ const TechnicianRecruitment = () => {
               value={experience}
               onChange={(e) => setExperience(e.target.value)}
               className={inputClass}
-              autoFocus
-            />
-          </div>
-        );
+              autoFocus />
+            
+          </div>);
+
       case 2:
         return (
           <div className="space-y-3 animate-slide-up">
@@ -161,20 +161,20 @@ const TechnicianRecruitment = () => {
                     key={area.id}
                     onClick={() => toggleArea(area.id)}
                     className={`flex items-center gap-2 px-3 py-3 rounded-xl border-2 transition-all text-sm font-medium ${
-                      isSelected
-                        ? 'border-primary bg-primary/20 text-foreground shadow-sm'
-                        : 'border-background/20 bg-card/80 text-foreground hover:border-primary/40'
-                    }`}
-                  >
+                    isSelected ?
+                    'border-primary bg-primary/20 text-foreground shadow-sm' :
+                    'border-background/20 bg-card/80 text-foreground hover:border-primary/40'}`
+                    }>
+                    
                     <span className="text-lg">{area.emoji}</span>
                     <span>{area.label}</span>
                     {isSelected && <CheckCircle2 className="w-4 h-4 text-primary mr-auto" />}
-                  </button>
-                );
+                  </button>);
+
               })}
             </div>
-          </div>
-        );
+          </div>);
+
       case 3:
         return (
           <div className="space-y-3 animate-slide-up">
@@ -188,8 +188,8 @@ const TechnicianRecruitment = () => {
                 onChange={(e) => setPhone(e.target.value)}
                 className={`${inputClass} pr-11`}
                 dir="ltr"
-                autoFocus
-              />
+                autoFocus />
+              
             </div>
             <div className="relative">
               <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -199,11 +199,11 @@ const TechnicianRecruitment = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={`${inputClass} pr-11`}
-                dir="ltr"
-              />
+                dir="ltr" />
+              
             </div>
-          </div>
-        );
+          </div>);
+
       case 4:
         return (
           <div className="space-y-3 animate-slide-up">
@@ -213,27 +213,27 @@ const TechnicianRecruitment = () => {
               type="file"
               accept=".pdf,.doc,.docx"
               onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
-              className="hidden"
-            />
+              className="hidden" />
+            
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full h-28 rounded-xl border-2 border-dashed border-primary/30 bg-card hover:bg-card/80 flex flex-col items-center justify-center gap-2 transition-colors"
-            >
-              {resumeFile ? (
-                <>
+              className="w-full h-28 rounded-xl border-2 border-dashed border-primary/30 bg-card hover:bg-card/80 flex flex-col items-center justify-center gap-2 transition-colors">
+              
+              {resumeFile ?
+              <>
                   <FileText className="w-8 h-8 text-primary" />
                   <span className="text-sm font-medium text-foreground">{resumeFile.name}</span>
                   <span className="text-xs text-muted-foreground">לחץ להחלפה</span>
-                </>
-              ) : (
-                <>
+                </> :
+
+              <>
                   <Upload className="w-8 h-8 text-primary/60" />
                   <span className="text-sm text-muted-foreground">לחץ להעלאת קובץ PDF / DOC</span>
                 </>
-              )}
+              }
             </button>
-          </div>
-        );
+          </div>);
+
       case 5:
         return (
           <div className="space-y-4 animate-slide-up">
@@ -242,15 +242,15 @@ const TechnicianRecruitment = () => {
                 id="privacy"
                 checked={privacyAccepted}
                 onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
-                className="mt-1"
-              />
+                className="mt-1" />
+              
               <label htmlFor="privacy" className="text-sm text-foreground leading-relaxed cursor-pointer">
                 אני מאשר/ת את <strong>מדיניות הפרטיות</strong> ומסכים/ה שהפרטים שלי ישמרו לצורך תהליך הגיוס בלבד.
                 המידע לא יועבר לצדדים שלישיים ויימחק בתום התהליך.
               </label>
             </div>
-          </div>
-        );
+          </div>);
+
     }
   };
 
@@ -259,35 +259,35 @@ const TechnicianRecruitment = () => {
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-foreground via-foreground/95 to-foreground/85" />
       
-      <div className="relative grid grid-cols-1 md:grid-cols-2 min-h-[420px]">
+      <div className="relative grid grid-cols-1 md:grid-cols-2 min-h-[420px] bg-muted mx-0">
         {/* Left side - Floating icons */}
-        <div className="hidden md:block relative">
-          {floatingIcons.map(({ Icon, size, position, delay, bg }, i) => (
-            <div
-              key={i}
-              className={`absolute ${position} ${size} ${bg} rounded-2xl shadow-lg flex items-center justify-center`}
-              style={{
-                animation: `techFloat 6s ease-in-out ${delay} infinite`,
-                transform: `rotate(${(i * 15) - 15}deg)`,
-              }}
-            >
+        <div className="hidden md:block relative bg-accent-foreground text-primary-foreground">
+          {floatingIcons.map(({ Icon, size, position, delay, bg }, i) =>
+          <div
+            key={i}
+            className={`absolute ${position} ${size} ${bg} rounded-2xl shadow-lg flex items-center justify-center`}
+            style={{
+              animation: `techFloat 6s ease-in-out ${delay} infinite`,
+              transform: `rotate(${i * 15 - 15}deg)`
+            }}>
+            
               <Icon className="w-5 h-5 text-primary-foreground" />
             </div>
-          ))}
+          )}
         </div>
 
         {/* Right side - Content */}
-        <div className="p-8 md:p-12 flex flex-col justify-center">
-          {isSubmitted ? (
-            <div className="text-center animate-slide-up space-y-4">
+        <div className="p-8 md:p-12 flex flex-col justify-center bg-ring">
+          {isSubmitted ?
+          <div className="text-center animate-slide-up space-y-4">
               <div className="w-20 h-20 bg-background/20 rounded-full flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-10 h-10 text-background" />
               </div>
               <h3 className="text-2xl font-extrabold text-background">הבקשה נשלחה!</h3>
               <p className="text-background/80">תודה {name}, ניצור איתך קשר בהקדם.</p>
-            </div>
-          ) : !showForm ? (
-            <>
+            </div> :
+          !showForm ?
+          <>
               <h2 className="text-3xl md:text-4xl font-extrabold text-background mb-4 leading-tight">
                 אתה טכנאי סלולר?
                 <br />
@@ -298,103 +298,103 @@ const TechnicianRecruitment = () => {
               </p>
               
               {/* Feature pills */}
-              <div className="flex flex-wrap gap-2 mb-8">
-                {features.map((f, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-2 bg-background/15 border border-background/25 rounded-full px-4 py-2"
-                  >
+              <div className="flex flex-wrap gap-2 mb-8 bg-primary">
+                {features.map((f, i) =>
+              <div
+                key={i}
+                className="flex items-center gap-2 bg-background/15 border border-background/25 rounded-full px-4 py-2">
+                
                     <CheckCircle2 className="w-4 h-4 text-background/80" />
                     <span className="text-sm font-medium text-background">{f.text}</span>
                   </div>
-                ))}
+              )}
               </div>
 
               {/* Mobile floating icons - show horizontally */}
               <div className="flex md:hidden items-center justify-center gap-4 mb-6">
-                {floatingIcons.map(({ Icon, delay }, i) => (
-                  <div
-                    key={i}
-                    className="w-12 h-12 bg-primary rounded-2xl shadow-lg flex items-center justify-center"
-                    style={{
-                      animation: `techFloat 6s ease-in-out ${delay} infinite`,
-                      transform: `rotate(${(i * 12) - 18}deg)`,
-                    }}
-                  >
+                {floatingIcons.map(({ Icon, delay }, i) =>
+              <div
+                key={i}
+                className="w-12 h-12 rounded-2xl shadow-lg flex items-center justify-center bg-warning"
+                style={{
+                  animation: `techFloat 6s ease-in-out ${delay} infinite`,
+                  transform: `rotate(${i * 12 - 18}deg)`
+                }}>
+                
                     <Icon className="w-5 h-5 text-primary-foreground" />
                   </div>
-                ))}
+              )}
               </div>
 
               <Button
-                onClick={() => { setShowForm(true); setStep(0); }}
-                className="w-full md:w-auto h-14 px-10 rounded-2xl text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl gap-2"
-              >
+              onClick={() => {setShowForm(true);setStep(0);}}
+              className="w-full md:w-auto h-14 px-10 rounded-2xl text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl gap-2">
+              
                 <ArrowLeft className="w-5 h-5" />
                 הגש בקשה
               </Button>
-            </>
-          ) : (
-            <div className="space-y-5">
+            </> :
+
+          <div className="space-y-5">
               {/* Progress dots */}
               <div className="flex items-center gap-2 mb-2">
-                {Array.from({ length: totalSteps }).map((_, s) => (
-                  <div
-                    key={s}
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      s === step ? 'w-8 bg-background' : s < step ? 'w-4 bg-background/60' : 'w-4 bg-background/20'
-                    }`}
-                  />
-                ))}
+                {Array.from({ length: totalSteps }).map((_, s) =>
+              <div
+                key={s}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                s === step ? 'w-8 bg-background' : s < step ? 'w-4 bg-background/60' : 'w-4 bg-background/20'}`
+                } />
+
+              )}
               </div>
 
               {renderFormStep()}
 
               <div className="flex gap-3 pt-2">
-                {step > 0 && (
-                  <Button
-                    variant="outline"
-                    onClick={() => setStep(step - 1)}
-                    className="h-12 px-6 rounded-xl bg-background/10 border-background/20 text-background hover:bg-background/20"
-                  >
+                {step > 0 &&
+              <Button
+                variant="outline"
+                onClick={() => setStep(step - 1)}
+                className="h-12 px-6 rounded-xl bg-background/10 border-background/20 text-background hover:bg-background/20">
+                
                     חזור
                   </Button>
-                )}
-                {step < totalSteps - 1 ? (
-                  <Button
-                    onClick={handleNext}
-                    disabled={!canProceed()}
-                    className="flex-1 h-12 rounded-xl bg-card text-foreground hover:bg-card/90 font-bold text-base gap-2"
-                  >
+              }
+                {step < totalSteps - 1 ?
+              <Button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="flex-1 h-12 rounded-xl bg-card text-foreground hover:bg-card/90 font-bold text-base gap-2">
+                
                     המשך
                     <ArrowLeft className="w-4 h-4" />
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleSubmit}
-                    disabled={!privacyAccepted || isSubmitting}
-                    className="flex-1 h-12 rounded-xl bg-card text-foreground hover:bg-card/90 font-bold text-base gap-2"
-                  >
-                    {isSubmitting ? (
-                      <>
+                  </Button> :
+
+              <Button
+                onClick={handleSubmit}
+                disabled={!privacyAccepted || isSubmitting}
+                className="flex-1 h-12 rounded-xl bg-card text-foreground hover:bg-card/90 font-bold text-base gap-2">
+                
+                    {isSubmitting ?
+                <>
                         <Loader2 className="w-4 h-4 animate-spin" />
                         שולח...
-                      </>
-                    ) : (
-                      'שלח בקשה'
-                    )}
+                      </> :
+
+                'שלח בקשה'
+                }
                   </Button>
-                )}
+              }
               </div>
 
               <button
-                onClick={() => { setShowForm(false); setStep(0); }}
-                className="text-xs text-primary-foreground/50 underline w-full text-center"
-              >
+              onClick={() => {setShowForm(false);setStep(0);}}
+              className="text-xs text-primary-foreground/50 underline w-full text-center">
+              
                 ביטול
               </button>
             </div>
-          )}
+          }
         </div>
       </div>
 
@@ -407,8 +407,8 @@ const TechnicianRecruitment = () => {
           75% { transform: translateY(-15px) rotate(calc(var(--rotate, 0deg) + 8deg)); }
         }
       `}</style>
-    </section>
-  );
+    </section>);
+
 };
 
 export default TechnicianRecruitment;

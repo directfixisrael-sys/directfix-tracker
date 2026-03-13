@@ -47,7 +47,7 @@ const Index = () => {
           <div className="max-w-2xl mx-auto px-6 py-12 text-center">
             <div className="mb-6 animate-fade-in">
               <Logo size="lg" clickable={false} className="justify-center mb-5" />
-              <h1 className="text-4xl font-extrabold text-foreground tracking-tight leading-tight mb-3">
+              <h1 className="font-extrabold text-foreground tracking-tight leading-tight mb-3 text-3xl">
                 תיקוני אייפון עם{' '}
                 <span className="text-primary font-extrabold text-3xl">החברה המובילה בישראל</span>
               </h1>
