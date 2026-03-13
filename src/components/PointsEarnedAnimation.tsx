@@ -117,6 +117,12 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         </p>
       </div>
 
+      {/* Scroll hint indicator */}
+      <div className="flex flex-col items-center gap-1 animate-bounce-slow">
+        <span className="text-xs text-muted-foreground/60 font-medium">גלול למטה לפרטים נוספים</span>
+        <ChevronDown className="w-5 h-5 text-muted-foreground/40" />
+      </div>
+
       {/* Benefits list */}
       <div
         className={`transition-all duration-500 ${
