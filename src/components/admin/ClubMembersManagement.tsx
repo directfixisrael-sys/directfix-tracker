@@ -72,6 +72,8 @@ const ClubMembersManagement = () => {
   const [textStyle, setTextStyle] = useState('marketing_light');
   const [imageStyle, setImageStyle] = useState('none');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [emailPreviewHtml, setEmailPreviewHtml] = useState<string | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
   // Email history state
   interface EmailHistoryEntry {
@@ -300,6 +302,29 @@ const ClubMembersManagement = () => {
       toast({ title: 'שגיאה בשליחה', description: err.message, variant: 'destructive' });
     } finally {
       setIsSendingEmail(false);
+    }
+  };
+
+  const handlePreviewEmail = async () => {
+    setIsLoadingPreview(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-club-broadcast-email', {
+        body: {
+          subject: broadcastSubject || 'מבצע מיוחד מדיירקט פיקס!',
+          message: broadcastMessage || 'תוכן ההודעה יופיע כאן...',
+          image: generatedImage,
+          preview: true,
+        }
+      });
+      if (error) throw error;
+      if (data?.html) {
+        setEmailPreviewHtml(data.html);
+      }
+    } catch (err: any) {
+      console.error('Preview error:', err);
+      toast({ title: 'שגיאה בתצוגה מקדימה', variant: 'destructive' });
+    } finally {
+      setIsLoadingPreview(false);
     }
   };
 
@@ -631,18 +656,33 @@ const ClubMembersManagement = () => {
               </Card>
             )}
 
-            <Button
-              onClick={handleSendEmailBroadcast}
-              disabled={!broadcastMessage.trim() || isSendingEmail || activeWithEmailCount === 0}
-              className="w-full h-12 gap-2 bg-gradient-to-l from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90"
-            >
-              {isSendingEmail ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Mail className="w-4 h-4" />
-              )}
-              {isSendingEmail ? 'שולח...' : `שלח מייל ל-${activeWithEmailCount} חברי מועדון`}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={handlePreviewEmail}
+                disabled={isLoadingPreview}
+                variant="outline"
+                className="h-12 gap-2 flex-1"
+              >
+                {isLoadingPreview ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+                תצוגה מקדימה
+              </Button>
+              <Button
+                onClick={handleSendEmailBroadcast}
+                disabled={!broadcastMessage.trim() || isSendingEmail || activeWithEmailCount === 0}
+                className="h-12 gap-2 flex-[2] bg-gradient-to-l from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90"
+              >
+                {isSendingEmail ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Mail className="w-4 h-4" />
+                )}
+                {isSendingEmail ? 'שולח...' : `שלח ל-${activeWithEmailCount} חברים`}
+              </Button>
+            </div>
 
             {activeWithEmailCount < activeCount && (
               <p className="text-xs text-amber-600 text-center">
@@ -771,6 +811,41 @@ const ClubMembersManagement = () => {
               <Button onClick={handleSaveMember} className="flex-1">שמור</Button>
               <Button variant="outline" onClick={() => setEditDialogOpen(false)}>ביטול</Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Email Preview Dialog */}
+      <Dialog open={!!emailPreviewHtml} onOpenChange={(open) => !open && setEmailPreviewHtml(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+          <DialogHeader className="p-4 pb-2">
+            <DialogTitle className="text-right">תצוגה מקדימה של המייל</DialogTitle>
+            <DialogDescription className="text-right text-sm text-muted-foreground">
+              כך ייראה המייל אצל חברי המועדון
+            </DialogDescription>
+          </DialogHeader>
+          {emailPreviewHtml && (
+            <div className="border-t">
+              <iframe
+                srcDoc={emailPreviewHtml}
+                className="w-full border-0"
+                style={{ height: '600px' }}
+                title="תצוגה מקדימה"
+              />
+            </div>
+          )}
+          <div className="p-4 pt-2 flex gap-2">
+            <Button variant="outline" onClick={() => setEmailPreviewHtml(null)} className="flex-1">
+              סגור
+            </Button>
+            <Button 
+              onClick={() => { setEmailPreviewHtml(null); handleSendEmailBroadcast(); }}
+              className="flex-1 bg-gradient-to-l from-amber-500 to-primary"
+              disabled={!broadcastMessage.trim() || isSendingEmail}
+            >
+              <Mail className="w-4 h-4 ml-2" />
+              שלח עכשיו
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

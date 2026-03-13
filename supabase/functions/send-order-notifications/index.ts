@@ -19,6 +19,7 @@ interface OrderData {
   customerEmail?: string;
   orderNumber?: number;
   promotionTitle?: string;
+  isClubMember?: boolean;
   leadSource?: string;
   leadSourceDetails?: {
     gclid?: string;
@@ -422,8 +423,47 @@ ${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : '
       </div>
 
       <div style="background: #f0fdf4; border-radius: 12px; padding: 15px; text-align: center;">
-        <p style="margin: 0; color: #166534; font-size: 14px;">🛡️ כל התיקונים שלנו כוללים אחריות מלאה</p>
+        <p style="margin: 0; color: #166534; font-size: 14px;">כל התיקונים שלנו כוללים אחריות מלאה</p>
       </div>
+
+      ${orderData.isClubMember ? `
+      <!-- Club Member Section -->
+      <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px; padding: 28px; margin-top: 20px; text-align: center; border: 1px solid #d4af37;">
+        <div style="margin-bottom: 12px;">
+          <span style="font-size: 28px; color: #d4af37;">&#9733;</span>
+        </div>
+        <h2 style="color: #d4af37; margin: 0 0 6px 0; font-size: 22px; font-weight: bold;">ברוכים הבאים למועדון DirectFix!</h2>
+        <p style="color: #e0e0e0; margin: 0 0 20px 0; font-size: 15px;">הצטרפת למועדון הלקוחות שלנו ואתה זכאי להטבות בלעדיות</p>
+        
+        <div style="background: rgba(255,255,255,0.08); border-radius: 12px; padding: 18px; text-align: right; margin-bottom: 18px;">
+          <div style="margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <p style="margin: 0; color: #d4af37; font-weight: bold; font-size: 15px;">&#127873; צבירת נקודות</p>
+            <p style="margin: 4px 0 0 0; color: #ccc; font-size: 14px;">על כל תיקון תצברו נקודות שהופכות להנחות - כל 100 ש"ח = 10 נקודות</p>
+          </div>
+          <div style="margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <p style="margin: 0; color: #d4af37; font-weight: bold; font-size: 15px;">&#128176; מבצעים והנחות בלעדיות</p>
+            <p style="margin: 4px 0 0 0; color: #ccc; font-size: 14px;">חברי המועדון מקבלים גישה למבצעים מיוחדים והנחות שלא זמינות לכולם</p>
+          </div>
+          <div style="margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <p style="margin: 0; color: #d4af37; font-weight: bold; font-size: 15px;">&#128222; שיחות ייעוץ חינם</p>
+            <p style="margin: 4px 0 0 0; color: #ccc; font-size: 14px;">שיחות ייעוץ עם טכנאים מנוסים ללא עלות - לכל שאלה על המכשיר שלכם</p>
+          </div>
+          <div style="margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <p style="margin: 0; color: #d4af37; font-weight: bold; font-size: 15px;">&#11088; עדיפות בתורים</p>
+            <p style="margin: 4px 0 0 0; color: #ccc; font-size: 14px;">חברי המועדון נהנים מעדיפות בקביעת תורים ושירות מועדף</p>
+          </div>
+          <div>
+            <p style="margin: 0; color: #d4af37; font-weight: bold; font-size: 15px;">&#128737; הארכת אחריות</p>
+            <p style="margin: 4px 0 0 0; color: #ccc; font-size: 14px;">אחריות מורחבת על כל תיקון כבונוס לחברי המועדון</p>
+          </div>
+        </div>
+        
+        <a href="https://directfix-tracker.lovable.app/track?phone=${encodeURIComponent(orderData.customerPhone)}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%); color: #1a1a2e; text-decoration: none; padding: 14px 36px; border-radius: 12px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">
+          &#128100; כניסה לאיזור האישי שלי
+        </a>
+        <p style="color: #999; font-size: 12px; margin: 12px 0 0 0;">באיזור האישי תוכלו לעקוב אחרי הנקודות, ההזמנות וההטבות שלכם</p>
+      </div>
+      ` : ''}
     </div>
     
     <p style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">

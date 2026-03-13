@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Award, ArrowLeft, Sparkles, Crown, Tag, Shield, Check, Star, ExternalLink, ChevronDown } from 'lucide-react';
+import { Award, ArrowLeft, Sparkles, Crown, Tag, Shield, Check, Star, ExternalLink, ChevronDown, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { calculatePointsFromPrice } from '@/components/LoyaltyPointsDisplay';
 import { Link } from 'react-router-dom';
@@ -52,6 +52,7 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
   const benefits = [
     { icon: Award, text: 'צבירת נקודות על כל תיקון', highlight: `+${pointsToEarn} נקודות` },
     { icon: Tag, text: 'מבצעים והנחות בלעדיות לחברים' },
+    { icon: Phone, text: 'שיחות ייעוץ חינם עם טכנאים מנוסים' },
     { icon: Star, text: 'עדיפות בתורים ושירות מועדף' },
     { icon: Shield, text: 'הארכת אחריות בונוס' },
   ];
