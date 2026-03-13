@@ -13,6 +13,7 @@ import DevicePurchase from "./pages/DevicePurchase";
 import ConsultationBooking from "./pages/ConsultationBooking";
 import DataTransfer from "./pages/DataTransfer";
 import NotFound from "./pages/NotFound";
+import ClubTerms from "./pages/ClubTerms";
 import MinimalFooter from "./components/MinimalFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { VisitorTracker } from "./components/VisitorTracker";
