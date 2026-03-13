@@ -73,6 +73,20 @@ const ClubMembersManagement = () => {
   const [imageStyle, setImageStyle] = useState('none');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
+  // Email history state
+  interface EmailHistoryEntry {
+    id: string;
+    subject: string;
+    message: string;
+    recipientCount: number;
+    sentCount: number;
+    failedCount: number;
+    sentAt: string;
+    image: string | null;
+  }
+  const [emailHistory, setEmailHistory] = useState<EmailHistoryEntry[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
   const loadMembers = async () => {
     setIsLoading(true);
 
