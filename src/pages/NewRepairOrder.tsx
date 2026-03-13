@@ -823,7 +823,7 @@ const NewRepairOrder = () => {
   const handleBundleDecision = (acceptBundle: boolean) => {
     setSelectedBundleAddon(acceptBundle);
     if (currentBundle) gaBundleDecision(acceptBundle, currentBundle.name);
-    goToStep('points');
+    checkClubMemberAndNavigate();
   };
   const handlePriceConfirm = () => {
     gaConfirmPrice(getTotalPrice());
