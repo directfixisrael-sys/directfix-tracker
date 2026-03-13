@@ -76,7 +76,7 @@ import LiveView from '@/components/admin/LiveView';
 import AnnouncementsManagement from '@/components/admin/AnnouncementsManagement';
 import RemindersManagement from '@/components/admin/RemindersManagement';
 import LeadsManagement from '@/components/admin/LeadsManagement';
-import LoyaltyManagement from '@/components/admin/LoyaltyManagement';
+import ClubMembersManagement from '@/components/admin/ClubMembersManagement';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
