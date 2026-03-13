@@ -14,6 +14,7 @@ import ConsultationBooking from "./pages/ConsultationBooking";
 import DataTransfer from "./pages/DataTransfer";
 import NotFound from "./pages/NotFound";
 import ClubTerms from "./pages/ClubTerms";
+import TermsOfService from "./pages/TermsOfService";
 import MinimalFooter from "./components/MinimalFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { VisitorTracker } from "./components/VisitorTracker";
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/consultation" element={<ConsultationBooking />} />
             <Route path="/data-transfer" element={<DataTransfer />} />
             <Route path="/club-terms" element={<ClubTerms />} />
+            <Route path="/terms" element={<TermsOfService />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

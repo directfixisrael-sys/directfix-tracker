@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Plus, Minus, Coins, MessageCircle, Crown, Send, Users, Sparkles, Loader2, Image, Trash2, Edit, Mail, Eye } from 'lucide-react';
+import { Search, Plus, Minus, Coins, MessageCircle, Crown, Send, Users, Sparkles, Loader2, Image, Trash2, Edit, Mail, Eye, History, Clock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import directfixLogo from '@/assets/directfix-logo.png';
 
@@ -54,7 +54,7 @@ const ClubMembersManagement = () => {
   const [adjustPhone, setAdjustPhone] = useState('');
   const [adjustAmount, setAdjustAmount] = useState('');
   const [adjustDescription, setAdjustDescription] = useState('');
-  const [subTab, setSubTab] = useState<'members' | 'points' | 'broadcast'>('members');
+  const [subTab, setSubTab] = useState<'members' | 'points' | 'broadcast' | 'history'>('members');
 
   // Member edit/delete
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -72,6 +72,20 @@ const ClubMembersManagement = () => {
   const [textStyle, setTextStyle] = useState('marketing_light');
   const [imageStyle, setImageStyle] = useState('none');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+
+  // Email history state
+  interface EmailHistoryEntry {
+    id: string;
+    subject: string;
+    message: string;
+    recipientCount: number;
+    sentCount: number;
+    failedCount: number;
+    sentAt: string;
+    image: string | null;
+  }
+  const [emailHistory, setEmailHistory] = useState<EmailHistoryEntry[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const loadMembers = async () => {
     setIsLoading(true);
@@ -118,6 +132,11 @@ const ClubMembersManagement = () => {
 
   useEffect(() => {
     loadMembers();
+    // Load email history from localStorage
+    const stored = localStorage.getItem('club_email_history');
+    if (stored) {
+      try { setEmailHistory(JSON.parse(stored)); } catch {}
+    }
   }, []);
 
   // --- Member CRUD ---
@@ -255,6 +274,23 @@ const ClubMembersManagement = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
+      // Save to history
+      const historyEntry = {
+        id: crypto.randomUUID(),
+        subject: broadcastSubject || 'מבצע מיוחד מדיירקט פיקס!',
+        message: broadcastMessage,
+        recipientCount: activeWithEmail.length,
+        sentCount: data?.sent || activeWithEmail.length,
+        failedCount: data?.failed || 0,
+        sentAt: new Date().toISOString(),
+        image: generatedImage,
+      };
+      const stored = localStorage.getItem('club_email_history');
+      const history = stored ? JSON.parse(stored) : [];
+      history.unshift(historyEntry);
+      localStorage.setItem('club_email_history', JSON.stringify(history.slice(0, 50)));
+      setEmailHistory(history.slice(0, 50));
+
       toast({
         title: `המייל נשלח בהצלחה!`,
         description: `נשלח ל-${data?.sent || activeWithEmail.length} חברי מועדון`,
@@ -322,6 +358,10 @@ const ClubMembersManagement = () => {
           <TabsTrigger value="broadcast" className="flex-1 gap-1.5">
             <Mail className="w-4 h-4" />
             שליחת מבצע
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex-1 gap-1.5">
+            <History className="w-4 h-4" />
+            היסטוריה
           </TabsTrigger>
         </TabsList>
 
@@ -608,6 +648,78 @@ const ClubMembersManagement = () => {
               <p className="text-xs text-amber-600 text-center">
                 {activeCount - activeWithEmailCount} חברים ללא כתובת מייל לא יקבלו את ההודעה
               </p>
+            )}
+          </Card>
+        </TabsContent>
+
+        {/* History tab */}
+        <TabsContent value="history" className="space-y-4 mt-4">
+          <Card className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-lg flex items-center gap-2">
+                <History className="w-5 h-5 text-primary" />
+                היסטוריית שליחת מיילים
+              </h3>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  setIsLoadingHistory(true);
+                  const stored = localStorage.getItem('club_email_history');
+                  if (stored) {
+                    try { setEmailHistory(JSON.parse(stored)); } catch {}
+                  }
+                  setIsLoadingHistory(false);
+                }}
+                className="gap-1.5"
+              >
+                <Clock className="w-3.5 h-3.5" />
+                רענן
+              </Button>
+            </div>
+
+            {emailHistory.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <Mail className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p className="font-medium">אין היסטוריית שליחות</p>
+                <p className="text-sm">מיילים שתשלח יופיעו כאן</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {emailHistory.map((entry) => (
+                  <Card key={entry.id} className="p-4 border">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-foreground text-sm truncate">{entry.subject}</p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{entry.message}</p>
+                        <div className="flex items-center gap-3 mt-2">
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {new Date(entry.sentAt).toLocaleString('he-IL')}
+                          </span>
+                          <span className="text-xs flex items-center gap-1 text-emerald-600">
+                            <CheckCircle2 className="w-3 h-3" />
+                            {entry.sentCount} נשלחו
+                          </span>
+                          {entry.failedCount > 0 && (
+                            <span className="text-xs flex items-center gap-1 text-destructive">
+                              <XCircle className="w-3 h-3" />
+                              {entry.failedCount} נכשלו
+                            </span>
+                          )}
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {entry.recipientCount} נמענים
+                          </span>
+                        </div>
+                      </div>
+                      {entry.image && (
+                        <img src={entry.image} alt="" className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </div>
             )}
           </Card>
         </TabsContent>

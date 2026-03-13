@@ -57,16 +57,16 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
   ];
 
   return (
-    <div className="space-y-3 animate-fade-in py-2 text-center [font-size:16px]">
+    <div className="space-y-5 animate-fade-in py-4 text-center">
       {/* Shimmering Club Card */}
-      <div className="relative flex justify-center mb-1">
-        <div className="absolute w-64 h-40 bg-primary/20 rounded-3xl blur-3xl animate-pulse" />
+      <div className="relative flex justify-center mb-3">
+        <div className="absolute w-80 h-48 bg-primary/20 rounded-3xl blur-3xl animate-pulse" />
         <div
           className={`relative transition-all duration-1000 ${
             cardAnimated ? 'scale-100 opacity-100 rotate-0' : 'scale-75 opacity-0 -rotate-6'
           }`}
         >
-          <div className="relative w-64 mx-auto overflow-hidden rounded-2xl shadow-2xl">
+          <div className="relative w-80 mx-auto overflow-hidden rounded-2xl shadow-2xl">
             <img
               src={clubCardImage}
               alt="DirectFix Club Card"
@@ -76,12 +76,12 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
               style={{ animation: 'shimmer 3s ease-in-out infinite' }}
             />
-            <div className="absolute bottom-2.5 right-2.5 bg-primary/90 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-lg">
-              <Award className="w-3.5 h-3.5 text-primary-foreground" />
-              <span className="text-primary-foreground font-extrabold text-base leading-none">
+            <div className="absolute bottom-3 right-3 bg-primary/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 shadow-lg">
+              <Award className="w-4 h-4 text-primary-foreground" />
+              <span className="text-primary-foreground font-extrabold text-lg leading-none">
                 {displayedPoints}
               </span>
-              <span className="text-primary-foreground/80 text-[9px]">נקודות</span>
+              <span className="text-primary-foreground/80 text-[10px]">נקודות</span>
             </div>
           </div>
         </div>
@@ -101,18 +101,18 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
       </div>
 
       {/* Title */}
-      <div className="space-y-1">
-        <div className="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full px-3 py-1 text-[13px] font-bold">
-          <Crown className="w-3.5 h-3.5" />
+      <div className="space-y-2">
+        <div className="inline-flex items-center gap-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full px-4 py-1.5 text-sm font-bold">
+          <Crown className="w-4 h-4" />
           מועדון הלקוחות של דיירקט פיקס
         </div>
-        <div className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full px-2.5 py-0.5 text-[11px] font-bold">
+        <div className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full px-3 py-1 text-xs font-bold">
           הצטרפות בחינם
         </div>
-        <h2 className="text-xl font-extrabold text-foreground">
+        <h2 className="text-2xl font-extrabold text-foreground">
           הצטרפו וקבלו <span className="text-primary">{pointsToEarn} נקודות!</span>
         </h2>
-        <p className="text-[13px] text-muted-foreground max-w-xs mx-auto">
+        <p className="text-sm text-muted-foreground max-w-sm mx-auto">
           חברי המועדון נהנים מהטבות בלעדיות, נקודות נאמנות והנחות מיוחדות
         </p>
       </div>
