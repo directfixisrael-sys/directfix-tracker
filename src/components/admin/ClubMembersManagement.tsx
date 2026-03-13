@@ -592,7 +592,7 @@ const ClubMembersManagement = () => {
 
             {/* AI prompt */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">תאר את המבצע או ההודעה:</label>
+              <label className="text-sm font-medium text-right block">תאר את המבצע או ההודעה:</label>
               <Textarea
                 placeholder="לדוגמא: 20% הנחה על החלפת מסך לכל חברי המועדון, או: חג פסח שמח..."
                 value={aiPrompt}
