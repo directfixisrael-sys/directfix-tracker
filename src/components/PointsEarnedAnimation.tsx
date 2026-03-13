@@ -117,9 +117,42 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         </p>
       </div>
 
-      {/* Join checkbox - ABOVE benefits */}
+      {/* Benefits list */}
       <div
         className={`transition-all duration-500 ${
+          showDetails ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      >
+        <div className="bg-gradient-to-br from-amber-500/5 via-card to-primary/5 rounded-2xl p-4 border border-amber-500/20 max-w-sm mx-auto space-y-2.5">
+          {benefits.map((benefit, i) => (
+            <div key={i} className="flex items-center gap-3 text-right">
+              <div className="w-8 h-8 bg-amber-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <benefit.icon className="w-4 h-4 text-amber-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground">{benefit.text}</p>
+              </div>
+              {benefit.highlight && (
+                <span className="text-xs font-bold text-primary bg-primary/10 rounded-full px-2 py-0.5 flex-shrink-0">
+                  {benefit.highlight}
+                </span>
+              )}
+            </div>
+          ))}
+
+          {/* Value display */}
+          <div className="border-t border-border/50 pt-2.5 mt-2.5">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">שווי הנקודות שתצברו</span>
+              <span className="font-bold text-success text-lg">₪{(pointsToEarn * POINT_VALUE).toFixed(0)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Join checkbox - BELOW benefits */}
+      <div
+        className={`transition-all duration-500 delay-200 ${
           showDetails ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}
       >
@@ -155,39 +188,6 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         </button>
       </div>
 
-      {/* Benefits list */}
-      <div
-        className={`transition-all duration-500 ${
-          showDetails ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}
-      >
-        <div className="bg-gradient-to-br from-amber-500/5 via-card to-primary/5 rounded-2xl p-4 border border-amber-500/20 max-w-sm mx-auto space-y-2.5">
-          {benefits.map((benefit, i) => (
-            <div key={i} className="flex items-center gap-3 text-right">
-              <div className="w-8 h-8 bg-amber-500/10 rounded-full flex items-center justify-center flex-shrink-0">
-                <benefit.icon className="w-4 h-4 text-amber-500" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground">{benefit.text}</p>
-              </div>
-              {benefit.highlight && (
-                <span className="text-xs font-bold text-primary bg-primary/10 rounded-full px-2 py-0.5 flex-shrink-0">
-                  {benefit.highlight}
-                </span>
-              )}
-            </div>
-          ))}
-
-          {/* Value display */}
-          <div className="border-t border-border/50 pt-2.5 mt-2.5">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground">שווי הנקודות שתצברו</span>
-              <span className="font-bold text-success text-lg">₪{(pointsToEarn * POINT_VALUE).toFixed(0)}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Marketing consent note + Terms link */}
       <div className="max-w-sm mx-auto space-y-2">
         <p className="text-[11px] text-muted-foreground/70 leading-relaxed text-right px-2">
@@ -203,33 +203,29 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         </p>
       </div>
 
-      {/* Spacer for sticky CTA */}
-      <div className="h-24" />
-
-      {/* Sticky CTA via portal */}
-      {createPortal(
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-          <div className="max-w-3xl mx-auto space-y-2">
-            <Button
-              onClick={() => onContinue(joinClub)}
-              className={`w-full h-14 text-base font-bold rounded-2xl shadow-lg gap-2 transition-all duration-300 ${
-                joinClub
-                  ? 'bg-gradient-to-r from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90'
-                  : ''
-              }`}
-            >
-              <ArrowLeft className="w-5 h-5" />
-              {joinClub ? `הצטרף וצבור ${pointsToEarn} נקודות` : 'המשך בלי מועדון'}
-            </Button>
-            {!joinClub && (
-              <p className="text-center text-xs text-muted-foreground/50">
-                ניתן להצטרף גם בהמשך
-              </p>
-            )}
-          </div>
-        </div>,
-        document.body
-      )}
+      {/* Inline CTA - user must scroll to reach it */}
+      <div
+        className={`transition-all duration-500 delay-300 max-w-sm mx-auto space-y-2 pt-2 pb-8 ${
+          showDetails ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      >
+        <Button
+          onClick={() => onContinue(joinClub)}
+          className={`w-full h-14 text-base font-bold rounded-2xl shadow-lg gap-2 transition-all duration-300 ${
+            joinClub
+              ? 'bg-gradient-to-r from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90'
+              : ''
+          }`}
+        >
+          <ArrowLeft className="w-5 h-5" />
+          {joinClub ? `הצטרף וצבור ${pointsToEarn} נקודות` : 'המשך בלי מועדון'}
+        </Button>
+        {!joinClub && (
+          <p className="text-center text-xs text-muted-foreground/50">
+            ניתן להצטרף גם בהמשך
+          </p>
+        )}
+      </div>
 
       <style>{`
         @keyframes shimmer {
