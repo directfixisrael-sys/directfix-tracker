@@ -1903,12 +1903,12 @@ const NewRepairOrder = () => {
                 )}
 
                 {/* Points to earn */}
-                {getPointsToEarn() > 0 && (
-                  <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl p-3 -mx-1 border border-primary/15 space-y-2">
+                {joinedClub && getPointsToEarn() > 0 && (
+                  <div className="bg-gradient-to-r from-amber-500/5 to-primary/10 rounded-xl p-3 -mx-1 border border-amber-500/20 space-y-2">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-primary font-medium flex items-center gap-1.5">
-                        <Award className="w-4 h-4" />
-                        נקודות שתצברו מהזמנה זו
+                      <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
+                        <Crown className="w-4 h-4" />
+                        נקודות מועדון שתצברו
                       </span>
                       <span className="font-bold text-primary text-lg">+{getPointsToEarn()}</span>
                     </div>
