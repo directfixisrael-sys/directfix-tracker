@@ -53,7 +53,7 @@ const PrivacyConsentModal = ({ open, onAccept, customerName }: PrivacyConsentMod
                 className="mt-0.5"
               />
               <label htmlFor="terms" className="text-sm cursor-pointer leading-tight">
-                אני מסכים/ה ל<span className="text-primary underline">תנאי השימוש</span> ולמדיניות הפרטיות
+                אני מסכים/ה ל<Link to="/terms" target="_blank" className="text-primary underline">תנאי השימוש</Link> ולמדיניות הפרטיות
               </label>
             </div>
 
