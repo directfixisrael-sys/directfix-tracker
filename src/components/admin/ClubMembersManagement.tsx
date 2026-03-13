@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Plus, Minus, Award, Coins, MessageCircle, Crown, Send, Users, Sparkles, Loader2, Image, Palette } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Search, Plus, Minus, Coins, MessageCircle, Crown, Send, Users, Sparkles, Loader2, Image, Trash2, Edit, Mail, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import directfixLogo from '@/assets/directfix-logo.png';
 
@@ -23,10 +25,25 @@ interface ClubMember {
 const POINT_VALUE = 0.5;
 
 const PROMO_TEMPLATES = [
-  { id: 'discount', name: 'הנחה מיוחדת', emoji: '', preview: 'הנחה בלעדית לחברי מועדון' },
-  { id: 'holiday', name: 'ברכת חג', emoji: '', preview: 'ברכה חמה לחג' },
-  { id: 'new_service', name: 'שירות חדש', emoji: '', preview: 'הכירו את השירות החדש שלנו' },
-  { id: 'flash_sale', name: 'מבצע בזק', emoji: '', preview: 'מבצע מוגבל בזמן' },
+  { id: 'discount', name: 'הנחה מיוחדת', preview: 'הנחה בלעדית לחברי מועדון' },
+  { id: 'holiday', name: 'ברכת חג', preview: 'ברכה חמה לחג' },
+  { id: 'new_service', name: 'שירות חדש', preview: 'הכירו את השירות החדש שלנו' },
+  { id: 'flash_sale', name: 'מבצע בזק', preview: 'מבצע מוגבל בזמן' },
+];
+
+const TEXT_STYLES = [
+  { id: 'marketing_heavy', name: 'שיווקי מלא', description: 'אימוג\'ים + טקסט שיווקי אגרסיבי' },
+  { id: 'marketing_light', name: 'שיווקי קליל', description: 'אימוג\'ים מעטים + טקסט מאוזן' },
+  { id: 'professional', name: 'מקצועי', description: 'ללא אימוג\'ים, טקסט רשמי' },
+  { id: 'minimal', name: 'מינימלי', description: 'קצר וענייני, בלי קישוטים' },
+];
+
+const IMAGE_STYLES = [
+  { id: 'none', name: 'ללא תמונה' },
+  { id: 'banner', name: 'באנר מבצע' },
+  { id: 'product', name: 'תמונת מוצר' },
+  { id: 'abstract', name: 'עיצוב גרפי' },
+  { id: 'photo', name: 'צילום ריאליסטי' },
 ];
 
 const ClubMembersManagement = () => {
@@ -38,33 +55,36 @@ const ClubMembersManagement = () => {
   const [adjustAmount, setAdjustAmount] = useState('');
   const [adjustDescription, setAdjustDescription] = useState('');
   const [subTab, setSubTab] = useState<'members' | 'points' | 'broadcast'>('members');
-  
+
+  // Member edit/delete
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<ClubMember | null>(null);
+  const [editForm, setEditForm] = useState({ name: '', email: '', phone: '', isActive: true });
+
   // Broadcast state
-  const [broadcastOpen, setBroadcastOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [broadcastSubject, setBroadcastSubject] = useState('');
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-  const [generatedPromo, setGeneratedPromo] = useState('');
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [aiPrompt, setAiPrompt] = useState('');
+  const [textStyle, setTextStyle] = useState('marketing_light');
+  const [imageStyle, setImageStyle] = useState('none');
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   const loadMembers = async () => {
     setIsLoading(true);
-    
-    // Load club members
+
     const { data: clubMembers } = await supabase
       .from('club_members')
       .select('*')
       .order('created_at', { ascending: false });
 
-    // Load loyalty points
     const { data: points } = await supabase
       .from('loyalty_points')
       .select('*');
 
-    // Load customer names from orders
     const { data: orders } = await supabase
       .from('orders')
       .select('customer_phone, customer_name');
@@ -72,7 +92,6 @@ const ClubMembersManagement = () => {
     const nameMap = new Map<string, string>();
     orders?.forEach(o => nameMap.set(o.customer_phone, o.customer_name));
 
-    // Build points map
     const pointsMap = new Map<string, number>();
     points?.forEach(p => {
       const current = pointsMap.get(p.customer_phone) || 0;
@@ -93,7 +112,7 @@ const ClubMembersManagement = () => {
       }));
       setMembers(mapped.sort((a, b) => b.totalPoints - a.totalPoints));
     }
-    
+
     setIsLoading(false);
   };
 
@@ -101,6 +120,51 @@ const ClubMembersManagement = () => {
     loadMembers();
   }, []);
 
+  // --- Member CRUD ---
+  const openEditMember = (member: ClubMember) => {
+    setEditingMember(member);
+    setEditForm({ name: member.name, email: member.email || '', phone: member.phone, isActive: member.isActive });
+    setEditDialogOpen(true);
+  };
+
+  const handleSaveMember = async () => {
+    if (!editingMember) return;
+    try {
+      const { error } = await supabase
+        .from('club_members')
+        .update({
+          name: editForm.name,
+          email: editForm.email || null,
+          is_active: editForm.isActive,
+        })
+        .eq('phone', editingMember.phone);
+
+      if (error) throw error;
+      toast({ title: 'הפרופיל עודכן בהצלחה' });
+      setEditDialogOpen(false);
+      loadMembers();
+    } catch (err: any) {
+      toast({ title: 'שגיאה בעדכון', description: err.message, variant: 'destructive' });
+    }
+  };
+
+  const handleDeleteMember = async (phone: string, name: string) => {
+    if (!confirm(`האם למחוק את ${name} מהמועדון?`)) return;
+    try {
+      const { error } = await supabase
+        .from('club_members')
+        .delete()
+        .eq('phone', phone);
+
+      if (error) throw error;
+      toast({ title: `${name} הוסר מהמועדון` });
+      loadMembers();
+    } catch (err: any) {
+      toast({ title: 'שגיאה במחיקה', description: err.message, variant: 'destructive' });
+    }
+  };
+
+  // --- Points ---
   const handleAdjust = async (type: 'add' | 'deduct') => {
     if (!adjustPhone.trim() || !adjustAmount) return;
     const pts = parseInt(adjustAmount);
@@ -126,26 +190,32 @@ const ClubMembersManagement = () => {
     }
   };
 
-  const handleGenerateAI = async (withImage = false) => {
+  // --- AI Generation ---
+  const handleGenerateAI = async (withImage: boolean) => {
     if (!aiPrompt.trim()) {
       toast({ title: 'נא לכתוב תיאור למבצע', variant: 'destructive' });
       return;
     }
     if (withImage) setIsGeneratingImage(true);
     else setIsGeneratingAI(true);
-    
+
     try {
       const { data, error } = await supabase.functions.invoke('generate-club-promo', {
-        body: { prompt: aiPrompt, template: selectedTemplate, generateImage: withImage }
+        body: {
+          prompt: aiPrompt,
+          template: selectedTemplate,
+          generateImage: withImage,
+          textStyle,
+          imageStyle: withImage ? imageStyle : undefined,
+        }
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      
-      setGeneratedPromo(data.message || '');
+
       setBroadcastMessage(data.message || '');
       setBroadcastSubject(data.subject || '');
       if (data.image) setGeneratedImage(data.image);
-      
+
       toast({ title: withImage ? 'הודעה ותמונה נוצרו בהצלחה' : 'הודעה נוצרה בהצלחה' });
     } catch (err: any) {
       console.error('AI generation error:', err);
@@ -156,27 +226,45 @@ const ClubMembersManagement = () => {
     }
   };
 
-  const handleSendBroadcast = () => {
+  // --- Send email broadcast ---
+  const handleSendEmailBroadcast = async () => {
     if (!broadcastMessage.trim()) {
       toast({ title: 'נא להזין הודעה', variant: 'destructive' });
       return;
     }
-    
-    const activeMembers = members.filter(m => m.isActive);
-    // Build WhatsApp links for all members
-    const message = encodeURIComponent(broadcastMessage);
-    
-    // Open first member's WhatsApp as example
-    if (activeMembers.length > 0) {
-      const firstPhone = activeMembers[0].phone.replace(/^0/, '');
-      window.open(`https://wa.me/972${firstPhone}?text=${message}`, '_blank');
+
+    const activeWithEmail = members.filter(m => m.isActive && m.email);
+    if (activeWithEmail.length === 0) {
+      toast({ title: 'אין חברי מועדון עם כתובת מייל', variant: 'destructive' });
+      return;
     }
-    
-    toast({ 
-      title: `הודעה מוכנה לשליחה ל-${activeMembers.length} חברי מועדון`,
-      description: 'נפתח WhatsApp עם ההודעה. שלח לכל חבר מועדון.'
-    });
-    setBroadcastOpen(false);
+
+    if (!confirm(`לשלוח מייל ל-${activeWithEmail.length} חברי מועדון?`)) return;
+
+    setIsSendingEmail(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-club-broadcast-email', {
+        body: {
+          subject: broadcastSubject || 'מבצע מיוחד מדיירקט פיקס!',
+          message: broadcastMessage,
+          image: generatedImage,
+          recipients: activeWithEmail.map(m => ({ email: m.email!, name: m.name })),
+        }
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast({
+        title: `המייל נשלח בהצלחה!`,
+        description: `נשלח ל-${data?.sent || activeWithEmail.length} חברי מועדון`,
+      });
+    } catch (err: any) {
+      console.error('Email broadcast error:', err);
+      toast({ title: 'שגיאה בשליחה', description: err.message, variant: 'destructive' });
+    } finally {
+      setIsSendingEmail(false);
+    }
   };
 
   const filtered = members.filter(c =>
@@ -184,9 +272,10 @@ const ClubMembersManagement = () => {
   );
 
   const activeCount = members.filter(m => m.isActive).length;
+  const activeWithEmailCount = members.filter(m => m.isActive && m.email).length;
 
   return (
-    <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto space-y-6">
+    <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto space-y-6" dir="rtl">
       <div>
         <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2">
           <Crown className="w-6 h-6 text-amber-500" />
@@ -208,7 +297,7 @@ const ClubMembersManagement = () => {
           <p className="text-xs text-muted-foreground">סה"כ נקודות</p>
         </Card>
         <Card className="p-4 text-center">
-          <p className="text-2xl font-bold text-success">
+          <p className="text-2xl font-bold text-green-500">
             ₪{(members.reduce((sum, c) => sum + Math.max(0, c.totalValue), 0)).toFixed(0)}
           </p>
           <p className="text-xs text-muted-foreground">שווי כולל</p>
@@ -231,7 +320,7 @@ const ClubMembersManagement = () => {
             נקודות
           </TabsTrigger>
           <TabsTrigger value="broadcast" className="flex-1 gap-1.5">
-            <Send className="w-4 h-4" />
+            <Mail className="w-4 h-4" />
             שליחת מבצע
           </TabsTrigger>
         </TabsList>
@@ -257,45 +346,50 @@ const ClubMembersManagement = () => {
                 <p>אין חברי מועדון עדיין</p>
               </div>
             ) : (
-              filtered.map(c => {
-                const pointsMsg = c.totalPoints > 0
-                  ? `היי ${c.name}!\nיש לך *${c.totalPoints} נקודות נאמנות* בדיירקט פיקס!\nזה שווה *₪${c.totalValue.toFixed(0)} הנחה* על התיקון הבא שלך\n\nנשמח לראותך שוב!`
-                  : `היי ${c.name}!\nרצינו לעדכן אותך שיש לך תוכנית נקודות נאמנות בדיירקט פיקס!\nכל 100 ש"ח בתיקון = 10 נקודות\n\nנשמח לראותך!`;
-                const waLink = `https://wa.me/972${c.phone.replace(/^0/, '')}?text=${encodeURIComponent(pointsMsg)}`;
-                
-                return (
-                  <Card key={c.phone} className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-bold text-foreground flex items-center gap-1.5">
-                          <Crown className="w-3.5 h-3.5 text-amber-500" />
-                          {c.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground" dir="ltr">{c.phone}</p>
-                        {c.email && <p className="text-xs text-muted-foreground">{c.email}</p>}
-                        <p className="text-[10px] text-muted-foreground/60">
-                          הצטרף: {new Date(c.joinedAt).toLocaleDateString('he-IL')}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <a
-                          href={waLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-9 h-9 rounded-full bg-[#25D366]/10 hover:bg-[#25D366]/20 flex items-center justify-center transition-colors"
-                          title="שלח הודעת וואטסאפ"
-                        >
-                          <MessageCircle className="w-4 h-4 text-[#25D366]" />
-                        </a>
-                        <div className="text-left">
-                          <p className="text-xl font-bold text-primary">{c.totalPoints}</p>
-                          <p className="text-xs text-muted-foreground">= ₪{c.totalValue.toFixed(0)}</p>
-                        </div>
+              filtered.map(c => (
+                <Card key={c.phone} className={`p-4 ${!c.isActive ? 'opacity-50' : ''}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-foreground flex items-center gap-1.5">
+                        <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        {c.name}
+                        {!c.isActive && (
+                          <span className="text-xs bg-muted px-1.5 py-0.5 rounded text-muted-foreground">לא פעיל</span>
+                        )}
+                      </p>
+                      <p className="text-sm text-muted-foreground" dir="ltr">{c.phone}</p>
+                      {c.email && <p className="text-xs text-muted-foreground">{c.email}</p>}
+                      <p className="text-[10px] text-muted-foreground/60">
+                        הצטרף: {new Date(c.joinedAt).toLocaleDateString('he-IL')}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => openEditMember(c)}
+                        title="ערוך פרופיל"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                        onClick={() => handleDeleteMember(c.phone, c.name)}
+                        title="מחק מהמועדון"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                      <div className="text-left mr-2">
+                        <p className="text-xl font-bold text-primary">{c.totalPoints}</p>
+                        <p className="text-xs text-muted-foreground">= ₪{c.totalValue.toFixed(0)}</p>
                       </div>
                     </div>
-                  </Card>
-                );
-              })
+                  </div>
+                </Card>
+              ))
             )}
           </div>
         </TabsContent>
@@ -349,38 +443,80 @@ const ClubMembersManagement = () => {
           </Card>
         </TabsContent>
 
-        {/* Broadcast tab */}
+        {/* Broadcast tab - redesigned */}
         <TabsContent value="broadcast" className="space-y-4 mt-4">
-          <Card className="p-5 space-y-4">
-            <h3 className="font-bold text-lg flex items-center gap-2">
-              <Send className="w-5 h-5 text-primary" />
-              שליחת מבצע/הודעה לכל חברי המועדון
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              בחר טמפלט או כתוב תיאור והבינה המלאכותית תעצב לך מבצע מושלם
-            </p>
+          <Card className="p-5 space-y-5">
+            <div>
+              <h3 className="font-bold text-lg flex items-center gap-2">
+                <Mail className="w-5 h-5 text-primary" />
+                שליחת מבצע במייל לחברי המועדון
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                {activeWithEmailCount} חברים עם כתובת מייל מתוך {activeCount} חברים פעילים
+              </p>
+            </div>
 
-            {/* Templates */}
-            <div className="grid grid-cols-2 gap-2">
-              {PROMO_TEMPLATES.map(t => (
-                <button
-                  key={t.id}
-                  onClick={() => { setSelectedTemplate(t.id); setAiPrompt(t.preview); }}
-                  className={`p-3 rounded-xl border-2 text-right transition-all ${
-                    selectedTemplate === t.id 
-                      ? 'border-primary bg-primary/5' 
-                      : 'border-border hover:border-foreground/20'
-                  }`}
-                >
-                  <p className="font-bold text-sm">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.preview}</p>
-                </button>
-              ))}
+            {/* Template selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">בחר סוג הודעה:</label>
+              <div className="grid grid-cols-2 gap-2">
+                {PROMO_TEMPLATES.map(t => (
+                  <button
+                    key={t.id}
+                    onClick={() => { setSelectedTemplate(t.id); setAiPrompt(t.preview); }}
+                    className={`p-3 rounded-xl border-2 text-right transition-all ${
+                      selectedTemplate === t.id
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-foreground/20'
+                    }`}
+                  >
+                    <p className="font-bold text-sm">{t.name}</p>
+                    <p className="text-xs text-muted-foreground">{t.preview}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Text style */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">סגנון טקסט:</label>
+              <Select value={textStyle} onValueChange={setTextStyle}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TEXT_STYLES.map(s => (
+                    <SelectItem key={s.id} value={s.id}>
+                      <div className="text-right">
+                        <span className="font-medium">{s.name}</span>
+                        <span className="text-xs text-muted-foreground mr-2">- {s.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Image style */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">סוג תמונה:</label>
+              <Select value={imageStyle} onValueChange={setImageStyle}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {IMAGE_STYLES.map(s => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* AI prompt */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">תאר את המבצע או ההודעה שברצונך לשלוח:</label>
+              <label className="text-sm font-medium">תאר את המבצע או ההודעה:</label>
               <Textarea
                 placeholder="לדוגמא: 20% הנחה על החלפת מסך לכל חברי המועדון, או: חג פסח שמח..."
                 value={aiPrompt}
@@ -388,74 +524,144 @@ const ClubMembersManagement = () => {
                 rows={3}
               />
               <div className="flex gap-2">
-                <Button 
-                  onClick={() => handleGenerateAI(false)} 
+                <Button
+                  onClick={() => handleGenerateAI(false)}
                   disabled={isGeneratingAI || isGeneratingImage || !aiPrompt.trim()}
                   className="flex-1 gap-2"
                   variant="outline"
                 >
-                  {isGeneratingAI ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-4 h-4" />
-                  )}
-                  {isGeneratingAI ? 'מעצב...' : 'עצב טקסט'}
+                  {isGeneratingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                  {isGeneratingAI ? 'מעצב...' : 'צור טקסט'}
                 </Button>
-                <Button 
-                  onClick={() => handleGenerateAI(true)} 
-                  disabled={isGeneratingAI || isGeneratingImage || !aiPrompt.trim()}
-                  className="flex-1 gap-2"
-                  variant="outline"
-                >
-                  {isGeneratingImage ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Image className="w-4 h-4" />
-                  )}
-                  {isGeneratingImage ? 'מעצב...' : 'עצב עם תמונה'}
-                </Button>
+                {imageStyle !== 'none' && (
+                  <Button
+                    onClick={() => handleGenerateAI(true)}
+                    disabled={isGeneratingAI || isGeneratingImage || !aiPrompt.trim()}
+                    className="flex-1 gap-2"
+                    variant="outline"
+                  >
+                    {isGeneratingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Image className="w-4 h-4" />}
+                    {isGeneratingImage ? 'מעצב...' : 'צור טקסט + תמונה'}
+                  </Button>
+                )}
               </div>
             </div>
 
-            {/* Generated/manual message */}
+            {/* Subject */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">ההודעה שתשלח:</label>
+              <label className="text-sm font-medium">נושא המייל:</label>
+              <Input
+                value={broadcastSubject}
+                onChange={e => setBroadcastSubject(e.target.value)}
+                placeholder="מבצע מיוחד מדיירקט פיקס!"
+              />
+            </div>
+
+            {/* Message */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">תוכן ההודעה:</label>
               <Textarea
                 placeholder="כתוב את ההודעה כאן או השתמש ב-AI..."
                 value={broadcastMessage}
                 onChange={e => setBroadcastMessage(e.target.value)}
-                rows={5}
+                rows={6}
               />
             </div>
 
             {/* Preview */}
             {broadcastMessage && (
               <Card className="p-4 bg-gradient-to-br from-amber-500/5 to-primary/5 border-amber-500/20">
-                <p className="text-xs font-bold text-muted-foreground mb-2">תצוגה מקדימה:</p>
-                <div className="bg-card rounded-lg p-3 space-y-2">
-                  <div className="flex items-center gap-2 mb-2">
-                    <img src={directfixLogo} alt="DirectFix" className="w-6 h-6 rounded" />
-                    <span className="text-xs font-bold">דיירקט פיקס</span>
+                <p className="text-xs font-bold text-muted-foreground mb-2 flex items-center gap-1.5">
+                  <Eye className="w-3.5 h-3.5" />
+                  תצוגה מקדימה:
+                </p>
+                <div className="bg-card rounded-lg p-4 space-y-3 border">
+                  <div className="flex items-center gap-2 border-b pb-2">
+                    <img src={directfixLogo} alt="DirectFix" className="w-8 h-8 rounded" />
+                    <div>
+                      <p className="text-sm font-bold">דיירקט פיקס</p>
+                      <p className="text-xs text-muted-foreground">{broadcastSubject || 'מבצע מיוחד'}</p>
+                    </div>
                   </div>
                   {generatedImage && (
-                    <img src={generatedImage} alt="Promo" className="w-full rounded-lg mb-2" />
+                    <img src={generatedImage} alt="Promo" className="w-full rounded-lg" />
                   )}
-                  <p className="text-sm whitespace-pre-wrap">{broadcastMessage}</p>
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{broadcastMessage}</p>
                 </div>
               </Card>
             )}
 
-            <Button 
-              onClick={handleSendBroadcast}
-              disabled={!broadcastMessage.trim()}
-              className="w-full h-12 gap-2 bg-gradient-to-r from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90"
+            <Button
+              onClick={handleSendEmailBroadcast}
+              disabled={!broadcastMessage.trim() || isSendingEmail || activeWithEmailCount === 0}
+              className="w-full h-12 gap-2 bg-gradient-to-l from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90"
             >
-              <Send className="w-4 h-4" />
-              שלח ל-{activeCount} חברי מועדון
+              {isSendingEmail ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Mail className="w-4 h-4" />
+              )}
+              {isSendingEmail ? 'שולח...' : `שלח מייל ל-${activeWithEmailCount} חברי מועדון`}
             </Button>
+
+            {activeWithEmailCount < activeCount && (
+              <p className="text-xs text-amber-600 text-center">
+                {activeCount - activeWithEmailCount} חברים ללא כתובת מייל לא יקבלו את ההודעה
+              </p>
+            )}
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit member dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-sm" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>עריכת פרופיל חבר</DialogTitle>
+            <DialogDescription>עדכון פרטי החבר במועדון</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div>
+              <label className="text-sm font-medium mb-1 block">שם</label>
+              <Input
+                value={editForm.name}
+                onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">מייל</label>
+              <Input
+                type="email"
+                value={editForm.email}
+                onChange={e => setEditForm(p => ({ ...p, email: e.target.value }))}
+                dir="ltr"
+                className="text-right"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">טלפון</label>
+              <Input
+                value={editForm.phone}
+                disabled
+                dir="ltr"
+                className="text-right opacity-50"
+              />
+              <p className="text-xs text-muted-foreground mt-1">לא ניתן לשנות מספר טלפון</p>
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">חבר פעיל</label>
+              <Switch
+                checked={editForm.isActive}
+                onCheckedChange={(checked) => setEditForm(p => ({ ...p, isActive: checked }))}
+              />
+            </div>
+            <div className="flex gap-2 pt-2">
+              <Button onClick={handleSaveMember} className="flex-1">שמור</Button>
+              <Button variant="outline" onClick={() => setEditDialogOpen(false)}>ביטול</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
