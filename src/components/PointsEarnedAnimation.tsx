@@ -235,6 +235,17 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
           50% { transform: translateX(100%) rotate(15deg); }
           100% { transform: translateX(100%) rotate(15deg); }
         }
+        @keyframes scroll-hint {
+          0% { transform: translateY(0); }
+          8% { transform: translateY(40px); }
+          16% { transform: translateY(-8px); }
+          22% { transform: translateY(12px); }
+          28% { transform: translateY(0); }
+          100% { transform: translateY(0); }
+        }
+        .animate-scroll-hint {
+          animation: scroll-hint 3s ease-in-out 1.8s 1;
+        }
         @keyframes bounce-slow {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(8px); }
