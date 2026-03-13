@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Award, ArrowLeft, Sparkles } from 'lucide-react';
+import { Award, ArrowLeft, Sparkles, Crown, Tag, Shield, Check, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { calculatePointsFromPrice } from '@/components/LoyaltyPointsDisplay';
+import clubCardImage from '@/assets/club-card.png';
 
 interface PointsEarnedAnimationProps {
   repairPrice: number;
-  onContinue: () => void;
+  onContinue: (joinedClub: boolean) => void;
 }
 
 const POINT_VALUE = 0.5;
@@ -15,12 +17,17 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
   const pointsToEarn = calculatePointsFromPrice(repairPrice);
   const [displayedPoints, setDisplayedPoints] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
+  const [joinClub, setJoinClub] = useState(false);
+  const [cardAnimated, setCardAnimated] = useState(false);
 
   useEffect(() => {
     if (pointsToEarn <= 0) {
-      onContinue();
+      onContinue(false);
       return;
     }
+
+    // Trigger card animation
+    setTimeout(() => setCardAnimated(true), 200);
 
     // Count-up animation
     const duration = 1200;
@@ -44,87 +51,190 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
 
   if (pointsToEarn <= 0) return null;
 
+  const benefits = [
+    { icon: Award, text: 'צבירת נקודות על כל תיקון', highlight: `+${pointsToEarn} נקודות` },
+    { icon: Tag, text: 'מבצעים והנחות בלעדיות לחברים' },
+    { icon: Star, text: 'עדיפות בתורים ושירות מועדף' },
+    { icon: Shield, text: 'הארכת אחריות בונוס' },
+  ];
+
   return (
-    <div className="space-y-6 animate-fade-in py-8 text-center">
-      {/* Glowing circle */}
-      <div className="relative flex justify-center mb-8">
-        <div className="absolute w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute w-28 h-28 bg-primary/30 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.5s' }} />
-        <div className="relative w-32 h-32 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-full flex items-center justify-center border-2 border-primary/30">
-          <div className="w-24 h-24 bg-gradient-to-br from-primary to-primary/80 rounded-full flex flex-col items-center justify-center shadow-xl">
-            <Award className="w-8 h-8 text-primary-foreground mb-1" />
-            <span className="text-3xl font-extrabold text-primary-foreground leading-none">
-              {displayedPoints}
-            </span>
+    <div className="space-y-5 animate-fade-in py-4 text-center">
+      {/* Shimmering Club Card */}
+      <div className="relative flex justify-center mb-2">
+        {/* Glow effect behind card */}
+        <div className="absolute w-72 h-44 bg-primary/20 rounded-3xl blur-3xl animate-pulse" />
+        <div
+          className={`relative transition-all duration-1000 ${
+            cardAnimated ? 'scale-100 opacity-100 rotate-0' : 'scale-75 opacity-0 -rotate-6'
+          }`}
+        >
+          {/* Card container with shimmer */}
+          <div className="relative w-72 mx-auto overflow-hidden rounded-2xl shadow-2xl">
+            <img
+              src={clubCardImage}
+              alt="DirectFix Club Card"
+              className="w-full h-auto"
+            />
+            {/* Shimmer overlay */}
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+              style={{
+                animation: 'shimmer 3s ease-in-out infinite',
+              }}
+            />
+            {/* Points badge on card */}
+            <div className="absolute bottom-3 right-3 bg-primary/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-lg">
+              <Award className="w-4 h-4 text-primary-foreground" />
+              <span className="text-primary-foreground font-extrabold text-lg leading-none">
+                {displayedPoints}
+              </span>
+              <span className="text-primary-foreground/80 text-[10px]">נקודות</span>
+            </div>
           </div>
         </div>
+
         {/* Floating sparkles */}
-        {[0, 1, 2, 3].map((i) => (
+        {[0, 1, 2, 3, 4].map((i) => (
           <Sparkles
             key={i}
-            className="absolute w-5 h-5 text-primary/60 animate-bounce"
+            className="absolute w-4 h-4 text-amber-400/70 animate-bounce"
             style={{
-              top: `${15 + i * 20}%`,
-              left: `${i % 2 === 0 ? 15 : 75}%`,
-              animationDelay: `${i * 0.3}s`,
-              animationDuration: '2s',
+              top: `${5 + i * 18}%`,
+              left: `${i % 2 === 0 ? 8 : 82}%`,
+              animationDelay: `${i * 0.25}s`,
+              animationDuration: '2.5s',
             }}
           />
         ))}
       </div>
 
-      <div className="space-y-2">
+      {/* Title */}
+      <div className="space-y-1.5">
+        <div className="inline-flex items-center gap-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full px-4 py-1.5 text-sm font-bold">
+          <Crown className="w-4 h-4" />
+          מועדון הלקוחות של דיירקט פיקס
+        </div>
         <h2 className="text-2xl font-extrabold text-foreground">
-          צברת <span className="text-primary">{pointsToEarn}</span> נקודות!
+          הצטרפו וקבלו <span className="text-primary">{pointsToEarn} נקודות!</span>
         </h2>
-        <p className="text-muted-foreground text-base">
-          בתיקון הזה אתה צובר נקודות נאמנות
+        <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+          חברי המועדון נהנים מהטבות בלעדיות, נקודות נאמנות והנחות מיוחדות
         </p>
       </div>
 
-      {/* Details card */}
+      {/* Benefits list */}
       <div
         className={`transition-all duration-500 ${
           showDetails ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}
       >
-        <div className="bg-gradient-to-br from-primary/5 via-card to-primary/10 rounded-2xl p-5 border border-primary/20 max-w-sm mx-auto space-y-3">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">נקודות שנצברו</span>
-            <span className="font-bold text-primary text-lg">+{pointsToEarn}</span>
-          </div>
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">שווי הנחה לתיקון הבא</span>
-            <span className="font-bold text-success text-lg">₪{(pointsToEarn * POINT_VALUE).toFixed(0)}</span>
-          </div>
-          <div className="border-t border-border pt-3">
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              כל 100 ש"ח = 10 נקודות · כל נקודה = ₪{POINT_VALUE} הנחה
-              <br />
-              הנקודות ייזקפו אוטומטית בתיקון הבא
-            </p>
+        <div className="bg-gradient-to-br from-amber-500/5 via-card to-primary/5 rounded-2xl p-4 border border-amber-500/20 max-w-sm mx-auto space-y-2.5">
+          {benefits.map((benefit, i) => (
+            <div key={i} className="flex items-center gap-3 text-right">
+              <div className="w-8 h-8 bg-amber-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <benefit.icon className="w-4 h-4 text-amber-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground">{benefit.text}</p>
+              </div>
+              {benefit.highlight && (
+                <span className="text-xs font-bold text-primary bg-primary/10 rounded-full px-2 py-0.5 flex-shrink-0">
+                  {benefit.highlight}
+                </span>
+              )}
+            </div>
+          ))}
+
+          {/* Value display */}
+          <div className="border-t border-border/50 pt-2.5 mt-2.5">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">שווי הנקודות שתצברו</span>
+              <span className="font-bold text-success text-lg">₪{(pointsToEarn * POINT_VALUE).toFixed(0)}</span>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Join checkbox */}
+      <div
+        className={`transition-all duration-500 delay-200 ${
+          showDetails ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      >
+        <button
+          type="button"
+          onClick={() => setJoinClub(!joinClub)}
+          className={`w-full max-w-sm mx-auto flex items-center gap-3 rounded-2xl p-4 border-2 transition-all duration-300 ${
+            joinClub
+              ? 'border-primary bg-primary/5 shadow-[0_0_20px_hsl(var(--primary)/0.15)]'
+              : 'border-foreground/10 bg-card hover:border-foreground/20'
+          }`}
+        >
+          <div
+            className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
+              joinClub
+                ? 'bg-primary border-primary'
+                : 'border-foreground/20 bg-transparent'
+            }`}
+          >
+            {joinClub && <Check className="w-4 h-4 text-primary-foreground" />}
+          </div>
+          <div className="text-right flex-1">
+            <p className="font-bold text-foreground text-sm">
+              {joinClub ? '🎉 מצטרף למועדון!' : 'רוצה להצטרף למועדון דיירקט פיקס'}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {joinClub
+                ? `תקבלו ${pointsToEarn} נקודות (₪${(pointsToEarn * POINT_VALUE).toFixed(0)} הנחה) כבר בהזמנה הבאה`
+                : 'בכפוף לתקנון המועדון. ניתן לבטל בכל עת'
+              }
+            </p>
+          </div>
+        </button>
+      </div>
+
+      {/* Terms note */}
+      <p className="text-[11px] text-muted-foreground/60 max-w-xs mx-auto leading-relaxed">
+        ההצטרפות למועדון כפופה לתקנון. הנקודות תקפות ל-24 חודשים. החברה רשאית לשנות את התוכנית בכל עת בכפוף לחוק.
+      </p>
+
       {/* Spacer for sticky CTA */}
       <div className="h-24" />
 
-      {/* Sticky CTA via portal so it's not trapped in overflow container */}
+      {/* Sticky CTA via portal */}
       {createPortal(
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto space-y-2">
             <Button
-              onClick={onContinue}
-              className="w-full h-14 text-base font-bold rounded-2xl shadow-lg gap-2"
+              onClick={() => onContinue(joinClub)}
+              className={`w-full h-14 text-base font-bold rounded-2xl shadow-lg gap-2 transition-all duration-300 ${
+                joinClub
+                  ? 'bg-gradient-to-r from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90'
+                  : ''
+              }`}
             >
               <ArrowLeft className="w-5 h-5" />
-              המשך להזמנה
+              {joinClub ? `הצטרף וצבור ${pointsToEarn} נקודות` : 'המשך בלי מועדון'}
             </Button>
+            {!joinClub && (
+              <p className="text-center text-xs text-muted-foreground/50">
+                ניתן להצטרף גם בהמשך
+              </p>
+            )}
           </div>
         </div>,
         document.body
       )}
+
+      {/* Shimmer keyframe style */}
+      <style>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%) rotate(15deg); }
+          50% { transform: translateX(100%) rotate(15deg); }
+          100% { transform: translateX(100%) rotate(15deg); }
+        }
+      `}</style>
     </div>
   );
 };
