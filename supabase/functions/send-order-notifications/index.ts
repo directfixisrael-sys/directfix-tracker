@@ -19,6 +19,7 @@ interface OrderData {
   customerEmail?: string;
   orderNumber?: number;
   promotionTitle?: string;
+  isClubMember?: boolean;
   leadSource?: string;
   leadSourceDetails?: {
     gclid?: string;
