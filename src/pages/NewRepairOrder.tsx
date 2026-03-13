@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send, Zap, Award, ChevronDown } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send, Zap, Award, ChevronDown, Crown } from 'lucide-react';
 import { getRepairIconComponent } from '@/lib/repairIcons';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
@@ -411,6 +411,7 @@ const NewRepairOrder = () => {
   const [customerLoyaltyPoints, setCustomerLoyaltyPoints] = useState(0);
   const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
   const [showPointsInfo, setShowPointsInfo] = useState(false);
+  const [joinedClub, setJoinedClub] = useState(false);
 
   const handleGiftToggle = () => {
     const newVal = !isGiftOrder;
@@ -1143,16 +1144,18 @@ const NewRepairOrder = () => {
           });
         }
         
-        // Award new loyalty points
-        const pointsToEarn = calculatePointsFromPrice(getFinalPrice());
-        if (pointsToEarn > 0) {
-          await supabase.from('loyalty_points').insert({
-            customer_phone: normalizedPhone,
-            points: pointsToEarn,
-            type: 'earned',
-            description: `צבירה מתיקון`,
-            order_id: orderResult?.id || null,
-          });
+        // Award new loyalty points only if joined club
+        if (joinedClub) {
+          const pointsToEarn = calculatePointsFromPrice(getFinalPrice());
+          if (pointsToEarn > 0) {
+            await supabase.from('loyalty_points').insert({
+              customer_phone: normalizedPhone,
+              points: pointsToEarn,
+              type: 'earned',
+              description: `צבירה מתיקון - חבר מועדון`,
+              order_id: orderResult?.id || null,
+            });
+          }
         }
         
         goToStep('success');
@@ -1757,7 +1760,10 @@ const NewRepairOrder = () => {
         {step === 'points' && (
           <PointsEarnedAnimation
             repairPrice={getTotalPrice()}
-            onContinue={() => goToStep('price')}
+            onContinue={(joined) => {
+              setJoinedClub(joined);
+              goToStep('price');
+            }}
           />
         )}
 
@@ -1899,12 +1905,12 @@ const NewRepairOrder = () => {
                 )}
 
                 {/* Points to earn */}
-                {getPointsToEarn() > 0 && (
-                  <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl p-3 -mx-1 border border-primary/15 space-y-2">
+                {joinedClub && getPointsToEarn() > 0 && (
+                  <div className="bg-gradient-to-r from-amber-500/5 to-primary/10 rounded-xl p-3 -mx-1 border border-amber-500/20 space-y-2">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-primary font-medium flex items-center gap-1.5">
-                        <Award className="w-4 h-4" />
-                        נקודות שתצברו מהזמנה זו
+                      <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
+                        <Crown className="w-4 h-4" />
+                        נקודות מועדון שתצברו
                       </span>
                       <span className="font-bold text-primary text-lg">+{getPointsToEarn()}</span>
                     </div>
