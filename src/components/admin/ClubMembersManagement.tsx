@@ -556,7 +556,7 @@ const ClubMembersManagement = () => {
             {/* Text style */}
             <div className="space-y-2">
               <label className="text-sm font-medium">סגנון טקסט:</label>
-              <Select value={textStyle} onValueChange={setTextStyle}>
+              <Select value={textStyle} onValueChange={setTextStyle} dir="rtl">
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
