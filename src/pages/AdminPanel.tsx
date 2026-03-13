@@ -1850,8 +1850,8 @@ const AdminPanel = () => {
                 <span>קופונים</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('loyalty')} className={cn("gap-3 py-3", activeTab === 'loyalty' && "text-primary font-medium")}>
-                <Award className="w-4 h-4" />
-                <span>נקודות נאמנות</span>
+                <Crown className="w-4 h-4" />
+                <span>חברי מועדון</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('settings')} className={cn("gap-3 py-3", activeTab === 'settings' && "text-primary font-medium")}>
                 <Settings className="w-4 h-4" />
