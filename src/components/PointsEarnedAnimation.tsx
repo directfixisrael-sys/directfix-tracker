@@ -57,7 +57,7 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
   ];
 
   return (
-    <div className="space-y-5 animate-fade-in py-4 text-center">
+    <div className="space-y-5 py-4 text-center animate-scroll-hint">
       {/* Shimmering Club Card */}
       <div className="relative flex justify-center mb-3">
         <div className="absolute w-80 h-48 bg-primary/20 rounded-3xl blur-3xl animate-pulse" />
