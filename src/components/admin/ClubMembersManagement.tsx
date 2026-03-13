@@ -575,7 +575,7 @@ const ClubMembersManagement = () => {
 
             {/* Image style */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">סוג תמונה:</label>
+              <label className="text-sm font-medium text-right block">סוג תמונה:</label>
               <Select value={imageStyle} onValueChange={setImageStyle} dir="rtl">
                 <SelectTrigger>
                   <SelectValue />
