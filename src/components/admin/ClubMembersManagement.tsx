@@ -132,6 +132,11 @@ const ClubMembersManagement = () => {
 
   useEffect(() => {
     loadMembers();
+    // Load email history from localStorage
+    const stored = localStorage.getItem('club_email_history');
+    if (stored) {
+      try { setEmailHistory(JSON.parse(stored)); } catch {}
+    }
   }, []);
 
   // --- Member CRUD ---
