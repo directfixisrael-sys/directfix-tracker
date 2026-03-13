@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Award, ArrowLeft, Sparkles, Crown, Tag, Shield, Check, Star, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { calculatePointsFromPrice } from '@/components/LoyaltyPointsDisplay';
@@ -202,29 +203,33 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         </p>
       </div>
 
-      {/* Inline CTA - user must scroll to reach it */}
-      <div
-        className={`transition-all duration-500 delay-300 max-w-sm mx-auto space-y-2 pt-2 pb-8 ${
-          showDetails ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}
-      >
-        <Button
-          onClick={() => onContinue(joinClub)}
-          className={`w-full h-14 text-base font-bold rounded-2xl shadow-lg gap-2 transition-all duration-300 ${
-            joinClub
-              ? 'bg-gradient-to-r from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90'
-              : ''
-          }`}
-        >
-          <ArrowLeft className="w-5 h-5" />
-          {joinClub ? `הצטרף וצבור ${pointsToEarn} נקודות` : 'המשך בלי מועדון'}
-        </Button>
-        {!joinClub && (
-          <p className="text-center text-xs text-muted-foreground/50">
-            ניתן להצטרף גם בהמשך
-          </p>
-        )}
-      </div>
+      {/* Spacer for sticky CTA */}
+      <div className="h-24" />
+
+      {/* Sticky CTA via portal */}
+      {createPortal(
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+          <div className="max-w-3xl mx-auto space-y-2">
+            <Button
+              onClick={() => onContinue(joinClub)}
+              className={`w-full h-14 text-base font-bold rounded-2xl shadow-lg gap-2 transition-all duration-300 ${
+                joinClub
+                  ? 'bg-gradient-to-r from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90'
+                  : ''
+              }`}
+            >
+              <ArrowLeft className="w-5 h-5" />
+              {joinClub ? `הצטרף וצבור ${pointsToEarn} נקודות` : 'המשך בלי מועדון'}
+            </Button>
+            {!joinClub && (
+              <p className="text-center text-xs text-muted-foreground/50">
+                ניתן להצטרף גם בהמשך
+              </p>
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
 
       <style>{`
         @keyframes shimmer {
