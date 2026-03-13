@@ -2090,8 +2090,8 @@ const AdminPanel = () => {
                     : "text-sidebar-foreground hover:bg-sidebar-accent/50"
                 )}
               >
-                <Award className="w-4 h-4" />
-                <span>נקודות נאמנות</span>
+                <Crown className="w-4 h-4" />
+                <span>חברי מועדון</span>
               </button>
               <button 
                 onClick={() => setActiveTab('settings')}
