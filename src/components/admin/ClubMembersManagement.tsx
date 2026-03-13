@@ -814,6 +814,41 @@ const ClubMembersManagement = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Email Preview Dialog */}
+      <Dialog open={!!emailPreviewHtml} onOpenChange={(open) => !open && setEmailPreviewHtml(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+          <DialogHeader className="p-4 pb-2">
+            <DialogTitle className="text-right">תצוגה מקדימה של המייל</DialogTitle>
+            <DialogDescription className="text-right text-sm text-muted-foreground">
+              כך ייראה המייל אצל חברי המועדון
+            </DialogDescription>
+          </DialogHeader>
+          {emailPreviewHtml && (
+            <div className="border-t">
+              <iframe
+                srcDoc={emailPreviewHtml}
+                className="w-full border-0"
+                style={{ height: '600px' }}
+                title="תצוגה מקדימה"
+              />
+            </div>
+          )}
+          <div className="p-4 pt-2 flex gap-2">
+            <Button variant="outline" onClick={() => setEmailPreviewHtml(null)} className="flex-1">
+              סגור
+            </Button>
+            <Button 
+              onClick={() => { setEmailPreviewHtml(null); handleSendEmailBroadcast(); }}
+              className="flex-1 bg-gradient-to-l from-amber-500 to-primary"
+              disabled={!broadcastMessage.trim() || isSendingEmail}
+            >
+              <Mail className="w-4 h-4 ml-2" />
+              שלח עכשיו
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
