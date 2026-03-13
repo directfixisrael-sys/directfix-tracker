@@ -437,6 +437,9 @@ const ClubMembersManagement = () => {
                     <img src={directfixLogo} alt="DirectFix" className="w-6 h-6 rounded" />
                     <span className="text-xs font-bold">דיירקט פיקס</span>
                   </div>
+                  {generatedImage && (
+                    <img src={generatedImage} alt="Promo" className="w-full rounded-lg mb-2" />
+                  )}
                   <p className="text-sm whitespace-pre-wrap">{broadcastMessage}</p>
                 </div>
               </Card>
