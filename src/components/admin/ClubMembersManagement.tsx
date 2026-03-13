@@ -629,6 +629,78 @@ const ClubMembersManagement = () => {
             )}
           </Card>
         </TabsContent>
+
+        {/* History tab */}
+        <TabsContent value="history" className="space-y-4 mt-4">
+          <Card className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-lg flex items-center gap-2">
+                <History className="w-5 h-5 text-primary" />
+                היסטוריית שליחת מיילים
+              </h3>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  setIsLoadingHistory(true);
+                  const stored = localStorage.getItem('club_email_history');
+                  if (stored) {
+                    try { setEmailHistory(JSON.parse(stored)); } catch {}
+                  }
+                  setIsLoadingHistory(false);
+                }}
+                className="gap-1.5"
+              >
+                <Clock className="w-3.5 h-3.5" />
+                רענן
+              </Button>
+            </div>
+
+            {emailHistory.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <Mail className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p className="font-medium">אין היסטוריית שליחות</p>
+                <p className="text-sm">מיילים שתשלח יופיעו כאן</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {emailHistory.map((entry) => (
+                  <Card key={entry.id} className="p-4 border">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-foreground text-sm truncate">{entry.subject}</p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{entry.message}</p>
+                        <div className="flex items-center gap-3 mt-2">
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {new Date(entry.sentAt).toLocaleString('he-IL')}
+                          </span>
+                          <span className="text-xs flex items-center gap-1 text-emerald-600">
+                            <CheckCircle2 className="w-3 h-3" />
+                            {entry.sentCount} נשלחו
+                          </span>
+                          {entry.failedCount > 0 && (
+                            <span className="text-xs flex items-center gap-1 text-destructive">
+                              <XCircle className="w-3 h-3" />
+                              {entry.failedCount} נכשלו
+                            </span>
+                          )}
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {entry.recipientCount} נמענים
+                          </span>
+                        </div>
+                      </div>
+                      {entry.image && (
+                        <img src={entry.image} alt="" className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </Card>
+        </TabsContent>
       </Tabs>
 
       {/* Edit member dialog */}
