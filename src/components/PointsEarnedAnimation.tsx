@@ -175,13 +175,26 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
             {/* Join checkbox */}
             <button
               type="button"
+              dir="rtl"
               onClick={() => setJoinClub(!joinClub)}
-              className={`w-full flex items-center gap-3 rounded-2xl p-3 border-2 transition-all duration-300 ${
+              className={`w-full flex flex-row-reverse items-center gap-3 rounded-2xl p-3 border-2 transition-all duration-300 ${
                 joinClub
                   ? 'border-amber-500 bg-gradient-to-r from-amber-500/10 to-amber-600/5 shadow-[0_0_15px_rgba(245,158,11,0.15)]'
                   : 'border-amber-500/30 bg-gradient-to-r from-amber-500/5 to-card hover:border-amber-500/50 hover:shadow-[0_0_10px_rgba(245,158,11,0.1)]'
               }`}
             >
+              <div className="text-right flex-1">
+                <p className="font-bold text-foreground text-sm flex items-center gap-1.5">
+                  <Crown className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                  {joinClub ? 'מצטרף למועדון!' : 'רוצה להצטרף למועדון דיירקט פיקס'}
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  {joinClub
+                    ? `+${pointsToEarn} נקודות (₪${(pointsToEarn * POINT_VALUE).toFixed(0)} הנחה)`
+                    : 'הצטרפות בחינם | בכפוף לתקנון'
+                  }
+                </p>
+              </div>
               <div
                 className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
                   joinClub
@@ -190,18 +203,6 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
                 }`}
               >
                 {joinClub && <Check className="w-3.5 h-3.5 text-white" />}
-              </div>
-              <div className="text-right flex-1">
-                <p className="font-bold text-foreground text-sm flex items-center gap-1.5 justify-start flex-row-reverse">
-                  {joinClub ? 'מצטרף למועדון!' : 'רוצה להצטרף למועדון דיירקט פיקס'}
-                  <Crown className="w-4 h-4 text-amber-500" />
-                </p>
-                <p className="text-[11px] text-muted-foreground">
-                  {joinClub
-                    ? `+${pointsToEarn} נקודות (₪${(pointsToEarn * POINT_VALUE).toFixed(0)} הנחה)`
-                    : 'הצטרפות בחינם | בכפוף לתקנון'
-                  }
-                </p>
               </div>
             </button>
 
