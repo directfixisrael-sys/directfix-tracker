@@ -413,6 +413,27 @@ const NewRepairOrder = () => {
   const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
   const [showPointsInfo, setShowPointsInfo] = useState(false);
   const [joinedClub, setJoinedClub] = useState(false);
+  const [isExistingClubMember, setIsExistingClubMember] = useState(false);
+
+  // Check if customer is already a club member and skip points step if so
+  const checkClubMemberAndNavigate = async () => {
+    const phone = (customerPhone || introPhone).replace(/\D/g, '');
+    if (phone) {
+      const { data } = await supabase
+        .from('club_members')
+        .select('phone')
+        .eq('phone', phone)
+        .eq('is_active', true)
+        .limit(1);
+      if (data && data.length > 0) {
+        setIsExistingClubMember(true);
+        setJoinedClub(true); // auto-mark as club member
+        goToStep('price');
+        return;
+      }
+    }
+    goToStep('points');
+  };
 
   const handleGiftToggle = () => {
     const newVal = !isGiftOrder;
