@@ -1758,7 +1758,10 @@ const NewRepairOrder = () => {
         {step === 'points' && (
           <PointsEarnedAnimation
             repairPrice={getTotalPrice()}
-            onContinue={() => goToStep('price')}
+            onContinue={(joined) => {
+              setJoinedClub(joined);
+              goToStep('price');
+            }}
           />
         )}
 
