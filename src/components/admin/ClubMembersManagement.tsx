@@ -635,7 +635,7 @@ const ClubMembersManagement = () => {
 
             {/* Message */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">תוכן ההודעה:</label>
+              <label className="text-sm font-medium text-right block">תוכן ההודעה:</label>
               <Textarea
                 placeholder="כתוב את ההודעה כאן או השתמש ב-AI..."
                 value={broadcastMessage}
