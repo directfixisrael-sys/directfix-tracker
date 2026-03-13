@@ -5,7 +5,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-function buildEmailHtml(subject: string, message: string, image: string | null, recipientName: string): string {
+function buildUnsubscribeUrl(phone: string): string {
+  const token = btoa(phone + "_directfix_unsub");
+  const baseUrl = Deno.env.get("SUPABASE_URL") || "";
+  return `${baseUrl}/functions/v1/handle-club-unsubscribe?phone=${encodeURIComponent(phone)}&token=${encodeURIComponent(token)}`;
+}
+
+function buildEmailHtml(subject: string, message: string, image: string | null, recipientName: string, phone?: string): string {
   const messageHtml = message.replace(/\n/g, '<br/>');
   const imageHtml = image
     ? `<img src="${image}" alt="מבצע" style="width:100%;max-width:560px;border-radius:16px;margin-bottom:24px;display:block;" />`
@@ -72,6 +78,9 @@ function buildEmailHtml(subject: string, message: string, image: string | null, 
     <p style="color:#555;font-size:11px;margin:8px 0 0;">
       קיבלת את המייל הזה כחבר/ת מועדון DirectFix
     </p>
+    ${phone ? `<p style="color:#555;font-size:11px;margin:8px 0 0;">
+      <a href="${buildUnsubscribeUrl(phone)}" style="color:#888;text-decoration:underline;">לא רוצה לקבל הודעות פרסומיות? לחצו כאן להסרה</a>
+    </p>` : ''}
   </td></tr>
 
 </table>
@@ -111,9 +120,9 @@ serve(async (req) => {
     for (let i = 0; i < recipients.length; i += batchSize) {
       const batch = recipients.slice(i, i + batchSize);
 
-      const promises = batch.map(async (r: { email: string; name: string }) => {
+      const promises = batch.map(async (r: { email: string; name: string; phone?: string }) => {
         try {
-          const html = buildEmailHtml(subject, message, image || null, r.name || "חבר/ת מועדון");
+          const html = buildEmailHtml(subject, message, image || null, r.name || "חבר/ת מועדון", r.phone);
           const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {

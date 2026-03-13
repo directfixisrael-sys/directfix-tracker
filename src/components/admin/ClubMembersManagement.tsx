@@ -20,6 +20,7 @@ interface ClubMember {
   totalValue: number;
   joinedAt: string;
   isActive: boolean;
+  wantsPromotions: boolean;
 }
 
 const POINT_VALUE = 0.5;
@@ -125,6 +126,7 @@ const ClubMembersManagement = () => {
         totalValue: (pointsMap.get(m.phone) || 0) * POINT_VALUE,
         joinedAt: m.joined_at,
         isActive: m.is_active,
+        wantsPromotions: m.wants_promotions,
       }));
       setMembers(mapped.sort((a, b) => b.totalPoints - a.totalPoints));
     }
@@ -254,9 +256,9 @@ const ClubMembersManagement = () => {
       return;
     }
 
-    const activeWithEmail = members.filter(m => m.isActive && m.email);
+    const activeWithEmail = members.filter(m => m.isActive && m.email && m.wantsPromotions);
     if (activeWithEmail.length === 0) {
-      toast({ title: 'אין חברי מועדון עם כתובת מייל', variant: 'destructive' });
+      toast({ title: 'אין חברי מועדון שמעוניינים לקבל מיילים', variant: 'destructive' });
       return;
     }
 
@@ -269,7 +271,7 @@ const ClubMembersManagement = () => {
           subject: broadcastSubject || 'מבצע מיוחד מדיירקט פיקס!',
           message: broadcastMessage,
           image: generatedImage,
-          recipients: activeWithEmail.map(m => ({ email: m.email!, name: m.name })),
+          recipients: activeWithEmail.map(m => ({ email: m.email!, name: m.name, phone: m.phone })),
         }
       });
 
@@ -333,7 +335,8 @@ const ClubMembersManagement = () => {
   );
 
   const activeCount = members.filter(m => m.isActive).length;
-  const activeWithEmailCount = members.filter(m => m.isActive && m.email).length;
+  const activeWithEmailCount = members.filter(m => m.isActive && m.email && m.wantsPromotions).length;
+  const unsubscribedCount = members.filter(m => m.isActive && !m.wantsPromotions).length;
 
   return (
     <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto space-y-6" dir="rtl">
@@ -424,9 +427,14 @@ const ClubMembersManagement = () => {
                       </p>
                       <p className="text-sm text-muted-foreground" dir="ltr">{c.phone}</p>
                       {c.email && <p className="text-xs text-muted-foreground">{c.email}</p>}
-                      <p className="text-[10px] text-muted-foreground/60">
-                        הצטרף: {new Date(c.joinedAt).toLocaleDateString('he-IL')}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-[10px] text-muted-foreground/60">
+                          הצטרף: {new Date(c.joinedAt).toLocaleDateString('he-IL')}
+                        </p>
+                        {!c.wantsPromotions && (
+                          <span className="text-[10px] bg-destructive/10 text-destructive px-1.5 py-0.5 rounded">הסיר פרסומות</span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
@@ -510,20 +518,23 @@ const ClubMembersManagement = () => {
 
         {/* Broadcast tab - redesigned */}
         <TabsContent value="broadcast" className="space-y-4 mt-4">
-          <Card className="p-5 space-y-5">
+          <Card className="p-5 space-y-5" dir="rtl">
             <div>
               <h3 className="font-bold text-lg flex items-center gap-2">
                 <Mail className="w-5 h-5 text-primary" />
                 שליחת מבצע במייל לחברי המועדון
               </h3>
               <p className="text-sm text-muted-foreground mt-1">
-                {activeWithEmailCount} חברים עם כתובת מייל מתוך {activeCount} חברים פעילים
+                {activeWithEmailCount} חברים יקבלו מייל מתוך {activeCount} פעילים
+                {unsubscribedCount > 0 && (
+                  <span className="text-destructive mr-1">({unsubscribedCount} הסירו פרסומות)</span>
+                )}
               </p>
             </div>
 
             {/* Template selection */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">בחר סוג הודעה:</label>
+              <label className="text-sm font-medium text-right block">בחר סוג הודעה:</label>
               <div className="grid grid-cols-2 gap-2">
                 {PROMO_TEMPLATES.map(t => (
                   <button
@@ -544,8 +555,8 @@ const ClubMembersManagement = () => {
 
             {/* Text style */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">סגנון טקסט:</label>
-              <Select value={textStyle} onValueChange={setTextStyle}>
+              <label className="text-sm font-medium text-right block">סגנון טקסט:</label>
+              <Select value={textStyle} onValueChange={setTextStyle} dir="rtl">
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -564,8 +575,8 @@ const ClubMembersManagement = () => {
 
             {/* Image style */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">סוג תמונה:</label>
-              <Select value={imageStyle} onValueChange={setImageStyle}>
+              <label className="text-sm font-medium text-right block">סוג תמונה:</label>
+              <Select value={imageStyle} onValueChange={setImageStyle} dir="rtl">
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -581,7 +592,7 @@ const ClubMembersManagement = () => {
 
             {/* AI prompt */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">תאר את המבצע או ההודעה:</label>
+              <label className="text-sm font-medium text-right block">תאר את המבצע או ההודעה:</label>
               <Textarea
                 placeholder="לדוגמא: 20% הנחה על החלפת מסך לכל חברי המועדון, או: חג פסח שמח..."
                 value={aiPrompt}
@@ -614,7 +625,7 @@ const ClubMembersManagement = () => {
 
             {/* Subject */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">נושא המייל:</label>
+              <label className="text-sm font-medium text-right block">נושא המייל:</label>
               <Input
                 value={broadcastSubject}
                 onChange={e => setBroadcastSubject(e.target.value)}
@@ -624,7 +635,7 @@ const ClubMembersManagement = () => {
 
             {/* Message */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">תוכן ההודעה:</label>
+              <label className="text-sm font-medium text-right block">תוכן ההודעה:</label>
               <Textarea
                 placeholder="כתוב את ההודעה כאן או השתמש ב-AI..."
                 value={broadcastMessage}
