@@ -100,6 +100,11 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         ))}
       </div>
 
+      {/* Scroll hint indicator - right after card */}
+      <div className="flex flex-col items-center gap-0.5 animate-bounce-slow -mt-1">
+        <ChevronDown className="w-5 h-5 text-muted-foreground/50" />
+      </div>
+
       {/* Title */}
       <div className="space-y-2">
         <div className="inline-flex items-center gap-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full px-4 py-1.5 text-sm font-bold">
@@ -115,12 +120,6 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         <p className="text-sm text-muted-foreground max-w-sm mx-auto">
           חברי המועדון נהנים מהטבות בלעדיות, נקודות נאמנות והנחות מיוחדות
         </p>
-      </div>
-
-      {/* Scroll hint indicator */}
-      <div className="flex flex-col items-center gap-1 animate-bounce-slow">
-        <span className="text-xs text-muted-foreground/60 font-medium">גלול למטה לפרטים נוספים</span>
-        <ChevronDown className="w-5 h-5 text-muted-foreground/40" />
       </div>
 
       {/* Benefits list */}
