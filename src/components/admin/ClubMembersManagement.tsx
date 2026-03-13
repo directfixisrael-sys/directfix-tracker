@@ -534,7 +534,7 @@ const ClubMembersManagement = () => {
 
             {/* Template selection */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">בחר סוג הודעה:</label>
+              <label className="text-sm font-medium text-right block">בחר סוג הודעה:</label>
               <div className="grid grid-cols-2 gap-2">
                 {PROMO_TEMPLATES.map(t => (
                   <button
