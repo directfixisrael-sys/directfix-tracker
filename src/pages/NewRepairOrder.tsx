@@ -1144,16 +1144,18 @@ const NewRepairOrder = () => {
           });
         }
         
-        // Award new loyalty points
-        const pointsToEarn = calculatePointsFromPrice(getFinalPrice());
-        if (pointsToEarn > 0) {
-          await supabase.from('loyalty_points').insert({
-            customer_phone: normalizedPhone,
-            points: pointsToEarn,
-            type: 'earned',
-            description: `צבירה מתיקון`,
-            order_id: orderResult?.id || null,
-          });
+        // Award new loyalty points only if joined club
+        if (joinedClub) {
+          const pointsToEarn = calculatePointsFromPrice(getFinalPrice());
+          if (pointsToEarn > 0) {
+            await supabase.from('loyalty_points').insert({
+              customer_phone: normalizedPhone,
+              points: pointsToEarn,
+              type: 'earned',
+              description: `צבירה מתיקון - חבר מועדון`,
+              order_id: orderResult?.id || null,
+            });
+          }
         }
         
         goToStep('success');
