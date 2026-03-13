@@ -23,3 +23,9 @@ verify_jwt = false
 
 [functions.parse-repair-request]
 verify_jwt = false
+
+[functions.customer-auth]
+verify_jwt = false
+
+[functions.send-technician-application]
+verify_jwt = false

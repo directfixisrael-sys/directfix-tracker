@@ -164,6 +164,45 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          is_verified: boolean
+          name: string
+          password_hash: string
+          phone: string
+          reset_token: string | null
+          reset_token_expires_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_verified?: boolean
+          name?: string
+          password_hash: string
+          phone: string
+          reset_token?: string | null
+          reset_token_expires_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_verified?: boolean
+          name?: string
+          password_hash?: string
+          phone?: string
+          reset_token?: string | null
+          reset_token_expires_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       iphone_models: {
         Row: {
           back_glass_price: number
