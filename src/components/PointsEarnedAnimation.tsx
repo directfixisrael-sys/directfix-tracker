@@ -52,6 +52,7 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
   const benefits = [
     { icon: Award, text: 'צבירת נקודות על כל תיקון', highlight: `+${pointsToEarn} נקודות` },
     { icon: Tag, text: 'מבצעים והנחות בלעדיות לחברים' },
+    { icon: Phone, text: 'שיחות ייעוץ חינם עם טכנאים מנוסים' },
     { icon: Star, text: 'עדיפות בתורים ושירות מועדף' },
     { icon: Shield, text: 'הארכת אחריות בונוס' },
   ];
