@@ -271,7 +271,7 @@ const ClubMembersManagement = () => {
           subject: broadcastSubject || 'מבצע מיוחד מדיירקט פיקס!',
           message: broadcastMessage,
           image: generatedImage,
-          recipients: activeWithEmail.map(m => ({ email: m.email!, name: m.name })),
+          recipients: activeWithEmail.map(m => ({ email: m.email!, name: m.name, phone: m.phone })),
         }
       });
 
