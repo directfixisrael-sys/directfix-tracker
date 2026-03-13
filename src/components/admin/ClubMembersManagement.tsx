@@ -335,7 +335,8 @@ const ClubMembersManagement = () => {
   );
 
   const activeCount = members.filter(m => m.isActive).length;
-  const activeWithEmailCount = members.filter(m => m.isActive && m.email).length;
+  const activeWithEmailCount = members.filter(m => m.isActive && m.email && m.wantsPromotions).length;
+  const unsubscribedCount = members.filter(m => m.isActive && !m.wantsPromotions).length;
 
   return (
     <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto space-y-6" dir="rtl">
