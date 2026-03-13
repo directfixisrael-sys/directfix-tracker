@@ -57,33 +57,16 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
   ];
 
   return (
-    <div className="space-y-5 animate-fade-in py-4 text-center">
-      {/* Title - above card */}
-      <div className="space-y-1.5">
-        <div className="inline-flex items-center gap-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full px-4 py-1.5 text-sm font-bold">
-          <Crown className="w-4 h-4" />
-          מועדון הלקוחות של דיירקט פיקס
-        </div>
-        <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full px-3 py-1 text-xs font-bold">
-          הצטרפות בחינם
-        </div>
-        <h2 className="text-2xl font-extrabold text-foreground">
-          הצטרפו וקבלו <span className="text-primary">{pointsToEarn} נקודות!</span>
-        </h2>
-        <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-          חברי המועדון נהנים מהטבות בלעדיות, נקודות נאמנות והנחות מיוחדות
-        </p>
-      </div>
-
+    <div className="space-y-3 animate-fade-in py-2 text-center [font-size:16px]">
       {/* Shimmering Club Card */}
-      <div className="relative flex justify-center mb-2">
-        <div className="absolute w-72 h-44 bg-primary/20 rounded-3xl blur-3xl animate-pulse" />
+      <div className="relative flex justify-center mb-1">
+        <div className="absolute w-64 h-40 bg-primary/20 rounded-3xl blur-3xl animate-pulse" />
         <div
           className={`relative transition-all duration-1000 ${
             cardAnimated ? 'scale-100 opacity-100 rotate-0' : 'scale-75 opacity-0 -rotate-6'
           }`}
         >
-          <div className="relative w-72 mx-auto overflow-hidden rounded-2xl shadow-2xl">
+          <div className="relative w-64 mx-auto overflow-hidden rounded-2xl shadow-2xl">
             <img
               src={clubCardImage}
               alt="DirectFix Club Card"
@@ -93,12 +76,12 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
               style={{ animation: 'shimmer 3s ease-in-out infinite' }}
             />
-            <div className="absolute bottom-3 right-3 bg-primary/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-lg">
-              <Award className="w-4 h-4 text-primary-foreground" />
-              <span className="text-primary-foreground font-extrabold text-lg leading-none">
+            <div className="absolute bottom-2.5 right-2.5 bg-primary/90 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-lg">
+              <Award className="w-3.5 h-3.5 text-primary-foreground" />
+              <span className="text-primary-foreground font-extrabold text-base leading-none">
                 {displayedPoints}
               </span>
-              <span className="text-primary-foreground/80 text-[10px]">נקודות</span>
+              <span className="text-primary-foreground/80 text-[9px]">נקודות</span>
             </div>
           </div>
         </div>
@@ -106,7 +89,7 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         {[0, 1, 2, 3, 4].map((i) => (
           <Sparkles
             key={i}
-            className="absolute w-4 h-4 text-amber-400/70 animate-bounce"
+            className="absolute w-3.5 h-3.5 text-amber-400/70 animate-bounce"
             style={{
               top: `${5 + i * 18}%`,
               left: `${i % 2 === 0 ? 8 : 82}%`,
@@ -117,23 +100,40 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         ))}
       </div>
 
+      {/* Title */}
+      <div className="space-y-1">
+        <div className="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full px-3 py-1 text-[13px] font-bold">
+          <Crown className="w-3.5 h-3.5" />
+          מועדון הלקוחות של דיירקט פיקס
+        </div>
+        <div className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full px-2.5 py-0.5 text-[11px] font-bold">
+          הצטרפות בחינם
+        </div>
+        <h2 className="text-xl font-extrabold text-foreground">
+          הצטרפו וקבלו <span className="text-primary">{pointsToEarn} נקודות!</span>
+        </h2>
+        <p className="text-[13px] text-muted-foreground max-w-xs mx-auto">
+          חברי המועדון נהנים מהטבות בלעדיות, נקודות נאמנות והנחות מיוחדות
+        </p>
+      </div>
+
       {/* Benefits list */}
       <div
         className={`transition-all duration-500 ${
           showDetails ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}
       >
-        <div className="bg-gradient-to-br from-amber-500/5 via-card to-primary/5 rounded-2xl p-4 border border-amber-500/20 max-w-sm mx-auto space-y-2.5">
+        <div className="bg-gradient-to-br from-amber-500/5 via-card to-primary/5 rounded-2xl p-3 border border-amber-500/20 max-w-sm mx-auto space-y-2">
           {benefits.map((benefit, i) => (
-            <div key={i} className="flex items-center gap-3 text-right">
-              <div className="w-8 h-8 bg-amber-500/10 rounded-full flex items-center justify-center flex-shrink-0">
-                <benefit.icon className="w-4 h-4 text-amber-500" />
+            <div key={i} className="flex items-center gap-2.5 text-right">
+              <div className="w-7 h-7 bg-amber-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <benefit.icon className="w-3.5 h-3.5 text-amber-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground">{benefit.text}</p>
+                <p className="text-[13px] font-medium text-foreground">{benefit.text}</p>
               </div>
               {benefit.highlight && (
-                <span className="text-xs font-bold text-primary bg-primary/10 rounded-full px-2 py-0.5 flex-shrink-0">
+                <span className="text-[11px] font-bold text-primary bg-primary/10 rounded-full px-1.5 py-0.5 flex-shrink-0">
                   {benefit.highlight}
                 </span>
               )}
@@ -141,25 +141,25 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
           ))}
 
           {/* Value display */}
-          <div className="border-t border-border/50 pt-2.5 mt-2.5">
-            <div className="flex justify-between items-center text-sm">
+          <div className="border-t border-border/50 pt-2 mt-2">
+            <div className="flex justify-between items-center text-[13px]">
               <span className="text-muted-foreground">שווי הנקודות שתצברו</span>
-              <span className="font-bold text-success text-lg">₪{(pointsToEarn * POINT_VALUE).toFixed(0)}</span>
+              <span className="font-bold text-success text-base">₪{(pointsToEarn * POINT_VALUE).toFixed(0)}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Marketing consent note + Terms link */}
-      <div className="max-w-sm mx-auto space-y-2">
-        <p className="text-[11px] text-muted-foreground/70 leading-relaxed text-right px-2">
+      <div className="max-w-sm mx-auto space-y-1.5">
+        <p className="text-[10px] text-muted-foreground/70 leading-relaxed text-right px-2">
           בהצטרפות למועדון אני מאשר/ת לדיירקט פיקס לשלוח לי מבצעים, הנחות, עדכונים וברכות לחגים באמצעות WhatsApp, SMS ואימייל. ניתן לבטל בכל עת.
         </p>
-        <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+        <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
           ההצטרפות בחינם וכפופה ל
           <Link to="/club-terms" target="_blank" className="text-primary underline hover:text-primary/80 inline-flex items-center gap-0.5 mx-1">
             תקנון המועדון המלא
-            <ExternalLink className="w-3 h-3" />
+            <ExternalLink className="w-2.5 h-2.5" />
           </Link>
           | הנקודות תקפות 24 חודשים | תקפות בדיירקט פיקס בלבד
         </p>
@@ -170,32 +170,32 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
 
       {/* Sticky CTA with join checkbox via portal */}
       {createPortal(
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-          <div className="max-w-3xl mx-auto space-y-3">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+          <div className="max-w-3xl mx-auto space-y-2.5">
             {/* Join checkbox */}
             <button
               type="button"
               onClick={() => setJoinClub(!joinClub)}
-              className={`w-full flex items-center gap-3 rounded-2xl p-3 border-2 transition-all duration-300 ${
+              className={`w-full flex items-center gap-3 rounded-2xl p-2.5 border-2 transition-all duration-300 ${
                 joinClub
                   ? 'border-primary bg-primary/5'
                   : 'border-foreground/10 bg-card hover:border-foreground/20'
               }`}
             >
               <div
-                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
+                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
                   joinClub
                     ? 'bg-primary border-primary'
                     : 'border-foreground/20 bg-transparent'
                 }`}
               >
-                {joinClub && <Check className="w-3.5 h-3.5 text-primary-foreground" />}
+                {joinClub && <Check className="w-3 h-3 text-primary-foreground" />}
               </div>
               <div className="text-right flex-1">
-                <p className="font-bold text-foreground text-sm">
+                <p className="font-bold text-foreground text-[13px]">
                   {joinClub ? 'מצטרף למועדון!' : 'רוצה להצטרף למועדון דיירקט פיקס'}
                 </p>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground">
                   {joinClub
                     ? `+${pointsToEarn} נקודות (₪${(pointsToEarn * POINT_VALUE).toFixed(0)} הנחה)`
                     : 'הצטרפות בחינם | בכפוף לתקנון'
@@ -207,13 +207,13 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
             {/* Continue button */}
             <Button
               onClick={() => onContinue(joinClub)}
-              className={`w-full h-14 text-base font-bold rounded-2xl shadow-lg gap-2 transition-all duration-300 ${
+              className={`w-full h-12 text-[14px] font-bold rounded-2xl shadow-lg gap-2 transition-all duration-300 ${
                 joinClub
                   ? 'bg-gradient-to-r from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90'
                   : ''
               }`}
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
               {joinClub ? `הצטרף וצבור ${pointsToEarn} נקודות` : 'המשך בלי מועדון'}
             </Button>
           </div>
