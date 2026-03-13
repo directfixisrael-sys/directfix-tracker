@@ -1240,6 +1240,16 @@ const AdminPanel = () => {
                         {selectedOrder.customerEmail && (
                           <p className="text-muted-foreground text-sm">{selectedOrder.customerEmail}</p>
                         )}
+                        {selectedOrder.isClubMember ? (
+                          <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full px-2.5 py-0.5 text-xs font-bold mt-1">
+                            <Crown className="w-3 h-3" />
+                            חבר מועדון
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 bg-muted text-muted-foreground rounded-full px-2.5 py-0.5 text-xs mt-1">
+                            לא חבר מועדון
+                          </span>
+                        )}
                       </div>
                     </div>
                     

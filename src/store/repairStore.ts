@@ -78,6 +78,7 @@ const dbToOrder = (row: any): RepairOrder => ({
   paymentStatus: row.payment_status as PaymentStatus || 'none',
   leadSource: row.lead_source || undefined,
   deviceImages: row.device_images || [],
+  isClubMember: row.is_club_member || false,
 });
 
 // Convert database row to ChatMessage

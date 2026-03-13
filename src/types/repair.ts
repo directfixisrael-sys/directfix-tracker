@@ -39,6 +39,7 @@ export interface RepairOrder {
   paymentStatus?: PaymentStatus;
   leadSource?: string;
   deviceImages?: string[];
+  isClubMember?: boolean;
 }
 
 export interface Accessory {
