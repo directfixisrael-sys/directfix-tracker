@@ -116,6 +116,42 @@ export type Database = {
         }
         Relationships: []
       }
+      club_members: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          joined_at: string
+          name: string
+          phone: string
+          updated_at: string
+          wants_promotions: boolean
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          name?: string
+          phone: string
+          updated_at?: string
+          wants_promotions?: boolean
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          name?: string
+          phone?: string
+          updated_at?: string
+          wants_promotions?: boolean
+        }
+        Relationships: []
+      }
       coupons: {
         Row: {
           code: string
@@ -430,6 +466,7 @@ export type Database = {
           feedback: string | null
           id: string
           invoice_link: string | null
+          is_club_member: boolean
           is_viewing: boolean | null
           issue_description: string
           last_viewed_at: string | null
@@ -466,6 +503,7 @@ export type Database = {
           feedback?: string | null
           id?: string
           invoice_link?: string | null
+          is_club_member?: boolean
           is_viewing?: boolean | null
           issue_description?: string
           last_viewed_at?: string | null
@@ -502,6 +540,7 @@ export type Database = {
           feedback?: string | null
           id?: string
           invoice_link?: string | null
+          is_club_member?: boolean
           is_viewing?: boolean | null
           issue_description?: string
           last_viewed_at?: string | null
