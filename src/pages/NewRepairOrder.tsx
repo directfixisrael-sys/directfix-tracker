@@ -974,6 +974,7 @@ const NewRepairOrder = () => {
           promotionTitle: activePromotion ? `${activePromotion.title} - ${activePromotion.description}` : undefined,
           leadSource: leadSrc.source,
           leadSourceDetails: leadSrc,
+          isClubMember: joinClub || isClubMember,
         }
       });
       console.log('Notifications sent successfully');
