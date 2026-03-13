@@ -72,6 +72,8 @@ const ClubMembersManagement = () => {
   const [textStyle, setTextStyle] = useState('marketing_light');
   const [imageStyle, setImageStyle] = useState('none');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [emailPreviewHtml, setEmailPreviewHtml] = useState<string | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
   // Email history state
   interface EmailHistoryEntry {
