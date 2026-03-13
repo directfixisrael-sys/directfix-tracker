@@ -1786,7 +1786,7 @@ const AdminPanel = () => {
             )}
           >
             <Award className="w-5 h-5" />
-            <span className="text-[10px]">נאמנות</span>
+            <span className="text-[10px]">מועדון</span>
           </button>
           {/* More menu */}
           <DropdownMenu>
