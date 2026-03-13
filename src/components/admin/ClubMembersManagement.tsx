@@ -525,7 +525,10 @@ const ClubMembersManagement = () => {
                 שליחת מבצע במייל לחברי המועדון
               </h3>
               <p className="text-sm text-muted-foreground mt-1">
-                {activeWithEmailCount} חברים עם כתובת מייל מתוך {activeCount} חברים פעילים
+                {activeWithEmailCount} חברים יקבלו מייל מתוך {activeCount} פעילים
+                {unsubscribedCount > 0 && (
+                  <span className="text-destructive mr-1">({unsubscribedCount} הסירו פרסומות)</span>
+                )}
               </p>
             </div>
 

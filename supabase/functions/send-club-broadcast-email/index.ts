@@ -117,9 +117,9 @@ serve(async (req) => {
     for (let i = 0; i < recipients.length; i += batchSize) {
       const batch = recipients.slice(i, i + batchSize);
 
-      const promises = batch.map(async (r: { email: string; name: string }) => {
+      const promises = batch.map(async (r: { email: string; name: string; phone?: string }) => {
         try {
-          const html = buildEmailHtml(subject, message, image || null, r.name || "חבר/ת מועדון");
+          const html = buildEmailHtml(subject, message, image || null, r.name || "חבר/ת מועדון", r.phone);
           const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {
