@@ -518,7 +518,7 @@ const ClubMembersManagement = () => {
 
         {/* Broadcast tab - redesigned */}
         <TabsContent value="broadcast" className="space-y-4 mt-4">
-          <Card className="p-5 space-y-5">
+          <Card className="p-5 space-y-5" dir="rtl">
             <div>
               <h3 className="font-bold text-lg flex items-center gap-2">
                 <Mail className="w-5 h-5 text-primary" />
