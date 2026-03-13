@@ -150,44 +150,6 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         </div>
       </div>
 
-      {/* Join checkbox - BELOW benefits */}
-      <div
-        className={`transition-all duration-500 delay-200 ${
-          showDetails ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}
-      >
-        <button
-          type="button"
-          onClick={() => setJoinClub(!joinClub)}
-          className={`w-full max-w-sm mx-auto flex items-center gap-3 rounded-2xl p-4 border-2 transition-all duration-300 ${
-            joinClub
-              ? 'border-primary bg-primary/5 shadow-[0_0_20px_hsl(var(--primary)/0.15)]'
-              : 'border-foreground/10 bg-card hover:border-foreground/20'
-          }`}
-        >
-          <div
-            className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
-              joinClub
-                ? 'bg-primary border-primary'
-                : 'border-foreground/20 bg-transparent'
-            }`}
-          >
-            {joinClub && <Check className="w-4 h-4 text-primary-foreground" />}
-          </div>
-          <div className="text-right flex-1">
-            <p className="font-bold text-foreground text-sm">
-              {joinClub ? 'מצטרף למועדון!' : 'רוצה להצטרף למועדון דיירקט פיקס'}
-            </p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {joinClub
-                ? `תקבלו ${pointsToEarn} נקודות (₪${(pointsToEarn * POINT_VALUE).toFixed(0)} הנחה) כבר בהזמנה הבאה`
-                : 'הצטרפות בחינם | בכפוף לתקנון המועדון'
-              }
-            </p>
-          </div>
-        </button>
-      </div>
-
       {/* Marketing consent note + Terms link */}
       <div className="max-w-sm mx-auto space-y-2">
         <p className="text-[11px] text-muted-foreground/70 leading-relaxed text-right px-2">
@@ -204,12 +166,45 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
       </div>
 
       {/* Spacer for sticky CTA */}
-      <div className="h-24" />
+      <div className="h-40" />
 
-      {/* Sticky CTA via portal */}
+      {/* Sticky CTA with join checkbox via portal */}
       {createPortal(
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-          <div className="max-w-3xl mx-auto space-y-2">
+          <div className="max-w-3xl mx-auto space-y-3">
+            {/* Join checkbox */}
+            <button
+              type="button"
+              onClick={() => setJoinClub(!joinClub)}
+              className={`w-full flex items-center gap-3 rounded-2xl p-3 border-2 transition-all duration-300 ${
+                joinClub
+                  ? 'border-primary bg-primary/5'
+                  : 'border-foreground/10 bg-card hover:border-foreground/20'
+              }`}
+            >
+              <div
+                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
+                  joinClub
+                    ? 'bg-primary border-primary'
+                    : 'border-foreground/20 bg-transparent'
+                }`}
+              >
+                {joinClub && <Check className="w-3.5 h-3.5 text-primary-foreground" />}
+              </div>
+              <div className="text-right flex-1">
+                <p className="font-bold text-foreground text-sm">
+                  {joinClub ? 'מצטרף למועדון!' : 'רוצה להצטרף למועדון דיירקט פיקס'}
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  {joinClub
+                    ? `+${pointsToEarn} נקודות (₪${(pointsToEarn * POINT_VALUE).toFixed(0)} הנחה)`
+                    : 'הצטרפות בחינם | בכפוף לתקנון'
+                  }
+                </p>
+              </div>
+            </button>
+
+            {/* Continue button */}
             <Button
               onClick={() => onContinue(joinClub)}
               className={`w-full h-14 text-base font-bold rounded-2xl shadow-lg gap-2 transition-all duration-300 ${
@@ -221,11 +216,6 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
               <ArrowLeft className="w-5 h-5" />
               {joinClub ? `הצטרף וצבור ${pointsToEarn} נקודות` : 'המשך בלי מועדון'}
             </Button>
-            {!joinClub && (
-              <p className="text-center text-xs text-muted-foreground/50">
-                ניתן להצטרף גם בהמשך
-              </p>
-            )}
           </div>
         </div>,
         document.body
