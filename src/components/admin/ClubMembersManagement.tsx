@@ -54,7 +54,7 @@ const ClubMembersManagement = () => {
   const [adjustPhone, setAdjustPhone] = useState('');
   const [adjustAmount, setAdjustAmount] = useState('');
   const [adjustDescription, setAdjustDescription] = useState('');
-  const [subTab, setSubTab] = useState<'members' | 'points' | 'broadcast'>('members');
+  const [subTab, setSubTab] = useState<'members' | 'points' | 'broadcast' | 'history'>('members');
 
   // Member edit/delete
   const [editDialogOpen, setEditDialogOpen] = useState(false);
