@@ -711,7 +711,7 @@ const NewRepairOrder = () => {
         setSelectedBundleAddon(false);
         goToStep('bundle');
       } else {
-        goToStep('points');
+        checkClubMemberAndNavigate();
       }
     }
   };
