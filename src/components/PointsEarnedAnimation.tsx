@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Award, ArrowLeft, Sparkles, Crown, Tag, Shield, Check, Star, ExternalLink } from 'lucide-react';
+import { Award, ArrowLeft, Sparkles, Crown, Tag, Shield, Check, Star, ExternalLink, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { calculatePointsFromPrice } from '@/components/LoyaltyPointsDisplay';
 import { Link } from 'react-router-dom';
@@ -117,6 +117,12 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
         </p>
       </div>
 
+      {/* Scroll hint indicator */}
+      <div className="flex flex-col items-center gap-1 animate-bounce-slow">
+        <span className="text-xs text-muted-foreground/60 font-medium">גלול למטה לפרטים נוספים</span>
+        <ChevronDown className="w-5 h-5 text-muted-foreground/40" />
+      </div>
+
       {/* Benefits list */}
       <div
         className={`transition-all duration-500 ${
@@ -228,6 +234,13 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
           0% { transform: translateX(-100%) rotate(15deg); }
           50% { transform: translateX(100%) rotate(15deg); }
           100% { transform: translateX(100%) rotate(15deg); }
+        }
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(8px); }
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 2s ease-in-out infinite;
         }
       `}</style>
     </div>
