@@ -656,18 +656,33 @@ const ClubMembersManagement = () => {
               </Card>
             )}
 
-            <Button
-              onClick={handleSendEmailBroadcast}
-              disabled={!broadcastMessage.trim() || isSendingEmail || activeWithEmailCount === 0}
-              className="w-full h-12 gap-2 bg-gradient-to-l from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90"
-            >
-              {isSendingEmail ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Mail className="w-4 h-4" />
-              )}
-              {isSendingEmail ? 'שולח...' : `שלח מייל ל-${activeWithEmailCount} חברי מועדון`}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={handlePreviewEmail}
+                disabled={isLoadingPreview}
+                variant="outline"
+                className="h-12 gap-2 flex-1"
+              >
+                {isLoadingPreview ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+                תצוגה מקדימה
+              </Button>
+              <Button
+                onClick={handleSendEmailBroadcast}
+                disabled={!broadcastMessage.trim() || isSendingEmail || activeWithEmailCount === 0}
+                className="h-12 gap-2 flex-[2] bg-gradient-to-l from-amber-500 to-primary hover:from-amber-500/90 hover:to-primary/90"
+              >
+                {isSendingEmail ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Mail className="w-4 h-4" />
+                )}
+                {isSendingEmail ? 'שולח...' : `שלח ל-${activeWithEmailCount} חברים`}
+              </Button>
+            </div>
 
             {activeWithEmailCount < activeCount && (
               <p className="text-xs text-amber-600 text-center">
