@@ -192,7 +192,7 @@ const PointsEarnedAnimation = ({ repairPrice, onContinue }: PointsEarnedAnimatio
                 {joinClub && <Check className="w-3.5 h-3.5 text-white" />}
               </div>
               <div className="text-right flex-1">
-                <p className="font-bold text-foreground text-sm flex items-center gap-1.5 justify-end">
+                <p className="font-bold text-foreground text-sm flex items-center gap-1.5 justify-start flex-row-reverse">
                   {joinClub ? 'מצטרף למועדון!' : 'רוצה להצטרף למועדון דיירקט פיקס'}
                   <Crown className="w-4 h-4 text-amber-500" />
                 </p>
