@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Plus, Minus, Coins, MessageCircle, Crown, Send, Users, Sparkles, Loader2, Image, Trash2, Edit, Mail, Eye } from 'lucide-react';
+import { Search, Plus, Minus, Coins, MessageCircle, Crown, Send, Users, Sparkles, Loader2, Image, Trash2, Edit, Mail, Eye, History, Clock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import directfixLogo from '@/assets/directfix-logo.png';
 
