@@ -126,6 +126,7 @@ const ClubMembersManagement = () => {
         totalValue: (pointsMap.get(m.phone) || 0) * POINT_VALUE,
         joinedAt: m.joined_at,
         isActive: m.is_active,
+        wantsPromotions: m.wants_promotions,
       }));
       setMembers(mapped.sort((a, b) => b.totalPoints - a.totalPoints));
     }
