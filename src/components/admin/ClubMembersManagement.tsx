@@ -126,24 +126,33 @@ const ClubMembersManagement = () => {
     }
   };
 
-  const handleGenerateAI = async () => {
+  const handleGenerateAI = async (withImage = false) => {
     if (!aiPrompt.trim()) {
       toast({ title: 'נא לכתוב תיאור למבצע', variant: 'destructive' });
       return;
     }
-    setIsGeneratingAI(true);
+    if (withImage) setIsGeneratingImage(true);
+    else setIsGeneratingAI(true);
+    
     try {
       const { data, error } = await supabase.functions.invoke('generate-club-promo', {
-        body: { prompt: aiPrompt, template: selectedTemplate }
+        body: { prompt: aiPrompt, template: selectedTemplate, generateImage: withImage }
       });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      
       setGeneratedPromo(data.message || '');
       setBroadcastMessage(data.message || '');
       setBroadcastSubject(data.subject || '');
+      if (data.image) setGeneratedImage(data.image);
+      
+      toast({ title: withImage ? 'הודעה ותמונה נוצרו בהצלחה' : 'הודעה נוצרה בהצלחה' });
     } catch (err: any) {
-      toast({ title: 'שגיאה ביצירת מבצע', description: err.message, variant: 'destructive' });
+      console.error('AI generation error:', err);
+      toast({ title: 'שגיאה ביצירת מבצע', description: err.message || 'נסה שוב', variant: 'destructive' });
     } finally {
       setIsGeneratingAI(false);
+      setIsGeneratingImage(false);
     }
   };
 
