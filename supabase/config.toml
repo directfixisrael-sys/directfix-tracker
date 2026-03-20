@@ -35,3 +35,9 @@ verify_jwt = false
 
 [functions.send-club-broadcast-email]
 verify_jwt = false
+
+[functions.send-completion-email]
+verify_jwt = false
+
+[functions.send-lead-recovery-email]
+verify_jwt = false

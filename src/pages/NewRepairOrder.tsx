@@ -1258,24 +1258,24 @@ const NewRepairOrder = () => {
         <div className="w-[calc(100%-2rem)] max-w-md bg-card rounded-2xl p-7 pb-8 shadow-2xl animate-scale-in border-2 border-primary/20">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-extrabold text-foreground">בואו נתחיל</h2>
-            <p className="text-base text-muted-foreground mt-2">שם וטלפון — וישר לבחירת הדגם</p>
+            <p className="text-base text-muted-foreground mt-2">שם מלא ואימייל — וישר לבחירת הדגם</p>
           </div>
 
           <div className="space-y-4">
             <Input
-              placeholder="השם שלכם *"
+              placeholder="שם מלא *"
               value={introName}
               onChange={(e) => setIntroName(e.target.value)}
               className="h-16 text-lg rounded-xl px-5"
               autoFocus
             />
             <Input
-              placeholder="050-0000000 *"
+              placeholder="כתובת דואר אלקטרוני *"
               value={introPhone}
-              onChange={(e) => setIntroPhone(formatPhone(e.target.value))}
-              type="tel"
+              onChange={(e) => setIntroPhone(e.target.value)}
+              type="email"
               dir="ltr"
-              className="h-16 text-lg rounded-xl px-5 text-right tracking-wider"
+              className="h-16 text-lg rounded-xl px-5 text-right"
             />
           </div>
 
@@ -1288,7 +1288,7 @@ const NewRepairOrder = () => {
 
           <Button
             onClick={handleIntroDismiss}
-            disabled={!introName.trim() || introPhone.length < 9 || !introPrivacy}
+            disabled={!introName.trim() || !introPhone.includes('@') || !introPrivacy}
             className="w-full h-12 text-sm font-bold rounded-xl mt-4"
           >
             יאללה, בואו נתחיל!
