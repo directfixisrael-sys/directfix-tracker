@@ -125,6 +125,8 @@ const AdminPanel = () => {
   const [paymentAmount, setPaymentAmount] = useState('');
   const [paymentDescription, setPaymentDescription] = useState('');
   const [settingsSubOpen, setSettingsSubOpen] = useState(false);
+  const [completionEmailPreview, setCompletionEmailPreview] = useState<string | null>(null);
+  const [showCompletionPreview, setShowCompletionPreview] = useState(false);
 
   const { 
     orders, 
