@@ -54,7 +54,8 @@ import {
   Megaphone,
   Bell,
   Award,
-  Crown
+  Crown,
+  Shield
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
