@@ -184,9 +184,9 @@ const ClubSignup = () => {
                     : `${cardBg} ${cardBorder}`
                 }`}
               >
-                <b.icon className={`w-4 h-4 mx-auto mb-1 ${b.highlight ? 'text-primary' : textMuted}`} />
-                <p className="text-[11px] font-bold leading-tight">{b.title}</p>
-                <p className={`text-[10px] ${textMuted} mt-0.5`}>{b.desc}</p>
+                <b.icon className={`w-5 h-5 mx-auto mb-1.5 ${b.highlight ? 'text-primary' : textMuted}`} />
+                <p className="text-sm font-bold leading-tight">{b.title}</p>
+                <p className={`text-xs ${textMuted} mt-0.5`}>{b.desc}</p>
               </div>
             ))}
           </div>
