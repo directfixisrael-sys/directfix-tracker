@@ -26,10 +26,14 @@ const getWarrantyDuration = (issueDescription: string): { months: number; days?:
 const WarrantyCertificate = ({ order }: WarrantyCertificateProps) => {
   if (order.status !== 'completed' || !order.completedAt) return null;
 
-  const warranty = getWarrantyDuration(order.issueDescription);
+  // Use override warranty_months if set, otherwise fall back to auto-detection
+  const autoWarranty = getWarrantyDuration(order.issueDescription);
+  const warranty = order.warrantyMonths
+    ? { months: order.warrantyMonths, label: `${order.warrantyMonths} חודשים` }
+    : autoWarranty;
   const completedDate = new Date(order.completedAt);
-  const expiryDate = warranty.days 
-    ? addDays(completedDate, warranty.days)
+  const expiryDate = (!order.warrantyMonths && autoWarranty.days)
+    ? addDays(completedDate, autoWarranty.days)
     : addMonths(completedDate, warranty.months);
   
   const isExpired = new Date() > expiryDate;
