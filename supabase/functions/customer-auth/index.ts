@@ -417,19 +417,25 @@ serve(async (req) => {
 
       const updates: Record<string, any> = {};
       if (email !== undefined) updates.email = email || null;
-      if (req.url) {
-        // birthday comes from the parsed body
-        const body = { email, birthday: (await req.clone().json().catch(() => ({}))).birthday };
-        // We already parsed the body above, need to use the original parsed values
+      if (birthday !== undefined) updates.birthday = birthday || null;
+
+      const { error: updateError } = await supabase
+        .from("customer_profiles")
+        .update(updates)
+        .eq("phone", normalizedPhone);
+
+      if (updateError) {
+        console.error("Update error:", updateError);
+        return new Response(
+          JSON.stringify({ error: "update_failed" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
-      
-      // Re-parse isn't possible since body was consumed. Use a different approach:
-      // The birthday variable is already extracted at the top from the parsed body
-      const bodyData = { email, birthday: undefined as string | undefined };
-      
-      return new Response(JSON.stringify({ error: "unknown action" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     return new Response(
