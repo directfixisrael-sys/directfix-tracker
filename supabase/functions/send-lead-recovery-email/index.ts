@@ -37,7 +37,7 @@ serve(async (req) => {
   }
 
   try {
-    const { customerName, customerEmail, lastStep, couponCode, couponDiscount, preview } = await req.json();
+    const { customerName, customerEmail, lastStep, couponCode, couponDiscount, deviceType, repairType, preview } = await req.json();
     
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     const stepInfo = getStepInfo(lastStep);
