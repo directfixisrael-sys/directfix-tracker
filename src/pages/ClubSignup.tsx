@@ -154,7 +154,9 @@ const ClubSignup = () => {
             מבצע מרץ — 50 נקודות במתנה
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight leading-snug mb-1">
-            מועדון החברים של <span className="text-primary">דיירקט פיקס</span>
+            מועדון החברים
+            <br />
+            של <span className="text-primary">דיירקט פיקס</span>
           </h1>
           <p className={`${textMuted} text-base`}>הצטרפו בחינם וקבלו הטבות בלעדיות</p>
         </section>
