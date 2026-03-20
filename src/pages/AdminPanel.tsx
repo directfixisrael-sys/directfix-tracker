@@ -1226,6 +1226,16 @@ const AdminPanel = () => {
                           <span className="hidden sm:inline">מייל</span>
                         </Button>
                         <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => selectedOrder && sendCompletionEmail(selectedOrder, true)}
+                          className="gap-1"
+                          disabled={!selectedOrder?.customerEmail}
+                          title="תצוגה מקדימה של מייל"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
                           variant="outline"
                           size="sm"
                           onClick={() => {
