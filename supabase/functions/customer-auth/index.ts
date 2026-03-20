@@ -381,6 +381,57 @@ serve(async (req) => {
       );
     }
 
+    // ── GET PROFILE ──
+    if (action === "get_profile") {
+      if (!normalizedPhone) {
+        return new Response(JSON.stringify({ error: "phone required" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: profile } = await supabase
+        .from("customer_profiles")
+        .select("id, name, email, birthday, phone")
+        .eq("phone", normalizedPhone)
+        .maybeSingle();
+
+      if (!profile) {
+        return new Response(JSON.stringify({ error: "not_found" }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      return new Response(
+        JSON.stringify({ name: profile.name, email: profile.email, birthday: profile.birthday, phone: profile.phone }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ── UPDATE PROFILE ──
+    if (action === "update_profile") {
+      if (!normalizedPhone) {
+        return new Response(JSON.stringify({ error: "phone required" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const updates: Record<string, any> = {};
+      if (email !== undefined) updates.email = email || null;
+      if (req.url) {
+        // birthday comes from the parsed body
+        const body = { email, birthday: (await req.clone().json().catch(() => ({}))).birthday };
+        // We already parsed the body above, need to use the original parsed values
+      }
+      
+      // Re-parse isn't possible since body was consumed. Use a different approach:
+      // The birthday variable is already extracted at the top from the parsed body
+      const bodyData = { email, birthday: undefined as string | undefined };
+      
+      return new Response(JSON.stringify({ error: "unknown action" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(
       JSON.stringify({ error: "unknown action" }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
