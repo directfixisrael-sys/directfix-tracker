@@ -57,6 +57,11 @@ const ClubMembersManagement = () => {
   const [adjustDescription, setAdjustDescription] = useState('');
   const [subTab, setSubTab] = useState<'members' | 'points' | 'broadcast' | 'history'>('members');
 
+  // Add member
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [addForm, setAddForm] = useState({ name: '', phone: '', email: '' });
+  const [isAdding, setIsAdding] = useState(false);
+
   // Member edit/delete
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<ClubMember | null>(null);
