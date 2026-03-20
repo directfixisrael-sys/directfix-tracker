@@ -93,7 +93,7 @@ serve(async (req) => {
 
     const unsubPhone = order.customer_phone.replace(/\D/g, '');
     const unsubToken = btoa(unsubPhone + "_directfix_unsub");
-    const unsubUrl = `${supabaseUrl}/functions/v1/handle-club-unsubscribe?phone=${encodeURIComponent(unsubPhone)}&token=${encodeURIComponent(unsubToken)}`;
+    const unsubUrl = `https://directfix-tracker.lovable.app/unsubscribe?phone=${encodeURIComponent(unsubPhone)}&token=${encodeURIComponent(unsubToken)}`;
 
     const html = `<!DOCTYPE html>
 <html dir="rtl" lang="he">
