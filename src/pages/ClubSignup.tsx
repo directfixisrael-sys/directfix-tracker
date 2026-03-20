@@ -7,7 +7,7 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
 import clubCardImg from '@/assets/club-card.png';
-import { Crown, Gift, Star, Sparkles, Phone, Mail, User, Cake, ChevronLeft, Shield, CheckCircle2, PartyPopper, Sun, Moon } from 'lucide-react';
+import { Crown, Gift, Star, Sparkles, Phone, Mail, User, ChevronLeft, Shield, CheckCircle2, PartyPopper, Sun, Moon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const BENEFITS = [
