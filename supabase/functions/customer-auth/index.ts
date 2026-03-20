@@ -52,7 +52,7 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { action, phone, password, email, name, token } = await req.json();
+    const { action, phone, password, email, name, token, birthday } = await req.json();
     const normalizedPhone = phone?.replace(/\D/g, "") || "";
 
     if (!action) {
@@ -374,6 +374,63 @@ serve(async (req) => {
           reset_token_expires_at: null,
         })
         .eq("id", profile.id);
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ── GET PROFILE ──
+    if (action === "get_profile") {
+      if (!normalizedPhone) {
+        return new Response(JSON.stringify({ error: "phone required" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: profile } = await supabase
+        .from("customer_profiles")
+        .select("id, name, email, birthday, phone")
+        .eq("phone", normalizedPhone)
+        .maybeSingle();
+
+      if (!profile) {
+        return new Response(JSON.stringify({ error: "not_found" }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      return new Response(
+        JSON.stringify({ name: profile.name, email: profile.email, birthday: profile.birthday, phone: profile.phone }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ── UPDATE PROFILE ──
+    if (action === "update_profile") {
+      if (!normalizedPhone) {
+        return new Response(JSON.stringify({ error: "phone required" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const updates: Record<string, any> = {};
+      if (email !== undefined) updates.email = email || null;
+      if (birthday !== undefined) updates.birthday = birthday || null;
+
+      const { error: updateError } = await supabase
+        .from("customer_profiles")
+        .update(updates)
+        .eq("phone", normalizedPhone);
+
+      if (updateError) {
+        console.error("Update error:", updateError);
+        return new Response(
+          JSON.stringify({ error: "update_failed" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
 
       return new Response(
         JSON.stringify({ success: true }),

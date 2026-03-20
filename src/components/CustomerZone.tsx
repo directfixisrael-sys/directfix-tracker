@@ -3,7 +3,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { User, Award, History, ArrowLeft, Phone, Wrench, ChevronDown, ChevronUp, HelpCircle, Sparkles, Lock, Mail, Eye, EyeOff, KeyRound } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { User, Award, History, ArrowLeft, Phone, Wrench, ChevronDown, ChevronUp, HelpCircle, Sparkles, Lock, Mail, Eye, EyeOff, KeyRound, Gift, Calendar, CheckCircle2, Edit3 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { getCustomerPoints, calculateDiscountFromPoints } from '@/components/LoyaltyPointsDisplay';
 import { format } from 'date-fns';
@@ -58,6 +59,10 @@ const CustomerZone = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPointsGuide, setShowPointsGuide] = useState(false);
   const [maskedEmail, setMaskedEmail] = useState('');
+  const [birthday, setBirthday] = useState('');
+  const [profileEmail, setProfileEmail] = useState('');
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // Try to load saved session
   useEffect(() => {
@@ -84,6 +89,11 @@ const CustomerZone = () => {
     const normalized = phoneNum.replace(/\D/g, '');
     setIsLoading(true);
 
+    let profileData: any = null;
+    try {
+      profileData = await callAuth({ action: 'get_profile', phone: normalized });
+    } catch {}
+
     const [pts, ordersRes] = await Promise.all([
       getCustomerPoints(normalized),
       supabase
@@ -101,8 +111,43 @@ const CustomerZone = () => {
     } else {
       setOrders([]);
     }
+    
+    if (profileData) {
+      setBirthday(profileData.birthday || '');
+      setProfileEmail(profileData.email || '');
+      if (profileData.name) setCustomerName(profileData.name);
+    }
+    
     setAuthView('dashboard');
     setIsLoading(false);
+  };
+
+  const getProfileCompletion = () => {
+    const fields = [
+      { label: 'שם', done: !!customerName },
+      { label: 'טלפון', done: !!phone },
+      { label: 'מייל', done: !!profileEmail },
+      { label: 'תאריך לידה', done: !!birthday },
+    ];
+    const completed = fields.filter(f => f.done).length;
+    return { fields, completed, total: fields.length, percent: Math.round((completed / fields.length) * 100) };
+  };
+
+  const handleSaveProfile = async () => {
+    setIsSavingProfile(true);
+    try {
+      await callAuth({
+        action: 'update_profile',
+        phone: phone.replace(/\D/g, ''),
+        email: profileEmail,
+        birthday,
+      });
+      toast({ title: 'הפרופיל עודכן!', description: 'הפרטים נשמרו בהצלחה' });
+      setIsEditingProfile(false);
+    } catch {
+      toast({ title: 'שגיאה', description: 'לא ניתן לעדכן, נסו שוב', variant: 'destructive' });
+    }
+    setIsSavingProfile(false);
   };
 
   // Step 1: Check phone
@@ -271,6 +316,9 @@ const CustomerZone = () => {
     setCustomerName('');
     setResetCode('');
     setNewPassword('');
+    setBirthday('');
+    setProfileEmail('');
+    setIsEditingProfile(false);
     sessionStorage.removeItem('customer_session');
   };
 
@@ -528,7 +576,10 @@ const CustomerZone = () => {
     </div>
   );
 
-  const renderDashboard = () => (
+  const renderDashboard = () => {
+    const profile = getProfileCompletion();
+    
+    return (
     <div className="space-y-5 animate-slide-up">
       {/* Welcome */}
       <div className="text-center">
@@ -540,6 +591,95 @@ const CustomerZone = () => {
         )}
         <p className="text-sm text-muted-foreground" dir="ltr">{phone}</p>
       </div>
+
+      {/* Profile Completion */}
+      {profile.percent < 100 && (
+        <Card className="p-4 border-2 border-amber-200 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Gift className="w-5 h-5 text-amber-600" />
+              <span className="font-bold text-sm text-foreground">השלמת פרופיל</span>
+            </div>
+            <span className="text-sm font-bold text-amber-600">{profile.percent}%</span>
+          </div>
+          <Progress value={profile.percent} className="h-2 mb-3" />
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            {profile.fields.map((f) => (
+              <div key={f.label} className="flex items-center gap-1.5">
+                <CheckCircle2 className={`w-3.5 h-3.5 ${f.done ? 'text-green-500' : 'text-muted-foreground/30'}`} />
+                <span className={`text-xs ${f.done ? 'text-foreground' : 'text-muted-foreground'}`}>{f.label}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-amber-700 dark:text-amber-400 mb-2">
+            השלימו את הפרופיל וקבלו מתנה ביום ההולדת!
+          </p>
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full border-amber-300 text-amber-700 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-950/30"
+            onClick={() => setIsEditingProfile(true)}
+          >
+            <Edit3 className="w-3.5 h-3.5 ml-1" />
+            השלם פרופיל
+          </Button>
+        </Card>
+      )}
+
+      {/* Profile Edit Section */}
+      {isEditingProfile && (
+        <Card className="p-4 space-y-3 border-2 border-primary/20">
+          <div className="flex items-center justify-between">
+            <h4 className="font-bold text-foreground flex items-center gap-2">
+              <Edit3 className="w-4 h-4 text-primary" />
+              עריכת פרופיל
+            </h4>
+            <button onClick={() => setIsEditingProfile(false)} className="text-xs text-muted-foreground underline">סגור</button>
+          </div>
+          <div className="space-y-2">
+            <div className="relative">
+              <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="email"
+                placeholder="כתובת מייל"
+                value={profileEmail}
+                onChange={(e) => setProfileEmail(e.target.value)}
+                className="h-11 pr-10 rounded-xl text-sm"
+                dir="ltr"
+              />
+            </div>
+            <div className="relative">
+              <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="date"
+                placeholder="תאריך לידה"
+                value={birthday}
+                onChange={(e) => setBirthday(e.target.value)}
+                className="h-11 pr-10 rounded-xl text-sm"
+                dir="ltr"
+              />
+            </div>
+          </div>
+          <Button
+            onClick={handleSaveProfile}
+            className="w-full h-10 rounded-xl text-sm font-bold"
+            disabled={isSavingProfile}
+          >
+            {isSavingProfile ? 'שומר...' : 'שמור פרטים'}
+          </Button>
+        </Card>
+      )}
+
+      {/* Completed profile badge */}
+      {profile.percent === 100 && !isEditingProfile && (
+        <Card className="p-3 border border-green-200 bg-green-50/50 dark:bg-green-950/20 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-green-500" />
+            <span className="text-sm font-semibold text-green-700 dark:text-green-400">הפרופיל שלך מלא!</span>
+          </div>
+          <button onClick={() => setIsEditingProfile(true)} className="text-xs text-primary underline">עריכה</button>
+        </Card>
+      )}
 
       {/* Loyalty Points Card */}
       <Card className="overflow-hidden border-2 border-primary/20">
@@ -671,7 +811,8 @@ const CustomerZone = () => {
         התנתק / החלף מספר טלפון
       </button>
     </div>
-  );
+    );
+  };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
