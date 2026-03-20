@@ -3,7 +3,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { User, Award, History, ArrowLeft, Phone, Wrench, ChevronDown, ChevronUp, HelpCircle, Sparkles, Lock, Mail, Eye, EyeOff, KeyRound } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { User, Award, History, ArrowLeft, Phone, Wrench, ChevronDown, ChevronUp, HelpCircle, Sparkles, Lock, Mail, Eye, EyeOff, KeyRound, Gift, Calendar, CheckCircle2, Edit3 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { getCustomerPoints, calculateDiscountFromPoints } from '@/components/LoyaltyPointsDisplay';
 import { format } from 'date-fns';
