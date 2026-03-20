@@ -14,6 +14,7 @@ import ConsultationBooking from "./pages/ConsultationBooking";
 import DataTransfer from "./pages/DataTransfer";
 import NotFound from "./pages/NotFound";
 import ClubTerms from "./pages/ClubTerms";
+import ClubSignup from "./pages/ClubSignup";
 import Unsubscribe from "./pages/Unsubscribe";
 import TermsOfService from "./pages/TermsOfService";
 import StorePage from "./pages/StorePage";
