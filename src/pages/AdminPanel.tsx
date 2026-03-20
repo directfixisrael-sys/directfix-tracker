@@ -911,7 +911,7 @@ const AdminPanel = () => {
             ) : (
               <div className="space-y-3">
                 {sortedCustomers.map((customer) => (
-                  <div key={customer.phone} className="glass-card p-4 rounded-xl hover:bg-muted/30 transition-colors">
+                  <div key={customer.phone} onClick={() => setSelectedCustomerPhone(customer.phone)} className="glass-card p-4 rounded-xl hover:bg-muted/30 transition-colors cursor-pointer">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-start gap-3">
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
