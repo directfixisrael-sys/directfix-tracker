@@ -1186,7 +1186,18 @@ const AdminPanel = () => {
                           className="gap-1 text-green-600 border-green-600 hover:bg-green-50 dark:hover:bg-green-950"
                         >
                           <MessageCircle className="w-4 h-4" />
-                          <span className="hidden sm:inline">שלח וואטסאפ</span>
+                          <span className="hidden sm:inline">וואטסאפ</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => sendCompletionEmail(selectedOrder)}
+                          className="gap-1 text-blue-600 border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950"
+                          disabled={!selectedOrder.customerEmail}
+                          title={!selectedOrder.customerEmail ? 'אין כתובת מייל' : 'שלח מייל ללקוח'}
+                        >
+                          <Send className="w-4 h-4" />
+                          <span className="hidden sm:inline">מייל</span>
                         </Button>
                         <Button
                           variant="outline"
