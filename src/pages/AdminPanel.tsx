@@ -1544,6 +1544,63 @@ const AdminPanel = () => {
                     )}
                   </div>
 
+                  {/* Warranty extension */}
+                  <div className="glass-card rounded-xl p-6">
+                    <h3 className="font-semibold text-foreground mb-4 text-lg flex items-center gap-2">
+                      <Shield className="w-5 h-5" />
+                      הארכת אחריות
+                    </h3>
+                    {selectedOrder.completedAt && (
+                      <div className="mb-3 p-2 bg-muted/50 rounded-lg text-sm text-muted-foreground">
+                        <p>תאריך סיום תיקון: {new Date(selectedOrder.completedAt).toLocaleDateString('he-IL')}</p>
+                        {(selectedOrder as any).warrantyMonths ? (
+                          <p className="text-success font-medium mt-1">
+                            אחריות נוכחית: {(selectedOrder as any).warrantyMonths} חודשים
+                            (עד {(() => {
+                              const d = new Date(selectedOrder.completedAt!);
+                              d.setMonth(d.getMonth() + ((selectedOrder as any).warrantyMonths || 0));
+                              return d.toLocaleDateString('he-IL');
+                            })()})
+                          </p>
+                        ) : (
+                          <p className="text-muted-foreground mt-1">אחריות ברירת מחדל לפי סוג תיקון</p>
+                        )}
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <select
+                        value={warrantyMonths}
+                        onChange={(e) => setWarrantyMonths(e.target.value)}
+                        className="flex-1 h-10 rounded-md border border-input bg-background px-3 text-sm"
+                      >
+                        <option value="">בחר תקופת אחריות</option>
+                        <option value="3">3 חודשים</option>
+                        <option value="6">6 חודשים</option>
+                        <option value="12">12 חודשים (שנה)</option>
+                        <option value="18">18 חודשים</option>
+                        <option value="24">24 חודשים (שנתיים)</option>
+                      </select>
+                      <Button onClick={async () => {
+                        if (selectedOrder && warrantyMonths) {
+                          const months = Number(warrantyMonths);
+                          const { error } = await supabase
+                            .from('orders')
+                            .update({ warranty_months: months })
+                            .eq('id', selectedOrder.id);
+                          if (error) {
+                            toast({ title: "שגיאה בעדכון אחריות", variant: "destructive" });
+                          } else {
+                            toast({ title: `אחריות עודכנה ל-${months} חודשים` });
+                            setWarrantyMonths('');
+                            loadOrders();
+                          }
+                        }
+                      }}>
+                        עדכן
+                      </Button>
+                    </div>
+                  </div>
+
                   {/* Payment link */}
                   <div className="glass-card rounded-xl p-6">
                     <h3 className="font-semibold text-foreground mb-4 text-lg flex items-center gap-2">
