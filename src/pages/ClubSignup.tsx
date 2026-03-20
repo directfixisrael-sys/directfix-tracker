@@ -97,7 +97,7 @@ const ClubSignup = () => {
   const textMuted = isDark ? 'text-white/50' : 'text-[hsl(220,12%,44%)]';
   const cardBg = isDark ? 'bg-[hsl(220,18%,13%)]' : 'bg-white';
   const cardBorder = isDark ? 'border-white/8' : 'border-[hsl(220,15%,90%)]';
-  const inputBg = isDark ? 'bg-[hsl(220,18%,18%)] border-white/15 text-white placeholder:text-white/40' : 'bg-background';
+  const inputBg = isDark ? 'bg-white border-[hsl(220,15%,80%)] text-[hsl(220,25%,12%)] placeholder:text-[hsl(220,12%,55%)]' : 'bg-white border-[hsl(220,15%,85%)]';
   const headerBg = isDark ? 'bg-[hsl(220,20%,8%)]/95' : 'bg-[hsl(40,60%,97%)]/95';
   const accentBg = isDark ? 'bg-primary/15' : 'bg-primary/8';
 
