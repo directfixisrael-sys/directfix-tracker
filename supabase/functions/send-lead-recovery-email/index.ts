@@ -42,7 +42,13 @@ serve(async (req) => {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     const stepInfo = getStepInfo(lastStep);
     
-    const orderUrl = `https://directfix-tracker.lovable.app/order`;
+    const orderParams = new URLSearchParams();
+    orderParams.set('step', stepInfo.param);
+    if (couponCode) orderParams.set('coupon', couponCode);
+    if (couponDiscount) orderParams.set('discount', String(couponDiscount));
+    if (customerName) orderParams.set('name', customerName);
+    if (customerEmail) orderParams.set('email', customerEmail);
+    const orderUrl = `https://directfix-tracker.lovable.app/order?${orderParams.toString()}`;
     
     const couponSection = couponCode ? `
     <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-radius:16px;padding:24px;margin-bottom:24px;border:2px solid #f59e0b;text-align:center;">
