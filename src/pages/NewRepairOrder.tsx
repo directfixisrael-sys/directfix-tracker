@@ -532,6 +532,41 @@ const NewRepairOrder = () => {
     loadData();
   }, []);
 
+  // Read URL params for lead recovery (step, coupon, name, email)
+  useEffect(() => {
+    if (isLoading) return;
+    const urlStep = searchParams.get('step') as Step | null;
+    const urlCoupon = searchParams.get('coupon');
+    const urlDiscount = searchParams.get('discount');
+    const urlName = searchParams.get('name');
+    const urlEmail = searchParams.get('email');
+
+    if (urlName) {
+      setIntroName(urlName);
+      setCustomerName(urlName);
+    }
+    if (urlEmail) {
+      setIntroPhone(urlEmail);
+      setCustomerEmail(urlEmail);
+    }
+
+    // Auto-apply coupon from URL
+    if (urlCoupon && urlDiscount) {
+      setCouponCode(urlCoupon);
+      setAppliedCoupon({
+        code: urlCoupon,
+        discount_type: 'fixed',
+        discount_value: Number(urlDiscount),
+      });
+    }
+
+    // Skip intro and jump to step
+    if (urlStep && ['model', 'repair', 'bundle', 'points', 'price', 'schedule', 'details'].includes(urlStep)) {
+      setShowIntroCard(false);
+      setStep(urlStep);
+    }
+  }, [isLoading]);
+
   // Get available dates (next 7 days, excluding blocked dates)
   const getAvailableDates = () => {
     const dates: Date[] = [];
