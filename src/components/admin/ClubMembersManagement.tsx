@@ -57,6 +57,11 @@ const ClubMembersManagement = () => {
   const [adjustDescription, setAdjustDescription] = useState('');
   const [subTab, setSubTab] = useState<'members' | 'points' | 'broadcast' | 'history'>('members');
 
+  // Add member
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [addForm, setAddForm] = useState({ name: '', phone: '', email: '' });
+  const [isAdding, setIsAdding] = useState(false);
+
   // Member edit/delete
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<ClubMember | null>(null);
@@ -185,6 +190,47 @@ const ClubMembersManagement = () => {
     } catch (err: any) {
       toast({ title: 'שגיאה במחיקה', description: err.message, variant: 'destructive' });
     }
+  };
+
+  // --- Add member ---
+  const handleAddMember = async () => {
+    if (!addForm.phone.trim() || !addForm.name.trim()) {
+      toast({ title: 'נא למלא שם וטלפון', variant: 'destructive' });
+      return;
+    }
+    setIsAdding(true);
+    try {
+      const normalizedPhone = addForm.phone.replace(/\D/g, '');
+      // Check if already exists
+      const { data: existing } = await supabase
+        .from('club_members')
+        .select('phone')
+        .eq('phone', normalizedPhone)
+        .maybeSingle();
+
+      if (existing) {
+        toast({ title: 'מספר זה כבר רשום במועדון', variant: 'destructive' });
+        setIsAdding(false);
+        return;
+      }
+
+      const { error } = await supabase.from('club_members').insert({
+        phone: normalizedPhone,
+        name: addForm.name.trim(),
+        email: addForm.email.trim() || null,
+        is_active: true,
+        wants_promotions: true,
+      });
+
+      if (error) throw error;
+      toast({ title: `${addForm.name} נוסף למועדון בהצלחה! 🎉` });
+      setAddDialogOpen(false);
+      setAddForm({ name: '', phone: '', email: '' });
+      loadMembers();
+    } catch (err: any) {
+      toast({ title: 'שגיאה בהוספה', description: err.message, variant: 'destructive' });
+    }
+    setIsAdding(false);
   };
 
   // --- Points ---
@@ -395,14 +441,20 @@ const ClubMembersManagement = () => {
 
         {/* Members tab */}
         <TabsContent value="members" className="space-y-4 mt-4">
-          <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="חפש לפי שם או טלפון..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pr-10"
-            />
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="חפש לפי שם או טלפון..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="pr-10"
+              />
+            </div>
+            <Button onClick={() => setAddDialogOpen(true)} className="gap-1.5 shrink-0">
+              <Plus className="w-4 h-4" />
+              הוסף חבר
+            </Button>
           </div>
 
           <div className="space-y-3">
@@ -821,6 +873,44 @@ const ClubMembersManagement = () => {
             <div className="flex gap-2 pt-2">
               <Button onClick={handleSaveMember} className="flex-1">שמור</Button>
               <Button variant="outline" onClick={() => setEditDialogOpen(false)}>ביטול</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add member dialog */}
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="max-w-sm" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>הוספת חבר מועדון חדש</DialogTitle>
+            <DialogDescription>הזן את פרטי החבר החדש</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 mt-2">
+            <Input
+              placeholder="שם מלא *"
+              value={addForm.name}
+              onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))}
+            />
+            <Input
+              placeholder="מספר טלפון *"
+              type="tel"
+              dir="ltr"
+              value={addForm.phone}
+              onChange={e => setAddForm(f => ({ ...f, phone: e.target.value }))}
+            />
+            <Input
+              placeholder="אימייל (אופציונלי)"
+              type="email"
+              dir="ltr"
+              value={addForm.email}
+              onChange={e => setAddForm(f => ({ ...f, email: e.target.value }))}
+            />
+            <div className="flex gap-2 pt-2">
+              <Button onClick={handleAddMember} disabled={isAdding} className="flex-1">
+                {isAdding ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : <Plus className="w-4 h-4 ml-2" />}
+                הוסף למועדון
+              </Button>
+              <Button variant="outline" onClick={() => setAddDialogOpen(false)}>ביטול</Button>
             </div>
           </div>
         </DialogContent>
