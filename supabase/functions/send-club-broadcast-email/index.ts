@@ -7,8 +7,7 @@ const corsHeaders = {
 
 function buildUnsubscribeUrl(phone: string): string {
   const token = btoa(phone + "_directfix_unsub");
-  const baseUrl = Deno.env.get("SUPABASE_URL") || "";
-  return `${baseUrl}/functions/v1/handle-club-unsubscribe?phone=${encodeURIComponent(phone)}&token=${encodeURIComponent(token)}`;
+  return `https://directfix-tracker.lovable.app/unsubscribe?phone=${encodeURIComponent(phone)}&token=${encodeURIComponent(token)}`;
 }
 
 function buildEmailHtml(subject: string, message: string, image: string | null, recipientName: string, phone?: string): string {

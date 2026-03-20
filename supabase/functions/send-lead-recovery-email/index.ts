@@ -37,7 +37,7 @@ serve(async (req) => {
   }
 
   try {
-    const { customerName, customerEmail, lastStep, couponCode, couponDiscount, preview } = await req.json();
+    const { customerName, customerEmail, lastStep, couponCode, couponDiscount, deviceType, repairType, preview } = await req.json();
     
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     const stepInfo = getStepInfo(lastStep);
@@ -48,11 +48,12 @@ serve(async (req) => {
     if (couponDiscount) orderParams.set('discount', String(couponDiscount));
     if (customerName) orderParams.set('name', customerName);
     if (customerEmail) orderParams.set('email', customerEmail);
+    if (deviceType) orderParams.set('device', deviceType);
+    if (repairType) orderParams.set('repair_type', repairType);
     const orderUrl = `https://directfix-tracker.lovable.app/order?${orderParams.toString()}`;
     
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "https://sggvzsewumgdhigdhcqp.supabase.co";
     const emailToken = btoa((customerEmail || '') + "_directfix_unsub");
-    const unsubscribeUrl = `${supabaseUrl}/functions/v1/handle-club-unsubscribe?phone=${encodeURIComponent(customerEmail || '')}&token=${encodeURIComponent(emailToken)}`;
+    const unsubscribeUrl = `https://directfix-tracker.lovable.app/unsubscribe?phone=${encodeURIComponent(customerEmail || '')}&token=${encodeURIComponent(emailToken)}`;
     
     const couponSection = couponCode ? `
     <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-radius:16px;padding:24px;margin-bottom:24px;border:2px solid #f59e0b;text-align:center;">
