@@ -576,7 +576,10 @@ const CustomerZone = () => {
     </div>
   );
 
-  const renderDashboard = () => (
+  const renderDashboard = () => {
+    const profile = getProfileCompletion();
+    
+    return (
     <div className="space-y-5 animate-slide-up">
       {/* Welcome */}
       <div className="text-center">
@@ -588,6 +591,95 @@ const CustomerZone = () => {
         )}
         <p className="text-sm text-muted-foreground" dir="ltr">{phone}</p>
       </div>
+
+      {/* Profile Completion */}
+      {profile.percent < 100 && (
+        <Card className="p-4 border-2 border-amber-200 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Gift className="w-5 h-5 text-amber-600" />
+              <span className="font-bold text-sm text-foreground">השלמת פרופיל</span>
+            </div>
+            <span className="text-sm font-bold text-amber-600">{profile.percent}%</span>
+          </div>
+          <Progress value={profile.percent} className="h-2 mb-3" />
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            {profile.fields.map((f) => (
+              <div key={f.label} className="flex items-center gap-1.5">
+                <CheckCircle2 className={`w-3.5 h-3.5 ${f.done ? 'text-green-500' : 'text-muted-foreground/30'}`} />
+                <span className={`text-xs ${f.done ? 'text-foreground' : 'text-muted-foreground'}`}>{f.label}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-amber-700 dark:text-amber-400 mb-2">
+            השלימו את הפרופיל וקבלו מתנה ביום ההולדת!
+          </p>
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full border-amber-300 text-amber-700 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-950/30"
+            onClick={() => setIsEditingProfile(true)}
+          >
+            <Edit3 className="w-3.5 h-3.5 ml-1" />
+            השלם פרופיל
+          </Button>
+        </Card>
+      )}
+
+      {/* Profile Edit Section */}
+      {isEditingProfile && (
+        <Card className="p-4 space-y-3 border-2 border-primary/20">
+          <div className="flex items-center justify-between">
+            <h4 className="font-bold text-foreground flex items-center gap-2">
+              <Edit3 className="w-4 h-4 text-primary" />
+              עריכת פרופיל
+            </h4>
+            <button onClick={() => setIsEditingProfile(false)} className="text-xs text-muted-foreground underline">סגור</button>
+          </div>
+          <div className="space-y-2">
+            <div className="relative">
+              <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="email"
+                placeholder="כתובת מייל"
+                value={profileEmail}
+                onChange={(e) => setProfileEmail(e.target.value)}
+                className="h-11 pr-10 rounded-xl text-sm"
+                dir="ltr"
+              />
+            </div>
+            <div className="relative">
+              <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="date"
+                placeholder="תאריך לידה"
+                value={birthday}
+                onChange={(e) => setBirthday(e.target.value)}
+                className="h-11 pr-10 rounded-xl text-sm"
+                dir="ltr"
+              />
+            </div>
+          </div>
+          <Button
+            onClick={handleSaveProfile}
+            className="w-full h-10 rounded-xl text-sm font-bold"
+            disabled={isSavingProfile}
+          >
+            {isSavingProfile ? 'שומר...' : 'שמור פרטים'}
+          </Button>
+        </Card>
+      )}
+
+      {/* Completed profile badge */}
+      {profile.percent === 100 && !isEditingProfile && (
+        <Card className="p-3 border border-green-200 bg-green-50/50 dark:bg-green-950/20 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-green-500" />
+            <span className="text-sm font-semibold text-green-700 dark:text-green-400">הפרופיל שלך מלא!</span>
+          </div>
+          <button onClick={() => setIsEditingProfile(true)} className="text-xs text-primary underline">עריכה</button>
+        </Card>
+      )}
 
       {/* Loyalty Points Card */}
       <Card className="overflow-hidden border-2 border-primary/20">
