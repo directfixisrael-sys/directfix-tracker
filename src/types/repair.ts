@@ -40,6 +40,7 @@ export interface RepairOrder {
   leadSource?: string;
   deviceImages?: string[];
   isClubMember?: boolean;
+  warrantyMonths?: number;
 }
 
 export interface Accessory {
