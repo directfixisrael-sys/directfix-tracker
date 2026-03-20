@@ -2462,6 +2462,32 @@ const AdminPanel = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Completion Email Preview Dialog */}
+      <Dialog open={showCompletionPreview} onOpenChange={setShowCompletionPreview}>
+        <DialogContent className="max-w-2xl max-h-[85vh] p-0">
+          <DialogHeader className="p-4 pb-0">
+            <DialogTitle>תצוגה מקדימה - מייל סיום תיקון</DialogTitle>
+            <DialogDescription>כך ייראה המייל שיישלח ללקוח</DialogDescription>
+          </DialogHeader>
+          {completionEmailPreview && (
+            <iframe
+              srcDoc={completionEmailPreview}
+              className="w-full border-0 rounded-b-2xl"
+              style={{ height: '60vh' }}
+              title="תצוגה מקדימה"
+            />
+          )}
+          <div className="p-4 pt-0 flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => setShowCompletionPreview(false)}>סגור</Button>
+            {selectedOrder && (
+              <Button onClick={() => { sendCompletionEmail(selectedOrder); setShowCompletionPreview(false); }}>
+                <Send className="w-4 h-4 ml-2" /> שלח מייל
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
