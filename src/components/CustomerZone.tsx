@@ -63,6 +63,7 @@ const CustomerZone = () => {
   const [profileEmail, setProfileEmail] = useState('');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [wizardStep, setWizardStep] = useState(0); // 0=closed, 1=birthday, 2=email, 3=done
 
   // Try to load saved session
   useEffect(() => {
