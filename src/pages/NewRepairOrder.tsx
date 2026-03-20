@@ -327,7 +327,8 @@ const NewRepairOrder = () => {
   // Sync intro fields to customer fields and save lead
   const handleIntroDismiss = async () => {
     if (introName.trim()) setCustomerName(introName.trim());
-    if (introPhone.trim()) setCustomerPhone(introPhone.trim());
+    // introPhone is now email
+    if (introPhone.trim()) setCustomerEmail(introPhone.trim());
     setShowIntroCard(false);
 
     // Scroll to top after dismissing intro
@@ -336,41 +337,19 @@ const NewRepairOrder = () => {
     document.body.scrollTop = 0;
     if (contentRef.current) contentRef.current.scrollTop = 0;
 
-    const normalizedPhone = introPhone.replace(/\D/g, '');
-    
-    // Check if returning customer
-    const { data: existingOrders } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('customer_phone', normalizedPhone)
-      .limit(1);
-    
-    const isReturning = !!(existingOrders && existingOrders.length > 0);
-    setIsReturningCustomer(isReturning);
-
-    // Save lead to DB
+    // Save lead to DB (with email)
     try {
       const { data: leadData } = await supabase.from('leads').insert({
         customer_name: introName.trim(),
-        customer_phone: normalizedPhone,
+        customer_phone: '',
+        customer_email: introPhone.trim(),
         privacy_accepted: introPrivacy,
-        is_returning_customer: isReturning,
+        is_returning_customer: false,
         last_step: 'בחירת דגם',
       }).select('id').single();
       if (leadData) setCurrentLeadId(leadData.id);
     } catch (e) {
       console.error('Error saving lead:', e);
-    }
-
-    if (isReturning) {
-      toast.success(`ברוכים השבים ${introName.trim()}! מגן מסך במתנה!`);
-    }
-
-    // Load loyalty points
-    const pts = await getCustomerPoints(normalizedPhone);
-    if (pts > 0) {
-      setCustomerLoyaltyPoints(pts);
-      setLoyaltyDiscount(calculateDiscountFromPoints(pts));
     }
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
@@ -1258,24 +1237,24 @@ const NewRepairOrder = () => {
         <div className="w-[calc(100%-2rem)] max-w-md bg-card rounded-2xl p-7 pb-8 shadow-2xl animate-scale-in border-2 border-primary/20">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-extrabold text-foreground">בואו נתחיל</h2>
-            <p className="text-base text-muted-foreground mt-2">שם וטלפון — וישר לבחירת הדגם</p>
+            <p className="text-base text-muted-foreground mt-2">שם מלא ואימייל — וישר לבחירת הדגם</p>
           </div>
 
           <div className="space-y-4">
             <Input
-              placeholder="השם שלכם *"
+              placeholder="שם מלא *"
               value={introName}
               onChange={(e) => setIntroName(e.target.value)}
               className="h-16 text-lg rounded-xl px-5"
               autoFocus
             />
             <Input
-              placeholder="050-0000000 *"
+              placeholder="כתובת דואר אלקטרוני *"
               value={introPhone}
-              onChange={(e) => setIntroPhone(formatPhone(e.target.value))}
-              type="tel"
+              onChange={(e) => setIntroPhone(e.target.value)}
+              type="email"
               dir="ltr"
-              className="h-16 text-lg rounded-xl px-5 text-right tracking-wider"
+              className="h-16 text-lg rounded-xl px-5 text-right"
             />
           </div>
 
@@ -1288,7 +1267,7 @@ const NewRepairOrder = () => {
 
           <Button
             onClick={handleIntroDismiss}
-            disabled={!introName.trim() || introPhone.length < 9 || !introPrivacy}
+            disabled={!introName.trim() || !introPhone.includes('@') || !introPrivacy}
             className="w-full h-12 text-sm font-bold rounded-xl mt-4"
           >
             יאללה, בואו נתחיל!

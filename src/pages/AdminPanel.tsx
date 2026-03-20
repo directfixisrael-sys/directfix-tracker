@@ -125,6 +125,8 @@ const AdminPanel = () => {
   const [paymentAmount, setPaymentAmount] = useState('');
   const [paymentDescription, setPaymentDescription] = useState('');
   const [settingsSubOpen, setSettingsSubOpen] = useState(false);
+  const [completionEmailPreview, setCompletionEmailPreview] = useState<string | null>(null);
+  const [showCompletionPreview, setShowCompletionPreview] = useState(false);
 
   const { 
     orders, 
@@ -495,6 +497,30 @@ const AdminPanel = () => {
       title: "וואטסאפ נפתח",
       description: wazeEta ? `זמן הגעה מוויז: ${wazeEta}` : "שלח את ההודעה ללקוח",
     });
+  };
+
+  // Send completion email to customer
+
+  const sendCompletionEmail = async (order: RepairOrder, previewOnly = false) => {
+    if (!order.customerEmail) {
+      toast({ title: "אין כתובת מייל", description: "לא ניתן לשלוח מייל ללקוח ללא כתובת מייל", variant: "destructive" });
+      return;
+    }
+    try {
+      const { data, error } = await supabase.functions.invoke('send-completion-email', {
+        body: { orderId: order.id, preview: previewOnly }
+      });
+      if (error) throw error;
+      if (previewOnly && data?.html) {
+        setCompletionEmailPreview(data.html);
+        setShowCompletionPreview(true);
+      } else {
+        toast({ title: "מייל נשלח!", description: `מייל סיום תיקון נשלח ל-${order.customerEmail}` });
+      }
+    } catch (e) {
+      console.error("Error sending completion email:", e);
+      toast({ title: "שגיאה", description: "לא ניתן לשלוח את המייל", variant: "destructive" });
+    }
   };
 
   const orderMessages = selectedOrder 
@@ -1186,7 +1212,28 @@ const AdminPanel = () => {
                           className="gap-1 text-green-600 border-green-600 hover:bg-green-50 dark:hover:bg-green-950"
                         >
                           <MessageCircle className="w-4 h-4" />
-                          <span className="hidden sm:inline">שלח וואטסאפ</span>
+                          <span className="hidden sm:inline">וואטסאפ</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => sendCompletionEmail(selectedOrder)}
+                          className="gap-1 text-blue-600 border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950"
+                          disabled={!selectedOrder.customerEmail}
+                          title={!selectedOrder.customerEmail ? 'אין כתובת מייל' : 'שלח מייל ללקוח'}
+                        >
+                          <Send className="w-4 h-4" />
+                          <span className="hidden sm:inline">מייל</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => selectedOrder && sendCompletionEmail(selectedOrder, true)}
+                          className="gap-1"
+                          disabled={!selectedOrder?.customerEmail}
+                          title="תצוגה מקדימה של מייל"
+                        >
+                          <Eye className="w-4 h-4" />
                         </Button>
                         <Button
                           variant="outline"
@@ -2422,6 +2469,32 @@ const AdminPanel = () => {
                 {label}
               </Button>
             ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Completion Email Preview Dialog */}
+      <Dialog open={showCompletionPreview} onOpenChange={setShowCompletionPreview}>
+        <DialogContent className="max-w-2xl max-h-[85vh] p-0">
+          <DialogHeader className="p-4 pb-0">
+            <DialogTitle>תצוגה מקדימה - מייל סיום תיקון</DialogTitle>
+            <DialogDescription>כך ייראה המייל שיישלח ללקוח</DialogDescription>
+          </DialogHeader>
+          {completionEmailPreview && (
+            <iframe
+              srcDoc={completionEmailPreview}
+              className="w-full border-0 rounded-b-2xl"
+              style={{ height: '60vh' }}
+              title="תצוגה מקדימה"
+            />
+          )}
+          <div className="p-4 pt-0 flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => setShowCompletionPreview(false)}>סגור</Button>
+            {selectedOrder && (
+              <Button onClick={() => { sendCompletionEmail(selectedOrder); setShowCompletionPreview(false); }}>
+                <Send className="w-4 h-4 ml-2" /> שלח מייל
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>

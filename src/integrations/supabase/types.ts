@@ -291,6 +291,7 @@ export type Database = {
         Row: {
           converted: boolean
           created_at: string
+          customer_email: string | null
           customer_name: string
           customer_phone: string
           device_type: string | null
@@ -304,6 +305,7 @@ export type Database = {
         Insert: {
           converted?: boolean
           created_at?: string
+          customer_email?: string | null
           customer_name: string
           customer_phone: string
           device_type?: string | null
@@ -317,6 +319,7 @@ export type Database = {
         Update: {
           converted?: boolean
           created_at?: string
+          customer_email?: string | null
           customer_name?: string
           customer_phone?: string
           device_type?: string | null
