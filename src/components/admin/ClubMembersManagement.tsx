@@ -878,6 +878,44 @@ const ClubMembersManagement = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Add member dialog */}
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="max-w-sm" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>הוספת חבר מועדון חדש</DialogTitle>
+            <DialogDescription>הזן את פרטי החבר החדש</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 mt-2">
+            <Input
+              placeholder="שם מלא *"
+              value={addForm.name}
+              onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))}
+            />
+            <Input
+              placeholder="מספר טלפון *"
+              type="tel"
+              dir="ltr"
+              value={addForm.phone}
+              onChange={e => setAddForm(f => ({ ...f, phone: e.target.value }))}
+            />
+            <Input
+              placeholder="אימייל (אופציונלי)"
+              type="email"
+              dir="ltr"
+              value={addForm.email}
+              onChange={e => setAddForm(f => ({ ...f, email: e.target.value }))}
+            />
+            <div className="flex gap-2 pt-2">
+              <Button onClick={handleAddMember} disabled={isAdding} className="flex-1">
+                {isAdding ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : <Plus className="w-4 h-4 ml-2" />}
+                הוסף למועדון
+              </Button>
+              <Button variant="outline" onClick={() => setAddDialogOpen(false)}>ביטול</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Email Preview Dialog */}
       <Dialog open={!!emailPreviewHtml} onOpenChange={(open) => !open && setEmailPreviewHtml(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
