@@ -22,9 +22,11 @@ function getStepInfo(lastStep: string): { param: string; label: string } {
   const map: Record<string, { param: string; label: string }> = {
     'בחירת דגם': { param: 'model', label: 'בחירת דגם' },
     'בחירת תיקון': { param: 'repair', label: 'בחירת סוג תיקון' },
-    'מחיר': { param: 'price', label: 'אישור מחיר' },
-    'מועד': { param: 'schedule', label: 'בחירת מועד' },
-    'פרטים': { param: 'details', label: 'מילוי פרטים' },
+    'חבילה': { param: 'bundle', label: 'בחירת חבילה' },
+    'נקודות': { param: 'points', label: 'נקודות מועדון' },
+    'אישור מחיר': { param: 'price', label: 'אישור מחיר' },
+    'תיאום מועד': { param: 'schedule', label: 'בחירת מועד' },
+    'מילוי פרטים': { param: 'details', label: 'מילוי פרטים' },
   };
   return map[lastStep] || { param: 'model', label: 'תחילת הזמנה' };
 }
