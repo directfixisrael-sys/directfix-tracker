@@ -164,6 +164,8 @@ const LeadsManagement = () => {
           lastStep: selectedLead.last_step,
           couponCode: recoveryCouponCode || undefined,
           couponDiscount: recoveryCouponDiscount ? Number(recoveryCouponDiscount) : undefined,
+          deviceType: selectedLead.device_type || undefined,
+          repairType: selectedLead.repair_type || undefined,
           preview: false,
         }
       });
