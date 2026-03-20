@@ -130,6 +130,7 @@ const AdminPanel = () => {
   const [settingsSubOpen, setSettingsSubOpen] = useState(false);
   const [completionEmailPreview, setCompletionEmailPreview] = useState<string | null>(null);
   const [showCompletionPreview, setShowCompletionPreview] = useState(false);
+  const [selectedCustomerPhone, setSelectedCustomerPhone] = useState<string | null>(null);
 
   const { 
     orders, 
