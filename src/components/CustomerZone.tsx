@@ -811,7 +811,8 @@ const CustomerZone = () => {
         התנתק / החלף מספר טלפון
       </button>
     </div>
-  );
+    );
+  };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
