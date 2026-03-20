@@ -48,6 +48,8 @@ serve(async (req) => {
     if (couponDiscount) orderParams.set('discount', String(couponDiscount));
     if (customerName) orderParams.set('name', customerName);
     if (customerEmail) orderParams.set('email', customerEmail);
+    if (deviceType) orderParams.set('device', deviceType);
+    if (repairType) orderParams.set('repair_type', repairType);
     const orderUrl = `https://directfix-tracker.lovable.app/order?${orderParams.toString()}`;
     
     const emailToken = btoa((customerEmail || '') + "_directfix_unsub");
