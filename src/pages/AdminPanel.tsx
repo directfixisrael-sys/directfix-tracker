@@ -741,6 +741,19 @@ const AdminPanel = () => {
         );
 
       case 'customers':
+        // If a customer is selected, show their full profile
+        if (selectedCustomerPhone) {
+          const selectedCustomerName = orders.find(o => o.customerPhone === selectedCustomerPhone)?.customerName || '';
+          return (
+            <CustomerProfileView
+              phone={selectedCustomerPhone}
+              name={selectedCustomerName}
+              orders={orders}
+              onClose={() => setSelectedCustomerPhone(null)}
+            />
+          );
+        }
+
         // Build unique customers with more data
         const uniqueCustomers = orders.reduce((acc, order) => {
           const existing = acc.find(c => c.phone === order.customerPhone);
