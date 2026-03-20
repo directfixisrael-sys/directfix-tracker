@@ -52,7 +52,7 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { action, phone, password, email, name, token } = await req.json();
+    const { action, phone, password, email, name, token, birthday } = await req.json();
     const normalizedPhone = phone?.replace(/\D/g, "") || "";
 
     if (!action) {
