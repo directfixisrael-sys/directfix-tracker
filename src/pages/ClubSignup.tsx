@@ -160,14 +160,13 @@ const ClubSignup = () => {
         </section>
 
         {/* Card - animated */}
-        <section className="py-3 flex justify-center perspective-[800px]">
+        <section className="py-1 flex justify-center perspective-[800px]">
           <div className="relative group">
-            {/* Glow effect */}
-            <div className="absolute -inset-4 rounded-3xl bg-primary/20 blur-2xl opacity-0 animate-[glow-pulse_3s_ease-in-out_infinite] group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -inset-3 rounded-3xl bg-primary/20 blur-2xl opacity-0 animate-[glow-pulse_3s_ease-in-out_infinite] group-hover:opacity-100 transition-opacity duration-500" />
             <img
               src={clubCardImg}
               alt="כרטיס מועדון"
-              className="relative w-[220px] drop-shadow-xl animate-[card-float_4s_ease-in-out_infinite] hover:animate-[card-flip_0.8s_ease-in-out_forwards] cursor-pointer"
+              className="relative w-[280px] drop-shadow-xl animate-[card-float_4s_ease-in-out_infinite] hover:animate-[card-flip_0.8s_ease-in-out_forwards] cursor-pointer"
               style={{ transformStyle: 'preserve-3d' }}
             />
           </div>
