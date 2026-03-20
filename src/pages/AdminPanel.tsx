@@ -96,6 +96,7 @@ const AdminPanel = () => {
   const [invoiceLink, setInvoiceLink] = useState('');
   const [paymentLink, setPaymentLink] = useState('');
   const [statusNote, setStatusNote] = useState('');
+  const [warrantyMonths, setWarrantyMonths] = useState('');
   const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
