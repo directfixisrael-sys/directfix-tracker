@@ -251,10 +251,10 @@ const ClubSignup = () => {
         {/* Terms */}
         <section className="pb-6">
           <div className={`rounded-xl p-3 border ${cardBorder} ${isDark ? 'bg-white/3' : 'bg-black/[0.015]'}`}>
-            <h3 className={`text-[11px] font-bold mb-2 flex items-center gap-1 ${textMuted}`}>
-              <Shield className="w-3 h-3" /> תקנון ותנאים
+            <h3 className={`text-sm font-bold mb-2 flex items-center gap-1.5 ${textMuted}`}>
+              <Shield className="w-3.5 h-3.5" /> תקנון ותנאים
             </h3>
-            <ul className="space-y-1">
+            <ul className="space-y-1.5">
               {[
                 'ההצטרפות בחינם ואינה מחייבת רכישה.',
                 'נקודות למימוש בחנות ההטבות בלבד.',
@@ -263,8 +263,8 @@ const ClubSignup = () => {
                 'ניתן לבטל חברות בכל עת.',
                 <>המידע נשמר בהתאם ל<Link to="/terms" className="text-primary underline">מדיניות הפרטיות</Link>.</>,
               ].map((t, i) => (
-                <li key={i} className={`flex gap-1.5 text-[10px] ${textMuted} leading-relaxed`}>
-                  <CheckCircle2 className="w-2.5 h-2.5 mt-0.5 flex-shrink-0 text-green-500/70" />
+                <li key={i} className={`flex gap-1.5 text-xs ${textMuted} leading-relaxed`}>
+                  <CheckCircle2 className="w-3 h-3 mt-0.5 flex-shrink-0 text-green-500/70" />
                   <span>{t}</span>
                 </li>
               ))}
