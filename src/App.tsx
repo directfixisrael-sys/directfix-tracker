@@ -14,6 +14,7 @@ import ConsultationBooking from "./pages/ConsultationBooking";
 import DataTransfer from "./pages/DataTransfer";
 import NotFound from "./pages/NotFound";
 import ClubTerms from "./pages/ClubTerms";
+import ClubSignup from "./pages/ClubSignup";
 import Unsubscribe from "./pages/Unsubscribe";
 import TermsOfService from "./pages/TermsOfService";
 import StorePage from "./pages/StorePage";
@@ -64,6 +65,7 @@ const App = () => (
                   <Route path="/consultation" element={<ConsultationBooking />} />
                   <Route path="/data-transfer" element={<DataTransfer />} />
                   <Route path="/club-terms" element={<ClubTerms />} />
+                  <Route path="/club" element={<ClubSignup />} />
                   <Route path="/unsubscribe" element={<Unsubscribe />} />
                   <Route path="/terms" element={<TermsOfService />} />
                   <Route path="*" element={<NotFound />} />
