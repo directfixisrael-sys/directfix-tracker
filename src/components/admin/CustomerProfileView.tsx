@@ -56,10 +56,10 @@ const CustomerProfileView = ({ phone, name, orders, onClose }: CustomerProfileVi
     ...customerOrders.map(o => o.customerEmail).filter(Boolean),
   ])];
 
-  // Coupons used
+  // Coupons used (from raw order data)
   const couponsUsed = customerOrders
-    .filter(o => o.couponCode)
-    .map(o => ({ code: o.couponCode, discount: o.couponDiscount, orderId: o.orderNumber }));
+    .filter(o => (o as any).couponCode)
+    .map(o => ({ code: (o as any).couponCode, discount: (o as any).couponDiscount || 0, orderId: o.orderNumber }));
 
   useEffect(() => {
     loadCustomerData();
