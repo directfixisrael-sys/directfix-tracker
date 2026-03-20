@@ -159,13 +159,18 @@ const ClubSignup = () => {
           <p className={`${textMuted} text-sm`}>הצטרפו בחינם וקבלו הטבות בלעדיות</p>
         </section>
 
-        {/* Card - tight */}
-        <section className="py-3 flex justify-center">
-          <img
-            src={clubCardImg}
-            alt="כרטיס מועדון"
-            className="w-[220px] drop-shadow-lg"
-          />
+        {/* Card - animated */}
+        <section className="py-3 flex justify-center perspective-[800px]">
+          <div className="relative group">
+            {/* Glow effect */}
+            <div className="absolute -inset-4 rounded-3xl bg-primary/20 blur-2xl opacity-0 animate-[glow-pulse_3s_ease-in-out_infinite] group-hover:opacity-100 transition-opacity duration-500" />
+            <img
+              src={clubCardImg}
+              alt="כרטיס מועדון"
+              className="relative w-[220px] drop-shadow-xl animate-[card-float_4s_ease-in-out_infinite] hover:animate-[card-flip_0.8s_ease-in-out_forwards] cursor-pointer"
+              style={{ transformStyle: 'preserve-3d' }}
+            />
+          </div>
         </section>
 
         {/* Benefits - tight grid */}
