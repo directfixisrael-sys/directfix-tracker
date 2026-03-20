@@ -59,6 +59,10 @@ const CustomerZone = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPointsGuide, setShowPointsGuide] = useState(false);
   const [maskedEmail, setMaskedEmail] = useState('');
+  const [birthday, setBirthday] = useState('');
+  const [profileEmail, setProfileEmail] = useState('');
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // Try to load saved session
   useEffect(() => {
