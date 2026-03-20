@@ -212,31 +212,32 @@ const ClubSignup = () => {
 
             <form onSubmit={handleSubmit} className="space-y-2.5">
               <div>
-                <Label htmlFor="name" className="flex items-center gap-1 text-[11px] font-bold mb-1">
+                <Label htmlFor="name" className={`flex items-center gap-1 text-[11px] font-bold mb-1 ${text}`}>
                   <User className="w-3 h-3" /> שם מלא *
                 </Label>
                 <Input id="name" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="ישראל ישראלי" required className={`h-10 rounded-xl text-sm ${inputBg}`} />
               </div>
 
               <div>
-                <Label htmlFor="phone" className="flex items-center gap-1 text-[11px] font-bold mb-1">
+                <Label htmlFor="phone" className={`flex items-center gap-1 text-[11px] font-bold mb-1 ${text}`}>
                   <Phone className="w-3 h-3" /> טלפון *
                 </Label>
                 <Input id="phone" type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="050-1234567" required dir="ltr" className={`h-10 rounded-xl text-sm text-right ${inputBg}`} />
               </div>
 
-              <div>
-                <Label htmlFor="email" className="flex items-center gap-1 text-[11px] font-bold mb-1">
-                  <Mail className="w-3 h-3" /> אימייל
-                </Label>
-                <Input id="email" type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder="example@email.com" dir="ltr" className={`h-10 rounded-xl text-sm text-right ${inputBg}`} />
-              </div>
-
-              <div>
-                <Label htmlFor="birthday" className="flex items-center gap-1 text-[11px] font-bold mb-1">
-                  <Cake className="w-3 h-3" /> תאריך יום הולדת
-                </Label>
-                <Input id="birthday" type="date" value={form.birthday} onChange={e => setForm(p => ({ ...p, birthday: e.target.value }))} className={`h-10 rounded-xl text-sm ${inputBg}`} />
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Label htmlFor="email" className={`flex items-center gap-1 text-[11px] font-bold mb-1 ${text}`}>
+                    <Mail className="w-3 h-3" /> אימייל
+                  </Label>
+                  <Input id="email" type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder="email@example.com" dir="ltr" className={`h-10 rounded-xl text-sm text-right ${inputBg}`} />
+                </div>
+                <div>
+                  <Label htmlFor="birthday" className={`flex items-center gap-1 text-[11px] font-bold mb-1 ${text}`}>
+                    <Cake className="w-3 h-3" /> יום הולדת
+                  </Label>
+                  <Input id="birthday" type="date" value={form.birthday} onChange={e => setForm(p => ({ ...p, birthday: e.target.value }))} className={`h-10 rounded-xl text-sm ${inputBg}`} />
+                </div>
               </div>
 
               <div className="flex items-start gap-2 pt-0.5">
