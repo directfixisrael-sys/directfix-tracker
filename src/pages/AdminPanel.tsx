@@ -497,6 +497,32 @@ const AdminPanel = () => {
     });
   };
 
+  // Send completion email to customer
+  const [completionEmailPreview, setCompletionEmailPreview] = useState<string | null>(null);
+  const [showCompletionPreview, setShowCompletionPreview] = useState(false);
+
+  const sendCompletionEmail = async (order: RepairOrder, previewOnly = false) => {
+    if (!order.customerEmail) {
+      toast({ title: "אין כתובת מייל", description: "לא ניתן לשלוח מייל ללקוח ללא כתובת מייל", variant: "destructive" });
+      return;
+    }
+    try {
+      const { data, error } = await supabase.functions.invoke('send-completion-email', {
+        body: { orderId: order.id, preview: previewOnly }
+      });
+      if (error) throw error;
+      if (previewOnly && data?.html) {
+        setCompletionEmailPreview(data.html);
+        setShowCompletionPreview(true);
+      } else {
+        toast({ title: "מייל נשלח!", description: `מייל סיום תיקון נשלח ל-${order.customerEmail}` });
+      }
+    } catch (e) {
+      console.error("Error sending completion email:", e);
+      toast({ title: "שגיאה", description: "לא ניתן לשלוח את המייל", variant: "destructive" });
+    }
+  };
+
   const orderMessages = selectedOrder 
     ? messages.filter(m => m.orderId === selectedOrder.id)
     : [];
