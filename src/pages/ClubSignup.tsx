@@ -149,14 +149,14 @@ const ClubSignup = () => {
       <main className="max-w-lg mx-auto px-5">
         {/* Hero - compact like Isracard */}
         <section className="pt-6 pb-2 text-center">
-          <div className={`inline-flex items-center gap-1.5 ${accentBg} text-primary px-3 py-1 rounded-full text-sm font-bold mb-3`}>
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className={`inline-flex items-center gap-1.5 ${accentBg} text-primary px-3 py-1 rounded-full text-base font-bold mb-3`}>
+            <Sparkles className="w-4 h-4" />
             מבצע מרץ — 50 נקודות במתנה
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight leading-snug mb-1">
+          <h1 className="text-3xl font-extrabold tracking-tight leading-snug mb-1">
             מועדון החברים של <span className="text-primary">דיירקט פיקס</span>
           </h1>
-          <p className={`${textMuted} text-sm`}>הצטרפו בחינם וקבלו הטבות בלעדיות</p>
+          <p className={`${textMuted} text-base`}>הצטרפו בחינם וקבלו הטבות בלעדיות</p>
         </section>
 
         {/* Card - animated */}
@@ -184,9 +184,9 @@ const ClubSignup = () => {
                     : `${cardBg} ${cardBorder}`
                 }`}
               >
-                <b.icon className={`w-4 h-4 mx-auto mb-1 ${b.highlight ? 'text-primary' : textMuted}`} />
-                <p className="text-[11px] font-bold leading-tight">{b.title}</p>
-                <p className={`text-[10px] ${textMuted} mt-0.5`}>{b.desc}</p>
+                <b.icon className={`w-5 h-5 mx-auto mb-1.5 ${b.highlight ? 'text-primary' : textMuted}`} />
+                <p className="text-sm font-bold leading-tight">{b.title}</p>
+                <p className={`text-xs ${textMuted} mt-0.5`}>{b.desc}</p>
               </div>
             ))}
           </div>
@@ -251,10 +251,10 @@ const ClubSignup = () => {
         {/* Terms */}
         <section className="pb-6">
           <div className={`rounded-xl p-3 border ${cardBorder} ${isDark ? 'bg-white/3' : 'bg-black/[0.015]'}`}>
-            <h3 className={`text-[11px] font-bold mb-2 flex items-center gap-1 ${textMuted}`}>
-              <Shield className="w-3 h-3" /> תקנון ותנאים
+            <h3 className={`text-sm font-bold mb-2 flex items-center gap-1.5 ${textMuted}`}>
+              <Shield className="w-3.5 h-3.5" /> תקנון ותנאים
             </h3>
-            <ul className="space-y-1">
+            <ul className="space-y-1.5">
               {[
                 'ההצטרפות בחינם ואינה מחייבת רכישה.',
                 'נקודות למימוש בחנות ההטבות בלבד.',
@@ -263,8 +263,8 @@ const ClubSignup = () => {
                 'ניתן לבטל חברות בכל עת.',
                 <>המידע נשמר בהתאם ל<Link to="/terms" className="text-primary underline">מדיניות הפרטיות</Link>.</>,
               ].map((t, i) => (
-                <li key={i} className={`flex gap-1.5 text-[10px] ${textMuted} leading-relaxed`}>
-                  <CheckCircle2 className="w-2.5 h-2.5 mt-0.5 flex-shrink-0 text-green-500/70" />
+                <li key={i} className={`flex gap-1.5 text-xs ${textMuted} leading-relaxed`}>
+                  <CheckCircle2 className="w-3 h-3 mt-0.5 flex-shrink-0 text-green-500/70" />
                   <span>{t}</span>
                 </li>
               ))}
@@ -273,7 +273,7 @@ const ClubSignup = () => {
         </section>
       </main>
 
-      <footer className={`border-t ${cardBorder} text-center py-3 text-[10px] ${textMuted} ${cardBg}`}>
+      <footer className={`border-t ${cardBorder} text-center py-3 text-xs ${textMuted} ${cardBg}`}>
         <p>© {new Date().getFullYear()} דיירקט פיקס — מועדון החברים</p>
       </footer>
     </div>
