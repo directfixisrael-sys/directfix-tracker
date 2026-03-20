@@ -79,6 +79,7 @@ import AnnouncementsManagement from '@/components/admin/AnnouncementsManagement'
 import RemindersManagement from '@/components/admin/RemindersManagement';
 import LeadsManagement from '@/components/admin/LeadsManagement';
 import ClubMembersManagement from '@/components/admin/ClubMembersManagement';
+import CustomerProfileView from '@/components/admin/CustomerProfileView';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -129,6 +130,7 @@ const AdminPanel = () => {
   const [settingsSubOpen, setSettingsSubOpen] = useState(false);
   const [completionEmailPreview, setCompletionEmailPreview] = useState<string | null>(null);
   const [showCompletionPreview, setShowCompletionPreview] = useState(false);
+  const [selectedCustomerPhone, setSelectedCustomerPhone] = useState<string | null>(null);
 
   const { 
     orders, 
@@ -739,6 +741,19 @@ const AdminPanel = () => {
         );
 
       case 'customers':
+        // If a customer is selected, show their full profile
+        if (selectedCustomerPhone) {
+          const selectedCustomerName = orders.find(o => o.customerPhone === selectedCustomerPhone)?.customerName || '';
+          return (
+            <CustomerProfileView
+              phone={selectedCustomerPhone}
+              name={selectedCustomerName}
+              orders={orders}
+              onClose={() => setSelectedCustomerPhone(null)}
+            />
+          );
+        }
+
         // Build unique customers with more data
         const uniqueCustomers = orders.reduce((acc, order) => {
           const existing = acc.find(c => c.phone === order.customerPhone);
@@ -896,7 +911,7 @@ const AdminPanel = () => {
             ) : (
               <div className="space-y-3">
                 {sortedCustomers.map((customer) => (
-                  <div key={customer.phone} className="glass-card p-4 rounded-xl hover:bg-muted/30 transition-colors">
+                  <div key={customer.phone} onClick={() => setSelectedCustomerPhone(customer.phone)} className="glass-card p-4 rounded-xl hover:bg-muted/30 transition-colors cursor-pointer">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-start gap-3">
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">

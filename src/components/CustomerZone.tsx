@@ -63,6 +63,7 @@ const CustomerZone = () => {
   const [profileEmail, setProfileEmail] = useState('');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [wizardStep, setWizardStep] = useState(0); // 0=closed, 1=birthday, 2=email, 3=done
 
   // Try to load saved session
   useEffect(() => {
@@ -319,6 +320,7 @@ const CustomerZone = () => {
     setBirthday('');
     setProfileEmail('');
     setIsEditingProfile(false);
+    setWizardStep(0);
     sessionStorage.removeItem('customer_session');
   };
 
@@ -592,92 +594,192 @@ const CustomerZone = () => {
         <p className="text-sm text-muted-foreground" dir="ltr">{phone}</p>
       </div>
 
-      {/* Profile Completion */}
-      {profile.percent < 100 && (
-        <Card className="p-4 border-2 border-amber-200 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
-          <div className="flex items-center justify-between mb-2">
+      {/* Profile Completion Wizard */}
+      {profile.percent < 100 && wizardStep === 0 && (
+        <Card className="p-4 border-2 border-amber-200 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20 overflow-hidden">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Gift className="w-5 h-5 text-amber-600" />
-              <span className="font-bold text-sm text-foreground">השלמת פרופיל</span>
+              <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+                <Gift className="w-4 h-4 text-amber-600" />
+              </div>
+              <div>
+                <span className="font-bold text-sm text-foreground block">השלמת פרופיל</span>
+                <span className="text-[11px] text-muted-foreground">קבלו מתנה ביום ההולדת!</span>
+              </div>
             </div>
-            <span className="text-sm font-bold text-amber-600">{profile.percent}%</span>
+            <div className="relative w-12 h-12">
+              <svg className="w-12 h-12 -rotate-90" viewBox="0 0 36 36">
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="hsl(var(--muted))" strokeWidth="3" />
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="hsl(var(--primary))" strokeWidth="3" strokeDasharray={`${profile.percent}, 100`} className="transition-all duration-700" />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-foreground">{profile.percent}%</span>
+            </div>
           </div>
-          <Progress value={profile.percent} className="h-2 mb-3" />
-          <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="grid grid-cols-4 gap-1.5 mb-3">
             {profile.fields.map((f) => (
-              <div key={f.label} className="flex items-center gap-1.5">
-                <CheckCircle2 className={`w-3.5 h-3.5 ${f.done ? 'text-green-500' : 'text-muted-foreground/30'}`} />
-                <span className={`text-xs ${f.done ? 'text-foreground' : 'text-muted-foreground'}`}>{f.label}</span>
+              <div key={f.label} className="text-center">
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center mx-auto mb-1 transition-all duration-300 ${f.done ? 'bg-green-100 dark:bg-green-900/40' : 'bg-muted'}`}>
+                  <CheckCircle2 className={`w-4 h-4 transition-colors duration-300 ${f.done ? 'text-green-500' : 'text-muted-foreground/30'}`} />
+                </div>
+                <span className={`text-[10px] ${f.done ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>{f.label}</span>
               </div>
             ))}
           </div>
-          <p className="text-xs text-amber-700 dark:text-amber-400 mb-2">
-            השלימו את הפרופיל וקבלו מתנה ביום ההולדת!
-          </p>
           <Button
             size="sm"
-            variant="outline"
-            className="w-full border-amber-300 text-amber-700 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-950/30"
-            onClick={() => setIsEditingProfile(true)}
+            className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl h-10"
+            onClick={() => setWizardStep(!birthday ? 1 : !profileEmail ? 2 : 1)}
           >
-            <Edit3 className="w-3.5 h-3.5 ml-1" />
-            השלם פרופיל
+            <Sparkles className="w-4 h-4 ml-1" />
+            השלם פרטים
           </Button>
         </Card>
       )}
 
-      {/* Profile Edit Section */}
-      {isEditingProfile && (
-        <Card className="p-4 space-y-3 border-2 border-primary/20">
-          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-foreground flex items-center gap-2">
-              <Edit3 className="w-4 h-4 text-primary" />
-              עריכת פרופיל
-            </h4>
-            <button onClick={() => setIsEditingProfile(false)} className="text-xs text-muted-foreground underline">סגור</button>
-          </div>
-          <div className="space-y-2">
-            <div className="relative">
-              <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="email"
-                placeholder="כתובת מייל"
-                value={profileEmail}
-                onChange={(e) => setProfileEmail(e.target.value)}
-                className="h-11 pr-10 rounded-xl text-sm"
-                dir="ltr"
-              />
+      {/* Wizard Step 1: Birthday */}
+      {wizardStep === 1 && (
+        <Card className="p-5 border-2 border-primary/20 animate-slide-up overflow-hidden">
+          <div className="text-center mb-4">
+            <div className="w-14 h-14 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mx-auto mb-3">
+              <Gift className="w-7 h-7 text-pink-500" />
             </div>
-            <div className="relative">
-              <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="date"
-                placeholder="תאריך לידה"
-                value={birthday}
-                onChange={(e) => setBirthday(e.target.value)}
-                className="h-11 pr-10 rounded-xl text-sm"
-                dir="ltr"
-              />
-            </div>
+            <h4 className="font-bold text-lg text-foreground">מתי יום ההולדת שלך?</h4>
+            <p className="text-sm text-muted-foreground mt-1">נשלח לך מתנה מיוחדת!</p>
           </div>
+          <div className="relative mb-4">
+            <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              type="date"
+              value={birthday}
+              onChange={(e) => setBirthday(e.target.value)}
+              className="h-12 pr-11 rounded-xl text-base"
+              dir="ltr"
+              autoFocus
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1 h-10 rounded-xl" onClick={() => setWizardStep(0)}>
+              אחר כך
+            </Button>
+            <Button
+              className="flex-1 h-10 rounded-xl font-bold"
+              onClick={async () => {
+                if (birthday) {
+                  setIsSavingProfile(true);
+                  try {
+                    await callAuth({ action: 'update_profile', phone: phone.replace(/\D/g, ''), birthday });
+                    toast({ title: 'נשמר!', description: 'תאריך הלידה נשמר' });
+                    if (!profileEmail) {
+                      setWizardStep(2);
+                    } else {
+                      setWizardStep(3);
+                    }
+                  } catch {
+                    toast({ title: 'שגיאה', variant: 'destructive' });
+                  }
+                  setIsSavingProfile(false);
+                } else {
+                  if (!profileEmail) setWizardStep(2);
+                  else setWizardStep(0);
+                }
+              }}
+              disabled={isSavingProfile}
+            >
+              {isSavingProfile ? 'שומר...' : 'המשך'}
+              <ArrowLeft className="w-4 h-4 mr-1" />
+            </Button>
+          </div>
+          {/* Step indicator */}
+          <div className="flex justify-center gap-1.5 mt-3">
+            <div className="w-8 h-1.5 rounded-full bg-primary" />
+            <div className={`w-8 h-1.5 rounded-full ${!profileEmail ? 'bg-muted' : 'bg-primary'}`} />
+          </div>
+        </Card>
+      )}
+
+      {/* Wizard Step 2: Email */}
+      {wizardStep === 2 && (
+        <Card className="p-5 border-2 border-primary/20 animate-slide-up overflow-hidden">
+          <div className="text-center mb-4">
+            <div className="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-3">
+              <Mail className="w-7 h-7 text-blue-500" />
+            </div>
+            <h4 className="font-bold text-lg text-foreground">מה כתובת המייל שלך?</h4>
+            <p className="text-sm text-muted-foreground mt-1">לעדכונים ולאיפוס סיסמא</p>
+          </div>
+          <div className="relative mb-4">
+            <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              type="email"
+              placeholder="your@email.com"
+              value={profileEmail}
+              onChange={(e) => setProfileEmail(e.target.value)}
+              className="h-12 pr-11 rounded-xl text-base"
+              dir="ltr"
+              autoFocus
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1 h-10 rounded-xl" onClick={() => setWizardStep(0)}>
+              אחר כך
+            </Button>
+            <Button
+              className="flex-1 h-10 rounded-xl font-bold"
+              onClick={async () => {
+                if (profileEmail) {
+                  setIsSavingProfile(true);
+                  try {
+                    await callAuth({ action: 'update_profile', phone: phone.replace(/\D/g, ''), email: profileEmail });
+                    toast({ title: 'נשמר!', description: 'כתובת המייל נשמרה' });
+                    setWizardStep(3);
+                  } catch {
+                    toast({ title: 'שגיאה', variant: 'destructive' });
+                  }
+                  setIsSavingProfile(false);
+                } else {
+                  setWizardStep(0);
+                }
+              }}
+              disabled={isSavingProfile}
+            >
+              {isSavingProfile ? 'שומר...' : 'סיום'}
+              <CheckCircle2 className="w-4 h-4 mr-1" />
+            </Button>
+          </div>
+          {/* Step indicator */}
+          <div className="flex justify-center gap-1.5 mt-3">
+            <div className="w-8 h-1.5 rounded-full bg-primary" />
+            <div className="w-8 h-1.5 rounded-full bg-primary" />
+          </div>
+        </Card>
+      )}
+
+      {/* Wizard Step 3: Success */}
+      {wizardStep === 3 && (
+        <Card className="p-5 border-2 border-green-200 bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/20 animate-slide-up overflow-hidden text-center">
+          <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center mx-auto mb-3">
+            <CheckCircle2 className="w-9 h-9 text-green-500" />
+          </div>
+          <h4 className="font-bold text-lg text-foreground mb-1">הפרופיל הושלם!</h4>
+          <p className="text-sm text-muted-foreground mb-4">תודה! נשלח לך מתנה ביום ההולדת שלך</p>
           <Button
-            onClick={handleSaveProfile}
-            className="w-full h-10 rounded-xl text-sm font-bold"
-            disabled={isSavingProfile}
+            variant="outline"
+            className="rounded-xl"
+            onClick={() => { setWizardStep(0); setIsEditingProfile(false); }}
           >
-            {isSavingProfile ? 'שומר...' : 'שמור פרטים'}
+            סגור
           </Button>
         </Card>
       )}
 
       {/* Completed profile badge */}
-      {profile.percent === 100 && !isEditingProfile && (
+      {profile.percent === 100 && wizardStep === 0 && (
         <Card className="p-3 border border-green-200 bg-green-50/50 dark:bg-green-950/20 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-green-500" />
             <span className="text-sm font-semibold text-green-700 dark:text-green-400">הפרופיל שלך מלא!</span>
           </div>
-          <button onClick={() => setIsEditingProfile(true)} className="text-xs text-primary underline">עריכה</button>
+          <button onClick={() => setWizardStep(1)} className="text-xs text-primary underline">עריכה</button>
         </Card>
       )}
 
