@@ -50,6 +50,10 @@ serve(async (req) => {
     if (customerEmail) orderParams.set('email', customerEmail);
     const orderUrl = `https://directfix-tracker.lovable.app/order?${orderParams.toString()}`;
     
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "https://sggvzsewumgdhigdhcqp.supabase.co";
+    const emailToken = btoa((customerEmail || '') + "_directfix_unsub");
+    const unsubscribeUrl = `${supabaseUrl}/functions/v1/handle-club-unsubscribe?phone=${encodeURIComponent(customerEmail || '')}&token=${encodeURIComponent(emailToken)}`;
+    
     const couponSection = couponCode ? `
     <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-radius:16px;padding:24px;margin-bottom:24px;border:2px solid #f59e0b;text-align:center;">
       <span style="font-size:40px;">&#127873;</span>
