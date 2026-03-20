@@ -316,6 +316,9 @@ const CustomerZone = () => {
     setCustomerName('');
     setResetCode('');
     setNewPassword('');
+    setBirthday('');
+    setProfileEmail('');
+    setIsEditingProfile(false);
     sessionStorage.removeItem('customer_session');
   };
 
