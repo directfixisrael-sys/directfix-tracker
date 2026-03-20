@@ -108,8 +108,9 @@ serve(async (req) => {
   </div>
 </div>
 
-<div style="text-align:center;padding:20px;">
-  <p style="color:#bbb;font-size:12px;margin:0;">DirectFix - תיקוני סלולר מקצועיים עד הבית</p>
+<div style="text-align:center;padding:20px;border-top:1px solid #eee;">
+  <p style="color:#bbb;font-size:12px;margin:0 0 8px;">DirectFix - תיקוני סלולר מקצועיים עד הבית</p>
+  <a href="${unsubscribeUrl}" style="color:#999;font-size:12px;text-decoration:underline;">הסרה מרשימת התפוצה</a>
 </div>
 
 </div>
