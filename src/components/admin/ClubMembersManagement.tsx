@@ -441,14 +441,20 @@ const ClubMembersManagement = () => {
 
         {/* Members tab */}
         <TabsContent value="members" className="space-y-4 mt-4">
-          <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="חפש לפי שם או טלפון..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pr-10"
-            />
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="חפש לפי שם או טלפון..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="pr-10"
+              />
+            </div>
+            <Button onClick={() => setAddDialogOpen(true)} className="gap-1.5 shrink-0">
+              <Plus className="w-4 h-4" />
+              הוסף חבר
+            </Button>
           </div>
 
           <div className="space-y-3">
