@@ -192,6 +192,47 @@ const ClubMembersManagement = () => {
     }
   };
 
+  // --- Add member ---
+  const handleAddMember = async () => {
+    if (!addForm.phone.trim() || !addForm.name.trim()) {
+      toast({ title: 'נא למלא שם וטלפון', variant: 'destructive' });
+      return;
+    }
+    setIsAdding(true);
+    try {
+      const normalizedPhone = addForm.phone.replace(/\D/g, '');
+      // Check if already exists
+      const { data: existing } = await supabase
+        .from('club_members')
+        .select('phone')
+        .eq('phone', normalizedPhone)
+        .maybeSingle();
+
+      if (existing) {
+        toast({ title: 'מספר זה כבר רשום במועדון', variant: 'destructive' });
+        setIsAdding(false);
+        return;
+      }
+
+      const { error } = await supabase.from('club_members').insert({
+        phone: normalizedPhone,
+        name: addForm.name.trim(),
+        email: addForm.email.trim() || null,
+        is_active: true,
+        wants_promotions: true,
+      });
+
+      if (error) throw error;
+      toast({ title: `${addForm.name} נוסף למועדון בהצלחה! 🎉` });
+      setAddDialogOpen(false);
+      setAddForm({ name: '', phone: '', email: '' });
+      loadMembers();
+    } catch (err: any) {
+      toast({ title: 'שגיאה בהוספה', description: err.message, variant: 'destructive' });
+    }
+    setIsAdding(false);
+  };
+
   // --- Points ---
   const handleAdjust = async (type: 'add' | 'deduct') => {
     if (!adjustPhone.trim() || !adjustAmount) return;
