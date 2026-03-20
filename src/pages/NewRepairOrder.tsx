@@ -270,6 +270,7 @@ interface RepairBundle {
 type Step = 'model' | 'repair' | 'bundle' | 'points' | 'price' | 'schedule' | 'details' | 'gift_payment' | 'success';
 const NewRepairOrder = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const {
     addOrder
   } = useRepairStore();
