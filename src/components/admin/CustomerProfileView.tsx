@@ -401,8 +401,8 @@ const CustomerProfileView = ({ phone, name, orders, onClose }: CustomerProfileVi
                       {order.paymentStatus === 'paid' && (
                         <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">שולם</span>
                       )}
-                      {order.couponCode && (
-                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">קופון: {order.couponCode}</span>
+                      {(order as any).couponCode && (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">קופון: {(order as any).couponCode}</span>
                       )}
                     </div>
                     <p className="font-semibold text-foreground text-sm">{order.deviceType}</p>
