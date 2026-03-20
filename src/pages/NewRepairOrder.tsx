@@ -327,7 +327,8 @@ const NewRepairOrder = () => {
   // Sync intro fields to customer fields and save lead
   const handleIntroDismiss = async () => {
     if (introName.trim()) setCustomerName(introName.trim());
-    if (introPhone.trim()) setCustomerPhone(introPhone.trim());
+    // introPhone is now email
+    if (introPhone.trim()) setCustomerEmail(introPhone.trim());
     setShowIntroCard(false);
 
     // Scroll to top after dismissing intro
@@ -336,41 +337,19 @@ const NewRepairOrder = () => {
     document.body.scrollTop = 0;
     if (contentRef.current) contentRef.current.scrollTop = 0;
 
-    const normalizedPhone = introPhone.replace(/\D/g, '');
-    
-    // Check if returning customer
-    const { data: existingOrders } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('customer_phone', normalizedPhone)
-      .limit(1);
-    
-    const isReturning = !!(existingOrders && existingOrders.length > 0);
-    setIsReturningCustomer(isReturning);
-
-    // Save lead to DB
+    // Save lead to DB (with email)
     try {
       const { data: leadData } = await supabase.from('leads').insert({
         customer_name: introName.trim(),
-        customer_phone: normalizedPhone,
+        customer_phone: '',
+        customer_email: introPhone.trim(),
         privacy_accepted: introPrivacy,
-        is_returning_customer: isReturning,
+        is_returning_customer: false,
         last_step: 'בחירת דגם',
       }).select('id').single();
       if (leadData) setCurrentLeadId(leadData.id);
     } catch (e) {
       console.error('Error saving lead:', e);
-    }
-
-    if (isReturning) {
-      toast.success(`ברוכים השבים ${introName.trim()}! מגן מסך במתנה!`);
-    }
-
-    // Load loyalty points
-    const pts = await getCustomerPoints(normalizedPhone);
-    if (pts > 0) {
-      setCustomerLoyaltyPoints(pts);
-      setLoyaltyDiscount(calculateDiscountFromPoints(pts));
     }
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
