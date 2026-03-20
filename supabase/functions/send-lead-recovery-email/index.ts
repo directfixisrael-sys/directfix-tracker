@@ -22,9 +22,11 @@ function getStepInfo(lastStep: string): { param: string; label: string } {
   const map: Record<string, { param: string; label: string }> = {
     'בחירת דגם': { param: 'model', label: 'בחירת דגם' },
     'בחירת תיקון': { param: 'repair', label: 'בחירת סוג תיקון' },
-    'מחיר': { param: 'price', label: 'אישור מחיר' },
-    'מועד': { param: 'schedule', label: 'בחירת מועד' },
-    'פרטים': { param: 'details', label: 'מילוי פרטים' },
+    'חבילה': { param: 'bundle', label: 'בחירת חבילה' },
+    'נקודות': { param: 'points', label: 'נקודות מועדון' },
+    'אישור מחיר': { param: 'price', label: 'אישור מחיר' },
+    'תיאום מועד': { param: 'schedule', label: 'בחירת מועד' },
+    'מילוי פרטים': { param: 'details', label: 'מילוי פרטים' },
   };
   return map[lastStep] || { param: 'model', label: 'תחילת הזמנה' };
 }
@@ -40,7 +42,17 @@ serve(async (req) => {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     const stepInfo = getStepInfo(lastStep);
     
-    const orderUrl = `https://directfix-tracker.lovable.app/order`;
+    const orderParams = new URLSearchParams();
+    orderParams.set('step', stepInfo.param);
+    if (couponCode) orderParams.set('coupon', couponCode);
+    if (couponDiscount) orderParams.set('discount', String(couponDiscount));
+    if (customerName) orderParams.set('name', customerName);
+    if (customerEmail) orderParams.set('email', customerEmail);
+    const orderUrl = `https://directfix-tracker.lovable.app/order?${orderParams.toString()}`;
+    
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "https://sggvzsewumgdhigdhcqp.supabase.co";
+    const emailToken = btoa((customerEmail || '') + "_directfix_unsub");
+    const unsubscribeUrl = `${supabaseUrl}/functions/v1/handle-club-unsubscribe?phone=${encodeURIComponent(customerEmail || '')}&token=${encodeURIComponent(emailToken)}`;
     
     const couponSection = couponCode ? `
     <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-radius:16px;padding:24px;margin-bottom:24px;border:2px solid #f59e0b;text-align:center;">
@@ -100,8 +112,9 @@ serve(async (req) => {
   </div>
 </div>
 
-<div style="text-align:center;padding:20px;">
-  <p style="color:#bbb;font-size:12px;margin:0;">DirectFix - תיקוני סלולר מקצועיים עד הבית</p>
+<div style="text-align:center;padding:20px;border-top:1px solid #eee;">
+  <p style="color:#bbb;font-size:12px;margin:0 0 8px;">DirectFix - תיקוני סלולר מקצועיים עד הבית</p>
+  <a href="${unsubscribeUrl}" style="color:#999;font-size:12px;text-decoration:underline;">הסרה מרשימת התפוצה</a>
 </div>
 
 </div>
