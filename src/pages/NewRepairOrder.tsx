@@ -532,7 +532,7 @@ const NewRepairOrder = () => {
     loadData();
   }, []);
 
-  // Read URL params for lead recovery (step, coupon, name, email)
+  // Read URL params for lead recovery (step, coupon, name, email, device, repair)
   useEffect(() => {
     if (isLoading) return;
     const urlStep = searchParams.get('step') as Step | null;
@@ -540,6 +540,8 @@ const NewRepairOrder = () => {
     const urlDiscount = searchParams.get('discount');
     const urlName = searchParams.get('name');
     const urlEmail = searchParams.get('email');
+    const urlDevice = searchParams.get('device');
+    const urlRepairType = searchParams.get('repair_type');
 
     if (urlName) {
       setIntroName(urlName);
@@ -558,6 +560,22 @@ const NewRepairOrder = () => {
         discount_type: 'fixed',
         discount_value: Number(urlDiscount),
       });
+    }
+
+    // Restore device selection
+    if (urlDevice && models.length > 0) {
+      const matchedModel = models.find(m => m.name === urlDevice);
+      if (matchedModel) {
+        setSelectedModel(matchedModel);
+      }
+    }
+
+    // Restore repair type selection
+    if (urlRepairType && repairTypes.length > 0) {
+      const matchedRepair = repairTypes.find(r => r.name === urlRepairType);
+      if (matchedRepair) {
+        setSelectedRepair(matchedRepair);
+      }
     }
 
     // Skip intro and jump to step
