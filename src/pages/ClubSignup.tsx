@@ -273,7 +273,7 @@ const ClubSignup = () => {
         </section>
       </main>
 
-      <footer className={`border-t ${cardBorder} text-center py-3 text-[10px] ${textMuted} ${cardBg}`}>
+      <footer className={`border-t ${cardBorder} text-center py-3 text-xs ${textMuted} ${cardBg}`}>
         <p>© {new Date().getFullYear()} דיירקט פיקס — מועדון החברים</p>
       </footer>
     </div>
