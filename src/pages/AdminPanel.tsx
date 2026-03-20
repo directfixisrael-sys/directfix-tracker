@@ -500,8 +500,6 @@ const AdminPanel = () => {
   };
 
   // Send completion email to customer
-  const [completionEmailPreview, setCompletionEmailPreview] = useState<string | null>(null);
-  const [showCompletionPreview, setShowCompletionPreview] = useState(false);
 
   const sendCompletionEmail = async (order: RepairOrder, previewOnly = false) => {
     if (!order.customerEmail) {
