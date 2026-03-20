@@ -163,11 +163,15 @@ serve(async (req) => {
     <p style="color:#a16207;margin:0;font-size:16px;">סה"כ ${totalPoints} נקודות ברשותך (שוות ₪${(totalPoints * 0.5).toFixed(0)} הנחה)</p>
   </div>` : ''}
 
-  <!-- Track Order -->
-  <div style="text-align:center;margin-bottom:20px;">
-    <a href="https://directfix-tracker.lovable.app/track?phone=${encodeURIComponent(order.customer_phone)}" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#0d64f4 0%,#0a4dbf 100%);color:#fff;text-decoration:none;padding:14px 32px;border-radius:12px;font-size:16px;font-weight:700;box-shadow:0 4px 15px rgba(13,100,244,0.3);">
-      &#128100; כניסה לאיזור האישי
+  <!-- Personal Area CTA -->
+  <div style="background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);border-radius:16px;padding:24px;margin-bottom:20px;text-align:center;">
+    <span style="font-size:36px;">&#128100;</span>
+    <h3 style="color:#fff;margin:8px 0 4px;font-size:20px;font-weight:800;">האיזור האישי שלך</h3>
+    <p style="color:rgba(255,255,255,0.85);margin:0 0 16px;font-size:15px;">צפו בנקודות, היסטוריית תיקונים, תעודת אחריות ועוד</p>
+    <a href="https://directfix-tracker.lovable.app/" target="_blank" style="display:inline-block;background:#fff;color:#7c3aed;text-decoration:none;padding:12px 32px;border-radius:12px;font-size:16px;font-weight:700;box-shadow:0 4px 15px rgba(0,0,0,0.15);">
+      כניסה לאיזור האישי
     </a>
+    <p style="color:rgba(255,255,255,0.65);margin:12px 0 0;font-size:13px;">השלימו את הפרופיל וקבלו מתנה ביום ההולדת!</p>
   </div>
 
   <div style="background:#f0fdf4;border-radius:12px;padding:16px;text-align:center;margin-bottom:20px;">
