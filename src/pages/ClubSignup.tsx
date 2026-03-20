@@ -206,51 +206,43 @@ const ClubSignup = () => {
 
         {/* Form */}
         <section className="pb-4" id="signup-form">
-          <div className={`${cardBg} rounded-2xl p-4 border ${cardBorder}`}>
-            <h2 className="text-base font-extrabold mb-0.5 text-center">טופס הרשמה</h2>
-            <p className={`${textMuted} text-[11px] text-center mb-3`}>חינם, בלי התחייבות</p>
+          <div className={`${cardBg} rounded-2xl p-5 border ${cardBorder}`}>
+            <h2 className="text-xl font-extrabold mb-0.5 text-center">הרשמה למועדון</h2>
+            <p className={`${textMuted} text-sm text-center mb-4`}>חינם, בלי התחייבות</p>
 
-            <form onSubmit={handleSubmit} className="space-y-2.5">
+            <form onSubmit={handleSubmit} className="space-y-3">
               <div>
-                <Label htmlFor="name" className={`flex items-center gap-1 text-[11px] font-bold mb-1 ${text}`}>
-                  <User className="w-3 h-3" /> שם מלא *
+                <Label htmlFor="name" className={`flex items-center gap-1.5 text-sm font-bold mb-1.5 ${text}`}>
+                  <User className="w-4 h-4" /> שם מלא *
                 </Label>
-                <Input id="name" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="ישראל ישראלי" required className={`h-10 rounded-xl text-sm ${inputBg}`} />
+                <Input id="name" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="ישראל ישראלי" required className={`h-12 rounded-xl text-base ${inputBg}`} />
               </div>
 
               <div>
-                <Label htmlFor="phone" className={`flex items-center gap-1 text-[11px] font-bold mb-1 ${text}`}>
-                  <Phone className="w-3 h-3" /> טלפון *
+                <Label htmlFor="phone" className={`flex items-center gap-1.5 text-sm font-bold mb-1.5 ${text}`}>
+                  <Phone className="w-4 h-4" /> טלפון *
                 </Label>
-                <Input id="phone" type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="050-1234567" required dir="ltr" className={`h-10 rounded-xl text-sm text-right ${inputBg}`} />
+                <Input id="phone" type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="050-1234567" required dir="ltr" className={`h-12 rounded-xl text-base text-right ${inputBg}`} />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label htmlFor="email" className={`flex items-center gap-1 text-[11px] font-bold mb-1 ${text}`}>
-                    <Mail className="w-3 h-3" /> אימייל
-                  </Label>
-                  <Input id="email" type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder="email@example.com" dir="ltr" className={`h-10 rounded-xl text-sm text-right ${inputBg}`} />
-                </div>
-                <div>
-                  <Label htmlFor="birthday" className={`flex items-center gap-1 text-[11px] font-bold mb-1 ${text}`}>
-                    <Cake className="w-3 h-3" /> יום הולדת
-                  </Label>
-                  <Input id="birthday" type="date" value={form.birthday} onChange={e => setForm(p => ({ ...p, birthday: e.target.value }))} className={`h-10 rounded-xl text-sm ${inputBg}`} />
-                </div>
+              <div>
+                <Label htmlFor="email" className={`flex items-center gap-1.5 text-sm font-bold mb-1.5 ${text}`}>
+                  <Mail className="w-4 h-4" /> אימייל
+                </Label>
+                <Input id="email" type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder="email@example.com" dir="ltr" className={`h-12 rounded-xl text-base text-right ${inputBg}`} />
               </div>
 
-              <div className="flex items-start gap-2 pt-0.5">
+              <div className="flex items-start gap-2 pt-1">
                 <Checkbox id="terms" checked={agreed} onCheckedChange={v => setAgreed(v === true)} className="mt-0.5" />
-                <Label htmlFor="terms" className={`text-[11px] leading-relaxed cursor-pointer ${textMuted}`}>
+                <Label htmlFor="terms" className={`text-sm leading-relaxed cursor-pointer ${textMuted}`}>
                   אני מאשר/ת את{' '}
                   <Link to="/club-terms" className="text-primary underline" target="_blank">תקנון המועדון</Link>
                   {' '}ומסכים/ה לקבל עדכונים
                 </Label>
               </div>
 
-              <Button type="submit" size="lg" disabled={loading} className="w-full h-11 text-sm font-extrabold rounded-2xl gap-2 transition-all active:scale-[0.97]">
-                {loading ? <span className="animate-pulse">רושם אותך...</span> : <><Crown className="w-4 h-4" /> הצטרף עכשיו</>}
+              <Button type="submit" size="lg" disabled={loading} className="w-full h-12 text-base font-extrabold rounded-2xl gap-2 transition-all active:scale-[0.97]">
+                {loading ? <span className="animate-pulse">רושם אותך...</span> : <><Crown className="w-5 h-5" /> הצטרף עכשיו</>}
               </Button>
             </form>
           </div>
