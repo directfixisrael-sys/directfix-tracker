@@ -149,14 +149,14 @@ const ClubSignup = () => {
       <main className="max-w-lg mx-auto px-5">
         {/* Hero - compact like Isracard */}
         <section className="pt-6 pb-2 text-center">
-          <div className={`inline-flex items-center gap-1.5 ${accentBg} text-primary px-3 py-1 rounded-full text-sm font-bold mb-3`}>
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className={`inline-flex items-center gap-1.5 ${accentBg} text-primary px-3 py-1 rounded-full text-base font-bold mb-3`}>
+            <Sparkles className="w-4 h-4" />
             מבצע מרץ — 50 נקודות במתנה
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight leading-snug mb-1">
+          <h1 className="text-3xl font-extrabold tracking-tight leading-snug mb-1">
             מועדון החברים של <span className="text-primary">דיירקט פיקס</span>
           </h1>
-          <p className={`${textMuted} text-sm`}>הצטרפו בחינם וקבלו הטבות בלעדיות</p>
+          <p className={`${textMuted} text-base`}>הצטרפו בחינם וקבלו הטבות בלעדיות</p>
         </section>
 
         {/* Card - animated */}
