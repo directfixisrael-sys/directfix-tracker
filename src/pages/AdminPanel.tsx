@@ -1554,12 +1554,12 @@ const AdminPanel = () => {
                     {selectedOrder.completedAt && (
                       <div className="mb-3 p-2 bg-muted/50 rounded-lg text-sm text-muted-foreground">
                         <p>תאריך סיום תיקון: {new Date(selectedOrder.completedAt).toLocaleDateString('he-IL')}</p>
-                        {(selectedOrder as any).warrantyMonths ? (
+                        {selectedOrder.warrantyMonths ? (
                           <p className="text-success font-medium mt-1">
-                            אחריות נוכחית: {(selectedOrder as any).warrantyMonths} חודשים
+                            אחריות נוכחית: {selectedOrder.warrantyMonths} חודשים
                             (עד {(() => {
                               const d = new Date(selectedOrder.completedAt!);
-                              d.setMonth(d.getMonth() + ((selectedOrder as any).warrantyMonths || 0));
+                              d.setMonth(d.getMonth() + (selectedOrder.warrantyMonths || 0));
                               return d.toLocaleDateString('he-IL');
                             })()})
                           </p>
