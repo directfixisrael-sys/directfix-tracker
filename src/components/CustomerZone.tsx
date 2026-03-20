@@ -320,6 +320,7 @@ const CustomerZone = () => {
     setBirthday('');
     setProfileEmail('');
     setIsEditingProfile(false);
+    setWizardStep(0);
     sessionStorage.removeItem('customer_session');
   };
 
