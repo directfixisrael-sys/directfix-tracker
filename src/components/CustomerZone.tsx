@@ -89,6 +89,11 @@ const CustomerZone = () => {
     const normalized = phoneNum.replace(/\D/g, '');
     setIsLoading(true);
 
+    let profileData: any = null;
+    try {
+      profileData = await callAuth({ action: 'get_profile', phone: normalized });
+    } catch {}
+
     const [pts, ordersRes] = await Promise.all([
       getCustomerPoints(normalized),
       supabase
@@ -106,8 +111,43 @@ const CustomerZone = () => {
     } else {
       setOrders([]);
     }
+    
+    if (profileData) {
+      setBirthday(profileData.birthday || '');
+      setProfileEmail(profileData.email || '');
+      if (profileData.name) setCustomerName(profileData.name);
+    }
+    
     setAuthView('dashboard');
     setIsLoading(false);
+  };
+
+  const getProfileCompletion = () => {
+    const fields = [
+      { label: 'שם', done: !!customerName },
+      { label: 'טלפון', done: !!phone },
+      { label: 'מייל', done: !!profileEmail },
+      { label: 'תאריך לידה', done: !!birthday },
+    ];
+    const completed = fields.filter(f => f.done).length;
+    return { fields, completed, total: fields.length, percent: Math.round((completed / fields.length) * 100) };
+  };
+
+  const handleSaveProfile = async () => {
+    setIsSavingProfile(true);
+    try {
+      await callAuth({
+        action: 'update_profile',
+        phone: phone.replace(/\D/g, ''),
+        email: profileEmail,
+        birthday,
+      });
+      toast({ title: 'הפרופיל עודכן!', description: 'הפרטים נשמרו בהצלחה' });
+      setIsEditingProfile(false);
+    } catch {
+      toast({ title: 'שגיאה', description: 'לא ניתן לעדכן, נסו שוב', variant: 'destructive' });
+    }
+    setIsSavingProfile(false);
   };
 
   // Step 1: Check phone
