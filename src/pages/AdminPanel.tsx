@@ -79,6 +79,7 @@ import AnnouncementsManagement from '@/components/admin/AnnouncementsManagement'
 import RemindersManagement from '@/components/admin/RemindersManagement';
 import LeadsManagement from '@/components/admin/LeadsManagement';
 import ClubMembersManagement from '@/components/admin/ClubMembersManagement';
+import CustomerProfileView from '@/components/admin/CustomerProfileView';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
