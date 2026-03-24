@@ -1290,7 +1290,7 @@ const NewRepairOrder = () => {
         <div className="w-[calc(100%-2rem)] max-w-md bg-card rounded-2xl p-7 pb-8 shadow-2xl animate-scale-in border-2 border-primary/20">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-extrabold text-foreground">בואו נתחיל</h2>
-            <p className="text-base text-muted-foreground mt-2">שם מלא ואימייל — וישר לבחירת הדגם</p>
+            <p className="text-base text-muted-foreground mt-2">שם מלא ומספר טלפון — וישר לבחירת הדגם</p>
           </div>
 
           <div className="space-y-4">
