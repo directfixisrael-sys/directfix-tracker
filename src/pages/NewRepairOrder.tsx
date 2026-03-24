@@ -328,8 +328,7 @@ const NewRepairOrder = () => {
   // Sync intro fields to customer fields and save lead
   const handleIntroDismiss = async () => {
     if (introName.trim()) setCustomerName(introName.trim());
-    // introPhone is now email
-    if (introPhone.trim()) setCustomerEmail(introPhone.trim());
+    if (introPhone.trim()) setCustomerPhone(introPhone.trim().replace(/\D/g, ''));
     setShowIntroCard(false);
 
     // Scroll to top after dismissing intro
@@ -338,12 +337,12 @@ const NewRepairOrder = () => {
     document.body.scrollTop = 0;
     if (contentRef.current) contentRef.current.scrollTop = 0;
 
-    // Save lead to DB (with email)
+    // Save lead to DB
     try {
       const { data: leadData } = await supabase.from('leads').insert({
         customer_name: introName.trim(),
-        customer_phone: '',
-        customer_email: introPhone.trim(),
+        customer_phone: introPhone.trim().replace(/\D/g, ''),
+        customer_email: '',
         privacy_accepted: introPrivacy,
         is_returning_customer: false,
         last_step: 'בחירת דגם',
