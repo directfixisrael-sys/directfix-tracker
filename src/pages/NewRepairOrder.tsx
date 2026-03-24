@@ -1320,7 +1320,7 @@ const NewRepairOrder = () => {
 
           <Button
             onClick={handleIntroDismiss}
-            disabled={!introName.trim() || !introPhone.includes('@') || !introPrivacy}
+            disabled={!introName.trim() || introPhone.replace(/\D/g, '').length < 9 || !introPrivacy}
             className="w-full h-12 text-sm font-bold rounded-xl mt-4"
           >
             יאללה, בואו נתחיל!
