@@ -227,13 +227,6 @@ const ClubSignup = () => {
                 <Input id="phone" type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="050-1234567" required dir="ltr" className={`h-12 rounded-xl text-base text-right ${inputBg}`} />
               </div>
 
-              <div>
-                <Label htmlFor="email" className={`flex items-center gap-1.5 text-sm font-bold mb-1.5 ${text}`}>
-                  <Mail className="w-4 h-4" /> אימייל
-                </Label>
-                <Input id="email" type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder="email@example.com" dir="ltr" className={`h-12 rounded-xl text-base text-right ${inputBg}`} />
-              </div>
-
               <div className="flex items-start gap-2 pt-1">
                 <Checkbox id="terms" checked={agreed} onCheckedChange={v => setAgreed(v === true)} className="mt-0.5" />
                 <Label htmlFor="terms" className={`text-sm leading-relaxed cursor-pointer ${textMuted}`}>
