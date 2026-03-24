@@ -7,7 +7,7 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
 import clubCardImg from '@/assets/club-card.png';
-import { Crown, Gift, Star, Sparkles, Phone, Mail, User, Cake, ChevronLeft, Shield, CheckCircle2, PartyPopper, Sun, Moon } from 'lucide-react';
+import { Crown, Gift, Star, Sparkles, Phone, User, Cake, ChevronLeft, Shield, CheckCircle2, PartyPopper, Sun, Moon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const BENEFITS = [
@@ -20,7 +20,7 @@ const BENEFITS = [
 ];
 
 const ClubSignup = () => {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', birthday: '' });
+  const [form, setForm] = useState({ name: '', phone: '' });
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -56,25 +56,11 @@ const ClubSignup = () => {
       const { error: clubError } = await supabase.from('club_members').insert({
         phone: normalizedPhone,
         name: form.name.trim(),
-        email: form.email.trim() || null,
+        email: null,
         is_active: true,
         wants_promotions: true,
       });
       if (clubError) throw clubError;
-
-      if (form.birthday) {
-        const { data: profile } = await supabase
-          .from('customer_profiles')
-          .select('id')
-          .eq('phone', normalizedPhone)
-          .maybeSingle();
-
-        if (profile) {
-          await supabase.functions.invoke('customer-auth', {
-            body: { action: 'update-profile', phone: normalizedPhone, birthday: form.birthday }
-          });
-        }
-      }
 
       await supabase.from('loyalty_points').insert({
         customer_phone: normalizedPhone,
@@ -225,13 +211,6 @@ const ClubSignup = () => {
                   <Phone className="w-4 h-4" /> טלפון *
                 </Label>
                 <Input id="phone" type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="050-1234567" required dir="ltr" className={`h-12 rounded-xl text-base text-right ${inputBg}`} />
-              </div>
-
-              <div>
-                <Label htmlFor="email" className={`flex items-center gap-1.5 text-sm font-bold mb-1.5 ${text}`}>
-                  <Mail className="w-4 h-4" /> אימייל
-                </Label>
-                <Input id="email" type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder="email@example.com" dir="ltr" className={`h-12 rounded-xl text-base text-right ${inputBg}`} />
               </div>
 
               <div className="flex items-start gap-2 pt-1">
