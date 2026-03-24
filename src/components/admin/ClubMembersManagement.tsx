@@ -488,7 +488,20 @@ const ClubMembersManagement = () => {
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => {
+                          const phone = c.phone.startsWith('0') ? '972' + c.phone.slice(1) : c.phone;
+                          const msg = `היי ${c.name} 👋\nתודה שהצטרפת למועדון דיירקט פיקס! 🎉\n\nיש לך קוד קופון הנחה מיוחד:\n🎁 *CLUB10* — 10% הנחה על התיקון הבא!\n\nלמימוש: https://directfix-tracker.lovable.app/store\n\nצוות דיירקט פיקס 💙`;
+                          window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+                        }}
+                        title="שלח קופון בוואטסאפ"
+                      >
+                        <MessageCircle className="w-4 h-4 text-green-500" />
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -507,7 +520,7 @@ const ClubMembersManagement = () => {
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
-                      <div className="text-left mr-2">
+                      <div className="text-left mr-1">
                         <p className="text-xl font-bold text-primary">{c.totalPoints}</p>
                         <p className="text-xs text-muted-foreground">= ₪{c.totalValue.toFixed(0)}</p>
                       </div>
