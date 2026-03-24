@@ -547,7 +547,6 @@ const NewRepairOrder = () => {
       setCustomerName(urlName);
     }
     if (urlEmail) {
-      setIntroPhone(urlEmail);
       setCustomerEmail(urlEmail);
     }
 
