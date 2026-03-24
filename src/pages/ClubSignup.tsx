@@ -62,20 +62,6 @@ const ClubSignup = () => {
       });
       if (clubError) throw clubError;
 
-      if (form.birthday) {
-        const { data: profile } = await supabase
-          .from('customer_profiles')
-          .select('id')
-          .eq('phone', normalizedPhone)
-          .maybeSingle();
-
-        if (profile) {
-          await supabase.functions.invoke('customer-auth', {
-            body: { action: 'update-profile', phone: normalizedPhone, birthday: form.birthday }
-          });
-        }
-      }
-
       await supabase.from('loyalty_points').insert({
         customer_phone: normalizedPhone,
         points: 50,
