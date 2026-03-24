@@ -20,7 +20,7 @@ const BENEFITS = [
 ];
 
 const ClubSignup = () => {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', birthday: '' });
+  const [form, setForm] = useState({ name: '', phone: '' });
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
