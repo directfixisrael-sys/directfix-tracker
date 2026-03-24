@@ -1302,10 +1302,10 @@ const NewRepairOrder = () => {
               autoFocus
             />
             <Input
-              placeholder="כתובת דואר אלקטרוני *"
+              placeholder="מספר טלפון *"
               value={introPhone}
               onChange={(e) => setIntroPhone(e.target.value)}
-              type="email"
+              type="tel"
               dir="ltr"
               className="h-16 text-lg rounded-xl px-5 text-right"
             />
