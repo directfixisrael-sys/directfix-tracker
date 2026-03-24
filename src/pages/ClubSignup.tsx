@@ -56,7 +56,7 @@ const ClubSignup = () => {
       const { error: clubError } = await supabase.from('club_members').insert({
         phone: normalizedPhone,
         name: form.name.trim(),
-        email: form.email.trim() || null,
+        email: null,
         is_active: true,
         wants_promotions: true,
       });
