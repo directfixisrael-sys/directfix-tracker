@@ -328,8 +328,7 @@ const NewRepairOrder = () => {
   // Sync intro fields to customer fields and save lead
   const handleIntroDismiss = async () => {
     if (introName.trim()) setCustomerName(introName.trim());
-    // introPhone is now email
-    if (introPhone.trim()) setCustomerEmail(introPhone.trim());
+    if (introPhone.trim()) setCustomerPhone(introPhone.trim().replace(/\D/g, ''));
     setShowIntroCard(false);
 
     // Scroll to top after dismissing intro
@@ -338,12 +337,12 @@ const NewRepairOrder = () => {
     document.body.scrollTop = 0;
     if (contentRef.current) contentRef.current.scrollTop = 0;
 
-    // Save lead to DB (with email)
+    // Save lead to DB
     try {
       const { data: leadData } = await supabase.from('leads').insert({
         customer_name: introName.trim(),
-        customer_phone: '',
-        customer_email: introPhone.trim(),
+        customer_phone: introPhone.trim().replace(/\D/g, ''),
+        customer_email: '',
         privacy_accepted: introPrivacy,
         is_returning_customer: false,
         last_step: 'בחירת דגם',
@@ -548,7 +547,6 @@ const NewRepairOrder = () => {
       setCustomerName(urlName);
     }
     if (urlEmail) {
-      setIntroPhone(urlEmail);
       setCustomerEmail(urlEmail);
     }
 
@@ -1291,7 +1289,7 @@ const NewRepairOrder = () => {
         <div className="w-[calc(100%-2rem)] max-w-md bg-card rounded-2xl p-7 pb-8 shadow-2xl animate-scale-in border-2 border-primary/20">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-extrabold text-foreground">בואו נתחיל</h2>
-            <p className="text-base text-muted-foreground mt-2">שם מלא ואימייל — וישר לבחירת הדגם</p>
+            <p className="text-base text-muted-foreground mt-2">שם מלא ומספר טלפון — וישר לבחירת הדגם</p>
           </div>
 
           <div className="space-y-4">
@@ -1303,10 +1301,10 @@ const NewRepairOrder = () => {
               autoFocus
             />
             <Input
-              placeholder="כתובת דואר אלקטרוני *"
+              placeholder="מספר טלפון *"
               value={introPhone}
               onChange={(e) => setIntroPhone(e.target.value)}
-              type="email"
+              type="tel"
               dir="ltr"
               className="h-16 text-lg rounded-xl px-5 text-right"
             />
@@ -1321,7 +1319,7 @@ const NewRepairOrder = () => {
 
           <Button
             onClick={handleIntroDismiss}
-            disabled={!introName.trim() || !introPhone.includes('@') || !introPrivacy}
+            disabled={!introName.trim() || introPhone.replace(/\D/g, '').length < 9 || !introPrivacy}
             className="w-full h-12 text-sm font-bold rounded-xl mt-4"
           >
             יאללה, בואו נתחיל!
