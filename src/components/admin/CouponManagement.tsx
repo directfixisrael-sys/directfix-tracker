@@ -41,6 +41,9 @@ const CouponManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
+  const [whatsappDialog, setWhatsappDialog] = useState<{ open: boolean; coupon: Coupon | null }>({ open: false, coupon: null });
+  const [whatsappPhone, setWhatsappPhone] = useState('');
+  const [whatsappMessage, setWhatsappMessage] = useState('');
   const [formData, setFormData] = useState({
     code: '',
     description: '',
