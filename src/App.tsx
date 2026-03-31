@@ -22,6 +22,7 @@ import StoreCategoryPage from "./pages/StoreCategoryPage";
 import StoreProductPage from "./pages/StoreProductPage";
 import StoreCartPage from "./pages/StoreCartPage";
 import StoreCheckoutPage from "./pages/StoreCheckoutPage";
+import BatteryProgram from "./pages/BatteryProgram";
 import MinimalFooter from "./components/MinimalFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { VisitorTracker } from "./components/VisitorTracker";
