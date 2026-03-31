@@ -289,6 +289,19 @@ const CouponManagement = () => {
                 </div>
                 
                 <div className="flex items-center gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                    onClick={() => {
+                      const discount = formatDiscount(coupon);
+                      setWhatsappPhone('');
+                      setWhatsappMessage(`היי! 👋\nיש לנו קוד קופון מיוחד בשבילך:\n\n🎁 *${coupon.code}* — ${discount} הנחה!\n${coupon.description ? `📝 ${coupon.description}\n` : ''}${coupon.end_date ? `⏰ בתוקף עד ${new Date(coupon.end_date).toLocaleDateString('he-IL')}\n` : ''}\nלהזמנת תיקון:\nhttps://directfix-tracker.lovable.app/order`);
+                      setWhatsappDialog({ open: true, coupon });
+                    }}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                  </Button>
                   <Switch
                     checked={coupon.is_active}
                     onCheckedChange={() => handleToggleActive(coupon)}
