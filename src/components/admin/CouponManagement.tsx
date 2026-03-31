@@ -13,8 +13,12 @@ import {
   Percent, 
   DollarSign,
   Copy,
-  Loader2 
+  Loader2,
+  MessageCircle,
+  Send
 } from 'lucide-react';
+import { Dialog as WhatsAppDialog, DialogContent as WhatsAppDialogContent, DialogHeader as WhatsAppDialogHeader, DialogTitle as WhatsAppDialogTitle } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -37,6 +41,9 @@ const CouponManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
+  const [whatsappDialog, setWhatsappDialog] = useState<{ open: boolean; coupon: Coupon | null }>({ open: false, coupon: null });
+  const [whatsappPhone, setWhatsappPhone] = useState('');
+  const [whatsappMessage, setWhatsappMessage] = useState('');
   const [formData, setFormData] = useState({
     code: '',
     description: '',
@@ -282,6 +289,19 @@ const CouponManagement = () => {
                 </div>
                 
                 <div className="flex items-center gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                    onClick={() => {
+                      const discount = formatDiscount(coupon);
+                      setWhatsappPhone('');
+                      setWhatsappMessage(`היי! 👋\nיש לנו קוד קופון מיוחד בשבילך:\n\n🎁 *${coupon.code}* — ${discount} הנחה!\n${coupon.description ? `📝 ${coupon.description}\n` : ''}${coupon.end_date ? `⏰ בתוקף עד ${new Date(coupon.end_date).toLocaleDateString('he-IL')}\n` : ''}\nלהזמנת תיקון:\nhttps://directfix-tracker.lovable.app/order`);
+                      setWhatsappDialog({ open: true, coupon });
+                    }}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                  </Button>
                   <Switch
                     checked={coupon.is_active}
                     onCheckedChange={() => handleToggleActive(coupon)}
@@ -424,6 +444,57 @@ const CouponManagement = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* WhatsApp Send Dialog */}
+      <WhatsAppDialog open={whatsappDialog.open} onOpenChange={(open) => setWhatsappDialog({ open, coupon: open ? whatsappDialog.coupon : null })}>
+        <WhatsAppDialogContent className="max-w-md">
+          <WhatsAppDialogHeader>
+            <WhatsAppDialogTitle className="flex items-center gap-2">
+              <MessageCircle className="w-5 h-5 text-green-600" />
+              שליחת קופון בוואטסאפ
+            </WhatsAppDialogTitle>
+          </WhatsAppDialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1.5">מספר טלפון</label>
+              <Input
+                type="tel"
+                value={whatsappPhone}
+                onChange={e => setWhatsappPhone(e.target.value)}
+                placeholder="050-0000000"
+                dir="ltr"
+                className="h-11"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-1.5">הודעה</label>
+              <Textarea
+                value={whatsappMessage}
+                onChange={e => setWhatsappMessage(e.target.value)}
+                rows={6}
+                className="text-sm"
+              />
+            </div>
+            
+            <Button
+              className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
+              disabled={!whatsappPhone.trim()}
+              onClick={() => {
+                const phone = whatsappPhone.replace(/\D/g, '');
+                const formatted = phone.startsWith('0') ? '972' + phone.slice(1) : phone;
+                window.open(`https://wa.me/${formatted}?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
+                setWhatsappDialog({ open: false, coupon: null });
+                toast.success('וואטסאפ נפתח');
+              }}
+            >
+              <Send className="w-4 h-4" />
+              שלח בוואטסאפ
+            </Button>
+          </div>
+        </WhatsAppDialogContent>
+      </WhatsAppDialog>
     </div>
   );
 };
