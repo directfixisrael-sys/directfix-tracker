@@ -13,8 +13,12 @@ import {
   Percent, 
   DollarSign,
   Copy,
-  Loader2 
+  Loader2,
+  MessageCircle,
+  Send
 } from 'lucide-react';
+import { Dialog as WhatsAppDialog, DialogContent as WhatsAppDialogContent, DialogHeader as WhatsAppDialogHeader, DialogTitle as WhatsAppDialogTitle } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
