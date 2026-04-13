@@ -1607,6 +1607,12 @@ const NewRepairOrder = () => {
 
             <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => setSelectedModel(model)} onConfirm={model => handleModelSelect(model)} />
 
+            {/* FOMO: Daily Slots + Technician Availability */}
+            <div className="space-y-2">
+              <DailySlotsBar />
+              <TechnicianAvailability />
+            </div>
+
             {/* Testimonials Slider */}
             <TestimonialsSlider />
 
