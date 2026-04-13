@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { RepairOrder } from '@/types/repair';
-import { Smartphone, Wrench, Gift, Shield, MapPin, Award } from 'lucide-react';
+import { Smartphone, Wrench, Gift, Shield, MapPin, Award, TrendingDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { calculatePointsFromPrice } from '@/components/LoyaltyPointsDisplay';
+import { getApplePrice, getSavingsPercent } from '@/lib/applePrices';
 
 interface Promotion {
   id: string;
@@ -162,6 +163,26 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
             <span className="font-bold text-primary text-lg">{calculatePointsFromPrice(totalPrice)}</span>
           </div>
         )}
+
+        {/* Apple Price Savings */}
+        {(() => {
+          const applePrice = getApplePrice(order.deviceType, order.issueDescription);
+          if (!applePrice || applePrice <= totalPrice) return null;
+          const savings = applePrice - totalPrice;
+          const percent = getSavingsPercent(totalPrice, applePrice);
+          return (
+            <div className="flex justify-between items-center text-base bg-emerald-50 dark:bg-emerald-950/30 rounded-xl p-3 border border-emerald-200 dark:border-emerald-800">
+              <span className="text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5 font-medium">
+                <TrendingDown className="w-4 h-4" />
+                חסכת לעומת Apple
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="line-through text-muted-foreground text-sm">₪{applePrice}</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400 text-lg">-₪{savings}</span>
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="flex justify-between pt-4 border-t border-border">
           <span className="font-bold text-foreground text-xl">סה״כ לתשלום</span>
