@@ -2113,6 +2113,16 @@ const NewRepairOrder = () => {
                   {selectedBundleAddon && currentBundle && <div className="text-xs text-amber-500 mt-1 text-left">
                       כולל סוללה בהנחה של {currentBundle.discount_percent}%
                     </div>}
+                  {/* Apple savings comparison */}
+                  {selectedModel && selectedRepair && (() => {
+                    const applePrice = getApplePrice(selectedModel.name, selectedRepair.name);
+                    if (!applePrice || applePrice <= getFinalPrice()) return null;
+                    return (
+                      <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 text-left font-medium">
+                        חסכת ₪{applePrice - getFinalPrice()} לעומת Apple!
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             </Card>
