@@ -31,6 +31,11 @@ import { getLeadSource } from '@/lib/leadSource';
 import GiftOrderToggle from '@/components/GiftOrderToggle';
 import LoyaltyPointsDisplay, { getCustomerPoints, calculatePointsFromPrice, calculateDiscountFromPoints } from '@/components/LoyaltyPointsDisplay';
 import PointsEarnedAnimation from '@/components/PointsEarnedAnimation';
+import FomoOrderToast from '@/components/FomoOrderToast';
+import DailySlotsBar from '@/components/DailySlotsBar';
+import FloatingTrustBadge from '@/components/FloatingTrustBadge';
+import TechnicianAvailability from '@/components/TechnicianAvailability';
+import { getApplePrice, getSavingsPercent } from '@/lib/applePrices';
 
 // iPhone back glass colors per model family
 const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
