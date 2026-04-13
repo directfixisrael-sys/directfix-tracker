@@ -1448,7 +1448,11 @@ const NewRepairOrder = () => {
         setShowGiftPopup(false);
         setGiftClaimed(true);
         sessionStorage.setItem('gift_promo_claimed', 'true');
-      }} />}
+       }} />}
+
+        {/* FOMO Toast Notifications */}
+        <FomoOrderToast />
+        <FloatingTrustBadge />
 
         {/* Trust Badges */}
         {step === 'model' && <div className="flex items-center justify-center gap-3 mb-6 animate-fade-in">
