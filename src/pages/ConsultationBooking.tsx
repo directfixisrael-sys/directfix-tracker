@@ -4,12 +4,25 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { Phone, Clock, Star, Shield, CheckCircle2, ArrowRight, CreditCard, Crown, Calendar, Loader2 } from 'lucide-react';
+import { Phone, Clock, Star, Shield, CheckCircle2, ArrowRight, CreditCard, Crown, Calendar, Loader2, ChevronDown, Camera } from 'lucide-react';
 import { useRepairStore } from '@/store/repairStore';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import Logo from '@/components/Logo';
 import { cn } from '@/lib/utils';
+
+import testimonial1 from '@/assets/testimonial-1.png';
+import testimonial2 from '@/assets/testimonial-2.jpg';
+import testimonial3 from '@/assets/testimonial-3.jpg';
+import testimonial4 from '@/assets/testimonial-4.jpg';
+import testimonial5 from '@/assets/testimonial-5.jpg';
+import testimonial6 from '@/assets/testimonial-6.jpg';
+import testimonial7 from '@/assets/testimonial-7.jpg';
+
+const customerPhotos = [
+  testimonial1, testimonial2, testimonial3, testimonial4,
+  testimonial5, testimonial6, testimonial7,
+];
 
 type ConsultationType = 'free' | 'paid' | null;
 
@@ -58,14 +71,21 @@ const ConsultationBooking = () => {
   });
   const { addOrder } = useRepairStore();
 
-  // Get available dates: tomorrow to +7 days
+  // Get available dates: tomorrow to +14 days, skip Friday (5) and Saturday (6)
   const getAvailableDates = () => {
     const dates: Date[] = [];
     const today = new Date();
-    for (let i = 1; i <= 7; i++) {
+    let added = 0;
+    let i = 1;
+    while (added < 7) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
-      dates.push(date);
+      const day = date.getDay();
+      if (day !== 5 && day !== 6) {
+        dates.push(date);
+        added++;
+      }
+      i++;
     }
     return dates;
   };
@@ -560,6 +580,65 @@ const ConsultationBooking = () => {
           >
             {isSubmitting ? 'שולח...' : consultationType === 'paid' ? `עברו לתשלום — ₪${PAID_PRICE}` : 'קבעו שיחה'}
           </Button>
+        </div>
+      )}
+      {/* Testimonial Photos Gallery - on choose step */}
+      {step === 'choose' && <TestimonialPhotoGallery />}
+    </div>
+  );
+};
+
+/* Collapsible photo gallery */
+const TestimonialPhotoGallery = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedImg, setSelectedImg] = useState<string | null>(null);
+
+  return (
+    <div className="mt-6 animate-fade-in">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border-2 border-border bg-card hover:bg-muted/30 transition-all"
+      >
+        <Camera className="w-4 h-4 text-primary" />
+        <span className="font-bold text-sm">לקוחות מרוצים — גלריית תודות</span>
+        <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform duration-300", isOpen && "rotate-180")} />
+      </button>
+
+      {isOpen && (
+        <div className="mt-3 animate-fade-in">
+          <p className="text-center text-xs text-muted-foreground mb-3">תודות אמיתיות מלקוחות שקיבלו שירות</p>
+          <div className="grid grid-cols-3 gap-2">
+            {customerPhotos.map((src, i) => (
+              <button
+                key={i}
+                onClick={() => setSelectedImg(src)}
+                className="aspect-square rounded-xl overflow-hidden border-2 border-border hover:border-primary/50 transition-all hover:scale-[1.03] active:scale-95"
+              >
+                <img src={src} alt={`תודה מלקוח ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {selectedImg && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setSelectedImg(null)}
+        >
+          <button
+            onClick={() => setSelectedImg(null)}
+            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-card/80 flex items-center justify-center text-foreground font-bold text-lg z-10"
+          >
+            X
+          </button>
+          <img
+            src={selectedImg}
+            alt="תודה מלקוח"
+            className="max-w-full max-h-[85vh] rounded-2xl object-contain"
+            onClick={e => e.stopPropagation()}
+          />
         </div>
       )}
     </div>
