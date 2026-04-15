@@ -1626,17 +1626,21 @@ const NewRepairOrder = () => {
               <h2 className="text-3xl font-extrabold">{additionalRepairs.length > 0 ? 'הוסף תיקון נוסף' : 'מה צריך לתקן?'}</h2>
             </div>
 
-            {/* App-exclusive discount banner */}
+            {/* April Sale Banner */}
             {additionalRepairs.length === 0 && (
-              <div className="relative overflow-hidden rounded-2xl border-2 border-primary/25 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 p-4">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/40 via-primary to-primary/40" />
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 bg-primary/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <BadgePercent className="w-6 h-6 text-primary" />
+              <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/20 to-primary/10 p-5">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-pulse" />
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-black px-4 py-1.5 rounded-bl-xl tracking-wide">
+                  SALE
+                </div>
+                <div className="relative flex items-center gap-4">
+                  <div className="w-14 h-14 bg-primary/20 rounded-2xl flex items-center justify-center flex-shrink-0 border border-primary/30">
+                    <BadgePercent className="w-8 h-8 text-primary" />
                   </div>
                   <div>
-                    <p className="font-bold text-foreground text-sm">הנחה בלעדית להזמנה דרך האפליקציה</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">המחירים כבר כוללים את ההנחה המיוחדת</p>
+                    <p className="font-black text-foreground text-base leading-tight">מבצעי אפריל - פעם בשנה!</p>
+                    <p className="text-sm text-primary font-bold mt-1">הנחות בלעדיות על כל התיקונים</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">המחירים כבר כוללים את ההנחה</p>
                   </div>
                 </div>
               </div>
