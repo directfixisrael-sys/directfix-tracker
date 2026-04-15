@@ -1659,6 +1659,12 @@ const NewRepairOrder = () => {
             if (selectedModel) {
               price = getRepairPrice(repair);
             }
+            // App-exclusive discount
+            const isScreen = repair.name.includes('מסך');
+            const isBattery = repair.name.includes('סוללה');
+            const appDiscount = isScreen ? 35 : isBattery ? 30 : 0;
+            const discountedPrice = price > 0 ? price - appDiscount : 0;
+
             const info = repair.info_title && repair.info_description ? { title: repair.info_title, description: repair.info_description } : null;
             const IconComponent = getRepairIconComponent(repair.icon);
             return <div key={repair.id}>
@@ -1693,7 +1699,18 @@ const NewRepairOrder = () => {
                               </Dialog>}
                           </div>
                           {repair.description && <p className="text-muted-foreground text-base mt-1">{repair.description}</p>}
-                          {!isPhoneOnly && selectedModel && <p className="text-2xl font-bold text-primary mt-2">₪{price}</p>}
+                          {!isPhoneOnly && selectedModel && price > 0 && (
+                            <div className="flex items-center gap-2 mt-2">
+                              {appDiscount > 0 ? (
+                                <>
+                                  <span className="line-through text-muted-foreground text-lg">₪{price}</span>
+                                  <span className="text-2xl font-bold text-primary">₪{discountedPrice}</span>
+                                </>
+                              ) : (
+                                <span className="text-2xl font-bold text-primary">₪{price}</span>
+                              )}
+                            </div>
+                          )}
                         </div>
                         
                         {!isPhoneOnly && <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />}
