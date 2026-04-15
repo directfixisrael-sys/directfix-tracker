@@ -168,10 +168,30 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
               <span className="font-semibold text-success">חינם</span>
             </div>
 
+            {/* Instant Discount */}
+            {discountAmount > 0 && (
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <BadgePercent className="w-4 h-4 text-primary" />
+                  <span className="font-bold text-foreground text-sm">הנחה מיוחדת הופעלה!</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-primary text-xs flex items-center gap-1">
+                    <Zap className="w-3 h-3" /> הנחה מיידית
+                  </span>
+                  <span className="font-bold text-primary">-₪{discountAmount}</span>
+                </div>
+              </div>
+            )}
 
             <div className="flex justify-between pt-3 border-t border-border">
               <span className="font-bold text-foreground">סה״כ לתשלום</span>
-              <span className="font-bold text-primary text-xl">₪{totalPrice}</span>
+              <div className="flex items-center gap-2">
+                {discountAmount > 0 && (
+                  <span className="line-through text-muted-foreground text-sm">₪{totalPrice}</span>
+                )}
+                <span className="font-bold text-primary text-xl">₪{discountAmount > 0 ? discountedTotal : totalPrice}</span>
+              </div>
             </div>
           </div>
         </div>
