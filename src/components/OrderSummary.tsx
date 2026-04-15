@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { RepairOrder } from '@/types/repair';
-import { Smartphone, Wrench, Gift, Shield, MapPin, Award } from 'lucide-react';
+import { Smartphone, Wrench, Gift, Shield, MapPin, Award, Zap, BadgePercent } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { calculatePointsFromPrice } from '@/components/LoyaltyPointsDisplay';
 
