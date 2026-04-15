@@ -1628,19 +1628,21 @@ const NewRepairOrder = () => {
 
             {/* April Sale Banner */}
             {additionalRepairs.length === 0 && (
-              <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/20 to-primary/10 p-5">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-pulse" />
-                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-black px-4 py-1.5 rounded-bl-xl tracking-wide">
-                  SALE
-                </div>
-                <div className="relative flex items-center gap-4">
-                  <div className="w-14 h-14 bg-primary/20 rounded-2xl flex items-center justify-center flex-shrink-0 border border-primary/30">
-                    <BadgePercent className="w-8 h-8 text-primary" />
+              <div className="relative overflow-hidden rounded-2xl p-[2px] bg-gradient-to-r from-red-500 via-orange-400 to-red-500 animate-gradient-x shadow-lg shadow-red-500/20">
+                <div className="relative rounded-[14px] bg-gradient-to-r from-red-950 via-orange-950 to-red-950 p-5 overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(239,68,68,0.15),transparent_60%)]" />
+                  <div className="absolute top-0 right-0 bg-gradient-to-l from-red-500 to-orange-500 text-white text-xs font-black px-5 py-1.5 rounded-bl-xl tracking-widest">
+                    SALE
                   </div>
-                  <div>
-                    <p className="font-black text-foreground text-base leading-tight">מבצעי אפריל - פעם בשנה!</p>
-                    <p className="text-sm text-primary font-bold mt-1">הנחות בלעדיות על כל התיקונים</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">המחירים כבר כוללים את ההנחה</p>
+                  <div className="relative flex items-center gap-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-red-500/30 to-orange-500/30 rounded-2xl flex items-center justify-center flex-shrink-0 border border-red-500/40">
+                      <BadgePercent className="w-8 h-8 text-red-400 animate-bounce" style={{ animationDuration: '2s' }} />
+                    </div>
+                    <div>
+                      <p className="font-black text-white text-base leading-tight">מבצעי אפריל - פעם בשנה!</p>
+                      <p className="text-sm text-orange-300 font-bold mt-1">הנחות בלעדיות על כל התיקונים</p>
+                      <p className="text-xs text-white/50 mt-0.5">המחירים כבר כוללים את ההנחה</p>
+                    </div>
                   </div>
                 </div>
               </div>
