@@ -1628,7 +1628,7 @@ const NewRepairOrder = () => {
 
             {/* April Sale Banner */}
             {additionalRepairs.length === 0 && (
-              <div className="relative overflow-hidden rounded-2xl p-[2px] bg-gradient-to-r from-red-500 via-orange-400 to-red-500 animate-gradient-x shadow-lg shadow-red-500/20">
+              <div className="relative overflow-hidden rounded-2xl p-[2px] bg-gradient-to-r from-red-500 via-orange-400 to-red-500 animate-gradient-x shadow-lg shadow-red-500/20" style={{ backgroundSize: '200% 200%' }}>
                 <div className="relative rounded-[14px] bg-gradient-to-r from-red-950 via-orange-950 to-red-950 p-5 overflow-hidden">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(239,68,68,0.15),transparent_60%)]" />
                   <div className="absolute top-0 right-0 bg-gradient-to-l from-red-500 to-orange-500 text-white text-xs font-black px-5 py-1.5 rounded-bl-xl tracking-widest">
