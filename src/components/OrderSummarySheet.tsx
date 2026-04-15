@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { RepairOrder } from '@/types/repair';
-import { Receipt, Smartphone, Wrench, Gift, Shield, MapPin } from 'lucide-react';
+import { Receipt, Smartphone, Wrench, Gift, Shield, MapPin, BadgePercent, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Promotion {
@@ -38,6 +38,12 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
     .reduce((sum, a) => sum + a.price, 0);
   
   const totalPrice = order.repairPrice + accessoriesTotal;
+
+  const issueLC = order.issueDescription.toLowerCase();
+  const isScreenRepair = issueLC.includes('מסך') || issueLC.includes('screen');
+  const isBatteryRepair = issueLC.includes('סוללה') || issueLC.includes('battery');
+  const discountAmount = isScreenRepair ? 35 : isBatteryRepair ? 30 : 0;
+  const discountedTotal = totalPrice - discountAmount;
 
   const getPromotionIcon = (icon: string | null) => {
     switch (icon) {
@@ -162,10 +168,30 @@ const OrderSummarySheet = ({ order }: OrderSummarySheetProps) => {
               <span className="font-semibold text-success">חינם</span>
             </div>
 
+            {/* Instant Discount */}
+            {discountAmount > 0 && (
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <BadgePercent className="w-4 h-4 text-primary" />
+                  <span className="font-bold text-foreground text-sm">הנחה מיוחדת הופעלה!</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-primary text-xs flex items-center gap-1">
+                    <Zap className="w-3 h-3" /> הנחה מיידית
+                  </span>
+                  <span className="font-bold text-primary">-₪{discountAmount}</span>
+                </div>
+              </div>
+            )}
 
             <div className="flex justify-between pt-3 border-t border-border">
               <span className="font-bold text-foreground">סה״כ לתשלום</span>
-              <span className="font-bold text-primary text-xl">₪{totalPrice}</span>
+              <div className="flex items-center gap-2">
+                {discountAmount > 0 && (
+                  <span className="line-through text-muted-foreground text-sm">₪{totalPrice}</span>
+                )}
+                <span className="font-bold text-primary text-xl">₪{discountAmount > 0 ? discountedTotal : totalPrice}</span>
+              </div>
             </div>
           </div>
         </div>

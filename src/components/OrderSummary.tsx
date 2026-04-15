@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { RepairOrder } from '@/types/repair';
-import { Smartphone, Wrench, Gift, Shield, MapPin, Award } from 'lucide-react';
+import { Smartphone, Wrench, Gift, Shield, MapPin, Award, Zap, BadgePercent } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { calculatePointsFromPrice } from '@/components/LoyaltyPointsDisplay';
 
@@ -41,6 +41,13 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
     .reduce((sum, a) => sum + a.price, 0);
   
   const totalPrice = order.repairPrice + accessoriesTotal;
+
+  // Detect repair type for discount
+  const issueLC = order.issueDescription.toLowerCase();
+  const isScreenRepair = issueLC.includes('מסך') || issueLC.includes('screen');
+  const isBatteryRepair = issueLC.includes('סוללה') || issueLC.includes('battery');
+  const discountAmount = isScreenRepair ? 35 : isBatteryRepair ? 30 : 0;
+  const discountedTotal = totalPrice - discountAmount;
 
   const getPromotionIcon = (icon: string | null) => {
     switch (icon) {
@@ -143,6 +150,29 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
           </div>
         )}
 
+        {/* Instant Discount Banner */}
+        {discountAmount > 0 && (
+          <div className="relative overflow-hidden rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 p-4">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-primary/15 rounded-full flex items-center justify-center flex-shrink-0">
+                <BadgePercent className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-bold text-foreground text-base">הנחה מיוחדת הופעלה!</p>
+                <p className="text-sm text-muted-foreground">הזמנתם עכשיו וקיבלתם הנחה של ₪{discountAmount}</p>
+              </div>
+            </div>
+            <div className="flex justify-between items-center mt-3 pt-3 border-t border-primary/15">
+              <span className="text-primary font-medium flex items-center gap-1.5">
+                <Zap className="w-4 h-4" />
+                הנחה מיידית
+              </span>
+              <span className="font-bold text-primary text-lg">-₪{discountAmount}</span>
+            </div>
+          </div>
+        )}
+
         {/* Free Home Visit */}
         <div className="flex justify-between text-base border-t border-border pt-4 mt-2">
           <span className="text-foreground flex items-center gap-1.5">
@@ -153,19 +183,24 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
         </div>
 
         {/* Loyalty points earned - only for club members */}
-        {calculatePointsFromPrice(totalPrice) > 0 && (
+        {calculatePointsFromPrice(discountAmount > 0 ? discountedTotal : totalPrice) > 0 && (
           <div className="flex justify-between text-base bg-primary/5 rounded-xl p-3 -mx-1 border border-primary/15">
             <span className="text-primary flex items-center gap-1.5 font-medium">
               <Award className="w-4 h-4" />
               נקודות מועדון שנצברו
             </span>
-            <span className="font-bold text-primary text-lg">{calculatePointsFromPrice(totalPrice)}</span>
+            <span className="font-bold text-primary text-lg">{calculatePointsFromPrice(discountAmount > 0 ? discountedTotal : totalPrice)}</span>
           </div>
         )}
 
         <div className="flex justify-between pt-4 border-t border-border">
           <span className="font-bold text-foreground text-xl">סה״כ לתשלום</span>
-          <span className="font-bold text-primary text-2xl">₪{totalPrice}</span>
+          <div className="flex items-center gap-2">
+            {discountAmount > 0 && (
+              <span className="line-through text-muted-foreground text-lg">₪{totalPrice}</span>
+            )}
+            <span className="font-bold text-primary text-2xl">₪{discountAmount > 0 ? discountedTotal : totalPrice}</span>
+          </div>
         </div>
       </div>
     </div>
