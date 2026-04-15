@@ -1626,6 +1626,22 @@ const NewRepairOrder = () => {
               <h2 className="text-3xl font-extrabold">{additionalRepairs.length > 0 ? 'הוסף תיקון נוסף' : 'מה צריך לתקן?'}</h2>
             </div>
 
+            {/* App-exclusive discount banner */}
+            {additionalRepairs.length === 0 && (
+              <div className="relative overflow-hidden rounded-2xl border-2 border-primary/25 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 p-4">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/40 via-primary to-primary/40" />
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 bg-primary/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <BadgePercent className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-foreground text-sm">הנחה בלעדית להזמנה דרך האפליקציה</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">המחירים כבר כוללים את ההנחה המיוחדת</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {additionalRepairs.length > 0 && renderRepairCart()}
 
             <div className="space-y-3">
