@@ -31,11 +31,6 @@ import { getLeadSource } from '@/lib/leadSource';
 import GiftOrderToggle from '@/components/GiftOrderToggle';
 import LoyaltyPointsDisplay, { getCustomerPoints, calculatePointsFromPrice, calculateDiscountFromPoints } from '@/components/LoyaltyPointsDisplay';
 import PointsEarnedAnimation from '@/components/PointsEarnedAnimation';
-import FomoOrderToast from '@/components/FomoOrderToast';
-import DailySlotsBar from '@/components/DailySlotsBar';
-import FloatingTrustBadge from '@/components/FloatingTrustBadge';
-import TechnicianAvailability from '@/components/TechnicianAvailability';
-import { getApplePrice, getSavingsPercent } from '@/lib/applePrices';
 
 // iPhone back glass colors per model family
 const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
@@ -1448,11 +1443,7 @@ const NewRepairOrder = () => {
         setShowGiftPopup(false);
         setGiftClaimed(true);
         sessionStorage.setItem('gift_promo_claimed', 'true');
-       }} />}
-
-        {/* FOMO Toast Notifications */}
-        <FomoOrderToast />
-        <FloatingTrustBadge />
+      }} />}
 
         {/* Trust Badges */}
         {step === 'model' && <div className="flex items-center justify-center gap-3 mb-6 animate-fade-in">
@@ -1606,12 +1597,6 @@ const NewRepairOrder = () => {
             <SmartRepairInput models={models} repairTypes={repairTypes} priceMap={priceMap} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
 
             <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => setSelectedModel(model)} onConfirm={model => handleModelSelect(model)} />
-
-            {/* FOMO: Daily Slots + Technician Availability */}
-            <div className="space-y-2">
-              <DailySlotsBar />
-              <TechnicianAvailability />
-            </div>
 
             {/* Testimonials Slider */}
             <TestimonialsSlider />
@@ -1900,28 +1885,6 @@ const NewRepairOrder = () => {
               <div className="mt-3 inline-flex items-center bg-primary text-primary-foreground text-xl font-bold px-5 py-2 rounded-2xl shadow-md">
                 ₪{getTotalPrice()}
               </div>
-
-              {/* Apple Price Comparison */}
-              {selectedModel && selectedRepair && (() => {
-                const applePrice = getApplePrice(selectedModel.name, selectedRepair.name);
-                if (!applePrice || applePrice <= getTotalPrice()) return null;
-                const savings = applePrice - getTotalPrice();
-                const percent = getSavingsPercent(getTotalPrice(), applePrice);
-                return (
-                  <div className="mt-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-2xl px-4 py-3 text-sm">
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
-                        <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-                      </svg>
-                      <span className="text-muted-foreground">ב-Apple: </span>
-                      <span className="line-through text-muted-foreground font-medium">₪{applePrice}</span>
-                    </div>
-                    <p className="font-bold text-emerald-700 dark:text-emerald-400 text-base">
-                      חסכת ₪{savings} ({percent}% פחות!)
-                    </p>
-                  </div>
-                );
-              })()}
             </div>
 
             <Card className="p-5 bg-gradient-to-br from-card via-card to-primary/5 border-2 border-primary/20 shadow-lg">
@@ -2113,16 +2076,6 @@ const NewRepairOrder = () => {
                   {selectedBundleAddon && currentBundle && <div className="text-xs text-amber-500 mt-1 text-left">
                       כולל סוללה בהנחה של {currentBundle.discount_percent}%
                     </div>}
-                  {/* Apple savings comparison */}
-                  {selectedModel && selectedRepair && (() => {
-                    const applePrice = getApplePrice(selectedModel.name, selectedRepair.name);
-                    if (!applePrice || applePrice <= getFinalPrice()) return null;
-                    return (
-                      <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 text-left font-medium">
-                        חסכת ₪{applePrice - getFinalPrice()} לעומת Apple!
-                      </div>
-                    );
-                  })()}
                 </div>
               </div>
             </Card>
