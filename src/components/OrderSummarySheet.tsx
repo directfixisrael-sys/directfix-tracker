@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { RepairOrder } from '@/types/repair';
-import { Receipt, Smartphone, Wrench, Gift, Shield, MapPin } from 'lucide-react';
+import { Receipt, Smartphone, Wrench, Gift, Shield, MapPin, BadgePercent, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Promotion {
