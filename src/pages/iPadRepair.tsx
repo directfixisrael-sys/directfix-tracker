@@ -122,6 +122,28 @@ const iPadRepair = () => {
 
       if (error) throw error;
       setOrderNumber(data.order_number);
+
+      // Send email/WhatsApp notifications
+      try {
+        const dateStr2 = selectedDate.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
+        await supabase.functions.invoke('send-order-notifications', {
+          body: {
+            customerName: customerName.trim(),
+            customerPhone: customerPhone.trim(),
+            customerAddress: customerAddress.trim(),
+            deviceType: selectedModel.name,
+            repairType: `תיקון מסך iPad - ${displayStatus}`,
+            repairPrice: selectedModel.screen_price,
+            scheduledTime: `${dateStr2}, ${selectedTime}`,
+            customerEmail: customerEmail?.trim() || undefined,
+            orderNumber: data.order_number,
+            notes: '',
+          }
+        });
+      } catch (notifErr) {
+        console.error('Error sending notifications:', notifErr);
+      }
+
       setStep('done');
     } catch (err) {
       console.error(err);
