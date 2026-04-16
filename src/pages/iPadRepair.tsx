@@ -54,6 +54,7 @@ const iPadRepair = () => {
   const [identifyOpen, setIdentifyOpen] = useState(false);
   const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
+  const timePickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -461,7 +462,7 @@ const iPadRepair = () => {
                 return (
                   <button
                     key={date.toISOString()}
-                    onClick={() => { setSelectedDate(date); setSelectedTime(''); }}
+                    onClick={() => { setSelectedDate(date); setSelectedTime(''); setTimeout(() => timePickerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); }}
                     className={cn(
                       "flex flex-col items-center p-3 rounded-xl border-2 transition-all",
                       isSelected
@@ -478,7 +479,7 @@ const iPadRepair = () => {
             </div>
 
             {selectedDate && (
-              <div className="space-y-2 animate-fade-in">
+              <div ref={timePickerRef} className="space-y-2 animate-fade-in">
                 <h3 className="text-base font-semibold text-right">בחרו טווח שעות לאיסוף</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {TIME_SLOTS.map(slot => (
