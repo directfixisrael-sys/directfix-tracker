@@ -262,19 +262,12 @@ const TechnicianRecruitment = () => {
       
       <div className="relative grid grid-cols-1 md:grid-cols-2 min-h-[420px] bg-muted mx-0">
         {/* Left side - Floating icons */}
-        <div className="hidden md:block relative bg-accent-foreground text-primary-foreground">
-          {floatingIcons.map(({ Icon, size, position, delay, bg }, i) =>
-          <div
-            key={i}
-            className={`absolute ${position} ${size} ${bg} rounded-2xl shadow-lg flex items-center justify-center`}
-            style={{
-              animation: `techFloat 6s ease-in-out ${delay} infinite`,
-              transform: `rotate(${i * 15 - 15}deg)`
-            }}>
-            
-              <Icon className="w-5 h-5 text-primary-foreground" />
-            </div>
-          )}
+        <div className="hidden md:block relative overflow-hidden">
+          <img
+            src={technicianHero}
+            alt="טכנאי סלולר מקצועי"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
         </div>
 
         {/* Right side - Content */}
