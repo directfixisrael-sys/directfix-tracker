@@ -651,6 +651,10 @@ const NewRepairOrder = () => {
   };
   const getPrice = () => {
     if (!selectedModel || !selectedRepair) return 0;
+    // If compatible screen selected, use compatible_screen_price
+    if (selectedScreenType === 'compatible' && selectedRepair.name.includes('מסך') && selectedModel.compatible_screen_price > 0) {
+      return selectedModel.compatible_screen_price;
+    }
     return getRepairPrice(selectedRepair);
   };
   const getAdditionalRepairsTotal = () => {
