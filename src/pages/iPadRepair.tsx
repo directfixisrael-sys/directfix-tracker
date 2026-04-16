@@ -282,9 +282,28 @@ const iPadRepair = () => {
                 dir="rtl"
               />
             </div>
+            <div className="flex items-start gap-2 flex-row-reverse">
+              <Checkbox
+                id="privacy-intro-ipad"
+                checked={privacyAccepted}
+                onCheckedChange={(v) => setPrivacyAccepted(v === true)}
+              />
+              <label htmlFor="privacy-intro-ipad" className="text-xs text-muted-foreground text-right leading-relaxed cursor-pointer">
+                אני מאשר/ת את{' '}
+                <a
+                  href="https://directfix.co.il/privacy-policy/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-primary hover:text-primary/80"
+                >
+                  מדיניות הפרטיות
+                </a>{' '}
+                ומסכים/ה לתיאום השירות באמצעות WhatsApp או טלפון
+              </label>
+            </div>
             <Button
               className="w-full h-12 text-base rounded-xl"
-              disabled={!customerName.trim() || customerPhone.length < 9}
+              disabled={!customerName.trim() || customerPhone.length < 9 || !privacyAccepted}
               onClick={() => setStep('model')}
             >
               המשך
