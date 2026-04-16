@@ -356,7 +356,12 @@ const iPadRepair = () => {
                       key={model.id}
                       onClick={() => {
                         setSelectedModel(model);
-                        setStep('issue');
+                        if (model.has_display_option) {
+                          setStep('issue');
+                        } else {
+                          setDisplayWorking(true);
+                          setStep('schedule');
+                        }
                         createiPadLead(model.name);
                       }}
                       className={cn(
@@ -456,7 +461,7 @@ const iPadRepair = () => {
         {step === 'schedule' && (
           <div className="space-y-4 animate-fade-in">
             <div className="flex items-center justify-between">
-              <button onClick={() => setStep('issue')} className="text-primary flex items-center gap-1 text-sm">
+              <button onClick={() => setStep(selectedModel?.has_display_option ? 'issue' : 'model')} className="text-primary flex items-center gap-1 text-sm">
                 <ArrowRight className="w-4 h-4" /> חזרה
               </button>
               <h2 className="text-lg font-bold">תאריך איסוף</h2>

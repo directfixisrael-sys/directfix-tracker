@@ -21,6 +21,7 @@ interface IPadModel {
   series: string;
   sort_order: number;
   is_active: boolean;
+  has_display_option: boolean;
 }
 
 const IPadPriceManagement = () => {
