@@ -560,10 +560,12 @@ const iPadRepair = () => {
                   {selectedDate?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </span>
               </div>
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>{displayWorking ? 'תצוגה תקינה' : 'תצוגה לא עובדת'}</span>
-                <span>מצב תצוגה</span>
-              </div>
+              {selectedModel?.has_display_option && (
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>{displayWorking ? 'תצוגה תקינה' : 'תצוגה לא עובדת'}</span>
+                  <span>מצב תצוגה</span>
+                </div>
+              )}
               <div className="border-t border-border pt-2 mt-2">
                 <div className="flex items-center gap-2 flex-row-reverse text-xs text-muted-foreground">
                   <Package className="w-4 h-4" />
