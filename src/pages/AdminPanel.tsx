@@ -55,7 +55,8 @@ import {
   Bell,
   Award,
   Crown,
-  Shield
+  Shield,
+  Tablet
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
