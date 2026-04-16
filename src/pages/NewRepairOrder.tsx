@@ -778,10 +778,11 @@ const NewRepairOrder = () => {
       return;
     }
 
-    
+    const isScreenRepair = repair.name.includes('מסך');
     
     setSelectedRepair(repair);
     setShowBackColorPicker(false);
+    updateLeadStep('אישור מחיר', { repair_type: repair.name });
 
     // Track AddToCart event for Facebook Pixel
     if (selectedModel) {
