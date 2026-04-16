@@ -379,6 +379,29 @@ const iPadRepair = () => {
                 </div>
               </div>
             ))}
+
+            {/* Model not listed */}
+            <Collapsible>
+              <CollapsibleTrigger asChild>
+                <button className="w-full flex items-center justify-center gap-2 p-3 rounded-xl text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <HelpCircle className="w-4 h-4" />
+                  הדגם שלכם לא מופיע ברשימה?
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pt-2">
+                <Card className="p-5 text-center space-y-3 animate-fade-in">
+                  <Phone className="w-8 h-8 text-primary mx-auto" />
+                  <p className="font-bold text-base">דברו עם נציג שלנו ונשמח לעזור</p>
+                  <a
+                    href="tel:033106020"
+                    className="inline-flex items-center justify-center gap-2 flex-row-reverse w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold text-base hover:bg-primary/90 transition-colors"
+                  >
+                    <Phone className="w-5 h-5" />
+                    התקשרו עכשיו - 03-3106020
+                  </a>
+                </Card>
+              </CollapsibleContent>
+            </Collapsible>
           </div>
         )}
 
