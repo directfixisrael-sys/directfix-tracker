@@ -242,6 +242,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ipad_models: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          screen_price: number
+          series: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          screen_price?: number
+          series?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          screen_price?: number
+          series?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       iphone_models: {
         Row: {
           back_glass_price: number
