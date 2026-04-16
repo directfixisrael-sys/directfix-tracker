@@ -777,9 +777,20 @@ const NewRepairOrder = () => {
       setShowBackColorPicker(true);
       return;
     }
+
+    // If screen repair and model has compatible screen price, show screen type picker
+    const isScreenRepair = repair.name.includes('מסך');
+    if (isScreenRepair && selectedModel && selectedModel.compatible_screen_price > 0) {
+      setSelectedRepair(repair);
+      setShowBackColorPicker(false);
+      setShowScreenTypePicker(true);
+      setSelectedScreenType(null);
+      return;
+    }
     
     setSelectedRepair(repair);
     setShowBackColorPicker(false);
+    setShowScreenTypePicker(false);
     updateLeadStep('אישור מחיר', { repair_type: repair.name });
 
     // Track AddToCart event for Facebook Pixel
@@ -790,12 +801,15 @@ const NewRepairOrder = () => {
     }
 
     // Check if there's a bundle offer for this repair type
-    const isScreenRepair = repair.name.includes('מסך');
-    const bundle = repairBundles.find(b => repair.name.includes(b.primary_repair_type));
-    if (bundle && isScreenRepair) {
-      setCurrentBundle(bundle);
-      setSelectedBundleAddon(false);
-      goToStep('bundle');
+    if (isScreenRepair) {
+      const bundle = repairBundles.find(b => repair.name.includes(b.primary_repair_type));
+      if (bundle) {
+        setCurrentBundle(bundle);
+        setSelectedBundleAddon(false);
+        goToStep('bundle');
+      } else {
+        checkClubMemberAndNavigate();
+      }
     } else {
       checkClubMemberAndNavigate();
     }
