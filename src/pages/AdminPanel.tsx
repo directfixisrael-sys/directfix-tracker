@@ -55,7 +55,8 @@ import {
   Bell,
   Award,
   Crown,
-  Shield
+  Shield,
+  Tablet
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
@@ -78,6 +79,7 @@ import LiveView from '@/components/admin/LiveView';
 import AnnouncementsManagement from '@/components/admin/AnnouncementsManagement';
 import RemindersManagement from '@/components/admin/RemindersManagement';
 import LeadsManagement from '@/components/admin/LeadsManagement';
+import IPadPriceManagement from '@/components/admin/IPadPriceManagement';
 import ClubMembersManagement from '@/components/admin/ClubMembersManagement';
 import CustomerProfileView from '@/components/admin/CustomerProfileView';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -1005,6 +1007,8 @@ const AdminPanel = () => {
 
       case 'prices':
         return <PriceManagement />;
+      case 'ipad_prices':
+        return <IPadPriceManagement />;
 
       case 'promotions':
         return <PromotionsManagement />;
@@ -1926,7 +1930,7 @@ const AdminPanel = () => {
               <button 
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
-                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'bundles', 'settings', 'announcements', 'coupons', 'leads'].includes(activeTab)
+                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'ipad_prices', 'bundles', 'settings', 'announcements', 'coupons', 'leads'].includes(activeTab)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground"
                 )}
@@ -1967,7 +1971,11 @@ const AdminPanel = () => {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('prices')} className={cn("gap-3 py-3", activeTab === 'prices' && "text-primary font-medium")}>
                 <DollarSign className="w-4 h-4" />
-                <span>מחירון</span>
+                <span>מחירון iPhone</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('ipad_prices')} className={cn("gap-3 py-3", activeTab === 'ipad_prices' && "text-primary font-medium")}>
+                <Tablet className="w-4 h-4" />
+                <span>מחירון iPad</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('bundles')} className={cn("gap-3 py-3", activeTab === 'bundles' && "text-primary font-medium")}>
                 <Package className="w-4 h-4" />
@@ -2095,7 +2103,7 @@ const AdminPanel = () => {
             onClick={() => setSettingsSubOpen(!settingsSubOpen)}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              ['customers', 'messages', 'prices', 'feedback', 'promotions', 'coupons', 'bundles', 'settings', 'announcements', 'reminders', 'loyalty'].includes(activeTab)
+              ['customers', 'messages', 'prices', 'ipad_prices', 'feedback', 'promotions', 'coupons', 'bundles', 'settings', 'announcements', 'reminders', 'loyalty'].includes(activeTab)
                 ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                 : "text-sidebar-foreground hover:bg-sidebar-accent/50"
             )}
@@ -2151,7 +2159,19 @@ const AdminPanel = () => {
                 )}
               >
                 <FileText className="w-4 h-4" />
-                <span>ניהול מחירון</span>
+                <span>מחירון iPhone</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('ipad_prices')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'ipad_prices' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Tablet className="w-4 h-4" />
+                <span>מחירון iPad</span>
               </button>
               <button 
                 onClick={() => setActiveTab('feedback')}
@@ -2275,7 +2295,8 @@ const AdminPanel = () => {
               {activeTab === 'orders' && 'ניהול הזמנות'}
               {activeTab === 'customers' && 'לקוחות'}
               {activeTab === 'messages' && 'הודעות'}
-              {activeTab === 'prices' && 'ניהול מחירון'}
+              {activeTab === 'prices' && 'מחירון iPhone'}
+              {activeTab === 'ipad_prices' && 'מחירון iPad'}
               {activeTab === 'settings' && 'הגדרות'}
               {activeTab === 'feedback' && 'משוב לקוחות'}
               {activeTab === 'analytics' && 'אנליטיקס'}
