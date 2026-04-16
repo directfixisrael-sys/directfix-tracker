@@ -1632,27 +1632,6 @@ const NewRepairOrder = () => {
               <h2 className="text-3xl font-extrabold">{additionalRepairs.length > 0 ? 'הוסף תיקון נוסף' : 'מה צריך לתקן?'}</h2>
             </div>
 
-            {/* April Sale Banner */}
-            {additionalRepairs.length === 0 && (
-              <div className="relative overflow-hidden rounded-2xl p-[2px] bg-gradient-to-r from-red-500 via-orange-400 to-red-500 animate-gradient-x shadow-lg shadow-red-500/20" style={{ backgroundSize: '200% 200%' }}>
-                <div className="relative rounded-[14px] bg-gradient-to-r from-red-950 via-orange-950 to-red-950 p-5 overflow-hidden">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(239,68,68,0.15),transparent_60%)]" />
-                  <div className="absolute top-0 right-0 bg-gradient-to-l from-red-500 to-orange-500 text-white text-xs font-black px-5 py-1.5 rounded-bl-xl tracking-widest">
-                    SALE
-                  </div>
-                  <div className="relative flex items-center gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-red-500/30 to-orange-500/30 rounded-2xl flex items-center justify-center flex-shrink-0 border border-red-500/40">
-                      <BadgePercent className="w-8 h-8 text-red-400 animate-bounce" style={{ animationDuration: '2s' }} />
-                    </div>
-                    <div>
-                      <p className="font-black text-white text-base leading-tight">מבצעי אפריל - פעם בשנה!</p>
-                      <p className="text-sm text-orange-300 font-bold mt-1">הנחות בלעדיות על כל התיקונים</p>
-                      <p className="text-xs text-white/50 mt-0.5">המחירים כבר כוללים את ההנחה</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {additionalRepairs.length > 0 && renderRepairCart()}
 
@@ -1671,11 +1650,6 @@ const NewRepairOrder = () => {
             if (selectedModel) {
               price = getRepairPrice(repair);
             }
-            // App-exclusive discount
-            const isScreen = repair.name.includes('מסך');
-            const isBattery = repair.name.includes('סוללה');
-            const appDiscount = isScreen ? 35 : isBattery ? 30 : 0;
-            const discountedPrice = price > 0 ? price - appDiscount : 0;
 
             const info = repair.info_title && repair.info_description ? { title: repair.info_title, description: repair.info_description } : null;
             const IconComponent = getRepairIconComponent(repair.icon);
@@ -1713,14 +1687,7 @@ const NewRepairOrder = () => {
                           {repair.description && <p className="text-muted-foreground text-base mt-1">{repair.description}</p>}
                           {!isPhoneOnly && selectedModel && price > 0 && (
                             <div className="flex items-center gap-2 mt-2">
-                              {appDiscount > 0 ? (
-                                <>
-                                  <span className="line-through text-muted-foreground text-lg">₪{price}</span>
-                                  <span className="text-2xl font-bold text-primary">₪{discountedPrice}</span>
-                                </>
-                              ) : (
-                                <span className="text-2xl font-bold text-primary">₪{price}</span>
-                              )}
+                              <span className="text-2xl font-bold text-primary">₪{price}</span>
                             </div>
                           )}
                         </div>
