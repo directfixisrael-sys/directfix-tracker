@@ -101,9 +101,9 @@ export default {
         "gradient-x": "gradient-x 3s ease infinite",
       },
       boxShadow: {
-        "wolt": "0 2px 8px rgba(0,0,0,0.08)",
-        "wolt-lg": "0 4px 20px rgba(0,0,0,0.12)",
-        "wolt-xl": "0 8px 30px rgba(0,0,0,0.16)",
+        "wolt": "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06)",
+        "wolt-lg": "0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)",
+        "wolt-xl": "0 8px 24px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04)",
       },
     },
   },
