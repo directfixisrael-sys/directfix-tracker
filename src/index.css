@@ -4,94 +4,93 @@
 
 @layer base {
   :root {
-    --background: 40 60% 97%;
-    --foreground: 220 25% 12%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 11%;
 
-    --card: 40 50% 99%;
-    --card-foreground: 220 25% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 11%;
 
-    --popover: 40 50% 99%;
-    --popover-foreground: 220 25% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 11%;
 
-    --primary: 218 93% 50%;
+    --primary: 211 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 40 35% 92%;
-    --secondary-foreground: 220 20% 20%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 40 30% 93%;
-    --muted-foreground: 220 12% 44%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 218 93% 50%;
+    --accent: 211 100% 50%;
     --accent-foreground: 0 0% 100%;
 
-    --success: 160 55% 42%;
+    --success: 142 60% 45%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 40 90% 52%;
+    --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 52%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 85%;
-    --input: 220 15% 85%;
-    --ring: 218 93% 50%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 211 100% 50%;
 
-    --radius: 1.25rem;
+    --radius: 0.875rem;
 
-    /* Strategly-style section colors */
-    --section-cream: 42 80% 95%;
-    --section-lavender: 270 50% 93%;
-    --section-mint: 150 40% 93%;
-    --section-peach: 20 60% 94%;
+    --section-cream: 0 0% 97%;
+    --section-lavender: 0 0% 96%;
+    --section-mint: 0 0% 97%;
+    --section-peach: 0 0% 96%;
 
-    --sidebar-background: 220 25% 12%;
-    --sidebar-foreground: 40 30% 96%;
-    --sidebar-primary: 218 93% 60%;
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 211 100% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 20%;
-    --sidebar-accent-foreground: 40 30% 96%;
-    --sidebar-border: 220 15% 25%;
-    --sidebar-ring: 218 93% 60%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 211 100% 55%;
   }
 
   .dark {
-    --background: 225 15% 7%;
-    --foreground: 210 15% 93%;
+    --background: 0 0% 6%;
+    --foreground: 0 0% 93%;
 
-    --card: 225 14% 11%;
-    --card-foreground: 210 15% 93%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 93%;
 
-    --popover: 225 14% 11%;
-    --popover-foreground: 210 15% 93%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 93%;
 
-    --primary: 218 90% 60%;
+    --primary: 211 100% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 225 12% 16%;
-    --secondary-foreground: 210 15% 88%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 88%;
 
-    --muted: 225 10% 16%;
-    --muted-foreground: 215 12% 60%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 218 90% 60%;
+    --accent: 211 100% 55%;
     --accent-foreground: 0 0% 100%;
 
-    --success: 160 50% 45%;
+    --success: 142 55% 48%;
     --success-foreground: 0 0% 100%;
 
-    --destructive: 0 65% 50%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 225 10% 20%;
-    --input: 225 10% 20%;
-    --ring: 218 90% 60%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 211 100% 55%;
 
-    --section-cream: 225 10% 10%;
-    --section-lavender: 235 12% 12%;
-    --section-mint: 210 12% 10%;
-    --section-peach: 220 10% 9%;
+    --section-cream: 0 0% 8%;
+    --section-lavender: 0 0% 9%;
+    --section-mint: 0 0% 8%;
+    --section-peach: 0 0% 9%;
   }
 
   /* Gift Mode - Warm & Loving theme */
@@ -239,38 +238,33 @@
 
 @layer components {
   .wolt-card {
-    @apply bg-card rounded-2xl border-2 border-foreground/15 shadow-[4px_4px_0_0_hsl(var(--foreground)/0.08)];
+    @apply bg-card rounded-2xl border border-border/60 shadow-sm;
   }
 
   .wolt-card-elevated {
-    @apply bg-card rounded-2xl border-2 border-foreground/20 shadow-[6px_6px_0_0_hsl(var(--foreground)/0.1)];
+    @apply bg-card rounded-2xl border border-border/60 shadow-md;
   }
 
-  /* Strategly-style highlighted text */
+  /* Subtle highlighted text */
   .text-highlight {
     @apply relative inline-block;
-    background: linear-gradient(180deg, transparent 55%, hsl(45, 95%, 70%) 55%);
+    background: linear-gradient(180deg, transparent 60%, hsl(211 100% 50% / 0.12) 60%);
     padding: 0 4px;
-    color: hsl(220, 25%, 12%);
   }
 
   :is(.dark) .text-highlight {
-    background: linear-gradient(180deg, transparent 55%, hsl(45, 85%, 50% / 0.4) 55%);
-    color: hsl(210, 15%, 93%);
+    background: linear-gradient(180deg, transparent 60%, hsl(211 100% 55% / 0.2) 60%);
   }
 
   .text-highlight-box {
-    @apply inline-block px-3 py-1 rounded-lg font-bold;
-    background-color: hsl(45, 95%, 72%);
-    color: hsl(220, 25%, 12%);
+    @apply inline-block px-3 py-1 rounded-lg font-semibold bg-primary/10 text-primary;
   }
 
   :is(.dark) .text-highlight-box {
-    background-color: hsl(45, 90%, 55%);
-    color: hsl(225, 15%, 10%);
+    @apply bg-primary/15 text-primary;
   }
 
-  /* Strategly-style section backgrounds */
+  /* Section backgrounds */
   .section-cream {
     background-color: hsl(var(--section-cream));
   }
@@ -284,14 +278,14 @@
     background-color: hsl(var(--section-peach));
   }
 
-  /* Strategly-style bordered card */
+  /* Clean card */
   .strategly-card {
-    @apply bg-card rounded-2xl border-2 border-foreground/15 p-5 transition-all duration-200;
-    box-shadow: 4px 4px 0 0 hsl(var(--foreground) / 0.08);
+    @apply bg-card rounded-2xl border border-border/60 p-5 transition-all duration-300;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04);
   }
   .strategly-card:hover {
-    box-shadow: 6px 6px 0 0 hsl(var(--foreground) / 0.12);
-    transform: translateY(-2px);
+    box-shadow: 0 4px 12px 0 rgb(0 0 0 / 0.08);
+    transform: translateY(-1px);
   }
 
   .status-dot {
