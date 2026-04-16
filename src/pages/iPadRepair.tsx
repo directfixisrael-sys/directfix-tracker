@@ -315,6 +315,7 @@ const iPadRepair = () => {
                       onClick={() => {
                         setSelectedModel(model);
                         setStep('issue');
+                        createiPadLead(model.name);
                       }}
                       className={cn(
                         "w-full flex items-center justify-between px-5 py-4 rounded-2xl transition-all active:scale-[0.98]",
