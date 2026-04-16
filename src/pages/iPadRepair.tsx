@@ -331,10 +331,10 @@ const iPadRepair = () => {
               <button
                 onClick={() => { setDisplayWorking(true); setStep('schedule'); }}
                 className={cn(
-                  "flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all active:scale-[0.97]",
+                  "flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all active:scale-[0.97] relative",
                   displayWorking === true
                     ? "border-primary bg-primary/10"
-                    : "border-border bg-card hover:border-primary/40"
+                    : "border-border bg-card hover:border-primary/40 animate-[pulse-border_2s_ease-in-out_infinite]"
                 )}
               >
                 <div className="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center">
@@ -347,12 +347,12 @@ const iPadRepair = () => {
               </button>
 
               <button
-                onClick={() => { setDisplayWorking(false); setStep('schedule'); }}
+                onClick={() => { setDisplayWorking(false); }}
                 className={cn(
-                  "flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all active:scale-[0.97]",
+                  "flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all active:scale-[0.97] relative",
                   displayWorking === false
                     ? "border-primary bg-primary/10"
-                    : "border-border bg-card hover:border-primary/40"
+                    : "border-border bg-card hover:border-primary/40 animate-[pulse-border_2s_ease-in-out_infinite_0.5s]"
                 )}
               >
                 <div className="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center">
@@ -364,6 +364,22 @@ const iPadRepair = () => {
                 </div>
               </button>
             </div>
+
+            {/* Show call prompt when display is not working */}
+            {displayWorking === false && (
+              <Card className="p-5 border-primary/30 bg-primary/5 animate-fade-in space-y-3 text-center">
+                <Phone className="w-8 h-8 text-primary mx-auto" />
+                <p className="font-bold text-base">להמשך טיפול בתקלה אנא התקשרו לנציג</p>
+                <p className="text-sm text-muted-foreground">הצוות שלנו יוכל לסייע ולהתאים את הפתרון המדויק עבורכם</p>
+                <a
+                  href="tel:033106020"
+                  className="inline-flex items-center justify-center gap-2 flex-row-reverse w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold text-base hover:bg-primary/90 transition-colors"
+                >
+                  <Phone className="w-5 h-5" />
+                  התקשרו עכשיו - 03-3106020
+                </a>
+              </Card>
+            )}
           </div>
         )}
 
