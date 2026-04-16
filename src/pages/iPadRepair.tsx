@@ -143,6 +143,7 @@ const iPadRepair = () => {
       }
     }
 
+    try {
       const dateStr = selectedDate.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
       const displayStatus = displayWorking ? 'תצוגה תקינה' : 'תצוגה לא עובדת';
       
