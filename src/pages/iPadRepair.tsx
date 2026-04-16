@@ -52,6 +52,7 @@ const iPadRepair = () => {
   const [submitting, setSubmitting] = useState(false);
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
   const [identifyOpen, setIdentifyOpen] = useState(false);
+  const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
