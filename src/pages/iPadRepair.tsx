@@ -186,7 +186,7 @@ const iPadRepair = () => {
             customerPhone: customerPhone.trim(),
             customerAddress: customerAddress.trim(),
             deviceType: selectedModel.name,
-            repairType: `תיקון מסך iPad - ${displayStatus}`,
+            repairType: issueDesc,
             repairPrice: selectedModel.screen_price,
             scheduledTime: `${dateStr2}, ${selectedTime}`,
             customerEmail: customerEmail?.trim() || undefined,
