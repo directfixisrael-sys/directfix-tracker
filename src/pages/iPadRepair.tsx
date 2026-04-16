@@ -407,7 +407,7 @@ const iPadRepair = () => {
               </Button>
             )}
 
-            <h3 className="text-base font-semibold text-center">האם רואים תצוגה במכשיר?</h3>
+            {selectedModel.has_display_option && <>
             <p className="text-sm text-muted-foreground text-center">זה עוזר לנו להתכונן עם החלקים הנכונים</p>
 
             <div className="grid grid-cols-2 gap-3">
