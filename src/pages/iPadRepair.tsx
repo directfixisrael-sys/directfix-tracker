@@ -148,6 +148,11 @@ const iPadRepair = () => {
     try {
       const dateStr = selectedDate.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
       const displayStatus = displayWorking ? 'תצוגה תקינה' : 'תצוגה לא עובדת';
+      const issueDesc = selectedModel.has_display_option 
+        ? `תיקון מסך iPad - ${displayStatus}` 
+        : `תיקון מסך iPad`;
+      const notes = [`שירות איסוף והחזרה - iPad`, `טווח איסוף: ${selectedTime}`];
+      if (selectedModel.has_display_option) notes.splice(1, 0, `תצוגה: ${displayStatus}`);
       
       const { data, error } = await supabase.from('orders').insert({
         customer_name: customerName,
@@ -155,11 +160,11 @@ const iPadRepair = () => {
         customer_address: customerAddress,
         customer_email: customerEmail || null,
         device_type: selectedModel.name,
-        issue_description: `תיקון מסך iPad - ${displayStatus}`,
+        issue_description: issueDesc,
         repair_price: selectedModel.screen_price,
         status: 'pending',
         estimated_arrival: `${dateStr}, ${selectedTime}`,
-        notes: [`שירות איסוף והחזרה - iPad`, `תצוגה: ${displayStatus}`, `טווח איסוף: ${selectedTime}`],
+        notes,
       }).select('order_number').single();
 
       if (error) throw error;
