@@ -245,6 +245,7 @@ export type Database = {
       ipad_models: {
         Row: {
           created_at: string
+          has_display_option: boolean
           id: string
           is_active: boolean
           name: string
@@ -255,6 +256,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          has_display_option?: boolean
           id?: string
           is_active?: boolean
           name: string
@@ -265,6 +267,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          has_display_option?: boolean
           id?: string
           is_active?: boolean
           name?: string

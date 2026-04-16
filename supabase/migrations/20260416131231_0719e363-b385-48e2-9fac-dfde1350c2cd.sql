@@ -1,0 +1,1 @@
+ALTER TABLE public.ipad_models ADD COLUMN has_display_option boolean NOT NULL DEFAULT true;

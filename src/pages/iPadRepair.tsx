@@ -24,6 +24,7 @@ interface IPadModel {
   name: string;
   screen_price: number;
   series: string;
+  has_display_option: boolean;
 }
 
 const TIME_SLOTS = [
@@ -147,6 +148,11 @@ const iPadRepair = () => {
     try {
       const dateStr = selectedDate.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
       const displayStatus = displayWorking ? 'תצוגה תקינה' : 'תצוגה לא עובדת';
+      const issueDesc = selectedModel.has_display_option 
+        ? `תיקון מסך iPad - ${displayStatus}` 
+        : `תיקון מסך iPad`;
+      const notes = [`שירות איסוף והחזרה - iPad`, `טווח איסוף: ${selectedTime}`];
+      if (selectedModel.has_display_option) notes.splice(1, 0, `תצוגה: ${displayStatus}`);
       
       const { data, error } = await supabase.from('orders').insert({
         customer_name: customerName,
@@ -154,11 +160,11 @@ const iPadRepair = () => {
         customer_address: customerAddress,
         customer_email: customerEmail || null,
         device_type: selectedModel.name,
-        issue_description: `תיקון מסך iPad - ${displayStatus}`,
+        issue_description: issueDesc,
         repair_price: selectedModel.screen_price,
         status: 'pending',
         estimated_arrival: `${dateStr}, ${selectedTime}`,
-        notes: [`שירות איסוף והחזרה - iPad`, `תצוגה: ${displayStatus}`, `טווח איסוף: ${selectedTime}`],
+        notes,
       }).select('order_number').single();
 
       if (error) throw error;
@@ -180,7 +186,7 @@ const iPadRepair = () => {
             customerPhone: customerPhone.trim(),
             customerAddress: customerAddress.trim(),
             deviceType: selectedModel.name,
-            repairType: `תיקון מסך iPad - ${displayStatus}`,
+            repairType: issueDesc,
             repairPrice: selectedModel.screen_price,
             scheduledTime: `${dateStr2}, ${selectedTime}`,
             customerEmail: customerEmail?.trim() || undefined,
@@ -355,7 +361,12 @@ const iPadRepair = () => {
                       key={model.id}
                       onClick={() => {
                         setSelectedModel(model);
-                        setStep('issue');
+                        if (model.has_display_option) {
+                          setStep('issue');
+                        } else {
+                          setDisplayWorking(true);
+                          setStep('schedule');
+                        }
                         createiPadLead(model.name);
                       }}
                       className={cn(
@@ -455,7 +466,7 @@ const iPadRepair = () => {
         {step === 'schedule' && (
           <div className="space-y-4 animate-fade-in">
             <div className="flex items-center justify-between">
-              <button onClick={() => setStep('issue')} className="text-primary flex items-center gap-1 text-sm">
+              <button onClick={() => setStep(selectedModel?.has_display_option ? 'issue' : 'model')} className="text-primary flex items-center gap-1 text-sm">
                 <ArrowRight className="w-4 h-4" /> חזרה
               </button>
               <h2 className="text-lg font-bold">תאריך איסוף</h2>
@@ -554,10 +565,12 @@ const iPadRepair = () => {
                   {selectedDate?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </span>
               </div>
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>{displayWorking ? 'תצוגה תקינה' : 'תצוגה לא עובדת'}</span>
-                <span>מצב תצוגה</span>
-              </div>
+              {selectedModel?.has_display_option && (
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>{displayWorking ? 'תצוגה תקינה' : 'תצוגה לא עובדת'}</span>
+                  <span>מצב תצוגה</span>
+                </div>
+              )}
               <div className="border-t border-border pt-2 mt-2">
                 <div className="flex items-center gap-2 flex-row-reverse text-xs text-muted-foreground">
                   <Package className="w-4 h-4" />
