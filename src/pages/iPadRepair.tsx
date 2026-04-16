@@ -477,10 +477,17 @@ const iPadRepair = () => {
               />
             </div>
 
-            <OrderPrivacyConsent
-              accepted={privacyAccepted}
-              onChange={setPrivacyAccepted}
-            />
+            <div className="flex items-start gap-2 flex-row-reverse">
+              <Checkbox
+                id="privacy-ipad"
+                checked={privacyAccepted}
+                onCheckedChange={(v) => setPrivacyAccepted(v === true)}
+              />
+              <label htmlFor="privacy-ipad" className="text-xs text-muted-foreground text-right leading-relaxed cursor-pointer">
+                אני מאשר/ת תיאום שירות באמצעות WhatsApp או טלפון בהתאם ל
+                <a href="/terms" target="_blank" className="text-primary underline mx-1">מדיניות הפרטיות</a>
+              </label>
+            </div>
 
             <Button
               className="w-full h-12 text-base rounded-xl"
