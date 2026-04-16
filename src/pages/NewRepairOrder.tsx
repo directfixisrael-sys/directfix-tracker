@@ -372,8 +372,7 @@ const NewRepairOrder = () => {
   const [selectedBackColor, setSelectedBackColor] = useState<string>('');
   const [showBackColorPicker, setShowBackColorPicker] = useState(false);
   const [otherRepairDescription, setOtherRepairDescription] = useState('');
-  const [showScreenTypePicker, setShowScreenTypePicker] = useState(false);
-  const [selectedScreenType, setSelectedScreenType] = useState<'original' | 'compatible' | null>(null);
+  
   const [additionalRepairs, setAdditionalRepairs] = useState<{ repair: RepairType; price: number; backColor?: string; model: IphoneModel }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
