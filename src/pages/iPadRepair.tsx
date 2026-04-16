@@ -52,6 +52,7 @@ const iPadRepair = () => {
   const [submitting, setSubmitting] = useState(false);
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
   const [identifyOpen, setIdentifyOpen] = useState(false);
+  const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -95,6 +96,31 @@ const iPadRepair = () => {
     return dates;
   };
 
+  // Lead tracking
+  const createiPadLead = async (modelName: string) => {
+    try {
+      const { data } = await supabase.from('leads').insert({
+        customer_name: 'iPad Lead',
+        customer_phone: '',
+        device_type: modelName,
+        last_step: 'בחירת דגם iPad',
+        repair_type: 'תיקון מסך iPad',
+      }).select('id').single();
+      if (data) setCurrentLeadId(data.id);
+    } catch (e) {
+      console.error('Error creating iPad lead:', e);
+    }
+  };
+
+  const updateiPadLeadStep = async (stepName: string, extra?: Record<string, string>) => {
+    if (!currentLeadId) return;
+    try {
+      await supabase.from('leads').update({ last_step: stepName, ...extra }).eq('id', currentLeadId);
+    } catch (e) {
+      console.error('Error updating iPad lead:', e);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!selectedModel || !selectedDate || !selectedTime || !customerName || !customerPhone || !customerAddress || !privacyAccepted) {
       toast.error('נא למלא את כל השדות');
@@ -102,6 +128,20 @@ const iPadRepair = () => {
     }
     setStep('processing');
     setSubmitting(true);
+
+    // Update lead with customer info
+    if (currentLeadId) {
+      try {
+        await supabase.from('leads').update({
+          customer_name: customerName.trim(),
+          customer_phone: customerPhone.trim().replace(/\D/g, ''),
+          customer_email: customerEmail?.trim() || null,
+          last_step: 'שליחת הזמנה iPad',
+        }).eq('id', currentLeadId);
+      } catch (e) {
+        console.error('Error updating iPad lead details:', e);
+      }
+    }
 
     try {
       const dateStr = selectedDate.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -122,6 +162,13 @@ const iPadRepair = () => {
 
       if (error) throw error;
       setOrderNumber(data.order_number);
+
+      // Mark lead as converted
+      if (currentLeadId) {
+        try {
+          await supabase.from('leads').update({ converted: true, last_step: 'הזמנה הושלמה iPad' }).eq('id', currentLeadId);
+        } catch (e) { console.error('Error marking iPad lead converted:', e); }
+      }
 
       // Send email/WhatsApp notifications
       try {
@@ -289,6 +336,7 @@ const iPadRepair = () => {
                       onClick={() => {
                         setSelectedModel(model);
                         setStep('issue');
+                        createiPadLead(model.name);
                       }}
                       className={cn(
                         "w-full flex items-center justify-between px-5 py-4 rounded-2xl transition-all active:scale-[0.98]",
@@ -329,7 +377,7 @@ const iPadRepair = () => {
 
             <div className="grid grid-cols-2 gap-3">
               <button
-                onClick={() => { setDisplayWorking(true); setStep('schedule'); }}
+                onClick={() => { setDisplayWorking(true); setStep('schedule'); updateiPadLeadStep('מצב תצוגה - תקינה'); }}
                 className={cn(
                   "flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all active:scale-[0.97] relative",
                   displayWorking === true
@@ -347,7 +395,7 @@ const iPadRepair = () => {
               </button>
 
               <button
-                onClick={() => { setDisplayWorking(false); }}
+                onClick={() => { setDisplayWorking(false); updateiPadLeadStep('מצב תצוגה - לא עובדת (התקשר)'); }}
                 className={cn(
                   "flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all active:scale-[0.97] relative",
                   displayWorking === false
@@ -455,7 +503,7 @@ const iPadRepair = () => {
             {selectedDate && selectedTime && (
               <Button
                 className="w-full h-12 text-base rounded-xl animate-fade-in"
-                onClick={() => setStep('details')}
+                onClick={() => { setStep('details'); updateiPadLeadStep('פרטי איסוף iPad'); }}
               >
                 המשך לפרטי איסוף
               </Button>
