@@ -96,6 +96,31 @@ const iPadRepair = () => {
     return dates;
   };
 
+  // Lead tracking
+  const createiPadLead = async (modelName: string) => {
+    try {
+      const { data } = await supabase.from('leads').insert({
+        customer_name: 'iPad Lead',
+        customer_phone: '',
+        device_type: modelName,
+        last_step: 'בחירת דגם iPad',
+        repair_type: 'תיקון מסך iPad',
+      }).select('id').single();
+      if (data) setCurrentLeadId(data.id);
+    } catch (e) {
+      console.error('Error creating iPad lead:', e);
+    }
+  };
+
+  const updateiPadLeadStep = async (stepName: string, extra?: Record<string, string>) => {
+    if (!currentLeadId) return;
+    try {
+      await supabase.from('leads').update({ last_step: stepName, ...extra }).eq('id', currentLeadId);
+    } catch (e) {
+      console.error('Error updating iPad lead:', e);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!selectedModel || !selectedDate || !selectedTime || !customerName || !customerPhone || !customerAddress || !privacyAccepted) {
       toast.error('נא למלא את כל השדות');
