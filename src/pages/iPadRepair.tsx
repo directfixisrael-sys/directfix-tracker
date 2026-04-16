@@ -9,7 +9,7 @@ import Logo from '@/components/Logo';
 import { cn } from '@/lib/utils';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import {
-  ArrowRight, Tablet, CheckCircle2, Calendar, Clock, Loader2, 
+  ArrowRight, Tablet, CheckCircle2, Calendar, Clock, Loader2, Phone,
   ChevronDown, ChevronUp, Eye, EyeOff, HelpCircle, Truck, Package, Info
 } from 'lucide-react';
 import {
