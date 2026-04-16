@@ -2,13 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import Logo from '@/components/Logo';
 import { cn } from '@/lib/utils';
-import PhoneInput from '@/components/PhoneInput';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
-import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
 import {
   ArrowRight, Tablet, CheckCircle2, Calendar, Clock, Loader2, 
   ChevronDown, ChevronUp, Eye, EyeOff, HelpCircle, Truck, Package, Info
