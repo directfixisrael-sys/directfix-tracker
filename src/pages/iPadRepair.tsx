@@ -361,12 +361,7 @@ const iPadRepair = () => {
                       key={model.id}
                       onClick={() => {
                         setSelectedModel(model);
-                        if (model.has_display_option) {
-                          setStep('issue');
-                        } else {
-                          setDisplayWorking(true);
-                          setStep('schedule');
-                        }
+                        setStep('issue');
                         createiPadLead(model.name);
                       }}
                       className={cn(
@@ -394,7 +389,7 @@ const iPadRepair = () => {
               <button onClick={() => setStep('model')} className="text-primary flex items-center gap-1 text-sm">
                 <ArrowRight className="w-4 h-4" /> חזרה
               </button>
-              <h2 className="text-lg font-bold">מצב המסך</h2>
+              <h2 className="text-lg font-bold">{selectedModel.has_display_option ? 'מצב המסך' : 'תיקון מסך'}</h2>
             </div>
 
             <Card className="p-4 text-center">
@@ -402,6 +397,15 @@ const iPadRepair = () => {
               <p className="font-bold text-lg">{selectedModel.name}</p>
               <p className="text-primary font-bold text-xl mt-1">{selectedModel.screen_price} ש"ח</p>
             </Card>
+
+            {!selectedModel.has_display_option && (
+              <Button 
+                onClick={() => { setDisplayWorking(true); setStep('schedule'); updateiPadLeadStep('תיקון מסך - ללא שאלת תצוגה'); }}
+                className="w-full h-14 text-base font-bold rounded-xl"
+              >
+                המשך לקביעת תור
+              </Button>
+            )}
 
             <h3 className="text-base font-semibold text-center">האם רואים תצוגה במכשיר?</h3>
             <p className="text-sm text-muted-foreground text-center">זה עוזר לנו להתכונן עם החלקים הנכונים</p>
