@@ -372,6 +372,8 @@ const NewRepairOrder = () => {
   const [selectedBackColor, setSelectedBackColor] = useState<string>('');
   const [showBackColorPicker, setShowBackColorPicker] = useState(false);
   const [otherRepairDescription, setOtherRepairDescription] = useState('');
+  const [showScreenTypePicker, setShowScreenTypePicker] = useState(false);
+  const [selectedScreenType, setSelectedScreenType] = useState<'original' | 'compatible' | null>(null);
   const [additionalRepairs, setAdditionalRepairs] = useState<{ repair: RepairType; price: number; backColor?: string; model: IphoneModel }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -649,6 +651,10 @@ const NewRepairOrder = () => {
   };
   const getPrice = () => {
     if (!selectedModel || !selectedRepair) return 0;
+    // If compatible screen selected, use compatible_screen_price
+    if (selectedScreenType === 'compatible' && selectedRepair.name.includes('מסך') && selectedModel.compatible_screen_price > 0) {
+      return selectedModel.compatible_screen_price;
+    }
     return getRepairPrice(selectedRepair);
   };
   const getAdditionalRepairsTotal = () => {
@@ -679,6 +685,12 @@ const NewRepairOrder = () => {
   };
   const getRepairTypeName = () => {
     if (!selectedRepair) return '';
+    if (selectedScreenType === 'compatible' && selectedRepair.name.includes('מסך')) {
+      return selectedRepair.name + ' (Soft OLED)';
+    }
+    if (selectedScreenType === 'original' && selectedRepair.name.includes('מסך') && selectedModel?.compatible_screen_price && selectedModel.compatible_screen_price > 0) {
+      return selectedRepair.name + ' (מקורי)';
+    }
     return selectedRepair.name;
   };
   const getAllRepairNames = () => {
@@ -775,9 +787,20 @@ const NewRepairOrder = () => {
       setShowBackColorPicker(true);
       return;
     }
+
+    // If screen repair and model has compatible screen price, show screen type picker
+    const isScreenRepair = repair.name.includes('מסך');
+    if (isScreenRepair && selectedModel && selectedModel.compatible_screen_price > 0) {
+      setSelectedRepair(repair);
+      setShowBackColorPicker(false);
+      setShowScreenTypePicker(true);
+      setSelectedScreenType(null);
+      return;
+    }
     
     setSelectedRepair(repair);
     setShowBackColorPicker(false);
+    setShowScreenTypePicker(false);
     updateLeadStep('אישור מחיר', { repair_type: repair.name });
 
     // Track AddToCart event for Facebook Pixel
@@ -788,12 +811,15 @@ const NewRepairOrder = () => {
     }
 
     // Check if there's a bundle offer for this repair type
-    const isScreenRepair = repair.name.includes('מסך');
-    const bundle = repairBundles.find(b => repair.name.includes(b.primary_repair_type));
-    if (bundle && isScreenRepair) {
-      setCurrentBundle(bundle);
-      setSelectedBundleAddon(false);
-      goToStep('bundle');
+    if (isScreenRepair) {
+      const bundle = repairBundles.find(b => repair.name.includes(b.primary_repair_type));
+      if (bundle) {
+        setCurrentBundle(bundle);
+        setSelectedBundleAddon(false);
+        goToStep('bundle');
+      } else {
+        checkClubMemberAndNavigate();
+      }
     } else {
       checkClubMemberAndNavigate();
     }
@@ -1767,6 +1793,99 @@ const NewRepairOrder = () => {
                           </div>
                         </div>
                       ) : null;
+                    })()}
+
+                    {/* Inline Screen Type Picker - original vs compatible */}
+                    {isScreen && showScreenTypePicker && selectedModel && selectedModel.compatible_screen_price > 0 && (() => {
+                      const originalPrice = getRepairPrice(repair);
+                      const compatiblePrice = selectedModel.compatible_screen_price;
+                      const appDiscountOriginal = 35;
+                      const appDiscountCompatible = 35;
+                      return (
+                        <div className="overflow-hidden animate-fade-in">
+                          <div className="pt-3 pb-1 px-1 space-y-3">
+                            <div className="text-center">
+                              <h3 className="text-lg font-bold">בחרו סוג מסך</h3>
+                              <p className="text-sm text-muted-foreground">שני המסכים מגיעים עם אחריות מלאה</p>
+                            </div>
+                            <div className="space-y-2">
+                              {/* Original Screen */}
+                              {originalPrice > 0 && (
+                                <button
+                                  onClick={() => {
+                                    setSelectedScreenType('original');
+                                    setShowScreenTypePicker(false);
+                                    updateLeadStep('אישור מחיר', { repair_type: repair.name + ' (מקורי)' });
+                                    trackAddToCart(repair.name + ' מקורי', originalPrice - appDiscountOriginal);
+                                    gaSelectRepair(repair.name + ' מקורי', originalPrice - appDiscountOriginal);
+                                    const bundle = repairBundles.find(b => repair.name.includes(b.primary_repair_type));
+                                    if (bundle) {
+                                      setCurrentBundle(bundle);
+                                      setSelectedBundleAddon(false);
+                                      goToStep('bundle');
+                                    } else {
+                                      checkClubMemberAndNavigate();
+                                    }
+                                  }}
+                                  className={`w-full p-4 rounded-2xl border-2 transition-all text-right ${
+                                    selectedScreenType === 'original'
+                                      ? 'border-primary bg-primary/5 shadow-md'
+                                      : 'border-border hover:border-primary/40'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <span className="line-through text-muted-foreground text-sm">{originalPrice} ש"ח</span>
+                                      <span className="text-xl font-bold text-primary">{originalPrice - appDiscountOriginal} ש"ח</span>
+                                    </div>
+                                    <div>
+                                      <p className="font-bold text-base">מסך מקורי</p>
+                                      <p className="text-xs text-muted-foreground">מסך Apple מקורי - איכות מפעל</p>
+                                    </div>
+                                  </div>
+                                </button>
+                              )}
+                              {/* Compatible Screen - Soft OLED */}
+                              <button
+                                onClick={() => {
+                                  setSelectedScreenType('compatible');
+                                  setShowScreenTypePicker(false);
+                                  updateLeadStep('אישור מחיר', { repair_type: repair.name + ' (Soft OLED)' });
+                                  trackAddToCart(repair.name + ' Soft OLED', compatiblePrice - appDiscountCompatible);
+                                  gaSelectRepair(repair.name + ' Soft OLED', compatiblePrice - appDiscountCompatible);
+                                  const bundle = repairBundles.find(b => repair.name.includes(b.primary_repair_type));
+                                  if (bundle) {
+                                    setCurrentBundle(bundle);
+                                    setSelectedBundleAddon(false);
+                                    goToStep('bundle');
+                                  } else {
+                                    checkClubMemberAndNavigate();
+                                  }
+                                }}
+                                className={`w-full p-4 rounded-2xl border-2 transition-all text-right relative overflow-hidden ${
+                                  selectedScreenType === 'compatible'
+                                    ? 'border-primary bg-primary/5 shadow-md'
+                                    : 'border-border hover:border-primary/40'
+                                }`}
+                              >
+                                <div className="absolute top-0 left-0 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] font-black px-3 py-0.5 rounded-br-lg tracking-wider">
+                                  מומלץ
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <span className="line-through text-muted-foreground text-sm">{compatiblePrice} ש"ח</span>
+                                    <span className="text-xl font-bold text-primary">{compatiblePrice - appDiscountCompatible} ש"ח</span>
+                                  </div>
+                                  <div>
+                                    <p className="font-bold text-base">Soft OLED</p>
+                                    <p className="text-xs text-muted-foreground">איכות הכי קרובה למקורי - מחיר מבצע</p>
+                                  </div>
+                                </div>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
                     })()}
                   </div>;
             })}
