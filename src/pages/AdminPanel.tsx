@@ -2159,7 +2159,19 @@ const AdminPanel = () => {
                 )}
               >
                 <FileText className="w-4 h-4" />
-                <span>ניהול מחירון</span>
+                <span>מחירון iPhone</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('ipad_prices')}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                  activeTab === 'ipad_prices' 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                )}
+              >
+                <Tablet className="w-4 h-4" />
+                <span>מחירון iPad</span>
               </button>
               <button 
                 onClick={() => setActiveTab('feedback')}
