@@ -652,7 +652,6 @@ const NewRepairOrder = () => {
     if (!selectedModel || !selectedRepair) return 0;
     return getRepairPrice(selectedRepair);
   };
-  };
   const getAdditionalRepairsTotal = () => {
     return additionalRepairs.reduce((sum, r) => sum + r.price, 0);
   };
