@@ -30,7 +30,7 @@ const IPadPriceManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editModel, setEditModel] = useState<IPadModel | null>(null);
-  const [form, setForm] = useState({ name: '', screen_price: 400, series: 'iPad', sort_order: 0 });
+  const [form, setForm] = useState({ name: '', screen_price: 400, series: 'iPad', sort_order: 0, has_display_option: true });
 
   const fetchModels = async () => {
     const { data } = await supabase.from('ipad_models').select('*').order('sort_order');
@@ -42,13 +42,13 @@ const IPadPriceManagement = () => {
 
   const openAdd = () => {
     setEditModel(null);
-    setForm({ name: '', screen_price: 400, series: 'iPad', sort_order: models.length });
+    setForm({ name: '', screen_price: 400, series: 'iPad', sort_order: models.length, has_display_option: true });
     setDialogOpen(true);
   };
 
   const openEdit = (m: IPadModel) => {
     setEditModel(m);
-    setForm({ name: m.name, screen_price: m.screen_price, series: m.series, sort_order: m.sort_order });
+    setForm({ name: m.name, screen_price: m.screen_price, series: m.series, sort_order: m.sort_order, has_display_option: m.has_display_option });
     setDialogOpen(true);
   };
 
@@ -61,6 +61,7 @@ const IPadPriceManagement = () => {
         screen_price: form.screen_price,
         series: form.series,
         sort_order: form.sort_order,
+        has_display_option: form.has_display_option,
       }).eq('id', editModel.id);
       if (error) { toast.error('שגיאה בעדכון'); return; }
       toast.success('הדגם עודכן');
@@ -70,6 +71,7 @@ const IPadPriceManagement = () => {
         screen_price: form.screen_price,
         series: form.series,
         sort_order: form.sort_order,
+        has_display_option: form.has_display_option,
       });
       if (error) { toast.error('שגיאה בהוספה'); return; }
       toast.success('דגם נוסף');
@@ -158,6 +160,10 @@ const IPadPriceManagement = () => {
             <div>
               <label className="text-sm font-medium mb-1 block">סדר מיון</label>
               <Input type="number" value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">הצג שאלת תצוגה</label>
+              <Switch checked={form.has_display_option} onCheckedChange={v => setForm(f => ({ ...f, has_display_option: v }))} />
             </div>
             <Button onClick={handleSave} className="w-full gap-2">
               <Save className="w-4 h-4" /> {editModel ? 'עדכן' : 'הוסף'}
