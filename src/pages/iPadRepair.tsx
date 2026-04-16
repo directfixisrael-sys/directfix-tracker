@@ -129,7 +129,20 @@ const iPadRepair = () => {
     setStep('processing');
     setSubmitting(true);
 
-    try {
+    // Update lead with customer info
+    if (currentLeadId) {
+      try {
+        await supabase.from('leads').update({
+          customer_name: customerName.trim(),
+          customer_phone: customerPhone.trim().replace(/\D/g, ''),
+          customer_email: customerEmail?.trim() || null,
+          last_step: 'שליחת הזמנה iPad',
+        }).eq('id', currentLeadId);
+      } catch (e) {
+        console.error('Error updating iPad lead details:', e);
+      }
+    }
+
       const dateStr = selectedDate.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
       const displayStatus = displayWorking ? 'תצוגה תקינה' : 'תצוגה לא עובדת';
       
