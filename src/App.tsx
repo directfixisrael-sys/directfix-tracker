@@ -71,6 +71,7 @@ const App = () => (
                   <Route path="/unsubscribe" element={<Unsubscribe />} />
                   <Route path="/terms" element={<TermsOfService />} />
                   <Route path="/battery" element={<BatteryProgram />} />
+                  <Route path="/ipad" element={<IPadRepair />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <MinimalFooter />
