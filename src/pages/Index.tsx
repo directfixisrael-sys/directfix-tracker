@@ -113,6 +113,7 @@ const Index = () => {
                   </Button>
                 </CollapsibleContent>
               </Collapsible>
+            </div>
           </div>
         </section>
 
