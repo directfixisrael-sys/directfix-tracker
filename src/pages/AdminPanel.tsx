@@ -1930,7 +1930,7 @@ const AdminPanel = () => {
               <button 
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
-                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'bundles', 'settings', 'announcements', 'coupons', 'leads'].includes(activeTab)
+                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'ipad_prices', 'bundles', 'settings', 'announcements', 'coupons', 'leads'].includes(activeTab)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground"
                 )}
@@ -2103,7 +2103,7 @@ const AdminPanel = () => {
             onClick={() => setSettingsSubOpen(!settingsSubOpen)}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              ['customers', 'messages', 'prices', 'feedback', 'promotions', 'coupons', 'bundles', 'settings', 'announcements', 'reminders', 'loyalty'].includes(activeTab)
+              ['customers', 'messages', 'prices', 'ipad_prices', 'feedback', 'promotions', 'coupons', 'bundles', 'settings', 'announcements', 'reminders', 'loyalty'].includes(activeTab)
                 ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                 : "text-sidebar-foreground hover:bg-sidebar-accent/50"
             )}
