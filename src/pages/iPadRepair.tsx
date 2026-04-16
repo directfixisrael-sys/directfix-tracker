@@ -175,8 +175,6 @@ const iPadRepair = () => {
                 </div>
               </div>
             </div>
-              </div>
-            </div>
           </div>
         </Card>
 
