@@ -463,6 +463,7 @@ const iPadRepair = () => {
                 </a>
               </Card>
             )}
+            </>}
           </div>
         )}
 
