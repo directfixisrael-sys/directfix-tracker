@@ -356,7 +356,7 @@ const iPadRepair = () => {
 
             <div className="grid grid-cols-2 gap-3">
               <button
-                onClick={() => { setDisplayWorking(true); setStep('schedule'); }}
+                onClick={() => { setDisplayWorking(true); setStep('schedule'); updateiPadLeadStep('מצב תצוגה - תקינה'); }}
                 className={cn(
                   "flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all active:scale-[0.97] relative",
                   displayWorking === true
@@ -374,7 +374,7 @@ const iPadRepair = () => {
               </button>
 
               <button
-                onClick={() => { setDisplayWorking(false); }}
+                onClick={() => { setDisplayWorking(false); updateiPadLeadStep('מצב תצוגה - לא עובדת (התקשר)'); }}
                 className={cn(
                   "flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all active:scale-[0.97] relative",
                   displayWorking === false
@@ -482,7 +482,7 @@ const iPadRepair = () => {
             {selectedDate && selectedTime && (
               <Button
                 className="w-full h-12 text-base rounded-xl animate-fade-in"
-                onClick={() => setStep('details')}
+                onClick={() => { setStep('details'); updateiPadLeadStep('פרטי איסוף iPad'); }}
               >
                 המשך לפרטי איסוף
               </Button>
