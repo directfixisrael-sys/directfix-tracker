@@ -163,6 +163,13 @@ const iPadRepair = () => {
       if (error) throw error;
       setOrderNumber(data.order_number);
 
+      // Mark lead as converted
+      if (currentLeadId) {
+        try {
+          await supabase.from('leads').update({ converted: true, last_step: 'הזמנה הושלמה iPad' }).eq('id', currentLeadId);
+        } catch (e) { console.error('Error marking iPad lead converted:', e); }
+      }
+
       // Send email/WhatsApp notifications
       try {
         const dateStr2 = selectedDate.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
