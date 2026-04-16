@@ -152,27 +152,27 @@ const iPadRepair = () => {
 
         {/* Service Explanation Banner */}
         <Card className="p-4 mb-6 bg-primary/5 border-primary/20">
-          <div className="flex items-start gap-3 flex-row-reverse">
-            <div className="flex-1 text-right">
-              <h3 className="font-bold text-base mb-2">איך זה עובד?</h3>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 flex-row-reverse">
-                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">1</div>
-                  <span className="text-sm">אנחנו אוספים את ה-iPad מהבית שלכם</span>
-                </div>
-                <div className="flex items-center gap-2 flex-row-reverse">
-                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">2</div>
-                  <span className="text-sm">מבצעים את התיקון במעבדה שלנו</span>
-                </div>
-                <div className="flex items-center gap-2 flex-row-reverse">
-                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">3</div>
-                  <span className="text-sm">מחזירים את המכשיר מתוקן ביום למחרת</span>
-                </div>
-              </div>
-            </div>
+          <div className="flex items-start gap-3">
             <div className="shrink-0">
               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
                 <Truck className="w-7 h-7 text-primary" />
+              </div>
+            </div>
+            <div className="flex-1 text-right">
+              <h3 className="font-bold text-base mb-2">איך זה עובד?</h3>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">1</div>
+                  <span className="text-sm">אנחנו אוספים את ה-iPad מהבית שלכם</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">2</div>
+                  <span className="text-sm">מבצעים את התיקון במעבדה שלנו</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">3</div>
+                  <span className="text-sm">מחזירים את המכשיר מתוקן ביום למחרת</span>
+                </div>
               </div>
             </div>
           </div>
