@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone, Play } from 'lucide-react';
+import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone, Play, Tablet, PhoneCall, ArrowLeftRight, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import Logo from '@/components/Logo';
 import CustomerZone from '@/components/CustomerZone';
 import paymentBit from '@/assets/payment-bit.png';
@@ -76,6 +77,42 @@ const Index = () => {
                 <Smartphone className="w-4 h-4" />
                 <span>עקוב אחר התיקון שלך</span>
               </Button>
+            </div>
+
+            {/* Additional Services */}
+            <div className="max-w-sm mx-auto mt-5 animate-fade-in" style={{ animationDelay: '250ms' }}>
+              <Collapsible>
+                <CollapsibleTrigger className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground transition-colors py-2 group">
+                  <span className="text-sm font-bold">שירותים נוספים</span>
+                  <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-2.5 pt-2">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
+                    onClick={() => navigate('/ipad')}>
+                    <Tablet className="w-4 h-4" />
+                    <span>תיקון מסך iPad</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
+                    onClick={() => navigate('/consultation')}>
+                    <PhoneCall className="w-4 h-4" />
+                    <span>שיחת ייעוץ</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
+                    onClick={() => navigate('/data-transfer')}>
+                    <ArrowLeftRight className="w-4 h-4" />
+                    <span>העברת מידע לטלפון חדש</span>
+                  </Button>
+                </CollapsibleContent>
+              </Collapsible>
             </div>
           </div>
         </section>
