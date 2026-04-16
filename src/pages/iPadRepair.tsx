@@ -203,11 +203,13 @@ const iPadRepair = () => {
                 className="text-right h-12 text-base rounded-xl"
                 dir="rtl"
               />
-              <PhoneInput
-                value={customerPhone}
-                onChange={setCustomerPhone}
+              <Input
                 placeholder="מספר טלפון"
-                className="h-12 text-base rounded-xl"
+                type="tel"
+                value={customerPhone}
+                onChange={e => setCustomerPhone(e.target.value)}
+                className="text-right h-12 text-base rounded-xl"
+                dir="rtl"
               />
             </div>
             <Button
