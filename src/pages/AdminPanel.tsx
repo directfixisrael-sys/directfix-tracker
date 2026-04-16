@@ -78,6 +78,7 @@ import LiveView from '@/components/admin/LiveView';
 import AnnouncementsManagement from '@/components/admin/AnnouncementsManagement';
 import RemindersManagement from '@/components/admin/RemindersManagement';
 import LeadsManagement from '@/components/admin/LeadsManagement';
+import IPadPriceManagement from '@/components/admin/IPadPriceManagement';
 import ClubMembersManagement from '@/components/admin/ClubMembersManagement';
 import CustomerProfileView from '@/components/admin/CustomerProfileView';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -1005,6 +1006,8 @@ const AdminPanel = () => {
 
       case 'prices':
         return <PriceManagement />;
+      case 'ipad_prices':
+        return <IPadPriceManagement />;
 
       case 'promotions':
         return <PromotionsManagement />;
@@ -1967,7 +1970,11 @@ const AdminPanel = () => {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('prices')} className={cn("gap-3 py-3", activeTab === 'prices' && "text-primary font-medium")}>
                 <DollarSign className="w-4 h-4" />
-                <span>מחירון</span>
+                <span>מחירון iPhone</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('ipad_prices')} className={cn("gap-3 py-3", activeTab === 'ipad_prices' && "text-primary font-medium")}>
+                <Tablet className="w-4 h-4" />
+                <span>מחירון iPad</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('bundles')} className={cn("gap-3 py-3", activeTab === 'bundles' && "text-primary font-medium")}>
                 <Package className="w-4 h-4" />
