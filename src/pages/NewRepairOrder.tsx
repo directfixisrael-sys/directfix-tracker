@@ -650,11 +650,8 @@ const NewRepairOrder = () => {
   };
   const getPrice = () => {
     if (!selectedModel || !selectedRepair) return 0;
-    // If compatible screen selected, use compatible_screen_price
-    if (selectedScreenType === 'compatible' && selectedRepair.name.includes('מסך') && selectedModel.compatible_screen_price > 0) {
-      return selectedModel.compatible_screen_price;
-    }
     return getRepairPrice(selectedRepair);
+  };
   };
   const getAdditionalRepairsTotal = () => {
     return additionalRepairs.reduce((sum, r) => sum + r.price, 0);
@@ -684,12 +681,6 @@ const NewRepairOrder = () => {
   };
   const getRepairTypeName = () => {
     if (!selectedRepair) return '';
-    if (selectedScreenType === 'compatible' && selectedRepair.name.includes('מסך')) {
-      return selectedRepair.name + ' (Soft OLED)';
-    }
-    if (selectedScreenType === 'original' && selectedRepair.name.includes('מסך') && selectedModel?.compatible_screen_price && selectedModel.compatible_screen_price > 0) {
-      return selectedRepair.name + ' (מקורי)';
-    }
     return selectedRepair.name;
   };
   const getAllRepairNames = () => {
@@ -787,20 +778,10 @@ const NewRepairOrder = () => {
       return;
     }
 
-    // If screen repair and model has compatible screen price, show screen type picker
-    const isScreenRepair = repair.name.includes('מסך');
-    if (isScreenRepair && selectedModel && selectedModel.compatible_screen_price > 0) {
-      setSelectedRepair(repair);
-      setShowBackColorPicker(false);
-      setShowScreenTypePicker(true);
-      setSelectedScreenType(null);
-      return;
-    }
+    
     
     setSelectedRepair(repair);
     setShowBackColorPicker(false);
-    setShowScreenTypePicker(false);
-    updateLeadStep('אישור מחיר', { repair_type: repair.name });
 
     // Track AddToCart event for Facebook Pixel
     if (selectedModel) {
