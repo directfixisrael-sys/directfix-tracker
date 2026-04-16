@@ -685,6 +685,12 @@ const NewRepairOrder = () => {
   };
   const getRepairTypeName = () => {
     if (!selectedRepair) return '';
+    if (selectedScreenType === 'compatible' && selectedRepair.name.includes('מסך')) {
+      return selectedRepair.name + ' (Soft OLED)';
+    }
+    if (selectedScreenType === 'original' && selectedRepair.name.includes('מסך') && selectedModel?.compatible_screen_price && selectedModel.compatible_screen_price > 0) {
+      return selectedRepair.name + ' (מקורי)';
+    }
     return selectedRepair.name;
   };
   const getAllRepairNames = () => {
