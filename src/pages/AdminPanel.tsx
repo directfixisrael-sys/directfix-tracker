@@ -2295,7 +2295,8 @@ const AdminPanel = () => {
               {activeTab === 'orders' && 'ניהול הזמנות'}
               {activeTab === 'customers' && 'לקוחות'}
               {activeTab === 'messages' && 'הודעות'}
-              {activeTab === 'prices' && 'ניהול מחירון'}
+              {activeTab === 'prices' && 'מחירון iPhone'}
+              {activeTab === 'ipad_prices' && 'מחירון iPad'}
               {activeTab === 'settings' && 'הגדרות'}
               {activeTab === 'feedback' && 'משוב לקוחות'}
               {activeTab === 'analytics' && 'אנליטיקס'}
