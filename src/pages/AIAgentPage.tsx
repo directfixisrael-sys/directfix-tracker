@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/Logo";
+import SEO from "@/components/SEO";
 
 interface AgentSettings {
   is_enabled: boolean;
@@ -234,6 +235,11 @@ const AgentInner = ({ settings }: { settings: AgentSettings }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10 flex flex-col" dir="rtl">
+      <SEO
+        title="דברו עם דני - נציג AI חכם של DirectFix"
+        description="שיחה ישירה עם נציג AI של דיירקט פיקס - מחירים, זמינות, ייעוץ ותיאום תיקון אייפון 24/7. ללא המתנה."
+        image="/og-ai-agent.jpg"
+      />
       <header className="px-6 py-3 flex items-center justify-between border-b border-border/50">
         <Logo size="sm" />
         <a href="tel:033106020" className="text-xs text-muted-foreground hover:text-primary">
