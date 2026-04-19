@@ -24,6 +24,7 @@ import StoreCartPage from "./pages/StoreCartPage";
 import StoreCheckoutPage from "./pages/StoreCheckoutPage";
 import BatteryProgram from "./pages/BatteryProgram";
 import IPadRepair from "./pages/iPadRepair";
+import AIAgentPage from "./pages/AIAgentPage";
 import MinimalFooter from "./components/MinimalFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { VisitorTracker } from "./components/VisitorTracker";
@@ -53,6 +54,9 @@ const App = () => (
             <Route path="/store/product/:id" element={<StoreProductPage />} />
             <Route path="/store/cart" element={<StoreCartPage />} />
             <Route path="/store/checkout" element={<StoreCheckoutPage />} />
+
+            {/* AI Agent - standalone page for WhatsApp sharing */}
+            <Route path="/ai-agent" element={<AIAgentPage />} />
 
             {/* Main site routes */}
             <Route path="/*" element={
