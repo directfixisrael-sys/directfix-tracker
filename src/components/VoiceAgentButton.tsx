@@ -3,7 +3,6 @@ import { ConversationProvider, useConversation } from "@elevenlabs/react";
 import { Mic, MicOff, Phone, PhoneOff, Volume2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -60,7 +59,7 @@ const VoiceAgentInner = () => {
 
       await conversation.startSession({
         agentId: "agent_3601kpjrdzanemzr9h71qsjc6bqk",
-        connectionType: "webrtc",
+        connectionType: "websocket",
       });
     } catch (err) {
       console.error("Failed to start conversation:", err);
