@@ -43,12 +43,10 @@ const AgentInner = ({ settings }: { settings: AgentSettings }) => {
       console.log("[AI Agent] Disconnected", details);
       vacationContextSentRef.current = false;
     },
-    onMessage: (msg) => {
-      console.log("[AI Agent] Message:", msg);
-    },
     onError: (error) => {
       console.error("[AI Agent] Error:", error);
-      toast.error(error instanceof Error ? error.message : "שגיאה בחיבור");
+      const msg = typeof error === "string" ? error : (error as any)?.message || "שגיאה בחיבור";
+      toast.error(msg);
     },
     clientTools: {
       save_contact: async (params: { name: string; phone: string; issue?: string }) => {
@@ -202,8 +200,21 @@ const AgentInner = ({ settings }: { settings: AgentSettings }) => {
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
       const { data, error } = await supabase.functions.invoke("elevenlabs-conversation-token");
-      if (error || !data?.signedUrl) throw new Error(error?.message || data?.error || "לא התקבל קישור");
-      await conversation.startSession({ signedUrl: data.signedUrl, connectionType: "websocket" });
+      if (error) throw new Error(error.message || "לא הצלחנו להתחבר");
+      if (!data?.conversationToken && !data?.signedUrl) {
+        throw new Error(data?.error || "לא התקבלו פרטי חיבור");
+      }
+      if (data.conversationToken) {
+        await conversation.startSession({
+          conversationToken: data.conversationToken,
+          connectionType: "webrtc",
+        });
+      } else {
+        await conversation.startSession({
+          signedUrl: data.signedUrl,
+          connectionType: "websocket",
+        });
+      }
     } catch (err) {
       toast.error(
         err instanceof Error && err.message.includes("Permission")
