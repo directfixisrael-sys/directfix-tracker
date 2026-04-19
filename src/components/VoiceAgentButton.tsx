@@ -44,6 +44,21 @@ const VoiceAgentInner = ({ settings }: { settings: AgentSettings }) => {
 
   const onVacation = isOnVacation(settings);
 
+  const speakVacationMessage = useCallback(async () => {
+    if (!onVacation || typeof window === "undefined" || !("speechSynthesis" in window)) return;
+
+    await new Promise<void>((resolve) => {
+      const utterance = new SpeechSynthesisUtterance(settings.vacation_message);
+      utterance.lang = "he-IL";
+      utterance.rate = 1;
+      utterance.onend = () => resolve();
+      utterance.onerror = () => resolve();
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+      window.setTimeout(resolve, 5000);
+    });
+  }, [onVacation, settings.vacation_message]);
+
   const conversation = useConversation({
     onConnect: () => {
       console.log("Voice agent connected");
@@ -70,7 +85,9 @@ const VoiceAgentInner = ({ settings }: { settings: AgentSettings }) => {
           });
           if (error) throw error;
           toast.success("הפרטים שלך נשמרו - נחזור אליך בהקדם");
-          return "Contact saved successfully. Tell the customer we will call them back soon.";
+          return onVacation
+            ? "We are currently on vacation. Tell the customer we received the details and will call back when we return."
+            : "Contact saved successfully. Tell the customer we will call them back soon.";
         } catch (err) {
           console.error("save_contact failed:", err);
           return "Failed to save contact. Please ask the customer to try again.";
@@ -78,6 +95,10 @@ const VoiceAgentInner = ({ settings }: { settings: AgentSettings }) => {
       },
       get_price: async (params: { model: string; repair_type: string; variant?: string }) => {
         try {
+          if (onVacation) {
+            return `החנות כרגע בחופשה. במקום למסור מחיר, בקש מהלקוח שם מלא, מספר טלפון ותיאור התקלה, ואז קרא ל-save_contact. אמור גם: \"${settings.vacation_message}\"`;
+          }
+
           const modelQuery = (params.model || "").trim();
           const repairQuery = (params.repair_type || "").trim();
           const variantHint = (params.variant || "").trim();
@@ -179,13 +200,13 @@ const VoiceAgentInner = ({ settings }: { settings: AgentSettings }) => {
     try {
       vacationContextSentRef.current = true;
       conversation.sendContextualUpdate(
-        `מצב חופשה פעיל עד ${settings.vacation_end}. בתחילת השיחה אמור בדיוק: "${settings.vacation_message}". לאחר מכן בקש רק שם מלא, טלפון ותיאור תקלה, שמור אותם עם save_contact, ואל תיתן מחירים או זמינות.`
+        `מצב חופשה פעיל. הודע מיד ללקוח: "${settings.vacation_message}". אחר כך בקש רק שם מלא, טלפון ותיאור תקלה. אל תיתן מחירים, אל תיתן זמינות, ואל תתנהג כרגיל. השתמש רק ב-save_contact.`
       );
     } catch (err) {
       console.error("Failed to send vacation context:", err);
       vacationContextSentRef.current = false;
     }
-  }, [conversation, isConnected, onVacation, settings.vacation_end, settings.vacation_message]);
+  }, [conversation, isConnected, onVacation, settings.vacation_message]);
 
   useEffect(() => {
     if (!isConnected) { setVolumeLevel(0); return; }
@@ -208,6 +229,7 @@ const VoiceAgentInner = ({ settings }: { settings: AgentSettings }) => {
     setIsConnecting(true);
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
+      await speakVacationMessage();
       const { data, error } = await supabase.functions.invoke("elevenlabs-conversation-token");
       if (error || !data?.signedUrl) throw new Error(error?.message || data?.error || "לא התקבל קישור");
       await conversation.startSession({ signedUrl: data.signedUrl, connectionType: "websocket" });
@@ -221,7 +243,7 @@ const VoiceAgentInner = ({ settings }: { settings: AgentSettings }) => {
     } finally {
       setIsConnecting(false);
     }
-  }, [conversation, consentAccepted]);
+  }, [conversation, consentAccepted, speakVacationMessage]);
 
   const stopConversation = useCallback(async () => {
     await conversation.endSession();
