@@ -175,6 +175,19 @@ const VoiceAgentInner = ({ settings }: { settings: AgentSettings }) => {
   const isSpeaking = conversation.isSpeaking;
 
   useEffect(() => {
+    if (!isConnected || !onVacation || vacationContextSentRef.current) return;
+    vacationContextSentRef.current = true;
+    conversation
+      .sendContextualUpdate(
+        `מצב חופשה פעיל עד ${settings.vacation_end}. בתחילת השיחה אמור בדיוק: "${settings.vacation_message}". לאחר מכן בקש רק שם מלא, טלפון ותיאור תקלה, שמור אותם עם save_contact, ואל תיתן מחירים או זמינות.`
+      )
+      .catch((err) => {
+        console.error("Failed to send vacation context:", err);
+        vacationContextSentRef.current = false;
+      });
+  }, [conversation, isConnected, onVacation, settings.vacation_end, settings.vacation_message]);
+
+  useEffect(() => {
     if (!isConnected) { setVolumeLevel(0); return; }
     const tick = () => {
       try {
