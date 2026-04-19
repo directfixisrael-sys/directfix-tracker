@@ -155,40 +155,6 @@ const VoiceAgentInner = () => {
           return "Failed to fetch price. Tell the customer we will check and call them back.";
         }
       },
-
-          // Find best matching repair type
-          const { data: repairs } = await supabase
-            .from("repair_types")
-            .select("id, name")
-            .eq("is_active", true);
-          const repair = repairs?.find(
-            (r) =>
-              r.name.includes(repairQuery) ||
-              repairQuery.includes(r.name) ||
-              r.name.toLowerCase().includes(repairQuery.toLowerCase())
-          );
-          if (!repair) {
-            return `Repair type "${repairQuery}" not recognized. Available repairs: החלפת מסך תואם, החלפת מסך מקורי, החלפת סוללה מקורית, החלפת גב מקורי, תיקון טעינה.`;
-          }
-
-          // Look up price
-          const { data: priceRow } = await supabase
-            .from("model_repair_prices")
-            .select("price")
-            .eq("model_id", model.id)
-            .eq("repair_type_id", repair.id)
-            .maybeSingle();
-
-          if (!priceRow || priceRow.price === 0) {
-            return `Price for ${repair.name} on ${model.name} is not currently available. Ask the customer to leave their details and we will call back with a quote.`;
-          }
-
-          return `המחיר ל${repair.name} ב${model.name} הוא ${priceRow.price} שקלים, כולל הגעה עד הבית, התקנה ואחריות. Tell the customer the price clearly in Hebrew.`;
-        } catch (err) {
-          console.error("get_price failed:", err);
-          return "Failed to fetch price. Tell the customer we will check and call them back.";
-        }
-      },
     },
   });
 
