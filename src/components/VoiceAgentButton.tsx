@@ -58,7 +58,7 @@ const VoiceAgentInner = () => {
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
       await conversation.startSession({
-        agentId: "agent_3601kpjrdzanemzr9h71qsjc6bqk",
+        agentId: "agent_7701kpjs7b8re47a4ajhgg9q1n6a",
         connectionType: "websocket",
       });
     } catch (err) {

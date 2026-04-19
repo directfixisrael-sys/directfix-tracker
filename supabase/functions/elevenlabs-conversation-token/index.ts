@@ -3,7 +3,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const AGENT_ID = "agent_3601kpjrdzanemzr9h71qsjc6bqk";
+const AGENT_ID = "agent_7701kpjs7b8re47a4ajhgg9q1n6a";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
