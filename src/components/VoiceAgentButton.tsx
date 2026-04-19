@@ -25,6 +25,26 @@ const VoiceAgentInner = () => {
       console.error("Voice agent error:", error);
       toast.error(error instanceof Error ? error.message : "שגיאה בחיבור לטכנאי הוירטואלי");
     },
+    clientTools: {
+      save_contact: async (params: { name: string; phone: string; issue?: string }) => {
+        try {
+          const conversationId = conversation.getId?.() ?? null;
+          const { error } = await supabase.from("voice_leads").insert({
+            customer_name: params.name || "",
+            customer_phone: params.phone || "",
+            issue_description: params.issue || "",
+            conversation_id: conversationId,
+            status: "new",
+          });
+          if (error) throw error;
+          toast.success("הפרטים שלך נשמרו - נחזור אליך בהקדם");
+          return "Contact saved successfully. Tell the customer we will call them back soon.";
+        } catch (err) {
+          console.error("save_contact failed:", err);
+          return "Failed to save contact. Please ask the customer to try again.";
+        }
+      },
+    },
   });
 
   const isConnected = conversation.status === "connected";
