@@ -179,11 +179,9 @@ const VoiceAgentInner = () => {
             price: priceRow?.price ?? null,
           });
 
-          if (!priceRow || priceRow.price === 0) {
-            return `אין כרגע מחיר זמין עבור ${repair.name} ב-${best.name}. קח פרטים ונחזור עם הצעת מחיר.`;
-          }
-
-          return `הצעת מחיר רשמית: עבור ${best.name}, ${repair.name} עולה ${priceRow.price} ש"ח. אסור לשנות, לעגל או לנחש מחיר אחר.`;
+          const exactResponse = `מחיר מדויק: ${repair.name} עבור ${best.name} - ${priceRow.price} ש"ח.`;
+          console.log("[get_price] exact response:", exactResponse);
+          return exactResponse;
         } catch (err) {
           console.error("get_price failed:", err);
           return "Failed to fetch price. Tell the customer we will check and call them back.";
