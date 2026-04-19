@@ -44,10 +44,12 @@ const VoiceAgentInner = () => {
           return "Failed to save contact. Please ask the customer to try again.";
         }
       },
-      get_price: async (params: { model: string; repair_type: string }) => {
+      get_price: async (params: { model: string; repair_type: string; variant?: string }) => {
         try {
           const modelQuery = (params.model || "").trim();
           const repairQuery = (params.repair_type || "").trim();
+          const variantHint = (params.variant || "").trim();
+          console.log("[get_price] params received:", JSON.stringify(params));
           if (!modelQuery || !repairQuery) {
             return "Missing model or repair_type. Ask the customer for both.";
           }
@@ -73,13 +75,15 @@ const VoiceAgentInner = () => {
               .replace(/\s+/g, " ")
               .trim();
 
-          const queryNorm = normalize(modelQuery);
+          // Combine model + variant hint for variant detection (some agents pass them separately)
+          const queryNorm = normalize(modelQuery + " " + variantHint);
           // Detect variant qualifiers explicitly
-          const wantsProMax = /\bpro\s*max\b/.test(queryNorm);
+          const wantsProMax = /\bpro\s*max\b/.test(queryNorm) || /\bmax\b/.test(queryNorm);
           const wantsPro = /\bpro\b/.test(queryNorm) && !wantsProMax;
           const wantsPlus = /\bplus\b/.test(queryNorm);
           const wantsMini = /\bmini\b/.test(queryNorm);
           const wantsBase = !wantsPro && !wantsProMax && !wantsPlus && !wantsMini;
+          console.log("[get_price] queryNorm:", queryNorm, { wantsBase, wantsPro, wantsProMax, wantsPlus, wantsMini });
 
           const { data: models } = await supabase
             .from("iphone_models")
@@ -103,21 +107,26 @@ const VoiceAgentInner = () => {
             return isBase(c.norm);
           });
 
-          // Now pick the one whose tokens overlap most with query (e.g. "iphone 13")
-          const queryTokens = queryNorm.split(" ").filter(Boolean);
+          // Strip variant words from query tokens for matching numbers/brand only
+          const variantWords = new Set(["pro", "max", "plus", "mini"]);
+          const queryTokens = queryNorm.split(" ").filter((t) => t && !variantWords.has(t));
           let best: typeof candidates[number] | undefined;
           let bestScore = -1;
           for (const c of filtered) {
             const cTokens = c.norm.split(" ").filter(Boolean);
-            // require all query tokens (numbers + brand) to be present in candidate
-            const allPresent = queryTokens.every((t) => cTokens.includes(t));
+            const cTokensNoVariant = cTokens.filter((t) => !variantWords.has(t));
+            // require all non-variant query tokens (numbers + brand) to be present
+            const allPresent = queryTokens.every((t) => cTokensNoVariant.includes(t));
             if (!allPresent) continue;
-            const score = cTokens.length === queryTokens.length ? 1000 : queryTokens.length;
+            // Prefer exact token-count match
+            const exactMatch = cTokensNoVariant.length === queryTokens.length;
+            const score = (exactMatch ? 1000 : 0) + queryTokens.length - Math.abs(cTokensNoVariant.length - queryTokens.length);
             if (score > bestScore) {
               bestScore = score;
               best = c;
             }
           }
+          console.log("[get_price] best match:", best?.name, "score:", bestScore);
 
           if (!best) {
             return `Model "${modelQuery}" not found in the requested variant. Ask the customer to clarify exactly: base model, Pro, Pro Max, Plus, or Mini.`;
