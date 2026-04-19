@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.handle-club-unsubscribe]
 verify_jwt = false
+
+[functions.elevenlabs-conversation-token]
+verify_jwt = false
