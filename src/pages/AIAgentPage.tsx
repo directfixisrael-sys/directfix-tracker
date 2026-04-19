@@ -128,7 +128,7 @@ const AgentInner = ({ settings }: { settings: AgentSettings }) => {
         </a>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-4 py-8">
+      <main className="flex-1 flex items-center justify-center px-4 py-8 pb-40">
         <div className="w-full max-w-md">
           {/* Hero */}
           <div className="text-center mb-8">
@@ -195,32 +195,41 @@ const AgentInner = ({ settings }: { settings: AgentSettings }) => {
             </div>
           )}
 
-          {/* Action */}
-          <div className="flex justify-center mb-6">
-            {isConnected ? (
-              <Button variant="destructive" size="lg" onClick={stopConversation} className="rounded-full px-10 h-14 text-base gap-2 shadow-lg">
-                <PhoneOff className="w-5 h-5" />
-                סיים שיחה
-              </Button>
-            ) : (
-              <Button
-                size="lg"
-                onClick={startConversation}
-                disabled={isConnecting || !consentAccepted}
-                className="rounded-full px-10 h-14 text-base gap-2 shadow-lg shadow-primary/30"
-              >
-                <Phone className="w-5 h-5" />
-                {isConnecting ? "מתחבר..." : "התחל שיחה"}
-              </Button>
-            )}
-          </div>
-
           <p className="text-center text-xs text-muted-foreground">
             למקרים מורכבים -{" "}
             <a href="tel:033106020" className="text-primary font-semibold">03-3106020</a>
           </p>
         </div>
       </main>
+
+      {/* Sticky CTA */}
+      <div
+        className="fixed bottom-0 inset-x-0 z-50 px-4 pt-6 pb-[calc(1rem+env(safe-area-inset-bottom))] bg-gradient-to-t from-background via-background/95 to-transparent"
+      >
+        <div className="max-w-md mx-auto">
+          {isConnected ? (
+            <Button
+              variant="destructive"
+              size="lg"
+              onClick={stopConversation}
+              className="w-full h-16 text-lg rounded-full gap-2 shadow-2xl shadow-destructive/40"
+            >
+              <PhoneOff className="w-5 h-5" />
+              סיים שיחה
+            </Button>
+          ) : (
+            <Button
+              size="lg"
+              onClick={startConversation}
+              disabled={isConnecting || !consentAccepted}
+              className="w-full h-16 text-lg rounded-full gap-2 shadow-2xl shadow-primary/40 hover:shadow-primary/60 hover:-translate-y-0.5 transition-all bg-gradient-to-br from-emerald-400 to-green-600 text-white border-0"
+            >
+              <Phone className="w-5 h-5" />
+              {isConnecting ? "מתחבר..." : "התחל שיחה עם דני"}
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
