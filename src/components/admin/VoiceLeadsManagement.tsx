@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Phone, MessageSquare, Trash2, CheckCircle, MessageCircle, Mic } from "lucide-react";
+import { Phone, MessageSquare, Trash2, CheckCircle, MessageCircle, Mic, PlayCircle } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
@@ -168,6 +168,22 @@ const VoiceLeadsManagement = () => {
                   <MessageCircle className="w-4 h-4" />
                   WhatsApp
                 </Button>
+                {lead.conversation_id && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      window.open(
+                        `https://elevenlabs.io/app/conversational-ai/history/${lead.conversation_id}`,
+                        "_blank"
+                      )
+                    }
+                    className="gap-1"
+                  >
+                    <PlayCircle className="w-4 h-4" />
+                    האזן להקלטה
+                  </Button>
+                )}
                 {lead.status === "new" && (
                   <Button
                     size="sm"
