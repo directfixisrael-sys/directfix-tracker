@@ -236,6 +236,20 @@ const VoiceLeadsManagement = () => {
                   מחק
                 </Button>
               </div>
+
+              {playingId === lead.id && audioUrls[lead.id] && (
+                <div className="mt-3 pt-3 border-t border-border">
+                  <audio
+                    controls
+                    autoPlay
+                    src={audioUrls[lead.id]}
+                    className="w-full"
+                  />
+                </div>
+              )}
+              {loadingAudioId === lead.id && (
+                <p className="mt-3 text-sm text-muted-foreground text-center">טוען הקלטה...</p>
+              )}
             </Card>
           ))}
         </div>
