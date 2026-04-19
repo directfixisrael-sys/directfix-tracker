@@ -2,7 +2,8 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { ConversationProvider, useConversation } from "@elevenlabs/react";
 import { Mic, MicOff, Phone, PhoneOff, Volume2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -17,12 +18,12 @@ const VoiceAgentInner = () => {
       console.log("Voice agent connected");
       toast.success("מחובר לטכנאי הוירטואלי");
     },
-    onDisconnect: () => {
-      console.log("Voice agent disconnected");
+    onDisconnect: (details) => {
+      console.log("Voice agent disconnected", details);
     },
     onError: (error) => {
       console.error("Voice agent error:", error);
-      toast.error("שגיאה בחיבור לטכנאי הוירטואלי");
+      toast.error(error instanceof Error ? error.message : "שגיאה בחיבור לטכנאי הוירטואלי");
     },
   });
 
@@ -57,8 +58,16 @@ const VoiceAgentInner = () => {
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
+      const { data, error } = await supabase.functions.invoke(
+        "elevenlabs-conversation-token"
+      );
+
+      if (error || !data?.signedUrl) {
+        throw new Error(error?.message || data?.error || "לא התקבל קישור חיבור מאובטח");
+      }
+
       await conversation.startSession({
-        agentId: "agent_7701kpjs7b8re47a4ajhgg9q1n6a",
+        signedUrl: data.signedUrl,
         connectionType: "websocket",
       });
     } catch (err) {
@@ -66,7 +75,9 @@ const VoiceAgentInner = () => {
       toast.error(
         err instanceof Error && err.message.includes("Permission")
           ? "נדרשת הרשאה למיקרופון כדי לדבר עם הטכנאי"
-          : "לא הצלחנו להתחבר. נסה שוב."
+          : err instanceof Error
+            ? err.message
+            : "לא הצלחנו להתחבר. נסה שוב."
       );
       setOpen(false);
     } finally {
@@ -127,6 +138,8 @@ const VoiceAgentInner = () => {
           className="max-w-md rounded-3xl p-0 overflow-hidden border-primary/20"
           dir="rtl"
         >
+          <DialogTitle className="sr-only">שיחה עם טכנאי וירטואלי</DialogTitle>
+          <DialogDescription className="sr-only">שיחה קולית בזמן אמת עם הטכנאי הוירטואלי של DirectFix.</DialogDescription>
           {/* Close button on Left */}
           <button
             onClick={handleClose}
