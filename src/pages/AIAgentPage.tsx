@@ -60,6 +60,98 @@ const AgentInner = ({ settings }: { settings: AgentSettings }) => {
           return "Failed to save contact.";
         }
       },
+      get_price: async (params: { model: string; repair_type: string; variant?: string }) => {
+        try {
+          if (onVacation) {
+            return `החנות כרגע בחופשה. במקום למסור מחיר, בקש מהלקוח שם מלא, מספר טלפון ותיאור התקלה, ואז קרא ל-save_contact. אמור גם: "${settings.vacation_message}"`;
+          }
+
+          const modelQuery = (params.model || "").trim();
+          const repairQuery = (params.repair_type || "").trim();
+          const variantHint = (params.variant || "").trim();
+          if (!modelQuery || !repairQuery) return "Missing model or repair_type.";
+
+          const normalize = (s: string) =>
+            s.toLowerCase()
+              .replace(/[\u05D0-\u05EA]+/g, (m) => {
+                const map: Record<string, string> = {
+                  "פרו": "pro", "מקס": "max", "פלוס": "plus", "מיני": "mini",
+                  "אייפון": "iphone", "סמסונג": "samsung", "גלקסי": "galaxy",
+                };
+                return map[m] || m;
+              })
+              .replace(/[^a-z0-9\u05D0-\u05EA\s]/g, " ")
+              .replace(/\s+/g, " ").trim();
+
+          const queryNorm = normalize(modelQuery + " " + variantHint);
+          const wantsProMax = /\bpro\s*max\b/.test(queryNorm) || /\bmax\b/.test(queryNorm);
+          const wantsPro = /\bpro\b/.test(queryNorm) && !wantsProMax;
+          const wantsPlus = /\bplus\b/.test(queryNorm);
+          const wantsMini = /\bmini\b/.test(queryNorm);
+
+          const { data: models } = await supabase.from("iphone_models").select("id, name").eq("is_active", true);
+          const candidates = (models || []).map((m) => ({ ...m, norm: normalize(m.name) }));
+          const isProMax = (n: string) => /\bpro\s*max\b/.test(n);
+          const isPro = (n: string) => /\bpro\b/.test(n) && !isProMax(n);
+          const isPlus = (n: string) => /\bplus\b/.test(n);
+          const isMini = (n: string) => /\bmini\b/.test(n);
+          const isBase = (n: string) => !isPro(n) && !isProMax(n) && !isPlus(n) && !isMini(n);
+
+          const filtered = candidates.filter((c) => {
+            if (wantsProMax) return isProMax(c.norm);
+            if (wantsPro) return isPro(c.norm);
+            if (wantsPlus) return isPlus(c.norm);
+            if (wantsMini) return isMini(c.norm);
+            return isBase(c.norm);
+          });
+
+          const variantWords = new Set(["pro", "max", "plus", "mini"]);
+          const queryTokens = queryNorm.split(" ").filter((t) => t && !variantWords.has(t));
+          let best: typeof candidates[number] | undefined;
+          let bestScore = -1;
+          for (const c of filtered) {
+            const cTokens = c.norm.split(" ").filter(Boolean).filter((t) => !variantWords.has(t));
+            const allPresent = queryTokens.every((t) => cTokens.includes(t));
+            if (!allPresent) continue;
+            const score = (cTokens.length === queryTokens.length ? 1000 : 0) + queryTokens.length - Math.abs(cTokens.length - queryTokens.length);
+            if (score > bestScore) { bestScore = score; best = c; }
+          }
+
+          if (!best) return `Model "${modelQuery}" not found.`;
+
+          const { data: repairs } = await supabase.from("repair_types").select("id, name").eq("is_active", true);
+          const normalizeRepair = (s: string) =>
+            normalize(s)
+              .replace(/מסך תואם/g, "screen compatible")
+              .replace(/מסך מקורי/g, "screen original")
+              .replace(/סוללה מקורית/g, "battery original")
+              .replace(/גב מקורי/g, "back original")
+              .replace(/תיקון טעינה/g, "charging")
+              .replace(/החלפת/g, "")
+              .replace(/תיקון/g, "")
+              .replace(/\s+/g, " ").trim();
+
+          const repairQueryNorm = normalizeRepair(repairQuery);
+          const repairCandidates = (repairs || []).map((r) => ({ ...r, norm: normalizeRepair(r.name) }));
+          const repair = repairCandidates.find((r) => r.norm === repairQueryNorm) ||
+            repairCandidates.find((r) => r.norm.includes(repairQueryNorm) || repairQueryNorm.includes(r.norm));
+
+          if (!repair) return `Repair "${repairQuery}" not recognized.`;
+
+          const { data: priceRow } = await supabase
+            .from("model_repair_prices")
+            .select("price")
+            .eq("model_id", best.id)
+            .eq("repair_type_id", repair.id)
+            .maybeSingle();
+
+          if (!priceRow?.price) return `No price found for ${best.name} - ${repair.name}.`;
+          return `מחיר מדויק: ${repair.name} עבור ${best.name} - ${priceRow.price} ש"ח.`;
+        } catch (err) {
+          console.error("get_price failed:", err);
+          return "Failed to fetch price.";
+        }
+      },
     },
   });
 
@@ -121,23 +213,23 @@ const AgentInner = ({ settings }: { settings: AgentSettings }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10 flex flex-col" dir="rtl">
-      <header className="px-6 py-4 flex items-center justify-between border-b border-border/50">
+      <header className="px-6 py-3 flex items-center justify-between border-b border-border/50">
         <Logo size="sm" />
         <a href="tel:033106020" className="text-xs text-muted-foreground hover:text-primary">
           03-3106020
         </a>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-4 py-8 pb-40">
+      <main className="flex-1 flex items-center justify-center px-4 py-6 pb-56">
         <div className="w-full max-w-md">
           {/* Hero */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-full mb-4">
-              <Sparkles className="w-3.5 h-3.5" />
+          <div className="text-center mb-5">
+            <div className="inline-flex items-center gap-1.5 bg-primary/10 text-primary text-[11px] font-bold px-2.5 py-1 rounded-full mb-2">
+              <Sparkles className="w-3 h-3" />
               נציג AI חכם
             </div>
-            <h1 className="text-3xl font-extrabold mb-2">דברו עם דני</h1>
-            <p className="text-muted-foreground text-sm">
+            <h1 className="text-2xl font-extrabold mb-1">דברו עם דני</h1>
+            <p className="text-muted-foreground text-xs">
               {isConnecting && "מתחבר לנציג..."}
               {isConnected && isSpeaking && "דני מדבר..."}
               {isConnected && !isSpeaking && "דני מקשיב לך..."}
@@ -148,71 +240,63 @@ const AgentInner = ({ settings }: { settings: AgentSettings }) => {
           </div>
 
           {/* Voice orb */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="relative w-56 h-56 flex items-center justify-center">
+          <div className="flex items-center justify-center">
+            <div className="relative w-44 h-44 flex items-center justify-center">
               {isConnected && (
                 <>
                   <div className="absolute inset-0 rounded-full bg-primary/15 transition-transform duration-100" style={{ transform: `scale(${orbScale * 1.15})` }} />
-                  <div className="absolute inset-6 rounded-full bg-primary/25 transition-transform duration-100" style={{ transform: `scale(${orbScale})` }} />
+                  <div className="absolute inset-5 rounded-full bg-primary/25 transition-transform duration-100" style={{ transform: `scale(${orbScale})` }} />
                 </>
               )}
               <div
                 className={cn(
-                  "relative w-36 h-36 rounded-full flex items-center justify-center",
+                  "relative w-28 h-28 rounded-full flex items-center justify-center",
                   "bg-gradient-to-br from-emerald-400 to-green-600",
                   "shadow-2xl shadow-green-500/40 transition-transform duration-100",
                   !isConnected && "opacity-80"
                 )}
                 style={{ transform: isConnected ? `scale(${orbScale})` : "scale(1)" }}
               >
-                {isSpeaking ? <Volume2 className="w-14 h-14 text-white" />
-                  : isConnected ? <Mic className="w-14 h-14 text-white" />
-                  : <MicOff className="w-14 h-14 text-white" />}
-                <span className="absolute -top-1 -right-1 w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center shadow-md ring-4 ring-background">
-                  <Sparkles className="w-4 h-4 text-white" strokeWidth={2.5} />
+                {isSpeaking ? <Volume2 className="w-10 h-10 text-white" />
+                  : isConnected ? <Mic className="w-10 h-10 text-white" />
+                  : <MicOff className="w-10 h-10 text-white" />}
+                <span className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center shadow-md ring-4 ring-background">
+                  <Sparkles className="w-3 h-3 text-white" strokeWidth={2.5} />
                 </span>
               </div>
             </div>
           </div>
+        </div>
+      </main>
 
-          {/* Consent */}
+      {/* Sticky bottom: consent + CTA + phone fallback */}
+      <div className="fixed bottom-0 inset-x-0 z-50 px-4 pt-6 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-gradient-to-t from-background via-background to-background/80 backdrop-blur-md border-t border-border/40">
+        <div className="max-w-md mx-auto space-y-3">
           {!isConnected && (
-            <div className="bg-card rounded-2xl p-4 mb-4 border border-border">
-              <div className="flex items-start gap-2.5">
+            <div className="bg-card/80 rounded-xl p-2.5 border border-border">
+              <div className="flex items-start gap-2">
                 <Checkbox
                   id="ai-consent"
                   checked={consentAccepted}
                   onCheckedChange={(c) => setConsentAccepted(c === true)}
                   className="mt-0.5"
                 />
-                <label htmlFor="ai-consent" className="text-sm cursor-pointer leading-snug flex-1">
-                  <Shield className="w-3.5 h-3.5 inline ml-1 text-primary" />
+                <label htmlFor="ai-consent" className="text-xs cursor-pointer leading-snug flex-1">
+                  <Shield className="w-3 h-3 inline ml-1 text-primary" />
                   אני מסכים/ה ל
                   <Link to="/terms" target="_blank" className="text-primary underline">תנאי השימוש</Link>
-                  {" "}וכי השיחה עשויה להיות מוקלטת לצרכי שירות.
+                  {" "}והקלטת השיחה.
                 </label>
               </div>
             </div>
           )}
 
-          <p className="text-center text-xs text-muted-foreground">
-            למקרים מורכבים -{" "}
-            <a href="tel:033106020" className="text-primary font-semibold">03-3106020</a>
-          </p>
-        </div>
-      </main>
-
-      {/* Sticky CTA */}
-      <div
-        className="fixed bottom-0 inset-x-0 z-50 px-4 pt-6 pb-[calc(1rem+env(safe-area-inset-bottom))] bg-gradient-to-t from-background via-background/95 to-transparent"
-      >
-        <div className="max-w-md mx-auto">
           {isConnected ? (
             <Button
               variant="destructive"
               size="lg"
               onClick={stopConversation}
-              className="w-full h-16 text-lg rounded-full gap-2 shadow-2xl shadow-destructive/40"
+              className="w-full h-14 text-base rounded-full gap-2 shadow-2xl shadow-destructive/40"
             >
               <PhoneOff className="w-5 h-5" />
               סיים שיחה
@@ -222,12 +306,17 @@ const AgentInner = ({ settings }: { settings: AgentSettings }) => {
               size="lg"
               onClick={startConversation}
               disabled={isConnecting || !consentAccepted}
-              className="w-full h-16 text-lg rounded-full gap-2 shadow-2xl shadow-primary/40 hover:shadow-primary/60 hover:-translate-y-0.5 transition-all bg-gradient-to-br from-emerald-400 to-green-600 text-white border-0"
+              className="w-full h-14 text-base rounded-full gap-2 shadow-2xl shadow-primary/40 hover:shadow-primary/60 hover:-translate-y-0.5 transition-all bg-gradient-to-br from-emerald-400 to-green-600 text-white border-0"
             >
               <Phone className="w-5 h-5" />
               {isConnecting ? "מתחבר..." : "התחל שיחה עם דני"}
             </Button>
           )}
+
+          <p className="text-center text-[11px] text-muted-foreground">
+            למקרים מורכבים -{" "}
+            <a href="tel:033106020" className="text-primary font-semibold">03-3106020</a>
+          </p>
         </div>
       </div>
     </div>
