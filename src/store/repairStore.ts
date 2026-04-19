@@ -6,7 +6,7 @@ interface RepairStore {
   orders: RepairOrder[];
   messages: ChatMessage[];
   currentOrder: RepairOrder | null;
-  activeTab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders' | 'leads' | 'loyalty' | 'ipad_prices';
+  activeTab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders' | 'leads' | 'voice_leads' | 'loyalty' | 'ipad_prices';
   isLoading: boolean;
   
   // Tab actions
