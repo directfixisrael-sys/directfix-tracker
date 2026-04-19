@@ -60,6 +60,98 @@ const AgentInner = ({ settings }: { settings: AgentSettings }) => {
           return "Failed to save contact.";
         }
       },
+      get_price: async (params: { model: string; repair_type: string; variant?: string }) => {
+        try {
+          if (onVacation) {
+            return `החנות כרגע בחופשה. במקום למסור מחיר, בקש מהלקוח שם מלא, מספר טלפון ותיאור התקלה, ואז קרא ל-save_contact. אמור גם: "${settings.vacation_message}"`;
+          }
+
+          const modelQuery = (params.model || "").trim();
+          const repairQuery = (params.repair_type || "").trim();
+          const variantHint = (params.variant || "").trim();
+          if (!modelQuery || !repairQuery) return "Missing model or repair_type.";
+
+          const normalize = (s: string) =>
+            s.toLowerCase()
+              .replace(/[\u05D0-\u05EA]+/g, (m) => {
+                const map: Record<string, string> = {
+                  "פרו": "pro", "מקס": "max", "פלוס": "plus", "מיני": "mini",
+                  "אייפון": "iphone", "סמסונג": "samsung", "גלקסי": "galaxy",
+                };
+                return map[m] || m;
+              })
+              .replace(/[^a-z0-9\u05D0-\u05EA\s]/g, " ")
+              .replace(/\s+/g, " ").trim();
+
+          const queryNorm = normalize(modelQuery + " " + variantHint);
+          const wantsProMax = /\bpro\s*max\b/.test(queryNorm) || /\bmax\b/.test(queryNorm);
+          const wantsPro = /\bpro\b/.test(queryNorm) && !wantsProMax;
+          const wantsPlus = /\bplus\b/.test(queryNorm);
+          const wantsMini = /\bmini\b/.test(queryNorm);
+
+          const { data: models } = await supabase.from("iphone_models").select("id, name").eq("is_active", true);
+          const candidates = (models || []).map((m) => ({ ...m, norm: normalize(m.name) }));
+          const isProMax = (n: string) => /\bpro\s*max\b/.test(n);
+          const isPro = (n: string) => /\bpro\b/.test(n) && !isProMax(n);
+          const isPlus = (n: string) => /\bplus\b/.test(n);
+          const isMini = (n: string) => /\bmini\b/.test(n);
+          const isBase = (n: string) => !isPro(n) && !isProMax(n) && !isPlus(n) && !isMini(n);
+
+          const filtered = candidates.filter((c) => {
+            if (wantsProMax) return isProMax(c.norm);
+            if (wantsPro) return isPro(c.norm);
+            if (wantsPlus) return isPlus(c.norm);
+            if (wantsMini) return isMini(c.norm);
+            return isBase(c.norm);
+          });
+
+          const variantWords = new Set(["pro", "max", "plus", "mini"]);
+          const queryTokens = queryNorm.split(" ").filter((t) => t && !variantWords.has(t));
+          let best: typeof candidates[number] | undefined;
+          let bestScore = -1;
+          for (const c of filtered) {
+            const cTokens = c.norm.split(" ").filter(Boolean).filter((t) => !variantWords.has(t));
+            const allPresent = queryTokens.every((t) => cTokens.includes(t));
+            if (!allPresent) continue;
+            const score = (cTokens.length === queryTokens.length ? 1000 : 0) + queryTokens.length - Math.abs(cTokens.length - queryTokens.length);
+            if (score > bestScore) { bestScore = score; best = c; }
+          }
+
+          if (!best) return `Model "${modelQuery}" not found.`;
+
+          const { data: repairs } = await supabase.from("repair_types").select("id, name").eq("is_active", true);
+          const normalizeRepair = (s: string) =>
+            normalize(s)
+              .replace(/מסך תואם/g, "screen compatible")
+              .replace(/מסך מקורי/g, "screen original")
+              .replace(/סוללה מקורית/g, "battery original")
+              .replace(/גב מקורי/g, "back original")
+              .replace(/תיקון טעינה/g, "charging")
+              .replace(/החלפת/g, "")
+              .replace(/תיקון/g, "")
+              .replace(/\s+/g, " ").trim();
+
+          const repairQueryNorm = normalizeRepair(repairQuery);
+          const repairCandidates = (repairs || []).map((r) => ({ ...r, norm: normalizeRepair(r.name) }));
+          const repair = repairCandidates.find((r) => r.norm === repairQueryNorm) ||
+            repairCandidates.find((r) => r.norm.includes(repairQueryNorm) || repairQueryNorm.includes(r.norm));
+
+          if (!repair) return `Repair "${repairQuery}" not recognized.`;
+
+          const { data: priceRow } = await supabase
+            .from("model_repair_prices")
+            .select("price")
+            .eq("model_id", best.id)
+            .eq("repair_type_id", repair.id)
+            .maybeSingle();
+
+          if (!priceRow?.price) return `No price found for ${best.name} - ${repair.name}.`;
+          return `מחיר מדויק: ${repair.name} עבור ${best.name} - ${priceRow.price} ש"ח.`;
+        } catch (err) {
+          console.error("get_price failed:", err);
+          return "Failed to fetch price.";
+        }
+      },
     },
   });
 
