@@ -168,6 +168,22 @@ const VoiceLeadsManagement = () => {
                   <MessageCircle className="w-4 h-4" />
                   WhatsApp
                 </Button>
+                {lead.conversation_id && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      window.open(
+                        `https://elevenlabs.io/app/conversational-ai/history/${lead.conversation_id}`,
+                        "_blank"
+                      )
+                    }
+                    className="gap-1"
+                  >
+                    <PlayCircle className="w-4 h-4" />
+                    האזן להקלטה
+                  </Button>
+                )}
                 {lead.status === "new" && (
                   <Button
                     size="sm"
