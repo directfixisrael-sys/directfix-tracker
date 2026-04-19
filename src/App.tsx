@@ -76,7 +76,7 @@ const App = () => (
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <MinimalFooter />
-                <VoiceAgentButton />
+                {/* <VoiceAgentButton /> - הוסתר זמנית, נחזור להציג בהמשך */}
               </>
             } />
           </Routes>
