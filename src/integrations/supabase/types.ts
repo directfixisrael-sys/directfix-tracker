@@ -827,6 +827,48 @@ export type Database = {
         }
         Relationships: []
       }
+      voice_agent_settings: {
+        Row: {
+          active_hours_end: string | null
+          active_hours_start: string | null
+          created_at: string
+          id: string
+          is_enabled: boolean
+          singleton: boolean
+          updated_at: string
+          use_active_hours: boolean
+          vacation_end: string | null
+          vacation_message: string
+          vacation_start: string | null
+        }
+        Insert: {
+          active_hours_end?: string | null
+          active_hours_start?: string | null
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          singleton?: boolean
+          updated_at?: string
+          use_active_hours?: boolean
+          vacation_end?: string | null
+          vacation_message?: string
+          vacation_start?: string | null
+        }
+        Update: {
+          active_hours_end?: string | null
+          active_hours_start?: string | null
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          singleton?: boolean
+          updated_at?: string
+          use_active_hours?: boolean
+          vacation_end?: string | null
+          vacation_message?: string
+          vacation_start?: string | null
+        }
+        Relationships: []
+      }
       voice_leads: {
         Row: {
           conversation_id: string | null
