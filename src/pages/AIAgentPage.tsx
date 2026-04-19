@@ -35,9 +35,19 @@ const AgentInner = ({ settings }: { settings: AgentSettings }) => {
   const onVacation = isOnVacation(settings);
 
   const conversation = useConversation({
-    onConnect: () => toast.success("מחובר לנציג"),
-    onDisconnect: () => { vacationContextSentRef.current = false; },
+    onConnect: () => {
+      console.log("[AI Agent] Connected");
+      toast.success("מחובר לנציג");
+    },
+    onDisconnect: (details) => {
+      console.log("[AI Agent] Disconnected", details);
+      vacationContextSentRef.current = false;
+    },
+    onMessage: (msg) => {
+      console.log("[AI Agent] Message:", msg);
+    },
     onError: (error) => {
+      console.error("[AI Agent] Error:", error);
       toast.error(error instanceof Error ? error.message : "שגיאה בחיבור");
     },
     clientTools: {
