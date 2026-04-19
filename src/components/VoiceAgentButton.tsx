@@ -40,6 +40,7 @@ const VoiceAgentInner = ({ settings }: { settings: AgentSettings }) => {
   const [volumeLevel, setVolumeLevel] = useState(0);
   const [consentAccepted, setConsentAccepted] = useState(false);
   const animFrameRef = useRef<number>();
+  const vacationContextSentRef = useRef(false);
 
   const onVacation = isOnVacation(settings);
 
@@ -50,26 +51,12 @@ const VoiceAgentInner = ({ settings }: { settings: AgentSettings }) => {
     },
     onDisconnect: (details) => {
       console.log("Voice agent disconnected", details);
+      vacationContextSentRef.current = false;
     },
     onError: (error) => {
       console.error("Voice agent error:", error);
       toast.error(error instanceof Error ? error.message : "שגיאה בחיבור לטכנאי הוירטואלי");
     },
-    overrides: onVacation
-      ? {
-          agent: {
-            prompt: {
-              prompt: `אתה דני, נציג וירטואלי של DirectFix. החנות נמצאת כעת בחופשה (עד ${settings.vacation_end}).
-פתח את השיחה מיד במשפט הבא בדיוק: "${settings.vacation_message}"
-לאחר מכן תפקידך הוא:
-1. לקחת את פרטי הלקוח: שם מלא, מספר טלפון, ותיאור התקלה.
-2. לקרוא לכלי save_contact עם הפרטים שאספת.
-3. להודיע שנחזור אליו מיד עם החזרה מהחופשה.
-אל תנסה לתת מחירים או לבצע פעולות אחרות. אל תקרא לכלי get_price.`,
-            },
-          },
-        }
-      : undefined,
     clientTools: {
       save_contact: async (params: { name: string; phone: string; issue?: string }) => {
         try {
