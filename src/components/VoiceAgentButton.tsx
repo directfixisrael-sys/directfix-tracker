@@ -107,21 +107,26 @@ const VoiceAgentInner = () => {
             return isBase(c.norm);
           });
 
-          // Now pick the one whose tokens overlap most with query (e.g. "iphone 13")
-          const queryTokens = queryNorm.split(" ").filter(Boolean);
+          // Strip variant words from query tokens for matching numbers/brand only
+          const variantWords = new Set(["pro", "max", "plus", "mini"]);
+          const queryTokens = queryNorm.split(" ").filter((t) => t && !variantWords.has(t));
           let best: typeof candidates[number] | undefined;
           let bestScore = -1;
           for (const c of filtered) {
             const cTokens = c.norm.split(" ").filter(Boolean);
-            // require all query tokens (numbers + brand) to be present in candidate
-            const allPresent = queryTokens.every((t) => cTokens.includes(t));
+            const cTokensNoVariant = cTokens.filter((t) => !variantWords.has(t));
+            // require all non-variant query tokens (numbers + brand) to be present
+            const allPresent = queryTokens.every((t) => cTokensNoVariant.includes(t));
             if (!allPresent) continue;
-            const score = cTokens.length === queryTokens.length ? 1000 : queryTokens.length;
+            // Prefer exact token-count match
+            const exactMatch = cTokensNoVariant.length === queryTokens.length;
+            const score = (exactMatch ? 1000 : 0) + queryTokens.length - Math.abs(cTokensNoVariant.length - queryTokens.length);
             if (score > bestScore) {
               bestScore = score;
               best = c;
             }
           }
+          console.log("[get_price] best match:", best?.name, "score:", bestScore);
 
           if (!best) {
             return `Model "${modelQuery}" not found in the requested variant. Ask the customer to clarify exactly: base model, Pro, Pro Max, Plus, or Mini.`;
