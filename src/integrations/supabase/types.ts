@@ -827,6 +827,42 @@ export type Database = {
         }
         Relationships: []
       }
+      voice_leads: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          customer_name: string
+          customer_phone: string
+          id: string
+          issue_description: string | null
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          issue_description?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          issue_description?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
