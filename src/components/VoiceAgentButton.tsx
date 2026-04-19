@@ -75,13 +75,15 @@ const VoiceAgentInner = () => {
               .replace(/\s+/g, " ")
               .trim();
 
-          const queryNorm = normalize(modelQuery);
+          // Combine model + variant hint for variant detection (some agents pass them separately)
+          const queryNorm = normalize(modelQuery + " " + variantHint);
           // Detect variant qualifiers explicitly
-          const wantsProMax = /\bpro\s*max\b/.test(queryNorm);
+          const wantsProMax = /\bpro\s*max\b/.test(queryNorm) || /\bmax\b/.test(queryNorm);
           const wantsPro = /\bpro\b/.test(queryNorm) && !wantsProMax;
           const wantsPlus = /\bplus\b/.test(queryNorm);
           const wantsMini = /\bmini\b/.test(queryNorm);
           const wantsBase = !wantsPro && !wantsProMax && !wantsPlus && !wantsMini;
+          console.log("[get_price] queryNorm:", queryNorm, { wantsBase, wantsPro, wantsProMax, wantsPlus, wantsMini });
 
           const { data: models } = await supabase
             .from("iphone_models")
