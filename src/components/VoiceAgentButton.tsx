@@ -52,18 +52,75 @@ const VoiceAgentInner = () => {
             return "Missing model or repair_type. Ask the customer for both.";
           }
 
-          // Find best matching iPhone model (case-insensitive partial match)
+          // Normalize: lowercase, strip punctuation, collapse spaces, normalize Hebrew "פרו"->"pro" etc.
+          const normalize = (s: string) =>
+            s
+              .toLowerCase()
+              .replace(/[\u05D0-\u05EA]+/g, (m) => {
+                // Map common Hebrew tokens to English equivalents
+                const map: Record<string, string> = {
+                  "פרו": "pro",
+                  "מקס": "max",
+                  "פלוס": "plus",
+                  "מיני": "mini",
+                  "אייפון": "iphone",
+                  "סמסונג": "samsung",
+                  "גלקסי": "galaxy",
+                };
+                return map[m] || m;
+              })
+              .replace(/[^a-z0-9\u05D0-\u05EA\s]/g, " ")
+              .replace(/\s+/g, " ")
+              .trim();
+
+          const queryNorm = normalize(modelQuery);
+          // Detect variant qualifiers explicitly
+          const wantsProMax = /\bpro\s*max\b/.test(queryNorm);
+          const wantsPro = /\bpro\b/.test(queryNorm) && !wantsProMax;
+          const wantsPlus = /\bplus\b/.test(queryNorm);
+          const wantsMini = /\bmini\b/.test(queryNorm);
+          const wantsBase = !wantsPro && !wantsProMax && !wantsPlus && !wantsMini;
+
           const { data: models } = await supabase
             .from("iphone_models")
             .select("id, name")
             .eq("is_active", true);
-          const model = models?.find(
-            (m) =>
-              m.name.toLowerCase().includes(modelQuery.toLowerCase()) ||
-              modelQuery.toLowerCase().includes(m.name.toLowerCase())
-          );
-          if (!model) {
-            return `Model "${modelQuery}" not found. Available iPhones range from iPhone 8 to iPhone 17 Pro, plus Samsung Galaxy and Google Pixel models. Ask the customer to clarify the model.`;
+
+          const candidates = (models || []).map((m) => ({ ...m, norm: normalize(m.name) }));
+
+          // Match variant strictly
+          const isProMax = (n: string) => /\bpro\s*max\b/.test(n);
+          const isPro = (n: string) => /\bpro\b/.test(n) && !isProMax(n);
+          const isPlus = (n: string) => /\bplus\b/.test(n);
+          const isMini = (n: string) => /\bmini\b/.test(n);
+          const isBase = (n: string) => !isPro(n) && !isProMax(n) && !isPlus(n) && !isMini(n);
+
+          let filtered = candidates.filter((c) => {
+            if (wantsProMax) return isProMax(c.norm);
+            if (wantsPro) return isPro(c.norm);
+            if (wantsPlus) return isPlus(c.norm);
+            if (wantsMini) return isMini(c.norm);
+            return isBase(c.norm);
+          });
+
+          // Now pick the one whose tokens overlap most with query (e.g. "iphone 13")
+          const queryTokens = queryNorm.split(" ").filter(Boolean);
+          let best: typeof candidates[number] | undefined;
+          let bestScore = -1;
+          for (const c of filtered) {
+            const cTokens = c.norm.split(" ").filter(Boolean);
+            // require all query tokens (numbers + brand) to be present in candidate
+            const allPresent = queryTokens.every((t) => cTokens.includes(t));
+            if (!allPresent) continue;
+            const score = cTokens.length === queryTokens.length ? 1000 : queryTokens.length;
+            if (score > bestScore) {
+              bestScore = score;
+              best = c;
+            }
+          }
+
+          if (!best) {
+            return `Model "${modelQuery}" not found in the requested variant. Ask the customer to clarify exactly: base model, Pro, Pro Max, Plus, or Mini.`;
           }
 
           // Find best matching repair type
@@ -78,22 +135,21 @@ const VoiceAgentInner = () => {
               r.name.toLowerCase().includes(repairQuery.toLowerCase())
           );
           if (!repair) {
-            return `Repair type "${repairQuery}" not recognized. Available repairs: החלפת מסך תואם, החלפת מסך מקורי, החלפת סוללה מקורית, החלפת גב מקורי, תיקון טעינה.`;
+            return `Repair type "${repairQuery}" not recognized. Available: החלפת מסך תואם, החלפת מסך מקורי, החלפת סוללה מקורית, החלפת גב מקורי, תיקון טעינה.`;
           }
 
-          // Look up price
           const { data: priceRow } = await supabase
             .from("model_repair_prices")
             .select("price")
-            .eq("model_id", model.id)
+            .eq("model_id", best.id)
             .eq("repair_type_id", repair.id)
             .maybeSingle();
 
           if (!priceRow || priceRow.price === 0) {
-            return `Price for ${repair.name} on ${model.name} is not currently available. Ask the customer to leave their details and we will call back with a quote.`;
+            return `Price for ${repair.name} on ${best.name} is not currently available. Ask the customer to leave their details and we will call back with a quote.`;
           }
 
-          return `המחיר ל${repair.name} ב${model.name} הוא ${priceRow.price} שקלים, כולל הגעה עד הבית, התקנה ואחריות. Tell the customer the price clearly in Hebrew.`;
+          return `המחיר ל${repair.name} ב${best.name} הוא ${priceRow.price} שקלים, כולל הגעה עד הבית, התקנה ואחריות. Tell the customer the exact model name "${best.name}" and the price clearly in Hebrew.`;
         } catch (err) {
           console.error("get_price failed:", err);
           return "Failed to fetch price. Tell the customer we will check and call them back.";
