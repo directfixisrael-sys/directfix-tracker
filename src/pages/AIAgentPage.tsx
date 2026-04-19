@@ -204,15 +204,15 @@ const AgentInner = ({ settings }: { settings: AgentSettings }) => {
       if (!data?.conversationToken && !data?.signedUrl) {
         throw new Error(data?.error || "לא התקבלו פרטי חיבור");
       }
-      if (data.conversationToken) {
-        await conversation.startSession({
-          conversationToken: data.conversationToken,
-          connectionType: "webrtc",
-        });
-      } else {
+      if (data.signedUrl) {
         await conversation.startSession({
           signedUrl: data.signedUrl,
           connectionType: "websocket",
+        });
+      } else {
+        await conversation.startSession({
+          conversationToken: data.conversationToken,
+          connectionType: "webrtc",
         });
       }
     } catch (err) {
