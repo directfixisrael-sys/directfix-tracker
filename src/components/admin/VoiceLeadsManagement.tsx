@@ -29,6 +29,42 @@ const formatPhone = (phone: string) => {
 const VoiceLeadsManagement = () => {
   const [leads, setLeads] = useState<VoiceLead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [audioUrls, setAudioUrls] = useState<Record<string, string>>({});
+  const [loadingAudioId, setLoadingAudioId] = useState<string | null>(null);
+
+  const togglePlayer = async (leadId: string) => {
+    if (playingId === leadId) {
+      setPlayingId(null);
+      return;
+    }
+    const lead = leads.find((l) => l.id === leadId);
+    if (!lead?.conversation_id) return;
+
+    if (!audioUrls[leadId]) {
+      setLoadingAudioId(leadId);
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-conversation-audio?conversation_id=${lead.conversation_id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            },
+          }
+        );
+        if (!res.ok) throw new Error("Failed to load audio");
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        setAudioUrls((prev) => ({ ...prev, [leadId]: url }));
+      } catch (err) {
+        toast.error("שגיאה בטעינת ההקלטה");
+        setLoadingAudioId(null);
+        return;
+      }
+      setLoadingAudioId(null);
+    }
+    setPlayingId(leadId);
+  };
 
   const fetchLeads = async () => {
     const { data, error } = await supabase
@@ -172,16 +208,11 @@ const VoiceLeadsManagement = () => {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() =>
-                      window.open(
-                        `https://elevenlabs.io/app/conversational-ai/history/${lead.conversation_id}`,
-                        "_blank"
-                      )
-                    }
+                    onClick={() => togglePlayer(lead.id)}
                     className="gap-1"
                   >
                     <PlayCircle className="w-4 h-4" />
-                    האזן להקלטה
+                    {playingId === lead.id ? "סגור הקלטה" : "האזן להקלטה"}
                   </Button>
                 )}
                 {lead.status === "new" && (
@@ -205,6 +236,20 @@ const VoiceLeadsManagement = () => {
                   מחק
                 </Button>
               </div>
+
+              {playingId === lead.id && audioUrls[lead.id] && (
+                <div className="mt-3 pt-3 border-t border-border">
+                  <audio
+                    controls
+                    autoPlay
+                    src={audioUrls[lead.id]}
+                    className="w-full"
+                  />
+                </div>
+              )}
+              {loadingAudioId === lead.id && (
+                <p className="mt-3 text-sm text-muted-foreground text-center">טוען הקלטה...</p>
+              )}
             </Card>
           ))}
         </div>
