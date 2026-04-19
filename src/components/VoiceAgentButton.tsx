@@ -44,6 +44,61 @@ const VoiceAgentInner = () => {
           return "Failed to save contact. Please ask the customer to try again.";
         }
       },
+      get_price: async (params: { model: string; repair_type: string }) => {
+        try {
+          const modelQuery = (params.model || "").trim();
+          const repairQuery = (params.repair_type || "").trim();
+          if (!modelQuery || !repairQuery) {
+            return "Missing model or repair_type. Ask the customer for both.";
+          }
+
+          // Find best matching iPhone model (case-insensitive partial match)
+          const { data: models } = await supabase
+            .from("iphone_models")
+            .select("id, name")
+            .eq("is_active", true);
+          const model = models?.find(
+            (m) =>
+              m.name.toLowerCase().includes(modelQuery.toLowerCase()) ||
+              modelQuery.toLowerCase().includes(m.name.toLowerCase())
+          );
+          if (!model) {
+            return `Model "${modelQuery}" not found. Available iPhones range from iPhone 8 to iPhone 17 Pro, plus Samsung Galaxy and Google Pixel models. Ask the customer to clarify the model.`;
+          }
+
+          // Find best matching repair type
+          const { data: repairs } = await supabase
+            .from("repair_types")
+            .select("id, name")
+            .eq("is_active", true);
+          const repair = repairs?.find(
+            (r) =>
+              r.name.includes(repairQuery) ||
+              repairQuery.includes(r.name) ||
+              r.name.toLowerCase().includes(repairQuery.toLowerCase())
+          );
+          if (!repair) {
+            return `Repair type "${repairQuery}" not recognized. Available repairs: החלפת מסך תואם, החלפת מסך מקורי, החלפת סוללה מקורית, החלפת גב מקורי, תיקון טעינה.`;
+          }
+
+          // Look up price
+          const { data: priceRow } = await supabase
+            .from("model_repair_prices")
+            .select("price")
+            .eq("model_id", model.id)
+            .eq("repair_type_id", repair.id)
+            .maybeSingle();
+
+          if (!priceRow || priceRow.price === 0) {
+            return `Price for ${repair.name} on ${model.name} is not currently available. Ask the customer to leave their details and we will call back with a quote.`;
+          }
+
+          return `המחיר ל${repair.name} ב${model.name} הוא ${priceRow.price} שקלים, כולל הגעה עד הבית, התקנה ואחריות. Tell the customer the price clearly in Hebrew.`;
+        } catch (err) {
+          console.error("get_price failed:", err);
+          return "Failed to fetch price. Tell the customer we will check and call them back.";
+        }
+      },
     },
   });
 
