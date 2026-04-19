@@ -132,19 +132,38 @@ const VoiceAgentInner = () => {
             return `Model "${modelQuery}" not found in the requested variant. Ask the customer to clarify exactly: base model, Pro, Pro Max, Plus, or Mini.`;
           }
 
-          // Find best matching repair type
+          // Find best matching repair type with exact normalized matching first
           const { data: repairs } = await supabase
             .from("repair_types")
             .select("id, name")
             .eq("is_active", true);
-          const repair = repairs?.find(
-            (r) =>
-              r.name.includes(repairQuery) ||
-              repairQuery.includes(r.name) ||
-              r.name.toLowerCase().includes(repairQuery.toLowerCase())
-          );
+
+          const normalizeRepair = (s: string) =>
+            normalize(s)
+              .replace(/מסך תואם/g, "screen compatible")
+              .replace(/מסך מקורי/g, "screen original")
+              .replace(/סוללה מקורית/g, "battery original")
+              .replace(/גב מקורי/g, "back original")
+              .replace(/תיקון טעינה/g, "charging")
+              .replace(/החלפת/g, "")
+              .replace(/תיקון/g, "")
+              .replace(/\s+/g, " ")
+              .trim();
+
+          const repairQueryNorm = normalizeRepair(repairQuery);
+          const repairCandidates = (repairs || []).map((r) => ({ ...r, norm: normalizeRepair(r.name) }));
+          const repair =
+            repairCandidates.find((r) => r.norm === repairQueryNorm) ||
+            repairCandidates.find((r) => r.norm.includes(repairQueryNorm) || repairQueryNorm.includes(r.norm));
+
+          console.log("[get_price] repair match:", {
+            requested: repairQuery,
+            normalized: repairQueryNorm,
+            matched: repair?.name,
+          });
+
           if (!repair) {
-            return `Repair type "${repairQuery}" not recognized. Available: החלפת מסך תואם, החלפת מסך מקורי, החלפת סוללה מקורית, החלפת גב מקורי, תיקון טעינה.`;
+            return `סוג התיקון "${repairQuery}" לא זוהה. בקש מהלקוח לבחור במדויק: החלפת מסך תואם, החלפת מסך מקורי, החלפת סוללה מקורית, החלפת גב מקורי, תיקון טעינה.`;
           }
 
           const { data: priceRow } = await supabase
@@ -154,11 +173,17 @@ const VoiceAgentInner = () => {
             .eq("repair_type_id", repair.id)
             .maybeSingle();
 
+          console.log("[get_price] final price:", {
+            model: best.name,
+            repair: repair.name,
+            price: priceRow?.price ?? null,
+          });
+
           if (!priceRow || priceRow.price === 0) {
-            return `Price for ${repair.name} on ${best.name} is not currently available. Ask the customer to leave their details and we will call back with a quote.`;
+            return `אין כרגע מחיר זמין עבור ${repair.name} ב-${best.name}. קח פרטים ונחזור עם הצעת מחיר.`;
           }
 
-          return `המחיר ל${repair.name} ב${best.name} הוא ${priceRow.price} שקלים, כולל הגעה עד הבית, התקנה ואחריות. Tell the customer the exact model name "${best.name}" and the price clearly in Hebrew.`;
+          return `הצעת מחיר רשמית: עבור ${best.name}, ${repair.name} עולה ${priceRow.price} ש"ח. אסור לשנות, לעגל או לנחש מחיר אחר.`;
         } catch (err) {
           console.error("get_price failed:", err);
           return "Failed to fetch price. Tell the customer we will check and call them back.";
