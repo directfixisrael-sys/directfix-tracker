@@ -258,21 +258,29 @@ const VoiceAgentInner = ({ settings }: { settings: AgentSettings }) => {
 
   return (
     <>
-      {/* Small floating button */}
+      {/* Floating green phone button with Gemini-style AI sparkle */}
       <button
         onClick={() => setOpen(true)}
-        aria-label="נציג AI"
+        aria-label="שיחה עם נציג AI"
         className={cn(
-          "fixed bottom-24 left-4 z-40",
-          "flex items-center gap-1.5 px-3 py-2 rounded-full",
-          "bg-background/90 backdrop-blur border border-primary/30",
-          "text-foreground shadow-md hover:shadow-lg",
-          "hover:bg-primary/5 hover:scale-105 transition-all duration-300"
+          "fixed bottom-24 left-4 z-40 group",
+          "w-14 h-14 rounded-full",
+          "bg-gradient-to-br from-emerald-400 to-green-600",
+          "flex items-center justify-center",
+          "shadow-lg shadow-green-500/40 hover:shadow-xl hover:shadow-green-500/60",
+          "hover:scale-110 active:scale-95 transition-all duration-300"
         )}
-        style={{ paddingBottom: "calc(0.5rem + env(safe-area-inset-bottom, 0px) / 2)" }}
+        style={{ marginBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
-        <Bot className="w-4 h-4 text-primary" />
-        <span className="text-xs font-semibold whitespace-nowrap">נציג AI</span>
+        <span className="absolute inset-0 rounded-full bg-green-400/40 animate-ping" />
+        <Phone className="w-6 h-6 text-white fill-white relative z-10" />
+        {/* Gemini-style sparkle badge */}
+        <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center shadow-md ring-2 ring-background z-20">
+          <Sparkles className="w-3 h-3 text-white" strokeWidth={2.5} />
+        </span>
+        <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-bold text-foreground bg-background/90 backdrop-blur px-1.5 py-0.5 rounded-full shadow-sm">
+          AI
+        </span>
       </button>
 
       <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
