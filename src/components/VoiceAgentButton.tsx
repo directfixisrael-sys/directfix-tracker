@@ -44,10 +44,12 @@ const VoiceAgentInner = () => {
           return "Failed to save contact. Please ask the customer to try again.";
         }
       },
-      get_price: async (params: { model: string; repair_type: string }) => {
+      get_price: async (params: { model: string; repair_type: string; variant?: string }) => {
         try {
           const modelQuery = (params.model || "").trim();
           const repairQuery = (params.repair_type || "").trim();
+          const variantHint = (params.variant || "").trim();
+          console.log("[get_price] params received:", JSON.stringify(params));
           if (!modelQuery || !repairQuery) {
             return "Missing model or repair_type. Ask the customer for both.";
           }
