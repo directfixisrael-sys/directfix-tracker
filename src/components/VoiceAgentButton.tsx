@@ -234,3 +234,10 @@ const VoiceAgentInner = () => {
     </>
   );
 };
+
+export const VoiceAgentButton = () => (
+  <ConversationProvider>
+    <VoiceAgentInner />
+  </ConversationProvider>
+);
+
