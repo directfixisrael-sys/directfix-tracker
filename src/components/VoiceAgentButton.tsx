@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { useConversation } from "@elevenlabs/react";
+import { ConversationProvider, useConversation } from "@elevenlabs/react";
 import { Mic, MicOff, Phone, PhoneOff, Volume2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-export const VoiceAgentButton = () => {
+const VoiceAgentInner = () => {
   const [open, setOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [volumeLevel, setVolumeLevel] = useState(0);
@@ -234,3 +234,10 @@ export const VoiceAgentButton = () => {
     </>
   );
 };
+
+export const VoiceAgentButton = () => (
+  <ConversationProvider>
+    <VoiceAgentInner />
+  </ConversationProvider>
+);
+
