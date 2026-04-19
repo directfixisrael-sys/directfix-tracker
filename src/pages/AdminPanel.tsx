@@ -1937,7 +1937,7 @@ const AdminPanel = () => {
               <button 
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
-                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'ipad_prices', 'bundles', 'settings', 'announcements', 'coupons', 'leads'].includes(activeTab)
+                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'ipad_prices', 'bundles', 'settings', 'announcements', 'coupons', 'leads', 'voice_leads', 'voice_agent'].includes(activeTab)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground"
                 )}
@@ -1950,6 +1950,14 @@ const AdminPanel = () => {
               <DropdownMenuItem onClick={() => setActiveTab('leads')} className={cn("gap-3 py-3", activeTab === 'leads' && "text-primary font-medium")}>
                 <Users className="w-4 h-4" />
                 <span>לידים</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('voice_leads')} className={cn("gap-3 py-3", activeTab === 'voice_leads' && "text-primary font-medium")}>
+                <Phone className="w-4 h-4" />
+                <span>לידים מ-AI</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('voice_agent')} className={cn("gap-3 py-3", activeTab === 'voice_agent' && "text-primary font-medium")}>
+                <Bot className="w-4 h-4" />
+                <span>נציג AI</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('live')} className={cn("gap-3 py-3", activeTab === 'live' && "text-success font-medium")}>
                 <Eye className="w-4 h-4" />
