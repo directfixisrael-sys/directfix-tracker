@@ -28,6 +28,7 @@ import MinimalFooter from "./components/MinimalFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { VisitorTracker } from "./components/VisitorTracker";
 import AnnouncementBanner from "./components/AnnouncementBanner";
+import { VoiceAgentButton } from "./components/VoiceAgentButton";
 
 import { captureLeadSource } from "./lib/leadSource";
 
@@ -75,6 +76,7 @@ const App = () => (
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <MinimalFooter />
+                <VoiceAgentButton />
               </>
             } />
           </Routes>
