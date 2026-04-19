@@ -58,16 +58,8 @@ const VoiceAgentInner = () => {
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
-      const { data, error } = await supabase.functions.invoke(
-        "elevenlabs-conversation-token"
-      );
-
-      if (error || !data?.token) {
-        throw new Error(error?.message || "לא התקבל טוקן");
-      }
-
       await conversation.startSession({
-        conversationToken: data.token,
+        agentId: "agent_3601kpjrdzanemzr9h71qsjc6bqk",
         connectionType: "webrtc",
       });
     } catch (err) {
