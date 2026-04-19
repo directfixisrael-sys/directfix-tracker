@@ -58,14 +58,13 @@ const VoiceAgentInner = ({ settings }: { settings: AgentSettings }) => {
     overrides: onVacation
       ? {
           agent: {
-            firstMessage: settings.vacation_message,
             prompt: {
-              prompt: `אתה דני, נציג וירטואלי של DirectFix. החנות נמצאת כעת בחופשה (עד ${settings.vacation_end}). 
-תפקידך הוא:
-1. להודיע ללקוח בנימוס שאנחנו בחופשה.
-2. לקחת את פרטיו: שם מלא, מספר טלפון, ותיאור התקלה.
-3. לקרוא לכלי save_contact עם הפרטים שאספת.
-4. להודיע שנחזור אליו מיד עם החזרה מהחופשה.
+              prompt: `אתה דני, נציג וירטואלי של DirectFix. החנות נמצאת כעת בחופשה (עד ${settings.vacation_end}).
+פתח את השיחה מיד במשפט הבא בדיוק: "${settings.vacation_message}"
+לאחר מכן תפקידך הוא:
+1. לקחת את פרטי הלקוח: שם מלא, מספר טלפון, ותיאור התקלה.
+2. לקרוא לכלי save_contact עם הפרטים שאספת.
+3. להודיע שנחזור אליו מיד עם החזרה מהחופשה.
 אל תנסה לתת מחירים או לבצע פעולות אחרות. אל תקרא לכלי get_price.`,
             },
           },
