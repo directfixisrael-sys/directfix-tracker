@@ -629,10 +629,10 @@ const NewRepairOrder = () => {
     const leadMinutes = selectedModel?.min_lead_hours ? selectedModel.min_lead_hours * 60 : 40;
     const minArrivalTime = new Date(now.getTime() + leadMinutes * 60 * 1000);
 
-    // Slot is available if the technician can still arrive BEFORE the slot ends.
-    // (Even if the slot has already started, as long as there's time left within
-    // the window to perform the repair, customers should be able to book it.)
-    if (slotEndDate <= minArrivalTime) return false;
+    // Minimum buffer required INSIDE the slot after arrival, to actually perform
+    // the repair (60 min). Prevents booking a 9-11 slot at 10:30 with no time left.
+    const MIN_REPAIR_WINDOW_MS = 60 * 60 * 1000;
+    if (slotEndDate.getTime() - minArrivalTime.getTime() < MIN_REPAIR_WINDOW_MS) return false;
 
     // Check hourly blocks for this date
     const dateStr = date.toISOString().split('T')[0];
