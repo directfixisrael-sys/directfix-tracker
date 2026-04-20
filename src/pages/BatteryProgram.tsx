@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import heroImg from '@/assets/battery-hero.jpg';
 import productImg from '@/assets/battery-product.jpg';
 import serviceImg from '@/assets/battery-service.jpg';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 interface ModelPrice {
   name: string;
@@ -88,6 +90,7 @@ const BatteryProgram = () => {
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">
+      <SEO {...seo.battery} />
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">

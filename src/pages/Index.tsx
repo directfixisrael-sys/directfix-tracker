@@ -14,6 +14,8 @@ import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
 import VideoPlayer from '@/components/VideoPlayer';
 import TechnicianRecruitment from '@/components/TechnicianRecruitment';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col" lang={i18n.language}>
+      <SEO {...seo.home} />
       {/* Skip to content */}
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-lg">
         {t('common.skipToContent')}

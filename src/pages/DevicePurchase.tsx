@@ -24,6 +24,8 @@ import iphone17ProMaxSilver from '@/assets/iphone-17-pro-max-silver.png';
 import iphone17ProImg from '@/assets/iphone-17-pro.png';
 import iphone17Img from '@/assets/iphone-17.png';
 import iphone17AirImg from '@/assets/iphone-17-air.png';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 // ─── Data ──────────────────────────────────────────────
 
@@ -342,6 +344,7 @@ const DevicePurchase = () => {
 
   return (
     <div className="min-h-screen bg-background" ref={contentRef}>
+      <SEO {...seo.devices} />
       <Header showBackButton onBack={() => step === 'hero' ? navigate('/') : goToStep(steps[currentStepIndex - 1])} />
 
       {/* Progress bar + scrolling marquee */}

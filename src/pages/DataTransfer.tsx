@@ -12,6 +12,8 @@ import Logo from '@/components/Logo';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import CustomerZone from '@/components/CustomerZone';
 import { getLeadSource } from '@/lib/leadSource';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 // Schedule configuration - next day only
 const weekdaySlots = ['9:00-11:00', '11:00-13:00', '13:00-17:00', '17:00-20:00', '20:00-22:00'];
@@ -221,6 +223,7 @@ const DataTransfer = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col" lang="he">
+      <SEO {...seo.dataTransfer} />
       {/* Header */}
       <header className="sticky top-0 bg-background/80 backdrop-blur-xl border-b border-border/40 z-10">
         <nav className="flex items-center justify-between p-3 max-w-5xl mx-auto">

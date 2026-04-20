@@ -9,6 +9,8 @@ import { storeProducts, storeCategories } from '@/store/storeData';
 import heroBanner from '@/assets/store-hero-banner.jpg';
 import iphonesBanner from '@/assets/store-iphones-banner.jpg';
 import accessoriesBanner from '@/assets/store-accessories-banner.jpg';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 const StorePage = () => {
   const navigate = useNavigate();
@@ -36,6 +38,7 @@ const StorePage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO {...seo.store} />
       <StoreHeader customerName={auth.name} points={auth.points} onLogout={handleLogout} />
 
       {/* Hero */}

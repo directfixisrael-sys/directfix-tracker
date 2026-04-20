@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 const Unsubscribe = () => {
   const [searchParams] = useSearchParams();
@@ -28,6 +30,7 @@ const Unsubscribe = () => {
   if (!phone || !token) {
     return (
       <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center p-4" dir="rtl">
+        <SEO {...seo.unsubscribe} />
         <div className="bg-[#1a1a2e] rounded-2xl p-12 max-w-[420px] text-center border border-[#2a2a3e] shadow-2xl">
           <h1 className="text-[#d4af37] text-2xl font-bold mb-4">שגיאה</h1>
           <p className="text-[#e0e0e0] text-lg leading-relaxed">קישור לא תקין</p>
