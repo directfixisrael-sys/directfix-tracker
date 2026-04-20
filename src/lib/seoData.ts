@@ -30,18 +30,31 @@ export const seo = {
     keywords:
       "תיקון אייפון, תיקון אייפון עד הבית, החלפת מסך אייפון, החלפת סוללה אייפון, תיקון iPhone, טכנאי אייפון, תיקון אייפון תל אביב, תיקון אייפון רמת גן, דיירקט פיקס",
     url: url("/"),
-    jsonLd: {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      name: SITE.name,
-      url: SITE.origin,
-      inLanguage: "he-IL",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: `${SITE.origin}/order?q={search_term_string}`,
-        "query-input": "required name=search_term_string",
+    jsonLd: [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: SITE.name,
+        url: SITE.origin,
+        inLanguage: "he-IL",
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${SITE.origin}/order?q={search_term_string}`,
+          "query-input": "required name=search_term_string",
+        },
       },
-    },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: [
+          { "@type": "Question", name: "כמה עולה החלפת מסך אייפון?", acceptedAnswer: { "@type": "Answer", text: "מחירי החלפת מסך אייפון נעים בין ₪399 לדגמים ישנים ועד ₪1,890 לדגמי Pro Max החדשים. המחיר המדויק מוצג בעמוד ההזמנה לפי הדגם שלכם." } },
+          { "@type": "Question", name: "כמה זמן לוקח התיקון?", acceptedAnswer: { "@type": "Answer", text: "רוב התיקונים מתבצעים במקום תוך 20-40 דקות. הטכנאי מגיע אליכם הביתה או למשרד עם כל הציוד הנדרש." } },
+          { "@type": "Question", name: "באילו אזורים אתם נותנים שירות?", acceptedAnswer: { "@type": "Answer", text: "אנחנו נותנים שירות בכל מרכז הארץ וגוש דן - מנתניה ועד מודיעין. כולל תל אביב, רמת גן, גבעתיים, הרצליה, רעננה, פתח תקווה, ראשון לציון, חולון ועוד." } },
+          { "@type": "Question", name: "איזו אחריות אתם נותנים?", acceptedAnswer: { "@type": "Answer", text: "אחריות מלאה על כל תיקון: 12 חודשים על סוללה, 6 חודשים על שקע טעינה, ו-3 חודשים על מסך (לא כולל נזק שבירה)." } },
+          { "@type": "Question", name: "האם החלקים מקוריים?", acceptedAnswer: { "@type": "Answer", text: "אנחנו מציעים מסך מקורי או תואם איכותי לבחירתכם. הסוללות שלנו מקוריות בלבד עם אחריות 12 חודשים." } },
+        ],
+      },
+    ],
   },
   order: {
     title: "הזמנת תיקון אייפון אונליין | מחירים שקופים - DirectFix",

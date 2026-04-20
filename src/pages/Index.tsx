@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone, Play, Tablet, PhoneCall, ArrowLeftRight, ChevronDown } from 'lucide-react';
+import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone, Play, Tablet, PhoneCall, ArrowLeftRight, ChevronDown, HelpCircle } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Logo from '@/components/Logo';
 import CustomerZone from '@/components/CustomerZone';
 import LanguageToggle from '@/components/LanguageToggle';
@@ -216,6 +218,51 @@ const Index = () => {
                 <img src={easyLogo} alt="Easy" className="h-5 w-5 rounded-full object-cover" />
                 <span className="text-base font-extrabold">9.94</span>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section - Cream */}
+        <section className="section-cream border-b-2 border-foreground/10">
+          <div className="max-w-2xl mx-auto px-6 py-10">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-extrabold mb-2">
+                <span className="text-foreground">שאלות נפוצות</span>
+              </h2>
+              <p className="text-muted-foreground text-base">כל מה שרציתם לדעת על תיקון אייפון בבית</p>
+            </div>
+
+            <Accordion type="single" collapsible className="space-y-2.5 animate-fade-in" style={{ animationDelay: '200ms' }}>
+              {[
+                { q: "כמה עולה החלפת מסך אייפון?", a: "מחירי החלפת מסך נעים בין ₪399 לדגמים ישנים ועד ₪1,890 ל-Pro Max החדשים. המחיר המדויק מוצג בעמוד ההזמנה לפי הדגם שלכם." },
+                { q: "כמה זמן לוקח התיקון?", a: "רוב התיקונים מתבצעים במקום תוך 20-40 דקות. הטכנאי מגיע אליכם הביתה או למשרד עם כל הציוד הנדרש." },
+                { q: "באילו אזורים אתם נותנים שירות?", a: "אנחנו פועלים בכל מרכז הארץ וגוש דן - מנתניה ועד מודיעין. כולל תל אביב, רמת גן, גבעתיים, הרצליה, רעננה, פתח תקווה, ראשון לציון, חולון ועוד." },
+                { q: "איזו אחריות אתם נותנים?", a: "אחריות מלאה על כל תיקון: 12 חודשים על סוללה, 6 חודשים על שקע טעינה, ו-3 חודשים על מסך (לא כולל נזק שבירה)." },
+                { q: "האם החלקים מקוריים?", a: "אנחנו מציעים מסך מקורי או תואם איכותי לבחירתכם. הסוללות שלנו מקוריות בלבד עם אחריות 12 חודשים." },
+              ].map((faq, i) => (
+                <AccordionItem
+                  key={i}
+                  value={`faq-${i}`}
+                  className="strategly-card px-4 border-2 border-foreground/10"
+                >
+                  <AccordionTrigger className="text-right text-base font-bold hover:no-underline py-4">
+                    {faq.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed pb-4 text-right">
+                    {faq.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+
+            <div className="text-center mt-5">
+              <Link
+                to="/faq"
+                className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
+              >
+                <HelpCircle className="w-4 h-4" />
+                <span>לכל השאלות הנפוצות</span>
+              </Link>
             </div>
           </div>
         </section>
