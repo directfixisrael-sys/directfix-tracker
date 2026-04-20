@@ -997,6 +997,57 @@ const AdminPanel = () => {
               </ul>
             </div>
             
+            {/* Clear Cache */}
+            <div className="glass-card p-4 md:p-6 rounded-xl">
+              <h3 className="font-bold text-foreground mb-2 text-lg">ניקוי Cache</h3>
+              <p className="text-muted-foreground text-sm mb-4">
+                מנקה את כל ה-Cache של הדפדפן ומבטל רישום של Service Worker. שימושי כדי לוודא שלקוחות רואים את הגרסה החדשה ביותר של המערכת.
+              </p>
+              <Button
+                variant="outline"
+                className="w-full gap-2"
+                onClick={async () => {
+                  try {
+                    // 1. Delete all caches
+                    if ('caches' in window) {
+                      const cacheNames = await caches.keys();
+                      await Promise.all(cacheNames.map((name) => caches.delete(name)));
+                    }
+
+                    // 2. Unregister all service workers
+                    if ('serviceWorker' in navigator) {
+                      const registrations = await navigator.serviceWorker.getRegistrations();
+                      await Promise.all(registrations.map((r) => r.unregister()));
+                    }
+
+                    // 3. Clear localStorage (preserve admin auth)
+                    const adminAuth = sessionStorage.getItem('admin-authenticated');
+                    localStorage.clear();
+                    if (adminAuth) sessionStorage.setItem('admin-authenticated', adminAuth);
+
+                    toast({
+                      title: 'Cache נוקה בהצלחה',
+                      description: 'הדף ייטען מחדש כעת...',
+                    });
+
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 1200);
+                  } catch (err) {
+                    console.error('Clear cache error:', err);
+                    toast({
+                      title: 'שגיאה בניקוי Cache',
+                      description: 'אנא נסה שוב או רענן את הדף ידנית',
+                      variant: 'destructive',
+                    });
+                  }
+                }}
+              >
+                <RefreshCw className="w-4 h-4" />
+                נקה Cache ורענן
+              </Button>
+            </div>
+
             {/* Logout */}
             <Button 
               variant="outline" 
