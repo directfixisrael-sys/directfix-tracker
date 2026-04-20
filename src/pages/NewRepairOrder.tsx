@@ -619,14 +619,20 @@ const NewRepairOrder = () => {
     const slotEndHour = parseInt(slotEnd.split(':')[0]);
     const slotEndMin = parseInt(slotEnd.split(':')[1] || '0');
 
-    // Create date with slot start time
-    const slotDate = new Date(date);
-    slotDate.setHours(slotStartHour, slotStartMin, 0, 0);
+    // Create date with slot start and end times
+    const slotStartDate = new Date(date);
+    slotStartDate.setHours(slotStartHour, slotStartMin, 0, 0);
+    const slotEndDate = new Date(date);
+    slotEndDate.setHours(slotEndHour, slotEndMin, 0, 0);
 
     // Use model-specific lead time or default 40 minutes
     const leadMinutes = selectedModel?.min_lead_hours ? selectedModel.min_lead_hours * 60 : 40;
-    const minTimeFromNow = new Date(now.getTime() + leadMinutes * 60 * 1000);
-    if (slotDate <= minTimeFromNow) return false;
+    const minArrivalTime = new Date(now.getTime() + leadMinutes * 60 * 1000);
+
+    // Slot is available if the technician can still arrive BEFORE the slot ends.
+    // (Even if the slot has already started, as long as there's time left within
+    // the window to perform the repair, customers should be able to book it.)
+    if (slotEndDate <= minArrivalTime) return false;
 
     // Check hourly blocks for this date
     const dateStr = date.toISOString().split('T')[0];
