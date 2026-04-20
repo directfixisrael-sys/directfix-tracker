@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone, Play, Tablet, PhoneCall, ArrowLeftRight, ChevronDown, HelpCircle } from 'lucide-react';
+import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone, Play, Tablet, PhoneCall, ArrowLeftRight, ChevronDown, HelpCircle, Bot } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -119,6 +119,14 @@ const Index = () => {
                     onClick={() => navigate('/data-transfer')}>
                     <ArrowLeftRight className="w-4 h-4" />
                     <span>{t('home.dataTransfer')}</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
+                    onClick={() => navigate('/ai-agent')}>
+                    <Bot className="w-4 h-4" />
+                    <span>{t('home.aiAgent')}</span>
                   </Button>
                 </CollapsibleContent>
               </Collapsible>
