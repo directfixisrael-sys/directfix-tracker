@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone, Play, Tablet, PhoneCall, ArrowLeftRight, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import Logo from '@/components/Logo';
 import CustomerZone from '@/components/CustomerZone';
+import LanguageToggle from '@/components/LanguageToggle';
 import paymentBit from '@/assets/payment-bit.png';
 import paymentPaybox from '@/assets/payment-paybox.png';
 import paymentVisa from '@/assets/payment-visa.png';
@@ -15,6 +17,7 @@ import TechnicianRecruitment from '@/components/TechnicianRecruitment';
 
 const Index = () => {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background flex flex-col" lang="he">
