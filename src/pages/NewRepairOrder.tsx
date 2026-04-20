@@ -30,6 +30,8 @@ import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { getLeadSource } from '@/lib/leadSource';
 import GiftOrderToggle from '@/components/GiftOrderToggle';
 import LoyaltyPointsDisplay, { getCustomerPoints, calculatePointsFromPrice, calculateDiscountFromPoints } from '@/components/LoyaltyPointsDisplay';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 import PointsEarnedAnimation from '@/components/PointsEarnedAnimation';
 
 // iPhone back glass colors per model family
@@ -1289,6 +1291,7 @@ const NewRepairOrder = () => {
     return <OrderPageSkeleton />;
   }
   return <>
+    <SEO {...seo.order} />
     {/* Quick Intro Card - Rendered at top level via fragment */}
     {showIntroCard && !showPrivacyConsent && (
       <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }} onClick={(e) => { if (e.target === e.currentTarget && introName.trim() && introPhone.trim()) handleIntroDismiss(); }}>

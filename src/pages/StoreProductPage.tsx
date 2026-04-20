@@ -9,6 +9,8 @@ import ProductCard from '@/components/store/ProductCard';
 import { storeProducts } from '@/store/storeData';
 import { useCartStore } from '@/store/cartStore';
 import { toast } from 'sonner';
+import SEO from "@/components/SEO";
+import { SITE } from "@/lib/seoData";
 
 const StoreProductPage = () => {
   const { id } = useParams();
@@ -58,6 +60,26 @@ const StoreProductPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={`${product.name} | חנות DirectFix`}
+        description={`${product.name} - ${product.description || 'הזמינו עכשיו בחנות DirectFix'}. ${product.price ? `מחיר: ₪${product.price}` : ''}`}
+        image={product.image}
+        url={`${SITE.origin}/store/product/${product.id}`}
+        type="product"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          description: product.description,
+          image: product.image,
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "ILS",
+            price: String(product.price ?? 0),
+            availability: "https://schema.org/InStock",
+          },
+        }}
+      />
       <StoreHeader customerName={auth.name} points={auth.points} onLogout={handleLogout} />
 
       <div className="max-w-7xl mx-auto px-4 py-8" dir="rtl">

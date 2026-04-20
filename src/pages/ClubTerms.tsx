@@ -2,12 +2,15 @@ import { ArrowRight, Award, Shield, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 const ClubTerms = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">
+      <SEO {...seo.clubTerms} />
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>

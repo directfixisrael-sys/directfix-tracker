@@ -7,6 +7,8 @@ import { Separator } from '@/components/ui/separator';
 import StoreHeader from '@/components/store/StoreHeader';
 import StoreLogin from '@/components/store/StoreLogin';
 import { useCartStore } from '@/store/cartStore';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 const StoreCartPage = () => {
   const navigate = useNavigate();
@@ -35,6 +37,7 @@ const StoreCartPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO {...seo.storeCart} />
       <StoreHeader customerName={auth.name} points={auth.points} onLogout={handleLogout} />
 
       <div className="max-w-4xl mx-auto px-4 py-8" dir="rtl">

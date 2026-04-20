@@ -18,6 +18,8 @@ import testimonial4 from '@/assets/testimonial-4.jpg';
 import testimonial5 from '@/assets/testimonial-5.jpg';
 import testimonial6 from '@/assets/testimonial-6.jpg';
 import testimonial7 from '@/assets/testimonial-7.jpg';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 const customerPhotos = [
   testimonial1, testimonial2, testimonial3, testimonial4,
@@ -253,6 +255,7 @@ const ConsultationBooking = () => {
     const orderNum = completedOrderNumber || returnedOrderNumber;
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-6" dir="rtl">
+        <SEO {...seo.consultation} />
         <div className="text-center max-w-sm animate-scale-in">
           <div className="text-6xl mb-4">{isPaid && paymentSuccess ? '!' : '✓'}</div>
           <h1 className="text-2xl font-extrabold mb-2">

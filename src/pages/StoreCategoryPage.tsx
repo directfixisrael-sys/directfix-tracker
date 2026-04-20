@@ -6,6 +6,8 @@ import StoreHeader from '@/components/store/StoreHeader';
 import StoreLogin from '@/components/store/StoreLogin';
 import ProductCard from '@/components/store/ProductCard';
 import { storeProducts, storeCategories } from '@/store/storeData';
+import SEO from "@/components/SEO";
+import { SITE } from "@/lib/seoData";
 
 const StoreCategoryPage = () => {
   const { slug } = useParams();
@@ -35,6 +37,11 @@ const StoreCategoryPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={`${category?.name || 'קטגוריה'} | חנות DirectFix`}
+        description={`קטגוריית ${category?.name || ''} בחנות DirectFix - מוצרים נבחרים עם משלוח עד הבית.`}
+        url={`${SITE.origin}/store/category/${slug}`}
+      />
       <StoreHeader customerName={auth.name} points={auth.points} onLogout={handleLogout} />
 
       <div className="max-w-7xl mx-auto px-4 py-8" dir="rtl">

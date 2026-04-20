@@ -10,6 +10,8 @@ import StoreHeader from '@/components/store/StoreHeader';
 import StoreLogin from '@/components/store/StoreLogin';
 import { useCartStore } from '@/store/cartStore';
 import { toast } from 'sonner';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 const StoreCheckoutPage = () => {
   const navigate = useNavigate();
@@ -57,6 +59,7 @@ const StoreCheckoutPage = () => {
   if (orderPlaced) {
     return (
       <div className="min-h-screen bg-background">
+        <SEO {...seo.storeCheckout} />
         <StoreHeader customerName={auth.name} points={auth.points} onLogout={handleLogout} />
         <div className="max-w-md mx-auto px-4 py-20 text-center space-y-6" dir="rtl">
           <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">

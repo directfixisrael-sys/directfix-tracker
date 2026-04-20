@@ -21,6 +21,8 @@ import Logo from '@/components/Logo';
 import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RepairOrder } from '@/types/repair';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 const CustomerTracker = () => {
   const [searchParams] = useSearchParams();
@@ -195,6 +197,7 @@ const CustomerTracker = () => {
   if (!currentOrder) {
     return (
       <div className="min-h-screen bg-background" lang="he">
+        <SEO {...seo.track} />
         <Header showBackButton={showHistory} onBack={() => { setShowHistory(false); setPhoneOrders([]); }} />
         <main className="container py-8 px-4" role="main" aria-label="מעקב הזמנות - חיפוש">
           {showHistory && phoneOrders.length > 0 ? (

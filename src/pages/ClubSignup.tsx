@@ -9,6 +9,8 @@ import Logo from '@/components/Logo';
 import clubCardImg from '@/assets/club-card.png';
 import { Crown, Gift, Star, Sparkles, Phone, User, Cake, ChevronLeft, Shield, CheckCircle2, PartyPopper, Sun, Moon } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 const BENEFITS = [
   { icon: Gift, title: '50 נקודות במתנה', desc: 'מיד עם ההרשמה', highlight: true },
@@ -90,6 +92,7 @@ const ClubSignup = () => {
   if (success) {
     return (
       <div className={`min-h-screen ${bg} flex items-center justify-center px-4`} dir="rtl">
+        <SEO {...seo.club} />
         <div className={`text-center max-w-sm mx-auto animate-fade-in ${text}`}>
           <div className="w-14 h-14 bg-green-500/15 rounded-full flex items-center justify-center mx-auto mb-3">
             <PartyPopper className="w-7 h-7 text-green-500" />
