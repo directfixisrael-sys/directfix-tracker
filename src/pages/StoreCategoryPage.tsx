@@ -6,6 +6,8 @@ import StoreHeader from '@/components/store/StoreHeader';
 import StoreLogin from '@/components/store/StoreLogin';
 import ProductCard from '@/components/store/ProductCard';
 import { storeProducts, storeCategories } from '@/store/storeData';
+import SEO from "@/components/SEO";
+import { SITE } from "@/lib/seoData";
 
 const StoreCategoryPage = () => {
   const { slug } = useParams();

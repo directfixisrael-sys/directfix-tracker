@@ -9,6 +9,8 @@ import ProductCard from '@/components/store/ProductCard';
 import { storeProducts } from '@/store/storeData';
 import { useCartStore } from '@/store/cartStore';
 import { toast } from 'sonner';
+import SEO from "@/components/SEO";
+import { SITE } from "@/lib/seoData";
 
 const StoreProductPage = () => {
   const { id } = useParams();

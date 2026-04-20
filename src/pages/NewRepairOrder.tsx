@@ -30,6 +30,8 @@ import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { getLeadSource } from '@/lib/leadSource';
 import GiftOrderToggle from '@/components/GiftOrderToggle';
 import LoyaltyPointsDisplay, { getCustomerPoints, calculatePointsFromPrice, calculateDiscountFromPoints } from '@/components/LoyaltyPointsDisplay';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 import PointsEarnedAnimation from '@/components/PointsEarnedAnimation';
 
 // iPhone back glass colors per model family
