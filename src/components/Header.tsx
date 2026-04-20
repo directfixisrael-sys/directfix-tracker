@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { ArrowRight, Moon, Sun, Phone, Accessibility, Menu, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/ThemeProvider';
 import Logo from '@/components/Logo';
 import CustomerZone from '@/components/CustomerZone';
+import LanguageToggle from '@/components/LanguageToggle';
 
 interface HeaderProps {
   showBackButton?: boolean;
