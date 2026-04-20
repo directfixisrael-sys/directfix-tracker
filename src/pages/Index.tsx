@@ -125,9 +125,9 @@ const Index = () => {
         <section className="section-peach border-b-2 border-foreground/10">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
-              <span className="text-3xl text-foreground">איך השירות עובד?</span>
+              <span className="text-3xl text-foreground">{t('home.howItWorksTitle')}</span>
             </h2>
-            <p className="text-muted-foreground mb-6 text-base">צפו בסרטון קצר ותבינו כמה זה פשוט</p>
+            <p className="text-muted-foreground mb-6 text-base">{t('home.howItWorksSubtitle')}</p>
             
             <div className="relative max-w-md mx-auto animate-fade-in" style={{ animationDelay: '180ms' }}>
               {/* Blur glow behind */}
@@ -146,31 +146,31 @@ const Index = () => {
         <section className="section-lavender border-b-2 border-foreground/10">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
-              <span className="text-foreground">למה לבחור בנו?</span>
+              <span className="text-foreground">{t('home.whyUsTitle')}</span>
             </h2>
-            <p className="text-muted-foreground mb-8 text-base">15+ שנות ניסיון ואלפי לקוחות מרוצים</p>
+            <p className="text-muted-foreground mb-8 text-base">{t('home.whyUsSubtitle')}</p>
             
             <div className="grid grid-cols-3 gap-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
-              <div className="strategly-card text-center p-4" role="img" aria-label="מגיעים אליך">
+              <div className="strategly-card text-center p-4" role="img" aria-label={t('home.comeToYou')}>
                 <div className="w-14 h-14 bg-section-mint rounded-2xl flex items-center justify-center mx-auto mb-3 border-2 border-foreground/10">
                   <MapPin className="w-6 h-6 text-foreground/70" aria-hidden="true" />
                 </div>
-                <p className="text-sm font-bold">מגיעים אליך</p>
-                <p className="text-xs text-muted-foreground mt-1">עד הבית</p>
+                <p className="text-sm font-bold">{t('home.comeToYou')}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('home.comeToYouSub')}</p>
               </div>
-              <div className="strategly-card text-center p-4" role="img" aria-label="תיקון מהיר">
+              <div className="strategly-card text-center p-4" role="img" aria-label={t('home.fastRepair')}>
                 <div className="w-14 h-14 bg-section-peach rounded-2xl flex items-center justify-center mx-auto mb-3 border-2 border-foreground/10">
                   <Clock className="w-6 h-6 text-foreground/70" aria-hidden="true" />
                 </div>
-                <p className="text-sm font-bold">תיקון מהיר</p>
-                <p className="text-xs text-muted-foreground mt-1">תוך דקות</p>
+                <p className="text-sm font-bold">{t('home.fastRepair')}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('home.fastRepairSub')}</p>
               </div>
-              <div className="strategly-card text-center p-4" role="img" aria-label="אחריות מלאה">
+              <div className="strategly-card text-center p-4" role="img" aria-label={t('home.fullWarranty')}>
                 <div className="w-14 h-14 bg-section-cream rounded-2xl flex items-center justify-center mx-auto mb-3 border-2 border-foreground/10">
                   <Shield className="w-6 h-6 text-foreground/70" aria-hidden="true" />
                 </div>
-                <p className="text-sm font-bold">אחריות מלאה</p>
-                <p className="text-xs text-muted-foreground mt-1">על כל תיקון</p>
+                <p className="text-sm font-bold">{t('home.fullWarranty')}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('home.fullWarrantySub')}</p>
               </div>
             </div>
           </div>
@@ -180,7 +180,7 @@ const Index = () => {
         <section className="section-mint border-b-2 border-foreground/10">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
-              <span className="text-foreground">מה הלקוחות אומרים</span>
+              <span className="text-foreground">{t('home.reviewsTitle')}</span>
             </h2>
             
             <div className="flex items-center justify-center gap-3 flex-wrap animate-fade-in" style={{ animationDelay: '250ms' }}>
