@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { ArrowRight, Moon, Sun, Phone, Accessibility, Menu, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/ThemeProvider';
 import Logo from '@/components/Logo';
 import CustomerZone from '@/components/CustomerZone';
+import LanguageToggle from '@/components/LanguageToggle';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -12,6 +14,7 @@ interface HeaderProps {
 
 const Header = ({ showBackButton, onBack }: HeaderProps) => {
   const { resolvedTheme, setTheme } = useTheme();
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleTheme = () => {
@@ -46,9 +49,10 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
         </div>
 
         {/* Desktop actions */}
-        <div className="hidden sm:flex items-center gap-2" role="toolbar" aria-label="פעולות מהירות">
+        <div className="hidden sm:flex items-center gap-2" role="toolbar" aria-label={t('common.quickActions')}>
           <CustomerZone />
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-xl border-2 border-foreground/10" aria-label={resolvedTheme === 'dark' ? 'עבור למצב בהיר' : 'עבור למצב כהה'}>
+          <LanguageToggle />
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-xl border-2 border-foreground/10" aria-label={resolvedTheme === 'dark' ? t('common.lightMode') : t('common.darkMode')}>
             {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
           </Button>
           <Button
@@ -56,14 +60,14 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
             size="icon"
             onClick={() => window.dispatchEvent(new CustomEvent('open-accessibility-widget'))}
             className="h-9 w-9 rounded-xl border-2 border-foreground/10"
-            aria-label="נגישות"
+            aria-label={t('common.accessibility')}
           >
             <Accessibility className="w-4 h-4" />
           </Button>
           <a
             href="tel:033106020"
             className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105"
-            aria-label="התקשר אלינו 033106020"
+            aria-label={`${t('common.call')} 033106020`}
           >
             <Phone className="w-4 h-4" aria-hidden="true" />
           </a>
@@ -79,7 +83,7 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
             <a
               href="tel:033106020"
               className="h-12 w-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105"
-              aria-label="התקשר 033106020"
+              aria-label={`${t('common.call')} 033106020`}
               onClick={() => setMenuOpen(false)}
             >
               <Phone className="w-5 h-5" />
@@ -89,6 +93,7 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
               size="icon"
               onClick={() => { toggleTheme(); setMenuOpen(false); }}
               className="h-12 w-12 rounded-xl border-2 border-foreground/15"
+              aria-label={resolvedTheme === 'dark' ? t('common.lightMode') : t('common.darkMode')}
             >
               {resolvedTheme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </Button>
@@ -97,10 +102,11 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
               size="icon"
               onClick={() => { window.dispatchEvent(new CustomEvent('open-accessibility-widget')); setMenuOpen(false); }}
               className="h-12 w-12 rounded-xl border-2 border-foreground/15"
-              aria-label="נגישות"
+              aria-label={t('common.accessibility')}
             >
               <Accessibility className="w-5 h-5" />
             </Button>
+            <LanguageToggle variant="menu" />
           </div>
         </div>
       )}

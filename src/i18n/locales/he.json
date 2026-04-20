@@ -1,0 +1,47 @@
+{
+  "common": {
+    "language": "שפה",
+    "switchToEnglish": "English",
+    "switchToHebrew": "עברית",
+    "menu": "תפריט",
+    "back": "חזור",
+    "call": "התקשר",
+    "accessibility": "נגישות",
+    "darkMode": "מצב כהה",
+    "lightMode": "מצב בהיר",
+    "skipToContent": "דלג לתוכן הראשי",
+    "mainNav": "ניווט ראשי",
+    "quickActions": "פעולות מהירות"
+  },
+  "home": {
+    "title": "תיקוני אייפון עם",
+    "titleHighlight": "החברה המובילה בישראל",
+    "subtitle": "טכנאי מגיע עד אליך. מהיר, מקצועי, עם אחריות מלאה.",
+    "ctaOrder": "הזמן תיקון עכשיו",
+    "ctaTrack": "עקוב אחר התיקון שלך",
+    "moreServices": "שירותים נוספים",
+    "ipadRepair": "תיקון מסך iPad",
+    "consultation": "שיחת ייעוץ",
+    "dataTransfer": "העברת מידע לטלפון חדש",
+    "howItWorksTitle": "איך השירות עובד?",
+    "howItWorksSubtitle": "צפו בסרטון קצר ותבינו כמה זה פשוט",
+    "whyUsTitle": "למה לבחור בנו?",
+    "whyUsSubtitle": "15+ שנות ניסיון ואלפי לקוחות מרוצים",
+    "comeToYou": "מגיעים אליך",
+    "comeToYouSub": "עד הבית",
+    "fastRepair": "תיקון מהיר",
+    "fastRepairSub": "תוך דקות",
+    "fullWarranty": "אחריות מלאה",
+    "fullWarrantySub": "על כל תיקון",
+    "reviewsTitle": "מה הלקוחות אומרים",
+    "paymentTitle": "אמצעי תשלום",
+    "footer": "© {{year}} דיירקט פיקס — תיקוני אייפון עד הבית"
+  },
+  "footer": {
+    "privacy": "מדיניות פרטיות",
+    "faq": "שאלות תשובות",
+    "accessibility": "הצהרת נגישות",
+    "contact": "צור קשר",
+    "rights": "© {{year}} DirectFix — תיקוני אייפון עד הבית"
+  }
+}

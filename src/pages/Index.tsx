@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone, Play, Tablet, PhoneCall, ArrowLeftRight, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import Logo from '@/components/Logo';
 import CustomerZone from '@/components/CustomerZone';
+import LanguageToggle from '@/components/LanguageToggle';
 import paymentBit from '@/assets/payment-bit.png';
 import paymentPaybox from '@/assets/payment-paybox.png';
 import paymentVisa from '@/assets/payment-visa.png';
@@ -15,23 +17,25 @@ import TechnicianRecruitment from '@/components/TechnicianRecruitment';
 
 const Index = () => {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col" lang="he">
+    <div className="min-h-screen bg-background flex flex-col" lang={i18n.language}>
       {/* Skip to content */}
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-lg">
-        דלג לתוכן הראשי
+        {t('common.skipToContent')}
       </a>
 
       {/* Strategly-style Navbar */}
       <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b-2 border-foreground/10" role="banner">
-        <nav className="max-w-2xl mx-auto flex items-center justify-between px-4 h-14" aria-label="ניווט ראשי">
+        <nav className="max-w-2xl mx-auto flex items-center justify-between px-4 h-14" aria-label={t('common.mainNav')}>
           <div className="flex items-center gap-2">
             <CustomerZone />
+            <LanguageToggle />
             <a
               href="tel:033106020"
               className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105 order-last"
-              aria-label="התקשר 033106020">
+              aria-label={`${t('common.call')} 033106020`}>
               <Phone className="w-4 h-4 border-0" />
             </a>
           </div>
@@ -41,7 +45,7 @@ const Index = () => {
 
 
       {/* Main Content */}
-      <main id="main-content" className="flex-1 flex flex-col" role="main" aria-label="דף הבית - דיירקט פיקס">
+      <main id="main-content" className="flex-1 flex flex-col" role="main" aria-label="DirectFix">
         
         {/* Hero Section - Cream Background */}
         <section className="section-cream border-b-2 border-foreground/10">
@@ -49,11 +53,11 @@ const Index = () => {
             <div className="mb-6 animate-fade-in">
               <Logo size="lg" clickable={false} className="justify-center mb-5" />
               <h1 className="font-extrabold text-foreground tracking-tight leading-tight mb-3 text-3xl">
-                תיקוני אייפון עם{' '}
-                <span className="text-primary font-extrabold text-3xl">החברה המובילה בישראל</span>
+                {t('home.title')}{' '}
+                <span className="text-primary font-extrabold text-3xl">{t('home.titleHighlight')}</span>
               </h1>
               <p className="text-muted-foreground mt-3 max-w-xs mx-auto leading-relaxed text-sm">
-                טכנאי מגיע עד אליך. מהיר, מקצועי, עם אחריות מלאה.
+                {t('home.subtitle')}
               </p>
             </div>
 
@@ -65,7 +69,7 @@ const Index = () => {
                 onClick={() => navigate('/order')}>
                 
                 <Wrench className="w-5 h-5" />
-                <span>הזמן תיקון עכשיו</span>
+                <span>{t('home.ctaOrder')}</span>
               </Button>
 
               <Button
@@ -75,7 +79,7 @@ const Index = () => {
                 onClick={() => navigate('/track')}>
                 
                 <Smartphone className="w-4 h-4" />
-                <span>עקוב אחר התיקון שלך</span>
+                <span>{t('home.ctaTrack')}</span>
               </Button>
             </div>
 
@@ -83,7 +87,7 @@ const Index = () => {
             <div className="max-w-sm mx-auto mt-5 animate-fade-in" style={{ animationDelay: '250ms' }}>
               <Collapsible>
                 <CollapsibleTrigger className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground transition-colors py-2 group">
-                  <span className="text-sm font-bold">שירותים נוספים</span>
+                  <span className="text-sm font-bold">{t('home.moreServices')}</span>
                   <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="space-y-2.5 pt-2">
@@ -93,7 +97,7 @@ const Index = () => {
                     className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
                     onClick={() => navigate('/ipad')}>
                     <Tablet className="w-4 h-4" />
-                    <span>תיקון מסך iPad</span>
+                    <span>{t('home.ipadRepair')}</span>
                   </Button>
                   <Button
                     variant="outline"
@@ -101,7 +105,7 @@ const Index = () => {
                     className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
                     onClick={() => navigate('/consultation')}>
                     <PhoneCall className="w-4 h-4" />
-                    <span>שיחת ייעוץ</span>
+                    <span>{t('home.consultation')}</span>
                   </Button>
                   <Button
                     variant="outline"
@@ -109,7 +113,7 @@ const Index = () => {
                     className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
                     onClick={() => navigate('/data-transfer')}>
                     <ArrowLeftRight className="w-4 h-4" />
-                    <span>העברת מידע לטלפון חדש</span>
+                    <span>{t('home.dataTransfer')}</span>
                   </Button>
                 </CollapsibleContent>
               </Collapsible>
@@ -121,9 +125,9 @@ const Index = () => {
         <section className="section-peach border-b-2 border-foreground/10">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
-              <span className="text-3xl text-foreground">איך השירות עובד?</span>
+              <span className="text-3xl text-foreground">{t('home.howItWorksTitle')}</span>
             </h2>
-            <p className="text-muted-foreground mb-6 text-base">צפו בסרטון קצר ותבינו כמה זה פשוט</p>
+            <p className="text-muted-foreground mb-6 text-base">{t('home.howItWorksSubtitle')}</p>
             
             <div className="relative max-w-md mx-auto animate-fade-in" style={{ animationDelay: '180ms' }}>
               {/* Blur glow behind */}
@@ -142,31 +146,31 @@ const Index = () => {
         <section className="section-lavender border-b-2 border-foreground/10">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-2">
-              <span className="text-foreground">למה לבחור בנו?</span>
+              <span className="text-foreground">{t('home.whyUsTitle')}</span>
             </h2>
-            <p className="text-muted-foreground mb-8 text-base">15+ שנות ניסיון ואלפי לקוחות מרוצים</p>
+            <p className="text-muted-foreground mb-8 text-base">{t('home.whyUsSubtitle')}</p>
             
             <div className="grid grid-cols-3 gap-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
-              <div className="strategly-card text-center p-4" role="img" aria-label="מגיעים אליך">
+              <div className="strategly-card text-center p-4" role="img" aria-label={t('home.comeToYou')}>
                 <div className="w-14 h-14 bg-section-mint rounded-2xl flex items-center justify-center mx-auto mb-3 border-2 border-foreground/10">
                   <MapPin className="w-6 h-6 text-foreground/70" aria-hidden="true" />
                 </div>
-                <p className="text-sm font-bold">מגיעים אליך</p>
-                <p className="text-xs text-muted-foreground mt-1">עד הבית</p>
+                <p className="text-sm font-bold">{t('home.comeToYou')}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('home.comeToYouSub')}</p>
               </div>
-              <div className="strategly-card text-center p-4" role="img" aria-label="תיקון מהיר">
+              <div className="strategly-card text-center p-4" role="img" aria-label={t('home.fastRepair')}>
                 <div className="w-14 h-14 bg-section-peach rounded-2xl flex items-center justify-center mx-auto mb-3 border-2 border-foreground/10">
                   <Clock className="w-6 h-6 text-foreground/70" aria-hidden="true" />
                 </div>
-                <p className="text-sm font-bold">תיקון מהיר</p>
-                <p className="text-xs text-muted-foreground mt-1">תוך דקות</p>
+                <p className="text-sm font-bold">{t('home.fastRepair')}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('home.fastRepairSub')}</p>
               </div>
-              <div className="strategly-card text-center p-4" role="img" aria-label="אחריות מלאה">
+              <div className="strategly-card text-center p-4" role="img" aria-label={t('home.fullWarranty')}>
                 <div className="w-14 h-14 bg-section-cream rounded-2xl flex items-center justify-center mx-auto mb-3 border-2 border-foreground/10">
                   <Shield className="w-6 h-6 text-foreground/70" aria-hidden="true" />
                 </div>
-                <p className="text-sm font-bold">אחריות מלאה</p>
-                <p className="text-xs text-muted-foreground mt-1">על כל תיקון</p>
+                <p className="text-sm font-bold">{t('home.fullWarranty')}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('home.fullWarrantySub')}</p>
               </div>
             </div>
           </div>
@@ -176,7 +180,7 @@ const Index = () => {
         <section className="section-mint border-b-2 border-foreground/10">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
-              <span className="text-foreground">מה הלקוחות אומרים</span>
+              <span className="text-foreground">{t('home.reviewsTitle')}</span>
             </h2>
             
             <div className="flex items-center justify-center gap-3 flex-wrap animate-fade-in" style={{ animationDelay: '250ms' }}>
@@ -217,7 +221,7 @@ const Index = () => {
         <section className="section-peach">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
-              <span className="text-foreground">אמצעי תשלום</span>
+              <span className="text-foreground">{t('home.paymentTitle')}</span>
             </h2>
             <div className="flex items-center justify-center gap-3 animate-fade-in" style={{ animationDelay: '300ms' }}>
               <div className="strategly-card h-14 w-18 flex items-center justify-center p-2">
@@ -233,7 +237,7 @@ const Index = () => {
                 <svg viewBox="0 0 24 24" className="w-5 h-5 text-background" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" /></svg>
               </div>
               <div className="strategly-card h-14 w-14 flex items-center justify-center bg-success border-success">
-                <span className="text-success-foreground text-lg font-bold">₪</span>
+                <span className="text-success-foreground text-lg font-bold">{i18n.language?.startsWith('he') ? '₪' : '$'}</span>
               </div>
             </div>
           </div>
@@ -245,7 +249,7 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="border-t-2 border-foreground/10 text-center py-5 text-sm text-muted-foreground bg-card" role="contentinfo">
-        <p className="font-medium">© {new Date().getFullYear()} דיירקט פיקס — תיקוני אייפון עד הבית</p>
+        <p className="font-medium">{t('home.footer', { year: new Date().getFullYear() })}</p>
       </footer>
     </div>);
 

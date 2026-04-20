@@ -1,0 +1,47 @@
+{
+  "common": {
+    "language": "Language",
+    "switchToEnglish": "English",
+    "switchToHebrew": "עברית",
+    "menu": "Menu",
+    "back": "Back",
+    "call": "Call",
+    "accessibility": "Accessibility",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "skipToContent": "Skip to main content",
+    "mainNav": "Main navigation",
+    "quickActions": "Quick actions"
+  },
+  "home": {
+    "title": "iPhone repairs with",
+    "titleHighlight": "Israel's leading company",
+    "subtitle": "A technician comes to you. Fast, professional, with full warranty.",
+    "ctaOrder": "Book a repair now",
+    "ctaTrack": "Track your repair",
+    "moreServices": "More services",
+    "ipadRepair": "iPad screen repair",
+    "consultation": "Consultation call",
+    "dataTransfer": "Data transfer to a new phone",
+    "howItWorksTitle": "How does it work?",
+    "howItWorksSubtitle": "Watch a short video and see how simple it is",
+    "whyUsTitle": "Why choose us?",
+    "whyUsSubtitle": "15+ years of experience and thousands of happy customers",
+    "comeToYou": "We come to you",
+    "comeToYouSub": "At your home",
+    "fastRepair": "Fast repair",
+    "fastRepairSub": "Within minutes",
+    "fullWarranty": "Full warranty",
+    "fullWarrantySub": "On every repair",
+    "reviewsTitle": "What customers say",
+    "paymentTitle": "Payment methods",
+    "footer": "© {{year}} DirectFix — iPhone repairs at your home"
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "faq": "FAQ",
+    "accessibility": "Accessibility Statement",
+    "contact": "Contact us",
+    "rights": "© {{year}} DirectFix — iPhone repairs at your home"
+  }
+}

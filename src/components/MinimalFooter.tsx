@@ -1,21 +1,24 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { X } from 'lucide-react';
-
-const footerLinks = [
-  { label: 'מדיניות פרטיות', href: 'https://directfix.co.il/privacy-policy/' },
-  { label: 'שאלות תשובות', href: 'https://directfix.co.il/%d7%a9%d7%90%d7%9c%d7%95%d7%aa-%d7%aa%d7%a9%d7%95%d7%91%d7%95%d7%aa/' },
-  { label: 'הצהרת נגישות', href: 'https://directfix.co.il/%d7%94%d7%a6%d7%94%d7%a8%d7%aa-%d7%a0%d7%92%d7%99%d7%a9%d7%95%d7%aa/' },
-  { label: 'צור קשר', href: 'https://directfix.co.il/%d7%a6%d7%95%d7%a8-%d7%a7%d7%a9%d7%a8/' },
-];
 
 const MinimalFooter = () => {
+  const { t, i18n } = useTranslation();
   const [openLink, setOpenLink] = useState<{ label: string; href: string } | null>(null);
+
+  const footerLinks = [
+    { label: t('footer.privacy'), href: 'https://directfix.co.il/privacy-policy/' },
+    { label: t('footer.faq'), href: 'https://directfix.co.il/%d7%a9%d7%90%d7%9c%d7%95%d7%aa-%d7%aa%d7%a9%d7%95%d7%91%d7%95%d7%aa/' },
+    { label: t('footer.accessibility'), href: 'https://directfix.co.il/%d7%94%d7%a6%d7%94%d7%a8%d7%aa-%d7%a0%d7%92%d7%99%d7%a9%d7%95%d7%aa/' },
+    { label: t('footer.contact'), href: 'https://directfix.co.il/%d7%a6%d7%95%d7%a8-%d7%a7%d7%a9%d7%a8/' },
+  ];
+
+  const isAlignRight = i18n.language?.startsWith('he');
 
   return (
     <>
-      <footer className="border-t-2 border-foreground/10 py-6 px-6 bg-card" role="contentinfo" aria-label="תחתית העמוד">
-        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2" aria-label="קישורים שימושיים">
+      <footer className="border-t-2 border-foreground/10 py-6 px-6 bg-card" role="contentinfo">
+        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
           {footerLinks.map((link, i) => (
             <button
               key={i}
@@ -27,14 +30,14 @@ const MinimalFooter = () => {
           ))}
         </nav>
         <p className="text-xs text-muted-foreground/60 text-center mt-3">
-          © {new Date().getFullYear()} DirectFix — תיקוני אייפון עד הבית
+          {t('footer.rights', { year: new Date().getFullYear() })}
         </p>
       </footer>
 
       <Dialog open={!!openLink} onOpenChange={(open) => !open && setOpenLink(null)}>
         <DialogContent className="max-w-lg h-[80vh] p-0 overflow-hidden">
           <DialogHeader className="px-4 pt-4 pb-2 border-b border-border">
-            <DialogTitle className="text-right text-base">{openLink?.label}</DialogTitle>
+            <DialogTitle className={isAlignRight ? 'text-right text-base' : 'text-left text-base'}>{openLink?.label}</DialogTitle>
           </DialogHeader>
           <iframe
             src={openLink?.href}
