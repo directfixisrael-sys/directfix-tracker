@@ -16,10 +16,10 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 } from '@/components/ui/dialog';
 import {
-import SEO from "@/components/SEO";
-import { seo } from "@/lib/seoData";
   Collapsible, CollapsibleContent, CollapsibleTrigger
 } from '@/components/ui/collapsible';
+import SEO from "@/components/SEO";
+import { seo } from "@/lib/seoData";
 
 interface IPadModel {
   id: string;
