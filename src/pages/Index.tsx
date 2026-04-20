@@ -221,7 +221,7 @@ const Index = () => {
         <section className="section-peach">
           <div className="max-w-2xl mx-auto px-6 py-10 text-center">
             <h2 className="text-2xl font-extrabold mb-6">
-              <span className="text-foreground">אמצעי תשלום</span>
+              <span className="text-foreground">{t('home.paymentTitle')}</span>
             </h2>
             <div className="flex items-center justify-center gap-3 animate-fade-in" style={{ animationDelay: '300ms' }}>
               <div className="strategly-card h-14 w-18 flex items-center justify-center p-2">
@@ -237,7 +237,7 @@ const Index = () => {
                 <svg viewBox="0 0 24 24" className="w-5 h-5 text-background" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" /></svg>
               </div>
               <div className="strategly-card h-14 w-14 flex items-center justify-center bg-success border-success">
-                <span className="text-success-foreground text-lg font-bold">₪</span>
+                <span className="text-success-foreground text-lg font-bold">{i18n.language?.startsWith('he') ? '₪' : '$'}</span>
               </div>
             </div>
           </div>
@@ -249,7 +249,7 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="border-t-2 border-foreground/10 text-center py-5 text-sm text-muted-foreground bg-card" role="contentinfo">
-        <p className="font-medium">© {new Date().getFullYear()} דיירקט פיקס — תיקוני אייפון עד הבית</p>
+        <p className="font-medium">{t('home.footer', { year: new Date().getFullYear() })}</p>
       </footer>
     </div>);
 
