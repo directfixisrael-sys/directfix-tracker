@@ -24,6 +24,7 @@ import StoreCartPage from "./pages/StoreCartPage";
 import StoreCheckoutPage from "./pages/StoreCheckoutPage";
 import BatteryProgram from "./pages/BatteryProgram";
 import IPadRepair from "./pages/iPadRepair";
+import FAQ from "./pages/FAQ";
 import AIAgentPage from "./pages/AIAgentPage";
 import MinimalFooter from "./components/MinimalFooter";
 import ScrollToTop from "./components/ScrollToTop";
@@ -77,6 +78,7 @@ const App = () => (
                   <Route path="/terms" element={<TermsOfService />} />
                   <Route path="/battery" element={<BatteryProgram />} />
                   <Route path="/ipad" element={<IPadRepair />} />
+                  <Route path="/faq" element={<FAQ />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <MinimalFooter />

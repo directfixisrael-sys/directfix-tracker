@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const MinimalFooter = () => {
@@ -8,7 +9,6 @@ const MinimalFooter = () => {
 
   const footerLinks = [
     { label: t('footer.privacy'), href: 'https://directfix.co.il/privacy-policy/' },
-    { label: t('footer.faq'), href: 'https://directfix.co.il/%d7%a9%d7%90%d7%9c%d7%95%d7%aa-%d7%aa%d7%a9%d7%95%d7%91%d7%95%d7%aa/' },
     { label: t('footer.accessibility'), href: 'https://directfix.co.il/%d7%94%d7%a6%d7%94%d7%a8%d7%aa-%d7%a0%d7%92%d7%99%d7%a9%d7%95%d7%aa/' },
     { label: t('footer.contact'), href: 'https://directfix.co.il/%d7%a6%d7%95%d7%a8-%d7%a7%d7%a9%d7%a8/' },
   ];
@@ -19,6 +19,12 @@ const MinimalFooter = () => {
     <>
       <footer className="border-t-2 border-foreground/10 py-6 px-6 bg-card" role="contentinfo">
         <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          <Link
+            to="/faq"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
+          >
+            {t('footer.faq')}
+          </Link>
           {footerLinks.map((link, i) => (
             <button
               key={i}
