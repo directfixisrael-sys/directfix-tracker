@@ -298,6 +298,7 @@ const ConsultationBooking = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 max-w-lg mx-auto px-5 py-8" dir="rtl">
+      <SEO {...seo.consultation} />
       <div className="text-center mb-8 animate-fade-in">
         <Logo size="md" className="mx-auto mb-4" />
         <h1 className="text-3xl font-extrabold tracking-tight">שיחת ייעוץ למכשירי Apple</h1>
