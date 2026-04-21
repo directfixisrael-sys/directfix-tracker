@@ -1893,6 +1893,7 @@ const AdminPanel = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row relative">
+      <SEO {...seo.admin} />
       {/* Completion Celebration Overlay */}
       {showCompletionCelebration && (
         <div 
