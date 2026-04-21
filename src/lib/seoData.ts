@@ -57,7 +57,7 @@ export const seo = {
     ],
   },
   order: {
-    title: "הזמנת תיקון | DirectFix",
+    title: "הזמנת תיקון | דיירקט פיקס",
     description:
       "בחרו דגם, סוג תיקון, מועד וכתובת - הטכנאי בדרך אליכם. החלפת מסך, סוללה, גב זכוכית ועוד. אחריות מלאה, תשלום מאובטח.",
     keywords: "הזמנת תיקון אייפון, מחיר החלפת מסך אייפון, מחיר סוללה אייפון, תיקון iPhone אונליין",
@@ -70,14 +70,14 @@ export const seo = {
     },
   },
   track: {
-    title: "מעקב תיקון | DirectFix",
+    title: "מעקב תיקון | דיירקט פיקס",
     description:
       "עקבו אחר התיקון שלכם בזמן אמת - סטטוס, מיקום הטכנאי, שעת הגעה משוערת והודעות ישירות. כניסה עם מספר טלפון.",
     keywords: "מעקב תיקון אייפון, סטטוס תיקון, איזור אישי דיירקט פיקס",
     url: url("/track"),
   },
   ipad: {
-    title: "תיקון iPad | DirectFix",
+    title: "תיקון iPad | דיירקט פיקס",
     description:
       "החלפת מסך iPad מקורי במחיר משתלם, עד הבית, בגוש דן והמרכז. שירות לכל הדגמים: iPad, iPad Air, iPad Pro, iPad mini. אחריות מלאה.",
     keywords: "תיקון מסך iPad, החלפת מסך אייפד, תיקון iPad Pro, תיקון iPad Air, תיקון אייפד עד הבית",
@@ -90,7 +90,7 @@ export const seo = {
     },
   },
   battery: {
-    title: "החלפת סוללה | DirectFix",
+    title: "החלפת סוללה | דיירקט פיקס",
     description:
       "החלפת סוללה מקורית לאייפון עד הבית. שיפור משמעותי בחיי הסוללה, אחריות 12 חודשים. מבצע מיוחד - לזמן מוגבל.",
     keywords: "החלפת סוללה אייפון, סוללה מקורית אייפון, תוכנית סוללה, סוללה ל iPhone",
@@ -103,7 +103,7 @@ export const seo = {
     },
   },
   consultation: {
-    title: "שיחת ייעוץ | DirectFix",
+    title: "שיחת ייעוץ | דיירקט פיקס",
     description:
       "שיחת ייעוץ אישית עם טכנאי מומחה למכשירי Apple - אבחון תקלות, מענה לשאלות והמלצות. שיחת חינם או שיחת פרימיום.",
     keywords: "ייעוץ אייפון, שיחת ייעוץ apple, טכנאי iPhone, אבחון תקלת אייפון",
@@ -115,7 +115,7 @@ export const seo = {
     },
   },
   dataTransfer: {
-    title: "העברת מידע | DirectFix",
+    title: "העברת מידע | דיירקט פיקס",
     description:
       "שירות העברת מידע בין מכשירים (iPhone, Android) עד הבית - אנשי קשר, תמונות, אפליקציות והודעות. ₪350, שירות ליום למחרת.",
     keywords: "העברת מידע אייפון, העברת נתונים iPhone, העברת תוכן בין מכשירים, העברת מידע android iPhone",
@@ -128,7 +128,7 @@ export const seo = {
     },
   },
   devices: {
-    title: "רכישת iPhone 17 | DirectFix",
+    title: "רכישת iPhone 17 | דיירקט פיקס",
     description:
       "iPhone 17 Pro Max חדש - הזמינו עכשיו עם מקדמה של ₪500 בלבד. כל הצבעים, כל הקיבולות, אספקה מהירה עד הבית.",
     keywords: "iPhone 17, iPhone 17 Pro Max, רכישת אייפון, אייפון חדש, אייפון 17 מחיר",
@@ -148,14 +148,14 @@ export const seo = {
     },
   },
   club: {
-    title: "מועדון DirectFix | DirectFix",
+    title: "מועדון DirectFix | דיירקט פיקס",
     description:
       "הצטרפו למועדון DirectFix וקבלו 50 נקודות במתנה, הנחות בלעדיות, ייעוץ חינם, מתנת יום הולדת ואחריות מורחבת.",
     keywords: "מועדון לקוחות אייפון, הטבות תיקון iPhone, DirectFix Club",
     url: url("/club"),
   },
   aiAgent: {
-    title: "נציג AI - דני | DirectFix",
+    title: "נציג AI - דני | דיירקט פיקס",
     description:
       "שיחה ישירה עם נציג AI של דיירקט פיקס - מחירים, זמינות, ייעוץ ותיאום תיקון אייפון 24/7. ללא המתנה.",
     keywords: "AI נציג אייפון, צ'אט בוט תיקון, נציג חכם DirectFix",
@@ -163,53 +163,53 @@ export const seo = {
     url: url("/ai-agent"),
   },
   store: {
-    title: "חנות הטבות | DirectFix",
+    title: "חנות הטבות | דיירקט פיקס",
     description:
       "חנות בלעדית לחברי מועדון DirectFix - מימוש נקודות נאמנות לקניית אייפונים, אביזרים, כיסויים, מטענים ואוזניות.",
     keywords: "חנות הטבות, אביזרי אייפון, כיסויים אייפון, מטענים אייפון, אוזניות AirPods",
     url: url("/store"),
   },
   storeCart: {
-    title: "סל קניות | DirectFix",
+    title: "סל קניות | דיירקט פיקס",
     description: "סל הקניות שלך בחנות DirectFix.",
     url: url("/store/cart"),
     noindex: true,
   },
   storeCheckout: {
-    title: "תשלום | DirectFix",
+    title: "תשלום | דיירקט פיקס",
     description: "השלמת רכישה בחנות DirectFix.",
     url: url("/store/checkout"),
     noindex: true,
   },
   terms: {
-    title: "תקנון ותנאי שימוש | DirectFix",
+    title: "תקנון ותנאי שימוש | דיירקט פיקס",
     description: "תנאי השימוש, תקנון האחריות ומדיניות הפרטיות של DirectFix.",
     url: url("/terms"),
   },
   clubTerms: {
-    title: "תקנון מועדון | DirectFix",
+    title: "תקנון מועדון | דיירקט פיקס",
     description: "תקנון מועדון הלקוחות של DirectFix - הטבות, נקודות וזכויות חברים.",
     url: url("/club-terms"),
   },
   unsubscribe: {
-    title: "הסרה מדיוור | DirectFix",
+    title: "הסרה מדיוור | דיירקט פיקס",
     description: "הסרה מרשימת הדיוור של DirectFix.",
     url: url("/unsubscribe"),
     noindex: true,
   },
   admin: {
-    title: "פאנל ניהול | DirectFix",
+    title: "פאנל ניהול | דיירקט פיקס",
     description: "פאנל ניהול פנימי של DirectFix.",
     url: url("/admin"),
     noindex: true,
   },
   faq: {
-    title: "שאלות ותשובות | DirectFix",
+    title: "שאלות ותשובות | דיירקט פיקס",
     description: "שאלות נפוצות על שירותי DirectFix.",
     url: url("/faq"),
   },
   notFound: {
-    title: "הדף לא נמצא | DirectFix",
+    title: "הדף לא נמצא | דיירקט פיקס",
     description: "הדף שחיפשתם לא נמצא. חזרו לדף הבית של DirectFix.",
     noindex: true,
   },
