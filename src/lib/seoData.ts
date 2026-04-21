@@ -197,6 +197,17 @@ export const seo = {
     url: url("/unsubscribe"),
     noindex: true,
   },
+  admin: {
+    title: "פאנל ניהול | DirectFix",
+    description: "פאנל ניהול פנימי של DirectFix.",
+    url: url("/admin"),
+    noindex: true,
+  },
+  faq: {
+    title: "שאלות ותשובות | DirectFix",
+    description: "שאלות נפוצות על שירותי DirectFix.",
+    url: url("/faq"),
+  },
   notFound: {
     title: "הדף לא נמצא | DirectFix",
     description: "הדף שחיפשתם לא נמצא. חזרו לדף הבית של DirectFix.",
