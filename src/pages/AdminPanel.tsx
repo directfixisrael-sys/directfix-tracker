@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import SEO from '@/components/SEO';
+import { seo } from '@/lib/seoData';
 import { useRepairStore } from '@/store/repairStore';
 import { RepairOrder, RepairStatus, statusLabels } from '@/types/repair';
 import { Button } from '@/components/ui/button';
