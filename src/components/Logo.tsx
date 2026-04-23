@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import logoImg from '@/assets/logo-directfix.png';
+import { useTheme } from '@/components/ThemeProvider';
+import logoLight from '@/assets/logo-directfix.png';
+import logoDark from '@/assets/logo-directfix-dark.png';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
@@ -10,12 +12,15 @@ interface LogoProps {
 
 const Logo = ({ size = 'md', clickable = true, className }: LogoProps) => {
   const navigate = useNavigate();
+  const { resolvedTheme } = useTheme();
 
   const heightClasses = {
     sm: 'h-12 sm:h-14',
     md: 'h-16 sm:h-20',
     lg: 'h-24 sm:h-28',
   };
+
+  const src = resolvedTheme === 'dark' ? logoDark : logoLight;
 
   return (
     <div
@@ -29,7 +34,7 @@ const Logo = ({ size = 'md', clickable = true, className }: LogoProps) => {
       aria-label="DirectFix - דיירקט פיקס"
     >
       <img
-        src={logoImg}
+        src={src}
         alt="DirectFix - דיירקט פיקס"
         className={cn('w-auto object-contain', heightClasses[size])}
         draggable={false}
