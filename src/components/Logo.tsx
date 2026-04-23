@@ -12,9 +12,9 @@ const Logo = ({ size = 'md', clickable = true, className }: LogoProps) => {
   const navigate = useNavigate();
 
   const heightClasses = {
-    sm: 'h-8',
-    md: 'h-10',
-    lg: 'h-14',
+    sm: 'h-12 sm:h-14',
+    md: 'h-16 sm:h-20',
+    lg: 'h-24 sm:h-28',
   };
 
   return (
