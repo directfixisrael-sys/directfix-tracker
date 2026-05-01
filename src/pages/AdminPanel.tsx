@@ -96,6 +96,7 @@ const ADMIN_CODE = 'pp1p1xke';
 const AdminPanel = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { resolvedTheme, setTheme } = useTheme();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [accessCode, setAccessCode] = useState('');
   const [codeError, setCodeError] = useState('');
