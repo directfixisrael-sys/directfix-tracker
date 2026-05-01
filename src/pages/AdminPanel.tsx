@@ -68,6 +68,8 @@ import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
 import PushNotificationToggle from '@/components/PushNotificationToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useTheme } from '@/components/ThemeProvider';
+import { Sun, Moon } from 'lucide-react';
 import SwipeableOrderCard from '@/components/SwipeableOrderCard';
 import AdminLiveChat from '@/components/AdminLiveChat';
 import PullToRefresh from '@/components/PullToRefresh';
@@ -94,6 +96,7 @@ const ADMIN_CODE = 'pp1p1xke';
 const AdminPanel = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { resolvedTheme, setTheme } = useTheme();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [accessCode, setAccessCode] = useState('');
   const [codeError, setCodeError] = useState('');
@@ -2381,7 +2384,17 @@ const AdminPanel = () => {
       {/* Main content - with margin for fixed sidebar */}
       <div className="flex-1 flex flex-col md:mr-64">
         {/* Header */}
-        <header className="bg-card border-b border-border px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
+        <header className="bg-card border-b border-border px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+            className="h-9 w-9 rounded-xl shrink-0"
+            aria-label={resolvedTheme === 'dark' ? 'מצב בהיר' : 'מצב כהה'}
+            title={resolvedTheme === 'dark' ? 'מצב בהיר' : 'מצב כהה'}
+          >
+            {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </Button>
           <div>
             <h1 className="text-lg md:text-xl font-bold text-foreground">
               {activeTab === 'dashboard' && 'דשבורד'}
