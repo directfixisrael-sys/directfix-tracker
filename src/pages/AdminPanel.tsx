@@ -68,6 +68,8 @@ import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
 import PushNotificationToggle from '@/components/PushNotificationToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useTheme } from '@/components/ThemeProvider';
+import { Sun, Moon } from 'lucide-react';
 import SwipeableOrderCard from '@/components/SwipeableOrderCard';
 import AdminLiveChat from '@/components/AdminLiveChat';
 import PullToRefresh from '@/components/PullToRefresh';
