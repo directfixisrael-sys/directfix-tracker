@@ -2384,7 +2384,17 @@ const AdminPanel = () => {
       {/* Main content - with margin for fixed sidebar */}
       <div className="flex-1 flex flex-col md:mr-64">
         {/* Header */}
-        <header className="bg-card border-b border-border px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
+        <header className="bg-card border-b border-border px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+            className="h-9 w-9 rounded-xl shrink-0"
+            aria-label={resolvedTheme === 'dark' ? 'מצב בהיר' : 'מצב כהה'}
+            title={resolvedTheme === 'dark' ? 'מצב בהיר' : 'מצב כהה'}
+          >
+            {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </Button>
           <div>
             <h1 className="text-lg md:text-xl font-bold text-foreground">
               {activeTab === 'dashboard' && 'דשבורד'}
