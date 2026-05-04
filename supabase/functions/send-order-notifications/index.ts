@@ -131,7 +131,7 @@ const handler = async (req: Request): Promise<Response> => {
     const results: { email?: unknown; whatsapp?: unknown; customerEmail?: unknown; businessWhatsapp?: unknown } = {};
 
     // Business owner phone number
-    const businessPhone = "972528692886";
+    const businessPhone = Deno.env.get('BUSINESS_PHONE') || "972528692886";
 
     // Build Google Calendar link
     const calendarLink = buildCalendarLink(orderData);
