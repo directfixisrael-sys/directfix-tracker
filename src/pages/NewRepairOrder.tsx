@@ -330,8 +330,10 @@ const NewRepairOrder = () => {
 
   // Sync intro fields to customer fields and save lead
   const handleIntroDismiss = async () => {
-    if (introName.trim()) setCustomerName(introName.trim());
-    if (introPhone.trim()) setCustomerPhone(introPhone.trim().replace(/\D/g, ''));
+    const name = introName.trim();
+    const phone = introPhone.trim().replace(/\D/g, '');
+    if (name) setCustomerName(name);
+    if (phone) setCustomerPhone(phone);
     setShowIntroCard(false);
 
     // Scroll to top after dismissing intro
@@ -343,16 +345,25 @@ const NewRepairOrder = () => {
     // Save lead to DB
     try {
       const { data: leadData } = await supabase.from('leads').insert({
-        customer_name: introName.trim(),
-        customer_phone: introPhone.trim().replace(/\D/g, ''),
+        customer_name: name,
+        customer_phone: phone,
         customer_email: '',
         privacy_accepted: introPrivacy,
         is_returning_customer: false,
-        last_step: 'בחירת דגם',
+        last_step: selectedRepair ? 'אישור מחיר' : 'בחירת דגם',
+        ...(selectedModel ? { device_model: selectedModel.name } : {}),
       }).select('id').single();
       if (leadData) setCurrentLeadId(leadData.id);
     } catch (e) {
       console.error('Error saving lead:', e);
+    }
+
+    // Continue with the pending repair selection if any
+    if (pendingIntroRepair) {
+      const repair = pendingIntroRepair;
+      setPendingIntroRepair(null);
+      // Use timeout so state updates flush before continuing the repair flow
+      setTimeout(() => continueRepairSelect(repair), 50);
     }
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
