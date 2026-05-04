@@ -16,7 +16,6 @@ import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
 import VideoPlayer from '@/components/VideoPlayer';
 import TechnicianRecruitment from '@/components/TechnicianRecruitment';
-import InstagramFeed from '@/components/InstagramFeed';
 import SEO from "@/components/SEO";
 import { seo } from "@/lib/seoData";
 
@@ -230,9 +229,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-
-        {/* Instagram Feed */}
-        <InstagramFeed />
 
         {/* FAQ Section - Cream */}
         <section className="section-cream border-b-2 border-foreground/10">

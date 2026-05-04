@@ -282,11 +282,10 @@ const NewRepairOrder = () => {
   } = useTheme();
   const [step, setStep] = useState<Step>('model');
   const [orderMenuOpen, setOrderMenuOpen] = useState(false);
-  const [showIntroCard, setShowIntroCard] = useState(false);
+  const [showIntroCard, setShowIntroCard] = useState(true);
   const [introName, setIntroName] = useState('');
   const [introPhone, setIntroPhone] = useState('');
   const [introPrivacy, setIntroPrivacy] = useState(false);
-  const [pendingIntroRepair, setPendingIntroRepair] = useState<RepairType | null>(null);
   const [isReturningCustomer, setIsReturningCustomer] = useState(false);
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
@@ -328,61 +327,32 @@ const NewRepairOrder = () => {
     }
   };
 
-  // Check if a phone is "known" (existing customer) — skip OTP for these
-  const isExistingCustomer = async (phone: string): Promise<boolean> => {
-    try {
-      const [orders, club, profile] = await Promise.all([
-        supabase.from('orders').select('id', { head: true, count: 'exact' }).eq('customer_phone', phone).limit(1),
-        supabase.from('club_members').select('id', { head: true, count: 'exact' }).eq('phone', phone).limit(1),
-        supabase.from('customer_profiles').select('id', { head: true, count: 'exact' }).eq('phone', phone).limit(1),
-      ]);
-      return ((orders.count ?? 0) + (club.count ?? 0) + (profile.count ?? 0)) > 0;
-    } catch (e) {
-      console.error('isExistingCustomer error:', e);
-      return false; // fail open — verify just in case
-    }
-  };
-
-  // Save lead and finalize intro
-  const finalizeIntro = async () => {
-    const name = introName.trim();
-    const phone = introPhone.trim().replace(/\D/g, '');
-    if (name) setCustomerName(name);
-    if (phone) setCustomerPhone(phone);
+  // Sync intro fields to customer fields and save lead
+  const handleIntroDismiss = async () => {
+    if (introName.trim()) setCustomerName(introName.trim());
+    if (introPhone.trim()) setCustomerPhone(introPhone.trim().replace(/\D/g, ''));
     setShowIntroCard(false);
 
+    // Scroll to top after dismissing intro
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     if (contentRef.current) contentRef.current.scrollTop = 0;
 
+    // Save lead to DB
     try {
       const { data: leadData } = await supabase.from('leads').insert({
-        customer_name: name,
-        customer_phone: phone,
+        customer_name: introName.trim(),
+        customer_phone: introPhone.trim().replace(/\D/g, ''),
         customer_email: '',
         privacy_accepted: introPrivacy,
         is_returning_customer: false,
-        last_step: selectedRepair ? 'אישור מחיר' : 'בחירת דגם',
-        ...(selectedModel ? { device_model: selectedModel.name } : {}),
+        last_step: 'בחירת דגם',
       }).select('id').single();
       if (leadData) setCurrentLeadId(leadData.id);
     } catch (e) {
       console.error('Error saving lead:', e);
     }
-
-    if (pendingIntroRepair) {
-      const repair = pendingIntroRepair;
-      setPendingIntroRepair(null);
-      setTimeout(() => continueRepairSelect(repair), 50);
-    }
-  };
-
-  // Simple intro form submit — no OTP, just save details and continue
-  const handleIntroDismiss = async () => {
-    const phone = introPhone.trim().replace(/\D/g, '');
-    if (!/^05\d{8}$/.test(phone)) return;
-    await finalizeIntro();
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptContact, setAcceptContact] = useState(false);
@@ -470,7 +440,6 @@ const NewRepairOrder = () => {
       document.documentElement.classList.remove('gift-mode');
     };
   }, [isGiftOrder]);
-
   const [giftClaimed, setGiftClaimed] = useState(false);
 
   // Force scroll to top on mount
@@ -797,7 +766,7 @@ const NewRepairOrder = () => {
       window.location.href = 'tel:0528692886';
       return;
     }
-
+    
     // "תיקון אחר" - just select it, stay on same step to show text input
     if (repair.name.includes('תיקון אחר')) {
       setSelectedRepair(repair);
@@ -805,9 +774,9 @@ const NewRepairOrder = () => {
       setOtherRepairDescription('');
       return; // Don't navigate - the inline form will appear
     }
-
+    
     const isBackGlass = repair.name.includes('גב');
-
+    
     // If back glass, show color picker instead of proceeding
     if (isBackGlass && selectedModel) {
       setSelectedRepair(repair);
@@ -816,22 +785,8 @@ const NewRepairOrder = () => {
       return;
     }
 
-    // Require name + phone before continuing past repair selection
-    const hasName = (customerName || introName).trim().length > 0;
-    const hasPhone = (customerPhone || introPhone).replace(/\D/g, '').length >= 9;
-    if (!hasName || !hasPhone) {
-      setSelectedRepair(repair);
-      setPendingIntroRepair(repair);
-      setShowIntroCard(true);
-      return;
-    }
-
-    continueRepairSelect(repair);
-  };
-
-  const continueRepairSelect = (repair: RepairType) => {
     const isScreenRepair = repair.name.includes('מסך');
-
+    
     setSelectedRepair(repair);
     setShowBackColorPicker(false);
     updateLeadStep('אישור מחיר', { repair_type: repair.name });
@@ -901,21 +856,12 @@ const NewRepairOrder = () => {
   
   const handleBackColorConfirm = () => {
     if (!selectedBackColor || !selectedRepair || !selectedModel) return;
-
-    // Require name + phone before continuing
-    const hasName = (customerName || introName).trim().length > 0;
-    const hasPhone = (customerPhone || introPhone).replace(/\D/g, '').length >= 9;
-    if (!hasName || !hasPhone) {
-      setPendingIntroRepair(selectedRepair);
-      setShowIntroCard(true);
-      return;
-    }
-
+    
     // Track
     const backPrice = getRepairPrice(selectedRepair);
     trackAddToCart(selectedRepair.name, backPrice);
     gaSelectRepair(selectedRepair.name, backPrice);
-
+    
     setShowBackColorPicker(false);
     checkClubMemberAndNavigate();
   };
@@ -1347,151 +1293,45 @@ const NewRepairOrder = () => {
     <SEO {...seo.order} />
     {/* Quick Intro Card - Rendered at top level via fragment */}
     {showIntroCard && !showPrivacyConsent && (
-      <div
-        className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-foreground/50 backdrop-blur-sm animate-fade-in"
-        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            // Allow closing only if not blocking a pending repair selection
-            if (!pendingIntroRepair) setShowIntroCard(false);
-          }
-        }}
-        dir="rtl"
-      >
-        <div className="w-full sm:w-[calc(100%-2rem)] sm:max-w-md bg-background rounded-t-3xl sm:rounded-2xl shadow-2xl animate-scale-in overflow-hidden">
-          {/* Top header strip */}
-          <div className="bg-primary text-primary-foreground px-5 py-4 flex items-center justify-between">
-            <h2 className="text-xl font-extrabold">מלא פרטים ונמשיך</h2>
-            <button
-              onClick={() => { if (!pendingIntroRepair) setShowIntroCard(false); }}
-              className="w-9 h-9 rounded-full hover:bg-primary-foreground/15 flex items-center justify-center transition-colors disabled:opacity-40"
-              aria-label="סגור"
-              disabled={!!pendingIntroRepair}
-            >
-              <X className="w-5 h-5" />
-            </button>
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }} onClick={(e) => { if (e.target === e.currentTarget && introName.trim() && introPhone.trim()) handleIntroDismiss(); }}>
+        <div className="w-[calc(100%-2rem)] max-w-md bg-card rounded-2xl p-7 pb-8 shadow-2xl animate-scale-in border-2 border-primary/20">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-extrabold text-foreground">בואו נתחיל</h2>
+            <p className="text-base text-muted-foreground mt-2">שם מלא ומספר טלפון — וישר לבחירת הדגם</p>
           </div>
 
-          <div className="p-5 space-y-4">
-            {/* Selected device + repair preview */}
-            {(selectedModel || selectedRepair) && (
-              <div className="rounded-2xl border border-border bg-card p-3 flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                  <Smartphone className="w-6 h-6 text-muted-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  {selectedModel && (
-                    <p className="font-bold text-sm text-foreground truncate">{selectedModel.name}</p>
-                  )}
-                  {selectedRepair && (
-                    <p className="text-xs text-muted-foreground truncate">{selectedRepair.name}</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Name field */}
-            <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">שם מלא</label>
-              <Input
-                placeholder="שם מלא"
-                value={introName}
-                onChange={(e) => setIntroName(e.target.value)}
-                className="h-14 text-lg rounded-xl px-4 border-2"
-                autoFocus
-              />
-            </div>
-
-            {/* Phone field */}
-            {(() => {
-              const phoneDigits = introPhone.replace(/\D/g, '');
-              const isValidIL = /^05\d{8}$/.test(phoneDigits);
-              const showPhoneError = phoneDigits.length > 0 && (phoneDigits.length >= 10 || (phoneDigits.length >= 2 && !phoneDigits.startsWith('05'))) && !isValidIL;
-              const formatted = phoneDigits.length > 3
-                ? `${phoneDigits.slice(0, 3)}-${phoneDigits.slice(3, 10)}`
-                : phoneDigits;
-              return (
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">מספר טלפון</label>
-                  <div className="flex gap-2 items-stretch" dir="ltr">
-                    <div className="h-14 px-3 rounded-xl border-2 border-border bg-muted/40 flex items-center font-bold text-base shrink-0">
-                      +972
-                    </div>
-                    <Input
-                      placeholder="050-0000000"
-                      value={formatted}
-                      onChange={(e) => {
-                        const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
-                        setIntroPhone(digits);
-                      }}
-                      inputMode="numeric"
-                      type="tel"
-                      maxLength={11}
-                      aria-invalid={showPhoneError}
-                      className={`h-14 text-lg rounded-xl px-4 border-2 flex-1 text-left ${showPhoneError ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-                    />
-                  </div>
-                  {showPhoneError && (
-                    <p className="text-xs text-destructive mt-1.5 text-right" role="alert">
-                      מספר לא תקין. יש להזין מספר ישראלי בן 10 ספרות שמתחיל ב-05
-                    </p>
-                  )}
-                </div>
-              );
-            })()}
-
-            {/* Consent */}
-            <label className="flex items-start gap-2.5 cursor-pointer pt-1">
-              <Checkbox
-                checked={introPrivacy}
-                onCheckedChange={checked => setIntroPrivacy(checked === true)}
-                className="mt-0.5 w-5 h-5"
-              />
-              <span className="text-sm text-foreground leading-relaxed">
-                אני מאשר/ת את <span className="text-primary font-semibold underline">תנאי השימוש</span> ו<span className="text-primary font-semibold underline">מדיניות הפרטיות</span>
-              </span>
-            </label>
-
-            {/* CTA */}
-            <Button
-              onClick={handleIntroDismiss}
-              disabled={
-                introName.trim().length < 2 ||
-                !/^05\d{8}$/.test(introPhone.replace(/\D/g, '')) ||
-                !introPrivacy
-              }
-              className="w-full h-14 text-base font-bold rounded-2xl tracking-wide uppercase"
-            >
-              המשך
-            </Button>
-
-            {/* Conversion reassurance */}
-            <div className="rounded-2xl bg-primary/10 border border-primary/20 px-3.5 py-3 flex items-center gap-2.5" dir="rtl">
-              <span className="relative flex h-2.5 w-2.5 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
-              </span>
-              <p className="text-sm font-semibold text-foreground leading-snug flex-1">
-                עוד רגע והטכנאי שלנו בדרך אליך
-              </p>
-            </div>
-
-            {/* Trust micro-row */}
-            <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground pt-0.5" dir="rtl">
-              <span className="inline-flex items-center gap-1">
-                <Shield className="w-3.5 h-3.5 text-primary" />
-                ללא ספאם
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                ללא חיוב מיידי
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-primary" />
-                30 שניות
-              </span>
-            </div>
+          <div className="space-y-4">
+            <Input
+              placeholder="שם מלא *"
+              value={introName}
+              onChange={(e) => setIntroName(e.target.value)}
+              className="h-16 text-lg rounded-xl px-5"
+              autoFocus
+            />
+            <Input
+              placeholder="מספר טלפון *"
+              value={introPhone}
+              onChange={(e) => setIntroPhone(e.target.value)}
+              type="tel"
+              dir="ltr"
+              className="h-16 text-lg rounded-xl px-5 text-right"
+            />
           </div>
+
+          <label className="flex items-start gap-2.5 mt-3 cursor-pointer">
+            <Checkbox checked={introPrivacy} onCheckedChange={checked => setIntroPrivacy(checked === true)} className="mt-0.5 w-4 h-4" />
+            <span className="text-[11px] text-muted-foreground leading-relaxed">
+              אני מאשר/ת שקראתי והסכמתי ל<span className="text-primary font-medium">מדיניות הפרטיות</span> ו<span className="text-primary font-medium">תנאי השימוש</span>, ומאשר/ת יצירת קשר לתיאום התיקון
+            </span>
+          </label>
+
+          <Button
+            onClick={handleIntroDismiss}
+            disabled={!introName.trim() || introPhone.replace(/\D/g, '').length < 9 || !introPrivacy}
+            className="w-full h-12 text-sm font-bold rounded-xl mt-4"
+          >
+            יאללה, בואו נתחיל!
+          </Button>
         </div>
       </div>
     )}
