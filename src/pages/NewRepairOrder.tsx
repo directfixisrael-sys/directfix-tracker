@@ -1328,45 +1328,114 @@ const NewRepairOrder = () => {
     <SEO {...seo.order} />
     {/* Quick Intro Card - Rendered at top level via fragment */}
     {showIntroCard && !showPrivacyConsent && (
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }} onClick={(e) => { if (e.target === e.currentTarget && introName.trim() && introPhone.trim()) handleIntroDismiss(); }}>
-        <div className="w-[calc(100%-2rem)] max-w-md bg-card rounded-2xl p-7 pb-8 shadow-2xl animate-scale-in border-2 border-primary/20">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-extrabold text-foreground">בואו נתחיל</h2>
-            <p className="text-base text-muted-foreground mt-2">שם מלא ומספר טלפון — וישר לבחירת הדגם</p>
+      <div
+        className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-foreground/50 backdrop-blur-sm animate-fade-in"
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            // Allow closing only if not blocking a pending repair selection
+            if (!pendingIntroRepair) setShowIntroCard(false);
+          }
+        }}
+        dir="rtl"
+      >
+        <div className="w-full sm:w-[calc(100%-2rem)] sm:max-w-md bg-background rounded-t-3xl sm:rounded-2xl shadow-2xl animate-scale-in overflow-hidden">
+          {/* Top header strip */}
+          <div className="bg-primary text-primary-foreground px-5 py-4 flex items-center justify-between">
+            <h2 className="text-xl font-extrabold">כניסה / הרשמה</h2>
+            <button
+              onClick={() => { if (!pendingIntroRepair) setShowIntroCard(false); }}
+              className="w-9 h-9 rounded-full hover:bg-primary-foreground/15 flex items-center justify-center transition-colors disabled:opacity-40"
+              aria-label="סגור"
+              disabled={!!pendingIntroRepair}
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
-          <div className="space-y-4">
-            <Input
-              placeholder="שם מלא *"
-              value={introName}
-              onChange={(e) => setIntroName(e.target.value)}
-              className="h-16 text-lg rounded-xl px-5"
-              autoFocus
-            />
-            <Input
-              placeholder="מספר טלפון *"
-              value={introPhone}
-              onChange={(e) => setIntroPhone(e.target.value)}
-              type="tel"
-              dir="ltr"
-              className="h-16 text-lg rounded-xl px-5 text-right"
-            />
+          <div className="p-5 space-y-4">
+            {/* Promo card */}
+            <div className="rounded-2xl border-2 border-primary/30 overflow-hidden">
+              <div className="bg-foreground text-background p-4 flex items-center justify-between gap-3">
+                <div className="flex-1">
+                  <p className="text-base sm:text-lg font-bold leading-snug">
+                    התחברות לקבלת<br />הנחות וקופונים בלעדיים
+                  </p>
+                </div>
+                <div className="w-14 h-14 rounded-full bg-primary/30 flex items-center justify-center shrink-0 relative">
+                  <BadgePercent className="w-7 h-7 text-primary-foreground" />
+                  <Sparkles className="w-3.5 h-3.5 text-primary-foreground absolute -top-0.5 -right-0.5" />
+                </div>
+              </div>
+
+              {/* Selected device + repair preview */}
+              {(selectedModel || selectedRepair) && (
+                <div className="bg-card p-3 flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                    <Smartphone className="w-7 h-7 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {selectedModel && (
+                      <p className="font-bold text-base text-foreground truncate">{selectedModel.name}</p>
+                    )}
+                    {selectedRepair && (
+                      <p className="text-sm text-muted-foreground truncate">{selectedRepair.name}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Name field */}
+            <div>
+              <label className="text-sm text-muted-foreground mb-1.5 block">שם מלא</label>
+              <Input
+                placeholder="שם מלא"
+                value={introName}
+                onChange={(e) => setIntroName(e.target.value)}
+                className="h-14 text-lg rounded-xl px-4 border-2"
+                autoFocus
+              />
+            </div>
+
+            {/* Phone field */}
+            <div>
+              <label className="text-sm text-muted-foreground mb-1.5 block">מספר טלפון</label>
+              <div className="flex gap-2 items-stretch" dir="ltr">
+                <div className="h-14 px-3 rounded-xl border-2 border-border bg-muted/40 flex items-center font-bold text-base shrink-0">
+                  +972
+                </div>
+                <Input
+                  placeholder="50-000-0000"
+                  value={introPhone}
+                  onChange={(e) => setIntroPhone(e.target.value)}
+                  type="tel"
+                  className="h-14 text-lg rounded-xl px-4 border-2 flex-1 text-left"
+                />
+              </div>
+            </div>
+
+            {/* Consent */}
+            <label className="flex items-start gap-2.5 cursor-pointer pt-1">
+              <Checkbox
+                checked={introPrivacy}
+                onCheckedChange={checked => setIntroPrivacy(checked === true)}
+                className="mt-0.5 w-5 h-5"
+              />
+              <span className="text-sm text-foreground leading-relaxed">
+                אני מאשר/ת את <span className="text-primary font-semibold underline">תנאי השימוש</span> ו<span className="text-primary font-semibold underline">מדיניות הפרטיות</span>
+              </span>
+            </label>
+
+            {/* CTA */}
+            <Button
+              onClick={handleIntroDismiss}
+              disabled={!introName.trim() || introPhone.replace(/\D/g, '').length < 9 || !introPrivacy}
+              className="w-full h-14 text-base font-bold rounded-2xl tracking-wide uppercase"
+            >
+              המשך
+            </Button>
           </div>
-
-          <label className="flex items-start gap-2.5 mt-3 cursor-pointer">
-            <Checkbox checked={introPrivacy} onCheckedChange={checked => setIntroPrivacy(checked === true)} className="mt-0.5 w-4 h-4" />
-            <span className="text-[11px] text-muted-foreground leading-relaxed">
-              אני מאשר/ת שקראתי והסכמתי ל<span className="text-primary font-medium">מדיניות הפרטיות</span> ו<span className="text-primary font-medium">תנאי השימוש</span>, ומאשר/ת יצירת קשר לתיאום התיקון
-            </span>
-          </label>
-
-          <Button
-            onClick={handleIntroDismiss}
-            disabled={!introName.trim() || introPhone.replace(/\D/g, '').length < 9 || !introPrivacy}
-            className="w-full h-12 text-sm font-bold rounded-xl mt-4"
-          >
-            יאללה, בואו נתחיל!
-          </Button>
         </div>
       </div>
     )}
