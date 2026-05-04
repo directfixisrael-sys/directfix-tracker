@@ -1378,7 +1378,7 @@ const NewRepairOrder = () => {
         <div className="w-full sm:w-[calc(100%-2rem)] sm:max-w-md bg-background rounded-t-3xl sm:rounded-2xl shadow-2xl animate-scale-in overflow-hidden">
           {/* Top header strip */}
           <div className="bg-primary text-primary-foreground px-5 py-4 flex items-center justify-between">
-            <h2 className="text-xl font-extrabold">כניסה / הרשמה</h2>
+            <h2 className="text-xl font-extrabold">מלא פרטים ונמשיך</h2>
             <button
               onClick={() => { if (!pendingIntroRepair) setShowIntroCard(false); }}
               className="w-9 h-9 rounded-full hover:bg-primary-foreground/15 flex items-center justify-center transition-colors disabled:opacity-40"
