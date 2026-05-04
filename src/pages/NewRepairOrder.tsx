@@ -350,9 +350,6 @@ const NewRepairOrder = () => {
     if (name) setCustomerName(name);
     if (phone) setCustomerPhone(phone);
     setShowIntroCard(false);
-    setOtpStep('form');
-    setOtpCode('');
-    setOtpError('');
 
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.documentElement.scrollTop = 0;
