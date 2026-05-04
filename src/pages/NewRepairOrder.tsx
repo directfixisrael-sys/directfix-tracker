@@ -287,14 +287,6 @@ const NewRepairOrder = () => {
   const [introPhone, setIntroPhone] = useState('');
   const [introPrivacy, setIntroPrivacy] = useState(false);
   const [pendingIntroRepair, setPendingIntroRepair] = useState<RepairType | null>(null);
-  // OTP verification state
-  const [otpStep, setOtpStep] = useState<'form' | 'verify'>('form');
-  const [otpCode, setOtpCode] = useState('');
-  const [otpChannel, setOtpChannel] = useState<'whatsapp' | 'sms'>('whatsapp');
-  const [otpError, setOtpError] = useState('');
-  const [otpSending, setOtpSending] = useState(false);
-  const [otpVerifying, setOtpVerifying] = useState(false);
-  const [otpResendSeconds, setOtpResendSeconds] = useState(0);
   const [isReturningCustomer, setIsReturningCustomer] = useState(false);
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
@@ -358,9 +350,6 @@ const NewRepairOrder = () => {
     if (name) setCustomerName(name);
     if (phone) setCustomerPhone(phone);
     setShowIntroCard(false);
-    setOtpStep('form');
-    setOtpCode('');
-    setOtpError('');
 
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.documentElement.scrollTop = 0;
@@ -389,84 +378,11 @@ const NewRepairOrder = () => {
     }
   };
 
-  // Sync intro fields and trigger OTP for new customers, or finalize for returning ones
+  // Simple intro form submit — no OTP, just save details and continue
   const handleIntroDismiss = async () => {
     const phone = introPhone.trim().replace(/\D/g, '');
     if (!/^05\d{8}$/.test(phone)) return;
-
-    setOtpError('');
-    const known = await isExistingCustomer(phone);
-    if (known) {
-      // Returning customer — skip OTP
-      await finalizeIntro();
-      return;
-    }
-
-    // New customer — send OTP
-    setOtpSending(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('send-otp', { body: { phone } });
-      if (error || data?.error) {
-        const msg = data?.message || (data?.error === 'rate_limited' ? 'יותר מדי ניסיונות, נסה שוב בעוד מספר דקות' : 'שליחת הקוד נכשלה. נסה שוב.');
-        setOtpError(msg);
-        setOtpSending(false);
-        return;
-      }
-      setOtpChannel(data?.channel || 'whatsapp');
-      setOtpStep('verify');
-      setOtpResendSeconds(30);
-    } catch (e) {
-      console.error('send-otp invoke error:', e);
-      setOtpError('שליחת הקוד נכשלה. נסה שוב.');
-    }
-    setOtpSending(false);
-  };
-
-  // Verify OTP code
-  const handleVerifyOtp = async () => {
-    const phone = introPhone.trim().replace(/\D/g, '');
-    const code = otpCode.replace(/\D/g, '');
-    if (code.length !== 6) {
-      setOtpError('יש להזין קוד בן 6 ספרות');
-      return;
-    }
-    setOtpError('');
-    setOtpVerifying(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('verify-otp', { body: { phone, code } });
-      if (error || data?.error) {
-        setOtpError(data?.message || 'קוד שגוי. נסה שוב.');
-        setOtpVerifying(false);
-        return;
-      }
-      setOtpVerifying(false);
-      await finalizeIntro();
-    } catch (e) {
-      console.error('verify-otp error:', e);
-      setOtpError('האימות נכשל. נסה שוב.');
-      setOtpVerifying(false);
-    }
-  };
-
-  // Resend OTP
-  const handleResendOtp = async () => {
-    if (otpResendSeconds > 0 || otpSending) return;
-    const phone = introPhone.trim().replace(/\D/g, '');
-    setOtpError('');
-    setOtpSending(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('send-otp', { body: { phone } });
-      if (error || data?.error) {
-        setOtpError(data?.message || 'שליחת הקוד נכשלה. נסה שוב.');
-      } else {
-        setOtpChannel(data?.channel || 'whatsapp');
-        setOtpResendSeconds(30);
-        setOtpCode('');
-      }
-    } catch (e) {
-      setOtpError('שליחת הקוד נכשלה. נסה שוב.');
-    }
-    setOtpSending(false);
+    await finalizeIntro();
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptContact, setAcceptContact] = useState(false);
@@ -555,12 +471,6 @@ const NewRepairOrder = () => {
     };
   }, [isGiftOrder]);
 
-  // OTP resend countdown
-  useEffect(() => {
-    if (otpResendSeconds <= 0) return;
-    const t = setTimeout(() => setOtpResendSeconds(s => s - 1), 1000);
-    return () => clearTimeout(t);
-  }, [otpResendSeconds]);
   const [giftClaimed, setGiftClaimed] = useState(false);
 
   // Force scroll to top on mount
@@ -1451,7 +1361,7 @@ const NewRepairOrder = () => {
         <div className="w-full sm:w-[calc(100%-2rem)] sm:max-w-md bg-background rounded-t-3xl sm:rounded-2xl shadow-2xl animate-scale-in overflow-hidden">
           {/* Top header strip */}
           <div className="bg-primary text-primary-foreground px-5 py-4 flex items-center justify-between">
-            <h2 className="text-xl font-extrabold">כניסה / הרשמה</h2>
+            <h2 className="text-xl font-extrabold">מלא פרטים ונמשיך</h2>
             <button
               onClick={() => { if (!pendingIntroRepair) setShowIntroCard(false); }}
               className="w-9 h-9 rounded-full hover:bg-primary-foreground/15 flex items-center justify-center transition-colors disabled:opacity-40"
@@ -1462,14 +1372,13 @@ const NewRepairOrder = () => {
             </button>
           </div>
 
-          {otpStep === 'form' ? (
           <div className="p-5 space-y-4">
             {/* Promo card */}
             <div className="rounded-2xl border-2 border-primary/30 overflow-hidden">
               <div className="bg-foreground text-background p-4 flex items-center justify-between gap-3">
                 <div className="flex-1">
                   <p className="text-base sm:text-lg font-bold leading-snug">
-                    התחברות לקבלת<br />הנחות וקופונים בלעדיים
+                    התחבר לקבלת עדכונים<br />והנחות בלעדיות
                   </p>
                 </div>
                 <div className="w-14 h-14 rounded-full bg-primary/30 flex items-center justify-center shrink-0 relative">
@@ -1558,83 +1467,19 @@ const NewRepairOrder = () => {
               </span>
             </label>
 
-            {otpError && (
-              <p className="text-sm text-destructive text-center" role="alert">{otpError}</p>
-            )}
-
             {/* CTA */}
             <Button
               onClick={handleIntroDismiss}
               disabled={
-                otpSending ||
                 introName.trim().length < 2 ||
                 !/^05\d{8}$/.test(introPhone.replace(/\D/g, '')) ||
                 !introPrivacy
               }
               className="w-full h-14 text-base font-bold rounded-2xl tracking-wide uppercase"
             >
-              {otpSending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'המשך'}
+              המשך
             </Button>
           </div>
-          ) : (
-          /* OTP verification step */
-          <div className="p-5 space-y-5">
-            <div className="text-center space-y-2">
-              <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
-                <Shield className="w-8 h-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-extrabold">אימות מספר טלפון</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                שלחנו קוד בן 6 ספרות {otpChannel === 'whatsapp' ? 'בוואטסאפ' : 'ב-SMS'} למספר<br />
-                <span dir="ltr" className="font-bold text-foreground">+972 {introPhone.replace(/^0/, '')}</span>
-              </p>
-            </div>
-
-            <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block text-center">קוד אימות</label>
-              <Input
-                value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                inputMode="numeric"
-                maxLength={6}
-                placeholder="000000"
-                autoFocus
-                className="h-16 text-3xl text-center font-bold tracking-[0.5em] rounded-xl border-2"
-                dir="ltr"
-              />
-            </div>
-
-            {otpError && (
-              <p className="text-sm text-destructive text-center" role="alert">{otpError}</p>
-            )}
-
-            <Button
-              onClick={handleVerifyOtp}
-              disabled={otpVerifying || otpCode.length !== 6}
-              className="w-full h-14 text-base font-bold rounded-2xl"
-            >
-              {otpVerifying ? <Loader2 className="w-5 h-5 animate-spin" /> : 'אמת והמשך'}
-            </Button>
-
-            <div className="flex items-center justify-between text-sm">
-              <button
-                type="button"
-                onClick={() => { setOtpStep('form'); setOtpCode(''); setOtpError(''); }}
-                className="text-muted-foreground hover:text-foreground underline"
-              >
-                שינוי מספר
-              </button>
-              <button
-                type="button"
-                onClick={handleResendOtp}
-                disabled={otpResendSeconds > 0 || otpSending}
-                className="text-primary font-semibold disabled:text-muted-foreground disabled:no-underline underline"
-              >
-                {otpSending ? 'שולח...' : otpResendSeconds > 0 ? `שלח שוב בעוד ${otpResendSeconds} שניות` : 'שלח קוד חדש'}
-              </button>
-            </div>
-          </div>
-          )}
         </div>
       </div>
     )}
