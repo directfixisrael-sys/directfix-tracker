@@ -389,84 +389,11 @@ const NewRepairOrder = () => {
     }
   };
 
-  // Sync intro fields and trigger OTP for new customers, or finalize for returning ones
+  // Simple intro form submit — no OTP, just save details and continue
   const handleIntroDismiss = async () => {
     const phone = introPhone.trim().replace(/\D/g, '');
     if (!/^05\d{8}$/.test(phone)) return;
-
-    setOtpError('');
-    const known = await isExistingCustomer(phone);
-    if (known) {
-      // Returning customer — skip OTP
-      await finalizeIntro();
-      return;
-    }
-
-    // New customer — send OTP
-    setOtpSending(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('send-otp', { body: { phone } });
-      if (error || data?.error) {
-        const msg = data?.message || (data?.error === 'rate_limited' ? 'יותר מדי ניסיונות, נסה שוב בעוד מספר דקות' : 'שליחת הקוד נכשלה. נסה שוב.');
-        setOtpError(msg);
-        setOtpSending(false);
-        return;
-      }
-      setOtpChannel(data?.channel || 'whatsapp');
-      setOtpStep('verify');
-      setOtpResendSeconds(30);
-    } catch (e) {
-      console.error('send-otp invoke error:', e);
-      setOtpError('שליחת הקוד נכשלה. נסה שוב.');
-    }
-    setOtpSending(false);
-  };
-
-  // Verify OTP code
-  const handleVerifyOtp = async () => {
-    const phone = introPhone.trim().replace(/\D/g, '');
-    const code = otpCode.replace(/\D/g, '');
-    if (code.length !== 6) {
-      setOtpError('יש להזין קוד בן 6 ספרות');
-      return;
-    }
-    setOtpError('');
-    setOtpVerifying(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('verify-otp', { body: { phone, code } });
-      if (error || data?.error) {
-        setOtpError(data?.message || 'קוד שגוי. נסה שוב.');
-        setOtpVerifying(false);
-        return;
-      }
-      setOtpVerifying(false);
-      await finalizeIntro();
-    } catch (e) {
-      console.error('verify-otp error:', e);
-      setOtpError('האימות נכשל. נסה שוב.');
-      setOtpVerifying(false);
-    }
-  };
-
-  // Resend OTP
-  const handleResendOtp = async () => {
-    if (otpResendSeconds > 0 || otpSending) return;
-    const phone = introPhone.trim().replace(/\D/g, '');
-    setOtpError('');
-    setOtpSending(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('send-otp', { body: { phone } });
-      if (error || data?.error) {
-        setOtpError(data?.message || 'שליחת הקוד נכשלה. נסה שוב.');
-      } else {
-        setOtpChannel(data?.channel || 'whatsapp');
-        setOtpResendSeconds(30);
-        setOtpCode('');
-      }
-    } catch (e) {
-      setOtpError('שליחת הקוד נכשלה. נסה שוב.');
-    }
-    setOtpSending(false);
+    await finalizeIntro();
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptContact, setAcceptContact] = useState(false);
