@@ -282,10 +282,11 @@ const NewRepairOrder = () => {
   } = useTheme();
   const [step, setStep] = useState<Step>('model');
   const [orderMenuOpen, setOrderMenuOpen] = useState(false);
-  const [showIntroCard, setShowIntroCard] = useState(true);
+  const [showIntroCard, setShowIntroCard] = useState(false);
   const [introName, setIntroName] = useState('');
   const [introPhone, setIntroPhone] = useState('');
   const [introPrivacy, setIntroPrivacy] = useState(false);
+  const [pendingIntroRepair, setPendingIntroRepair] = useState<RepairType | null>(null);
   const [isReturningCustomer, setIsReturningCustomer] = useState(false);
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
