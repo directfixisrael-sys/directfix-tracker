@@ -287,6 +287,14 @@ const NewRepairOrder = () => {
   const [introPhone, setIntroPhone] = useState('');
   const [introPrivacy, setIntroPrivacy] = useState(false);
   const [pendingIntroRepair, setPendingIntroRepair] = useState<RepairType | null>(null);
+  // OTP verification state
+  const [otpStep, setOtpStep] = useState<'form' | 'verify'>('form');
+  const [otpCode, setOtpCode] = useState('');
+  const [otpChannel, setOtpChannel] = useState<'whatsapp' | 'sms'>('whatsapp');
+  const [otpError, setOtpError] = useState('');
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [otpResendSeconds, setOtpResendSeconds] = useState(0);
   const [isReturningCustomer, setIsReturningCustomer] = useState(false);
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
@@ -328,21 +336,37 @@ const NewRepairOrder = () => {
     }
   };
 
-  // Sync intro fields to customer fields and save lead
-  const handleIntroDismiss = async () => {
+  // Check if a phone is "known" (existing customer) — skip OTP for these
+  const isExistingCustomer = async (phone: string): Promise<boolean> => {
+    try {
+      const [orders, club, profile] = await Promise.all([
+        supabase.from('orders').select('id', { head: true, count: 'exact' }).eq('customer_phone', phone).limit(1),
+        supabase.from('club_members').select('id', { head: true, count: 'exact' }).eq('phone', phone).limit(1),
+        supabase.from('customer_profiles').select('id', { head: true, count: 'exact' }).eq('phone', phone).limit(1),
+      ]);
+      return ((orders.count ?? 0) + (club.count ?? 0) + (profile.count ?? 0)) > 0;
+    } catch (e) {
+      console.error('isExistingCustomer error:', e);
+      return false; // fail open — verify just in case
+    }
+  };
+
+  // Save lead and finalize intro
+  const finalizeIntro = async () => {
     const name = introName.trim();
     const phone = introPhone.trim().replace(/\D/g, '');
     if (name) setCustomerName(name);
     if (phone) setCustomerPhone(phone);
     setShowIntroCard(false);
+    setOtpStep('form');
+    setOtpCode('');
+    setOtpError('');
 
-    // Scroll to top after dismissing intro
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     if (contentRef.current) contentRef.current.scrollTop = 0;
 
-    // Save lead to DB
     try {
       const { data: leadData } = await supabase.from('leads').insert({
         customer_name: name,
@@ -358,13 +382,91 @@ const NewRepairOrder = () => {
       console.error('Error saving lead:', e);
     }
 
-    // Continue with the pending repair selection if any
     if (pendingIntroRepair) {
       const repair = pendingIntroRepair;
       setPendingIntroRepair(null);
-      // Use timeout so state updates flush before continuing the repair flow
       setTimeout(() => continueRepairSelect(repair), 50);
     }
+  };
+
+  // Sync intro fields and trigger OTP for new customers, or finalize for returning ones
+  const handleIntroDismiss = async () => {
+    const phone = introPhone.trim().replace(/\D/g, '');
+    if (!/^05\d{8}$/.test(phone)) return;
+
+    setOtpError('');
+    const known = await isExistingCustomer(phone);
+    if (known) {
+      // Returning customer — skip OTP
+      await finalizeIntro();
+      return;
+    }
+
+    // New customer — send OTP
+    setOtpSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-otp', { body: { phone } });
+      if (error || data?.error) {
+        const msg = data?.message || (data?.error === 'rate_limited' ? 'יותר מדי ניסיונות, נסה שוב בעוד מספר דקות' : 'שליחת הקוד נכשלה. נסה שוב.');
+        setOtpError(msg);
+        setOtpSending(false);
+        return;
+      }
+      setOtpChannel(data?.channel || 'whatsapp');
+      setOtpStep('verify');
+      setOtpResendSeconds(30);
+    } catch (e) {
+      console.error('send-otp invoke error:', e);
+      setOtpError('שליחת הקוד נכשלה. נסה שוב.');
+    }
+    setOtpSending(false);
+  };
+
+  // Verify OTP code
+  const handleVerifyOtp = async () => {
+    const phone = introPhone.trim().replace(/\D/g, '');
+    const code = otpCode.replace(/\D/g, '');
+    if (code.length !== 6) {
+      setOtpError('יש להזין קוד בן 6 ספרות');
+      return;
+    }
+    setOtpError('');
+    setOtpVerifying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-otp', { body: { phone, code } });
+      if (error || data?.error) {
+        setOtpError(data?.message || 'קוד שגוי. נסה שוב.');
+        setOtpVerifying(false);
+        return;
+      }
+      setOtpVerifying(false);
+      await finalizeIntro();
+    } catch (e) {
+      console.error('verify-otp error:', e);
+      setOtpError('האימות נכשל. נסה שוב.');
+      setOtpVerifying(false);
+    }
+  };
+
+  // Resend OTP
+  const handleResendOtp = async () => {
+    if (otpResendSeconds > 0 || otpSending) return;
+    const phone = introPhone.trim().replace(/\D/g, '');
+    setOtpError('');
+    setOtpSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-otp', { body: { phone } });
+      if (error || data?.error) {
+        setOtpError(data?.message || 'שליחת הקוד נכשלה. נסה שוב.');
+      } else {
+        setOtpChannel(data?.channel || 'whatsapp');
+        setOtpResendSeconds(30);
+        setOtpCode('');
+      }
+    } catch (e) {
+      setOtpError('שליחת הקוד נכשלה. נסה שוב.');
+    }
+    setOtpSending(false);
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptContact, setAcceptContact] = useState(false);
@@ -452,6 +554,13 @@ const NewRepairOrder = () => {
       document.documentElement.classList.remove('gift-mode');
     };
   }, [isGiftOrder]);
+
+  // OTP resend countdown
+  useEffect(() => {
+    if (otpResendSeconds <= 0) return;
+    const t = setTimeout(() => setOtpResendSeconds(s => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [otpResendSeconds]);
   const [giftClaimed, setGiftClaimed] = useState(false);
 
   // Force scroll to top on mount
@@ -1353,6 +1462,7 @@ const NewRepairOrder = () => {
             </button>
           </div>
 
+          {otpStep === 'form' ? (
           <div className="p-5 space-y-4">
             {/* Promo card */}
             <div className="rounded-2xl border-2 border-primary/30 overflow-hidden">
@@ -1448,19 +1558,83 @@ const NewRepairOrder = () => {
               </span>
             </label>
 
+            {otpError && (
+              <p className="text-sm text-destructive text-center" role="alert">{otpError}</p>
+            )}
+
             {/* CTA */}
             <Button
               onClick={handleIntroDismiss}
               disabled={
+                otpSending ||
                 introName.trim().length < 2 ||
                 !/^05\d{8}$/.test(introPhone.replace(/\D/g, '')) ||
                 !introPrivacy
               }
               className="w-full h-14 text-base font-bold rounded-2xl tracking-wide uppercase"
             >
-              המשך
+              {otpSending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'המשך'}
             </Button>
           </div>
+          ) : (
+          /* OTP verification step */
+          <div className="p-5 space-y-5">
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
+                <Shield className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-extrabold">אימות מספר טלפון</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                שלחנו קוד בן 6 ספרות {otpChannel === 'whatsapp' ? 'בוואטסאפ' : 'ב-SMS'} למספר<br />
+                <span dir="ltr" className="font-bold text-foreground">+972 {introPhone.replace(/^0/, '')}</span>
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm text-muted-foreground mb-1.5 block text-center">קוד אימות</label>
+              <Input
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="000000"
+                autoFocus
+                className="h-16 text-3xl text-center font-bold tracking-[0.5em] rounded-xl border-2"
+                dir="ltr"
+              />
+            </div>
+
+            {otpError && (
+              <p className="text-sm text-destructive text-center" role="alert">{otpError}</p>
+            )}
+
+            <Button
+              onClick={handleVerifyOtp}
+              disabled={otpVerifying || otpCode.length !== 6}
+              className="w-full h-14 text-base font-bold rounded-2xl"
+            >
+              {otpVerifying ? <Loader2 className="w-5 h-5 animate-spin" /> : 'אמת והמשך'}
+            </Button>
+
+            <div className="flex items-center justify-between text-sm">
+              <button
+                type="button"
+                onClick={() => { setOtpStep('form'); setOtpCode(''); setOtpError(''); }}
+                className="text-muted-foreground hover:text-foreground underline"
+              >
+                שינוי מספר
+              </button>
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={otpResendSeconds > 0 || otpSending}
+                className="text-primary font-semibold disabled:text-muted-foreground disabled:no-underline underline"
+              >
+                {otpSending ? 'שולח...' : otpResendSeconds > 0 ? `שלח שוב בעוד ${otpResendSeconds} שניות` : 'שלח קוד חדש'}
+              </button>
+            </div>
+          </div>
+          )}
         </div>
       </div>
     )}
