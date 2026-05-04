@@ -778,7 +778,7 @@ const NewRepairOrder = () => {
       window.location.href = 'tel:0528692886';
       return;
     }
-    
+
     // "תיקון אחר" - just select it, stay on same step to show text input
     if (repair.name.includes('תיקון אחר')) {
       setSelectedRepair(repair);
@@ -786,9 +786,9 @@ const NewRepairOrder = () => {
       setOtherRepairDescription('');
       return; // Don't navigate - the inline form will appear
     }
-    
+
     const isBackGlass = repair.name.includes('גב');
-    
+
     // If back glass, show color picker instead of proceeding
     if (isBackGlass && selectedModel) {
       setSelectedRepair(repair);
@@ -797,8 +797,22 @@ const NewRepairOrder = () => {
       return;
     }
 
+    // Require name + phone before continuing past repair selection
+    const hasName = (customerName || introName).trim().length > 0;
+    const hasPhone = (customerPhone || introPhone).replace(/\D/g, '').length >= 9;
+    if (!hasName || !hasPhone) {
+      setSelectedRepair(repair);
+      setPendingIntroRepair(repair);
+      setShowIntroCard(true);
+      return;
+    }
+
+    continueRepairSelect(repair);
+  };
+
+  const continueRepairSelect = (repair: RepairType) => {
     const isScreenRepair = repair.name.includes('מסך');
-    
+
     setSelectedRepair(repair);
     setShowBackColorPicker(false);
     updateLeadStep('אישור מחיר', { repair_type: repair.name });
