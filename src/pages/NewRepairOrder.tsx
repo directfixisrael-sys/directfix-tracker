@@ -471,12 +471,6 @@ const NewRepairOrder = () => {
     };
   }, [isGiftOrder]);
 
-  // OTP resend countdown
-  useEffect(() => {
-    if (otpResendSeconds <= 0) return;
-    const t = setTimeout(() => setOtpResendSeconds(s => s - 1), 1000);
-    return () => clearTimeout(t);
-  }, [otpResendSeconds]);
   const [giftClaimed, setGiftClaimed] = useState(false);
 
   // Force scroll to top on mount
