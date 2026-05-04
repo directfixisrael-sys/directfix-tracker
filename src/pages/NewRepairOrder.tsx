@@ -1701,7 +1701,48 @@ const NewRepairOrder = () => {
 
                     {/* Inline Color Picker - slides open under the back glass card */}
                     {isBackGlass && showBackColorPicker && selectedModel && (() => {
-...
+                       const colors = iphoneBackColors[selectedModel.name] || [];
+                       return colors.length > 0 ? (
+                         <div className="overflow-hidden animate-fade-in">
+                           <div className="pt-3 pb-1 px-1 space-y-4">
+                             <div className="text-center">
+                               <h3 className="text-lg font-bold">באיזה צבע הגב של המכשיר?</h3>
+                               <p className="text-sm text-muted-foreground">בחרו את הצבע כדי שנביא את החלק המתאים</p>
+                             </div>
+                             <div className="grid grid-cols-3 gap-3">
+                               {colors.map((color) => (
+                                 <button
+                                   key={color.name}
+                                   onClick={() => setSelectedBackColor(color.name)}
+                                   className={`flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all duration-200 ${
+                                     selectedBackColor === color.name
+                                       ? 'border-primary bg-primary/5 shadow-md'
+                                       : 'border-border hover:border-primary/40'
+                                   }`}
+                                 >
+                                   <div
+                                     className={`w-10 h-10 rounded-full border-2 shadow-inner ${
+                                       selectedBackColor === color.name ? 'border-primary ring-2 ring-primary/30' : 'border-border'
+                                     }`}
+                                     style={{ backgroundColor: color.hex }}
+                                   />
+                                   <span className="text-xs font-medium text-center leading-tight">{color.name}</span>
+                                   {selectedBackColor === color.name && (
+                                     <Check className="w-4 h-4 text-primary" />
+                                   )}
+                                 </button>
+                               ))}
+                             </div>
+                             <Button
+                               onClick={handleBackColorConfirm}
+                               disabled={!selectedBackColor}
+                               className="w-full h-12 text-base font-bold rounded-xl"
+                             >
+                               המשך עם {selectedBackColor || '...'}
+                             </Button>
+                           </div>
+                         </div>
+                       ) : null;
                      })()}
 
 
