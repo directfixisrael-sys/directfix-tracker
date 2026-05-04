@@ -1671,7 +1671,23 @@ const NewRepairOrder = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <h3 className="font-semibold text-xl">{repair.name}</h3>
-...
+                            {!isPhoneOnly && info && <Dialog>
+                                <DialogTrigger asChild>
+                                  <button type="button" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-primary transition-colors p-1">
+                                    <HelpCircle className="w-5 h-5" />
+                                  </button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-sm" onClick={e => e.stopPropagation()}>
+                                  <DialogHeader>
+                                    <DialogTitle className="text-right">{info.title}</DialogTitle>
+                                  </DialogHeader>
+                                  <p className="text-base text-muted-foreground text-right leading-relaxed">
+                                    {info.description}
+                                  </p>
+                                </DialogContent>
+                              </Dialog>}
+                          </div>
+                          {repair.description && <p className="text-muted-foreground text-base mt-1">{repair.description}</p>}
                           {!isPhoneOnly && selectedModel && price > 0 && (
                             <div className="flex items-center gap-2 mt-2">
                               <span className="text-2xl font-bold text-primary">₪{price}</span>
