@@ -287,6 +287,9 @@ const NewRepairOrder = () => {
   const [introPhone, setIntroPhone] = useState('');
   const [introPrivacy, setIntroPrivacy] = useState(false);
   const [isReturningCustomer, setIsReturningCustomer] = useState(false);
+  const [returningBannerDismissed, setReturningBannerDismissed] = useState(() => {
+    try { return sessionStorage.getItem('returningBannerDismissed') === '1'; } catch { return false; }
+  });
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
