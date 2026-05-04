@@ -196,13 +196,13 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Open Sans Hebrew', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   
   * {
-    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Open Sans Hebrew', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   /* High Contrast Mode */
