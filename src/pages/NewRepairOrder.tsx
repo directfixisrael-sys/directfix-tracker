@@ -1399,21 +1399,42 @@ const NewRepairOrder = () => {
             </div>
 
             {/* Phone field */}
-            <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">מספר טלפון</label>
-              <div className="flex gap-2 items-stretch" dir="ltr">
-                <div className="h-14 px-3 rounded-xl border-2 border-border bg-muted/40 flex items-center font-bold text-base shrink-0">
-                  +972
+            {(() => {
+              const phoneDigits = introPhone.replace(/\D/g, '');
+              const isValidIL = /^05\d{8}$/.test(phoneDigits);
+              const showPhoneError = phoneDigits.length > 0 && (phoneDigits.length >= 10 || (phoneDigits.length >= 2 && !phoneDigits.startsWith('05'))) && !isValidIL;
+              const formatted = phoneDigits.length > 3
+                ? `${phoneDigits.slice(0, 3)}-${phoneDigits.slice(3, 10)}`
+                : phoneDigits;
+              return (
+                <div>
+                  <label className="text-sm text-muted-foreground mb-1.5 block">מספר טלפון</label>
+                  <div className="flex gap-2 items-stretch" dir="ltr">
+                    <div className="h-14 px-3 rounded-xl border-2 border-border bg-muted/40 flex items-center font-bold text-base shrink-0">
+                      +972
+                    </div>
+                    <Input
+                      placeholder="050-0000000"
+                      value={formatted}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                        setIntroPhone(digits);
+                      }}
+                      inputMode="numeric"
+                      type="tel"
+                      maxLength={11}
+                      aria-invalid={showPhoneError}
+                      className={`h-14 text-lg rounded-xl px-4 border-2 flex-1 text-left ${showPhoneError ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    />
+                  </div>
+                  {showPhoneError && (
+                    <p className="text-xs text-destructive mt-1.5 text-right" role="alert">
+                      מספר לא תקין. יש להזין מספר ישראלי בן 10 ספרות שמתחיל ב-05
+                    </p>
+                  )}
                 </div>
-                <Input
-                  placeholder="50-000-0000"
-                  value={introPhone}
-                  onChange={(e) => setIntroPhone(e.target.value)}
-                  type="tel"
-                  className="h-14 text-lg rounded-xl px-4 border-2 flex-1 text-left"
-                />
-              </div>
-            </div>
+              );
+            })()}
 
             {/* Consent */}
             <label className="flex items-start gap-2.5 cursor-pointer pt-1">
@@ -1430,7 +1451,11 @@ const NewRepairOrder = () => {
             {/* CTA */}
             <Button
               onClick={handleIntroDismiss}
-              disabled={!introName.trim() || introPhone.replace(/\D/g, '').length < 9 || !introPrivacy}
+              disabled={
+                introName.trim().length < 2 ||
+                !/^05\d{8}$/.test(introPhone.replace(/\D/g, '')) ||
+                !introPrivacy
+              }
               className="w-full h-14 text-base font-bold rounded-2xl tracking-wide uppercase"
             >
               המשך
