@@ -82,14 +82,14 @@ const AnnouncementBanner = () => {
     <>
       {/* Header banners */}
       {headerBanners.map(ann => (
-        <div key={ann.id} className={`relative px-4 py-2.5 text-center text-sm font-medium ${colorMap[ann.bg_color] || colorMap.warning}`}>
+        <div key={ann.id} className={`relative px-4 py-2.5 pl-12 text-center text-sm font-medium ${colorMap[ann.bg_color] || colorMap.warning}`}>
           <div className="max-w-4xl mx-auto flex items-center justify-center gap-2">
             {ann.title && <strong>{ann.title}:</strong>}
             <span>{ann.message}</span>
           </div>
           <button
             onClick={() => dismiss(ann.id)}
-            className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-black/10 transition-colors"
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/15 hover:bg-white/25 border border-white/25 flex items-center justify-center transition-colors"
             aria-label="סגור הודעה"
           >
             <X className="w-4 h-4" />
