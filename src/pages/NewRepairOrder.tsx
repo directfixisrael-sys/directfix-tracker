@@ -882,12 +882,21 @@ const NewRepairOrder = () => {
   
   const handleBackColorConfirm = () => {
     if (!selectedBackColor || !selectedRepair || !selectedModel) return;
-    
+
+    // Require name + phone before continuing
+    const hasName = (customerName || introName).trim().length > 0;
+    const hasPhone = (customerPhone || introPhone).replace(/\D/g, '').length >= 9;
+    if (!hasName || !hasPhone) {
+      setPendingIntroRepair(selectedRepair);
+      setShowIntroCard(true);
+      return;
+    }
+
     // Track
     const backPrice = getRepairPrice(selectedRepair);
     trackAddToCart(selectedRepair.name, backPrice);
     gaSelectRepair(selectedRepair.name, backPrice);
-    
+
     setShowBackColorPicker(false);
     checkClubMemberAndNavigate();
   };
