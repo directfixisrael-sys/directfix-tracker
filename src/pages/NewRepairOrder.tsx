@@ -1373,37 +1373,22 @@ const NewRepairOrder = () => {
           </div>
 
           <div className="p-5 space-y-4">
-            {/* Promo card */}
-            <div className="rounded-2xl border-2 border-primary/30 overflow-hidden">
-              <div className="bg-foreground text-background p-4 flex items-center justify-between gap-3">
-                <div className="flex-1">
-                  <p className="text-base sm:text-lg font-bold leading-snug">
-                    התחבר לקבלת עדכונים<br />והנחות בלעדיות
-                  </p>
+            {/* Selected device + repair preview */}
+            {(selectedModel || selectedRepair) && (
+              <div className="rounded-2xl border border-border bg-card p-3 flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                  <Smartphone className="w-6 h-6 text-muted-foreground" />
                 </div>
-                <div className="w-14 h-14 rounded-full bg-primary/30 flex items-center justify-center shrink-0 relative">
-                  <BadgePercent className="w-7 h-7 text-primary-foreground" />
-                  <Sparkles className="w-3.5 h-3.5 text-primary-foreground absolute -top-0.5 -right-0.5" />
+                <div className="flex-1 min-w-0">
+                  {selectedModel && (
+                    <p className="font-bold text-sm text-foreground truncate">{selectedModel.name}</p>
+                  )}
+                  {selectedRepair && (
+                    <p className="text-xs text-muted-foreground truncate">{selectedRepair.name}</p>
+                  )}
                 </div>
               </div>
-
-              {/* Selected device + repair preview */}
-              {(selectedModel || selectedRepair) && (
-                <div className="bg-card p-3 flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                    <Smartphone className="w-7 h-7 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    {selectedModel && (
-                      <p className="font-bold text-base text-foreground truncate">{selectedModel.name}</p>
-                    )}
-                    {selectedRepair && (
-                      <p className="text-sm text-muted-foreground truncate">{selectedRepair.name}</p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
 
             {/* Name field */}
             <div>
