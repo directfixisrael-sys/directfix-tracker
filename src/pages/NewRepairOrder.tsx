@@ -287,6 +287,9 @@ const NewRepairOrder = () => {
   const [introPhone, setIntroPhone] = useState('');
   const [introPrivacy, setIntroPrivacy] = useState(false);
   const [isReturningCustomer, setIsReturningCustomer] = useState(false);
+  const [returningBannerDismissed, setReturningBannerDismissed] = useState(() => {
+    try { return sessionStorage.getItem('returningBannerDismissed') === '1'; } catch { return false; }
+  });
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
@@ -1509,13 +1512,24 @@ const NewRepairOrder = () => {
         {step === 'model' && <div className="space-y-8 animate-fade-in py-0 relative">
 
             {/* Returning customer banner */}
-            {isReturningCustomer && !showIntroCard && (
-              <div className="bg-success/10 border border-success/30 rounded-2xl p-3 flex items-center gap-3 animate-fade-in">
+            {isReturningCustomer && !showIntroCard && !returningBannerDismissed && (
+              <div className="relative bg-success/10 border border-success/30 rounded-2xl p-3 pl-10 flex items-center gap-3 animate-fade-in">
                 <Gift className="w-5 h-5 text-success flex-shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-foreground">ברוכים השבים!</p>
                   <p className="text-xs text-muted-foreground">מגן מסך פרימיום במתנה על תיקון חוזר</p>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReturningBannerDismissed(true);
+                    try { sessionStorage.setItem('returningBannerDismissed', '1'); } catch {}
+                  }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-card/80 hover:bg-card border border-border flex items-center justify-center transition-colors"
+                  aria-label="סגור הודעה"
+                >
+                  <X className="w-3.5 h-3.5 text-muted-foreground" />
+                </button>
               </div>
             )}
 

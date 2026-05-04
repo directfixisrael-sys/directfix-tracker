@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { Facebook, Instagram } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const MinimalFooter = () => {
@@ -35,6 +36,26 @@ const MinimalFooter = () => {
             </button>
           ))}
         </nav>
+        <div className="flex items-center justify-center gap-3 mt-4">
+          <a
+            href="https://www.facebook.com/directfix.co.il"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+            className="w-9 h-9 rounded-full bg-muted/60 hover:bg-primary hover:text-primary-foreground border border-border/60 flex items-center justify-center transition-all hover:scale-105"
+          >
+            <Facebook className="w-4 h-4" />
+          </a>
+          <a
+            href="https://www.instagram.com/directfixisrael1/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            className="w-9 h-9 rounded-full bg-muted/60 hover:bg-primary hover:text-primary-foreground border border-border/60 flex items-center justify-center transition-all hover:scale-105"
+          >
+            <Instagram className="w-4 h-4" />
+          </a>
+        </div>
         <p className="text-xs text-muted-foreground/60 text-center mt-3">
           {t('footer.rights', { year: new Date().getFullYear() })}
         </p>
