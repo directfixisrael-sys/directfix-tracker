@@ -287,6 +287,14 @@ const NewRepairOrder = () => {
   const [introPhone, setIntroPhone] = useState('');
   const [introPrivacy, setIntroPrivacy] = useState(false);
   const [pendingIntroRepair, setPendingIntroRepair] = useState<RepairType | null>(null);
+  // OTP verification state
+  const [otpStep, setOtpStep] = useState<'form' | 'verify'>('form');
+  const [otpCode, setOtpCode] = useState('');
+  const [otpChannel, setOtpChannel] = useState<'whatsapp' | 'sms'>('whatsapp');
+  const [otpError, setOtpError] = useState('');
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [otpResendSeconds, setOtpResendSeconds] = useState(0);
   const [isReturningCustomer, setIsReturningCustomer] = useState(false);
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
