@@ -1479,6 +1479,33 @@ const NewRepairOrder = () => {
             >
               המשך
             </Button>
+
+            {/* Conversion reassurance */}
+            <div className="rounded-2xl bg-primary/10 border border-primary/20 px-3.5 py-3 flex items-center gap-2.5" dir="rtl">
+              <span className="relative flex h-2.5 w-2.5 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+              </span>
+              <p className="text-sm font-semibold text-foreground leading-snug flex-1">
+                עוד רגע והטכנאי שלנו בדרך אליך
+              </p>
+            </div>
+
+            {/* Trust micro-row */}
+            <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground pt-0.5" dir="rtl">
+              <span className="inline-flex items-center gap-1">
+                <Shield className="w-3.5 h-3.5 text-primary" />
+                ללא ספאם
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                ללא חיוב מיידי
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-primary" />
+                30 שניות
+              </span>
+            </div>
           </div>
         </div>
       </div>
