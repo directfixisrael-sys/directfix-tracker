@@ -1110,15 +1110,8 @@ const NewRepairOrder = () => {
       }
       if (appliedCoupon) {
         notes.push(`קופון: ${appliedCoupon.code} - הנחה של ${appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : `₪${appliedCoupon.discount_value}`}`);
-        // Update coupon usage
-        const {
-          data: couponData
-        } = await supabase.from('coupons').select('current_uses').eq('code', appliedCoupon.code).single();
-        if (couponData) {
-          await supabase.from('coupons').update({
-            current_uses: couponData.current_uses + 1
-          }).eq('code', appliedCoupon.code);
-        }
+        // Atomic coupon usage increment (prevents race conditions on max_uses)
+        await supabase.rpc('increment_coupon_usage', { coupon_code: appliedCoupon.code });
       }
       if (loyaltyDiscount > 0) {
         notes.push(`הנחת נקודות נאמנות: -₪${loyaltyDiscount} (${customerLoyaltyPoints} נקודות)`);
