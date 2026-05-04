@@ -1462,6 +1462,7 @@ const NewRepairOrder = () => {
             </button>
           </div>
 
+          {otpStep === 'form' ? (
           <div className="p-5 space-y-4">
             {/* Promo card */}
             <div className="rounded-2xl border-2 border-primary/30 overflow-hidden">
@@ -1557,19 +1558,83 @@ const NewRepairOrder = () => {
               </span>
             </label>
 
+            {otpError && (
+              <p className="text-sm text-destructive text-center" role="alert">{otpError}</p>
+            )}
+
             {/* CTA */}
             <Button
               onClick={handleIntroDismiss}
               disabled={
+                otpSending ||
                 introName.trim().length < 2 ||
                 !/^05\d{8}$/.test(introPhone.replace(/\D/g, '')) ||
                 !introPrivacy
               }
               className="w-full h-14 text-base font-bold rounded-2xl tracking-wide uppercase"
             >
-              המשך
+              {otpSending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'המשך'}
             </Button>
           </div>
+          ) : (
+          /* OTP verification step */
+          <div className="p-5 space-y-5">
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
+                <Shield className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-extrabold">אימות מספר טלפון</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                שלחנו קוד בן 6 ספרות {otpChannel === 'whatsapp' ? 'בוואטסאפ' : 'ב-SMS'} למספר<br />
+                <span dir="ltr" className="font-bold text-foreground">+972 {introPhone.replace(/^0/, '')}</span>
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm text-muted-foreground mb-1.5 block text-center">קוד אימות</label>
+              <Input
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="000000"
+                autoFocus
+                className="h-16 text-3xl text-center font-bold tracking-[0.5em] rounded-xl border-2"
+                dir="ltr"
+              />
+            </div>
+
+            {otpError && (
+              <p className="text-sm text-destructive text-center" role="alert">{otpError}</p>
+            )}
+
+            <Button
+              onClick={handleVerifyOtp}
+              disabled={otpVerifying || otpCode.length !== 6}
+              className="w-full h-14 text-base font-bold rounded-2xl"
+            >
+              {otpVerifying ? <Loader2 className="w-5 h-5 animate-spin" /> : 'אמת והמשך'}
+            </Button>
+
+            <div className="flex items-center justify-between text-sm">
+              <button
+                type="button"
+                onClick={() => { setOtpStep('form'); setOtpCode(''); setOtpError(''); }}
+                className="text-muted-foreground hover:text-foreground underline"
+              >
+                שינוי מספר
+              </button>
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={otpResendSeconds > 0 || otpSending}
+                className="text-primary font-semibold disabled:text-muted-foreground disabled:no-underline underline"
+              >
+                {otpSending ? 'שולח...' : otpResendSeconds > 0 ? `שלח שוב בעוד ${otpResendSeconds} שניות` : 'שלח קוד חדש'}
+              </button>
+            </div>
+          </div>
+          )}
         </div>
       </div>
     )}
