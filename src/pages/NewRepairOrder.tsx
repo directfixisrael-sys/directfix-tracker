@@ -336,21 +336,37 @@ const NewRepairOrder = () => {
     }
   };
 
-  // Sync intro fields to customer fields and save lead
-  const handleIntroDismiss = async () => {
+  // Check if a phone is "known" (existing customer) — skip OTP for these
+  const isExistingCustomer = async (phone: string): Promise<boolean> => {
+    try {
+      const [orders, club, profile] = await Promise.all([
+        supabase.from('orders').select('id', { head: true, count: 'exact' }).eq('customer_phone', phone).limit(1),
+        supabase.from('club_members').select('id', { head: true, count: 'exact' }).eq('phone', phone).limit(1),
+        supabase.from('customer_profiles').select('id', { head: true, count: 'exact' }).eq('phone', phone).limit(1),
+      ]);
+      return ((orders.count ?? 0) + (club.count ?? 0) + (profile.count ?? 0)) > 0;
+    } catch (e) {
+      console.error('isExistingCustomer error:', e);
+      return false; // fail open — verify just in case
+    }
+  };
+
+  // Save lead and finalize intro
+  const finalizeIntro = async () => {
     const name = introName.trim();
     const phone = introPhone.trim().replace(/\D/g, '');
     if (name) setCustomerName(name);
     if (phone) setCustomerPhone(phone);
     setShowIntroCard(false);
+    setOtpStep('form');
+    setOtpCode('');
+    setOtpError('');
 
-    // Scroll to top after dismissing intro
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     if (contentRef.current) contentRef.current.scrollTop = 0;
 
-    // Save lead to DB
     try {
       const { data: leadData } = await supabase.from('leads').insert({
         customer_name: name,
@@ -366,13 +382,91 @@ const NewRepairOrder = () => {
       console.error('Error saving lead:', e);
     }
 
-    // Continue with the pending repair selection if any
     if (pendingIntroRepair) {
       const repair = pendingIntroRepair;
       setPendingIntroRepair(null);
-      // Use timeout so state updates flush before continuing the repair flow
       setTimeout(() => continueRepairSelect(repair), 50);
     }
+  };
+
+  // Sync intro fields and trigger OTP for new customers, or finalize for returning ones
+  const handleIntroDismiss = async () => {
+    const phone = introPhone.trim().replace(/\D/g, '');
+    if (!/^05\d{8}$/.test(phone)) return;
+
+    setOtpError('');
+    const known = await isExistingCustomer(phone);
+    if (known) {
+      // Returning customer — skip OTP
+      await finalizeIntro();
+      return;
+    }
+
+    // New customer — send OTP
+    setOtpSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-otp', { body: { phone } });
+      if (error || data?.error) {
+        const msg = data?.message || (data?.error === 'rate_limited' ? 'יותר מדי ניסיונות, נסה שוב בעוד מספר דקות' : 'שליחת הקוד נכשלה. נסה שוב.');
+        setOtpError(msg);
+        setOtpSending(false);
+        return;
+      }
+      setOtpChannel(data?.channel || 'whatsapp');
+      setOtpStep('verify');
+      setOtpResendSeconds(30);
+    } catch (e) {
+      console.error('send-otp invoke error:', e);
+      setOtpError('שליחת הקוד נכשלה. נסה שוב.');
+    }
+    setOtpSending(false);
+  };
+
+  // Verify OTP code
+  const handleVerifyOtp = async () => {
+    const phone = introPhone.trim().replace(/\D/g, '');
+    const code = otpCode.replace(/\D/g, '');
+    if (code.length !== 6) {
+      setOtpError('יש להזין קוד בן 6 ספרות');
+      return;
+    }
+    setOtpError('');
+    setOtpVerifying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-otp', { body: { phone, code } });
+      if (error || data?.error) {
+        setOtpError(data?.message || 'קוד שגוי. נסה שוב.');
+        setOtpVerifying(false);
+        return;
+      }
+      setOtpVerifying(false);
+      await finalizeIntro();
+    } catch (e) {
+      console.error('verify-otp error:', e);
+      setOtpError('האימות נכשל. נסה שוב.');
+      setOtpVerifying(false);
+    }
+  };
+
+  // Resend OTP
+  const handleResendOtp = async () => {
+    if (otpResendSeconds > 0 || otpSending) return;
+    const phone = introPhone.trim().replace(/\D/g, '');
+    setOtpError('');
+    setOtpSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-otp', { body: { phone } });
+      if (error || data?.error) {
+        setOtpError(data?.message || 'שליחת הקוד נכשלה. נסה שוב.');
+      } else {
+        setOtpChannel(data?.channel || 'whatsapp');
+        setOtpResendSeconds(30);
+        setOtpCode('');
+      }
+    } catch (e) {
+      setOtpError('שליחת הקוד נכשלה. נסה שוב.');
+    }
+    setOtpSending(false);
   };
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptContact, setAcceptContact] = useState(false);
