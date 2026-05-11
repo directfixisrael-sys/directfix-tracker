@@ -791,6 +791,27 @@ const PriceManagement = () => {
                 })}
               </div>
             </div>
+
+            {/* Battery quality selector */}
+            <div className="rounded-xl border border-border p-3 bg-muted/30">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold flex items-center gap-1.5">
+                    <Battery className="w-4 h-4 text-amber-500" />
+                    סוללה מקורית
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {modelForm.battery_is_original
+                      ? 'יוצג ללקוח: סוללה מקורית'
+                      : 'יוצג ללקוח: סוללה באיכות הגבוהה ביותר · אחריות שנה'}
+                  </p>
+                </div>
+                <Switch
+                  checked={modelForm.battery_is_original}
+                  onCheckedChange={(checked) => setModelForm({ ...modelForm, battery_is_original: checked })}
+                />
+              </div>
+            </div>
             <div>
               <label className="block text-sm font-medium mb-2">מרווח הזמנה מינימלי (שעות)</label>
               <Input
