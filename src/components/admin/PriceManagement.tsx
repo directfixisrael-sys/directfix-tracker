@@ -276,6 +276,7 @@ const PriceManagement = () => {
             series: finalSeries,
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
+            battery_is_original: modelForm.battery_is_original,
           })
           .eq('id', editingModel.id);
 
@@ -291,6 +292,7 @@ const PriceManagement = () => {
             series: finalSeries,
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
+            battery_is_original: modelForm.battery_is_original,
             sort_order: maxOrder + 1,
           })
           .select('id')
