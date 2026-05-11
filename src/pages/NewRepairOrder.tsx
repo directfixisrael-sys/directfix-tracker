@@ -669,6 +669,14 @@ const NewRepairOrder = () => {
   const getRepairPrice = (repair: RepairType, model?: IphoneModel | null) => {
     const m = model || selectedModel;
     if (!m) return 0;
+    // Battery override: when user picked "new" battery option in picker
+    if (
+      batteryPriceOverride !== null &&
+      selectedRepair?.id === repair.id &&
+      repair.name.includes('סוללה')
+    ) {
+      return batteryPriceOverride;
+    }
     return priceMap[m.id]?.[repair.id] || 0;
   };
   const getPrice = () => {
