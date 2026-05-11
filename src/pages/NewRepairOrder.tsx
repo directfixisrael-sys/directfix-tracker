@@ -240,6 +240,7 @@ interface IphoneModel {
   back_glass_price: number;
   charging_price?: number;
   min_lead_hours?: number;
+  battery_is_original?: boolean;
 }
 interface RepairType {
   id: string;
