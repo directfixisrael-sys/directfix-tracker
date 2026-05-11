@@ -92,6 +92,7 @@ const PriceManagement = () => {
     battery_is_original: true,
     battery_pullout_available: false,
     battery_new_price: 0,
+    battery_pullout_description: 'רכיב מקורי של אפל 14 ימים',
   });
   const [repairPriceForm, setRepairPriceForm] = useState<Record<string, number>>({});
   const [newSeriesName, setNewSeriesName] = useState('');
