@@ -283,10 +283,14 @@ const NewRepairOrder = () => {
   } = useTheme();
   const [step, setStep] = useState<Step>('model');
   const [orderMenuOpen, setOrderMenuOpen] = useState(false);
-  const [showIntroCard, setShowIntroCard] = useState(true);
-  const [introName, setIntroName] = useState('');
-  const [introPhone, setIntroPhone] = useState('');
-  const [introPrivacy, setIntroPrivacy] = useState(false);
+  const savedIntro = (() => {
+    try { return JSON.parse(localStorage.getItem('df_intro_lead') || 'null'); } catch { return null; }
+  })();
+  const hasSavedIntro = !!(savedIntro?.name && savedIntro?.phone);
+  const [showIntroCard, setShowIntroCard] = useState(!hasSavedIntro);
+  const [introName, setIntroName] = useState(savedIntro?.name || '');
+  const [introPhone, setIntroPhone] = useState(savedIntro?.phone || '');
+  const [introPrivacy, setIntroPrivacy] = useState(hasSavedIntro);
   const [isReturningCustomer, setIsReturningCustomer] = useState(false);
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
@@ -310,8 +314,8 @@ const NewRepairOrder = () => {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
 
   // Form fields
-  const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerName, setCustomerName] = useState(savedIntro?.name || '');
+  const [customerPhone, setCustomerPhone] = useState(savedIntro?.phone || '');
   const [customerAddress, setCustomerAddress] = useState('');
   const [customerNotes, setCustomerNotes] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
@@ -333,6 +337,12 @@ const NewRepairOrder = () => {
     if (introName.trim()) setCustomerName(introName.trim());
     if (introPhone.trim()) setCustomerPhone(introPhone.trim().replace(/\D/g, ''));
     setShowIntroCard(false);
+    try {
+      localStorage.setItem('df_intro_lead', JSON.stringify({
+        name: introName.trim(),
+        phone: introPhone.trim().replace(/\D/g, ''),
+      }));
+    } catch {}
 
     // Scroll to top after dismissing intro
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
