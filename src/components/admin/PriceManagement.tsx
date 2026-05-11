@@ -304,6 +304,7 @@ const PriceManagement = () => {
             min_lead_hours: modelForm.min_lead_hours,
             battery_is_original: modelForm.battery_is_original,
             battery_pullout_available: modelForm.battery_pullout_available,
+            battery_new_price: modelForm.battery_new_price || 0,
             sort_order: maxOrder + 1,
           })
           .select('id')
