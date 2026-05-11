@@ -2003,7 +2003,7 @@ const AdminPanel = () => {
               <button 
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
-                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'ipad_prices', 'bundles', 'settings', 'announcements', 'coupons', 'leads', 'voice_leads', 'voice_agent'].includes(activeTab)
+                    ['live', 'analytics', 'wp_clicks', 'messages', 'feedback', 'promotions', 'prices', 'ipad_prices', 'bundles', 'settings', 'announcements', 'coupons', 'leads', 'voice_leads', 'voice_agent'].includes(activeTab)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground"
                 )}
@@ -2032,6 +2032,10 @@ const AdminPanel = () => {
               <DropdownMenuItem onClick={() => setActiveTab('analytics')} className={cn("gap-3 py-3", activeTab === 'analytics' && "text-primary font-medium")}>
                 <Activity className="w-4 h-4" />
                 <span>אנליטיקס</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('wp_clicks')} className={cn("gap-3 py-3", activeTab === 'wp_clicks' && "text-primary font-medium")}>
+                <MousePointerClick className="w-4 h-4" />
+                <span>קליקים וורדפרס</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('messages')} className={cn("gap-3 py-3", activeTab === 'messages' && "text-primary font-medium")}>
                 <MessageSquare className="w-4 h-4" />
