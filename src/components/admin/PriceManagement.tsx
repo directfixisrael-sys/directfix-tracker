@@ -48,6 +48,7 @@ interface IphoneModel {
   series: string;
   min_lead_hours: number;
   battery_is_original: boolean;
+  battery_pullout_available: boolean;
 }
 
 interface ModelRepairPrice {
@@ -87,6 +88,7 @@ const PriceManagement = () => {
     is_active: true,
     min_lead_hours: 0,
     battery_is_original: true,
+    battery_pullout_available: false,
   });
   const [repairPriceForm, setRepairPriceForm] = useState<Record<string, number>>({});
   const [newSeriesName, setNewSeriesName] = useState('');
@@ -227,6 +229,7 @@ const PriceManagement = () => {
         is_active: model.is_active,
         min_lead_hours: model.min_lead_hours || 0,
         battery_is_original: model.battery_is_original ?? true,
+        battery_pullout_available: model.battery_pullout_available ?? false,
       });
       // Load prices for this model from junction table
       const prices: Record<string, number> = {};
@@ -242,6 +245,7 @@ const PriceManagement = () => {
         is_active: true,
         min_lead_hours: 0,
         battery_is_original: true,
+        battery_pullout_available: false,
       });
       // Initialize all prices to 0
       const prices: Record<string, number> = {};
@@ -277,6 +281,7 @@ const PriceManagement = () => {
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
             battery_is_original: modelForm.battery_is_original,
+            battery_pullout_available: modelForm.battery_pullout_available,
           })
           .eq('id', editingModel.id);
 
@@ -293,6 +298,7 @@ const PriceManagement = () => {
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
             battery_is_original: modelForm.battery_is_original,
+            battery_pullout_available: modelForm.battery_pullout_available,
             sort_order: maxOrder + 1,
           })
           .select('id')
