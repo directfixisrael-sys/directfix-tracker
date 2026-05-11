@@ -283,10 +283,14 @@ const NewRepairOrder = () => {
   } = useTheme();
   const [step, setStep] = useState<Step>('model');
   const [orderMenuOpen, setOrderMenuOpen] = useState(false);
-  const [showIntroCard, setShowIntroCard] = useState(true);
-  const [introName, setIntroName] = useState('');
-  const [introPhone, setIntroPhone] = useState('');
-  const [introPrivacy, setIntroPrivacy] = useState(false);
+  const savedIntro = (() => {
+    try { return JSON.parse(localStorage.getItem('df_intro_lead') || 'null'); } catch { return null; }
+  })();
+  const hasSavedIntro = !!(savedIntro?.name && savedIntro?.phone);
+  const [showIntroCard, setShowIntroCard] = useState(!hasSavedIntro);
+  const [introName, setIntroName] = useState(savedIntro?.name || '');
+  const [introPhone, setIntroPhone] = useState(savedIntro?.phone || '');
+  const [introPrivacy, setIntroPrivacy] = useState(hasSavedIntro);
   const [isReturningCustomer, setIsReturningCustomer] = useState(false);
   const [models, setModels] = useState<IphoneModel[]>([]);
   const [repairTypes, setRepairTypes] = useState<RepairType[]>([]);
