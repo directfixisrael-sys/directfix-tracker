@@ -281,6 +281,7 @@ export type Database = {
       iphone_models: {
         Row: {
           back_glass_price: number
+          battery_is_original: boolean
           battery_price: number
           charging_price: number
           compatible_screen_price: number
@@ -296,6 +297,7 @@ export type Database = {
         }
         Insert: {
           back_glass_price?: number
+          battery_is_original?: boolean
           battery_price?: number
           charging_price?: number
           compatible_screen_price?: number
@@ -311,6 +313,7 @@ export type Database = {
         }
         Update: {
           back_glass_price?: number
+          battery_is_original?: boolean
           battery_price?: number
           charging_price?: number
           compatible_screen_price?: number

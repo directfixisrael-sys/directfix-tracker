@@ -1,0 +1,1 @@
+ALTER TABLE public.iphone_models ADD COLUMN IF NOT EXISTS battery_is_original boolean NOT NULL DEFAULT true;
