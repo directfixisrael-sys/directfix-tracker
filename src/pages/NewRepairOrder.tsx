@@ -1649,6 +1649,8 @@ const NewRepairOrder = () => {
             const isPhoneOnly = repair.is_phone_only;
             const isBackGlass = repair.name.includes('גב');
             const isCharging = repair.name.includes('טעינה');
+            const isBattery = repair.name.includes('סוללה');
+            const batteryIsOriginal = selectedModel?.battery_is_original ?? true;
             let price = 0;
             if (selectedModel) {
               price = getRepairPrice(repair);
