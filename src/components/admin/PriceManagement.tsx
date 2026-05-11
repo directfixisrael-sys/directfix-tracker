@@ -253,6 +253,7 @@ const PriceManagement = () => {
         battery_is_original: true,
         battery_pullout_available: false,
         battery_new_price: 0,
+        battery_pullout_description: 'רכיב מקורי של אפל 14 ימים',
       });
       // Initialize all prices to 0
       const prices: Record<string, number> = {};
