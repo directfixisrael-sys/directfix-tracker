@@ -154,6 +154,9 @@ const AdminDashboard = ({ orders }: AdminDashboardProps) => {
         )}
       </Card>
 
+      {/* ===== WORDPRESS BUTTON CLICKS ===== */}
+      <WordPressClicksCard />
+
       {/* ===== KEY METRICS ===== */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4">
