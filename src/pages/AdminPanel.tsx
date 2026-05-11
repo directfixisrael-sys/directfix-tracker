@@ -59,7 +59,8 @@ import {
   Crown,
   Shield,
   Tablet,
-  Bot
+  Bot,
+  MousePointerClick
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
@@ -89,6 +90,7 @@ import VoiceAgentManagement from '@/components/admin/VoiceAgentManagement';
 import IPadPriceManagement from '@/components/admin/IPadPriceManagement';
 import ClubMembersManagement from '@/components/admin/ClubMembersManagement';
 import CustomerProfileView from '@/components/admin/CustomerProfileView';
+import WordPressClicksCard from '@/components/admin/WordPressClicksCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -578,6 +580,12 @@ const AdminPanel = () => {
         return <VoiceLeadsManagement />;
       case 'voice_agent':
         return <VoiceAgentManagement />;
+      case 'wp_clicks':
+        return (
+          <div className="flex-1 p-4 md:p-6 overflow-y-auto pb-24 md:pb-6">
+            <WordPressClicksCard />
+          </div>
+        );
       case 'live':
         return <LiveView />;
       case 'messages':
