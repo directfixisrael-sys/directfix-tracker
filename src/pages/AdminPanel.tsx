@@ -2203,6 +2203,18 @@ const AdminPanel = () => {
             <Activity className="w-5 h-5" />
             <span>אנליטיקס</span>
           </button>
+          <button 
+            onClick={() => setActiveTab('wp_clicks')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'wp_clicks' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <MousePointerClick className="w-5 h-5" />
+            <span>קליקים וורדפרס</span>
+          </button>
 
           {/* Divider */}
           <div className="border-t border-sidebar-border my-3" />
