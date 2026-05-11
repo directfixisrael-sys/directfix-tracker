@@ -865,6 +865,19 @@ const PriceManagement = () => {
                   <p className="text-xs text-muted-foreground mt-1">
                     מחיר עבור אפשרות "סוללה חדשה". אם נשאר 0, יוצג אותו המחיר של סוללה מפירוק.
                   </p>
+
+                  <label className="block text-sm font-medium mt-4 mb-2">
+                    תיאור סוללה מפירוק (יוצג ללקוח)
+                  </label>
+                  <Input
+                    placeholder="לדוגמה: רכיב מקורי של אפל 14 ימים"
+                    value={modelForm.battery_pullout_description}
+                    onChange={(e) => setModelForm({ ...modelForm, battery_pullout_description: e.target.value })}
+                    dir="rtl"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    הטקסט שיופיע ללקוח מתחת ל"סוללה אפל מקורית מפירוק".
+                  </p>
                 </div>
               )}
             </div>
