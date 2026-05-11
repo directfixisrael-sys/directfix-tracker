@@ -337,6 +337,12 @@ const NewRepairOrder = () => {
     if (introName.trim()) setCustomerName(introName.trim());
     if (introPhone.trim()) setCustomerPhone(introPhone.trim().replace(/\D/g, ''));
     setShowIntroCard(false);
+    try {
+      localStorage.setItem('df_intro_lead', JSON.stringify({
+        name: introName.trim(),
+        phone: introPhone.trim().replace(/\D/g, ''),
+      }));
+    } catch {}
 
     // Scroll to top after dismissing intro
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
