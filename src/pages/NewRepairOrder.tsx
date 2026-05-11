@@ -749,6 +749,7 @@ const NewRepairOrder = () => {
   };
   const handleModelSelect = (model: IphoneModel) => {
     setSelectedModel(model);
+    setBatteryPriceOverride(null);
     gaSelectModel(model.name);
     updateLeadStep('בחירת תיקון', { device_type: model.name });
     goToStep('repair');
