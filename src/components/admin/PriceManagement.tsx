@@ -50,6 +50,7 @@ interface IphoneModel {
   battery_is_original: boolean;
   battery_pullout_available: boolean;
   battery_new_price: number;
+  battery_pullout_description: string;
 }
 
 interface ModelRepairPrice {
