@@ -283,6 +283,7 @@ export type Database = {
           back_glass_price: number
           battery_is_original: boolean
           battery_price: number
+          battery_pullout_available: boolean
           charging_price: number
           compatible_screen_price: number
           created_at: string
@@ -299,6 +300,7 @@ export type Database = {
           back_glass_price?: number
           battery_is_original?: boolean
           battery_price?: number
+          battery_pullout_available?: boolean
           charging_price?: number
           compatible_screen_price?: number
           created_at?: string
@@ -315,6 +317,7 @@ export type Database = {
           back_glass_price?: number
           battery_is_original?: boolean
           battery_price?: number
+          battery_pullout_available?: boolean
           charging_price?: number
           compatible_screen_price?: number
           created_at?: string
