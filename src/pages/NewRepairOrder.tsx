@@ -314,8 +314,8 @@ const NewRepairOrder = () => {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
 
   // Form fields
-  const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerName, setCustomerName] = useState(savedIntro?.name || '');
+  const [customerPhone, setCustomerPhone] = useState(savedIntro?.phone || '');
   const [customerAddress, setCustomerAddress] = useState('');
   const [customerNotes, setCustomerNotes] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
