@@ -291,6 +291,7 @@ const PriceManagement = () => {
             battery_is_original: modelForm.battery_is_original,
             battery_pullout_available: modelForm.battery_pullout_available,
             battery_new_price: modelForm.battery_new_price || 0,
+            battery_pullout_description: modelForm.battery_pullout_description || 'רכיב מקורי של אפל 14 ימים',
           })
           .eq('id', editingModel.id);
 
