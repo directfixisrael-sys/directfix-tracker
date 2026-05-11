@@ -47,6 +47,7 @@ interface IphoneModel {
   sort_order: number;
   series: string;
   min_lead_hours: number;
+  battery_is_original: boolean;
 }
 
 interface ModelRepairPrice {
@@ -85,6 +86,7 @@ const PriceManagement = () => {
     series: '',
     is_active: true,
     min_lead_hours: 0,
+    battery_is_original: true,
   });
   const [repairPriceForm, setRepairPriceForm] = useState<Record<string, number>>({});
   const [newSeriesName, setNewSeriesName] = useState('');
@@ -224,6 +226,7 @@ const PriceManagement = () => {
         series: model.series,
         is_active: model.is_active,
         min_lead_hours: model.min_lead_hours || 0,
+        battery_is_original: model.battery_is_original ?? true,
       });
       // Load prices for this model from junction table
       const prices: Record<string, number> = {};
@@ -238,6 +241,7 @@ const PriceManagement = () => {
         series: '',
         is_active: true,
         min_lead_hours: 0,
+        battery_is_original: true,
       });
       // Initialize all prices to 0
       const prices: Record<string, number> = {};
@@ -272,6 +276,7 @@ const PriceManagement = () => {
             series: finalSeries,
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
+            battery_is_original: modelForm.battery_is_original,
           })
           .eq('id', editingModel.id);
 
@@ -287,6 +292,7 @@ const PriceManagement = () => {
             series: finalSeries,
             is_active: modelForm.is_active,
             min_lead_hours: modelForm.min_lead_hours,
+            battery_is_original: modelForm.battery_is_original,
             sort_order: maxOrder + 1,
           })
           .select('id')
@@ -783,6 +789,27 @@ const PriceManagement = () => {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* Battery quality selector */}
+            <div className="rounded-xl border border-border p-3 bg-muted/30">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold flex items-center gap-1.5">
+                    <Battery className="w-4 h-4 text-amber-500" />
+                    סוללה מקורית
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {modelForm.battery_is_original
+                      ? 'יוצג ללקוח: סוללה מקורית'
+                      : 'יוצג ללקוח: סוללה באיכות הגבוהה ביותר · אחריות שנה'}
+                  </p>
+                </div>
+                <Switch
+                  checked={modelForm.battery_is_original}
+                  onCheckedChange={(checked) => setModelForm({ ...modelForm, battery_is_original: checked })}
+                />
               </div>
             </div>
             <div>

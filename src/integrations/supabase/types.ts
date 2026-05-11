@@ -281,6 +281,7 @@ export type Database = {
       iphone_models: {
         Row: {
           back_glass_price: number
+          battery_is_original: boolean
           battery_price: number
           charging_price: number
           compatible_screen_price: number
@@ -296,6 +297,7 @@ export type Database = {
         }
         Insert: {
           back_glass_price?: number
+          battery_is_original?: boolean
           battery_price?: number
           charging_price?: number
           compatible_screen_price?: number
@@ -311,6 +313,7 @@ export type Database = {
         }
         Update: {
           back_glass_price?: number
+          battery_is_original?: boolean
           battery_price?: number
           charging_price?: number
           compatible_screen_price?: number
@@ -600,6 +603,39 @@ export type Database = {
           warranty_expiry?: string | null
           warranty_months?: number | null
           waze_link?: string | null
+        }
+        Relationships: []
+      }
+      otp_codes: {
+        Row: {
+          attempts: number
+          channel: string
+          code_hash: string
+          created_at: string
+          expires_at: string
+          id: string
+          phone: string
+          verified: boolean
+        }
+        Insert: {
+          attempts?: number
+          channel?: string
+          code_hash: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          phone: string
+          verified?: boolean
+        }
+        Update: {
+          attempts?: number
+          channel?: string
+          code_hash?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone?: string
+          verified?: boolean
         }
         Relationships: []
       }

@@ -240,6 +240,7 @@ interface IphoneModel {
   back_glass_price: number;
   charging_price?: number;
   min_lead_hours?: number;
+  battery_is_original?: boolean;
 }
 interface RepairType {
   id: string;
@@ -1648,6 +1649,8 @@ const NewRepairOrder = () => {
             const isPhoneOnly = repair.is_phone_only;
             const isBackGlass = repair.name.includes('גב');
             const isCharging = repair.name.includes('טעינה');
+            const isBattery = repair.name.includes('סוללה');
+            const batteryIsOriginal = selectedModel?.battery_is_original ?? true;
             let price = 0;
             if (selectedModel) {
               price = getRepairPrice(repair);
@@ -1687,6 +1690,14 @@ const NewRepairOrder = () => {
                               </Dialog>}
                           </div>
                           {repair.description && <p className="text-muted-foreground text-base mt-1">{repair.description}</p>}
+                          {!isPhoneOnly && isBattery && selectedModel && (
+                            <div className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-2.5 py-1 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                              <Battery className="w-3.5 h-3.5" />
+                              {batteryIsOriginal
+                                ? 'סוללה מקורית'
+                                : 'איכות הגבוהה ביותר · אחריות שנה'}
+                            </div>
+                          )}
                           {!isPhoneOnly && selectedModel && price > 0 && (
                             <div className="flex items-center gap-2 mt-2">
                               <span className="text-2xl font-bold text-primary">₪{price}</span>
