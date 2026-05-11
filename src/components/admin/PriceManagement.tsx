@@ -47,6 +47,7 @@ interface IphoneModel {
   sort_order: number;
   series: string;
   min_lead_hours: number;
+  battery_is_original: boolean;
 }
 
 interface ModelRepairPrice {
