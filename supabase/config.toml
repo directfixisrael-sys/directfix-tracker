@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.elevenlabs-conversation-audio]
 verify_jwt = false
+
+[functions.log-wp-click]
+verify_jwt = false
