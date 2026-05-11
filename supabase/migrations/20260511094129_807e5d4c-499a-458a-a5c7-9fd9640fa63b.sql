@@ -1,0 +1,1 @@
+ALTER TABLE public.iphone_models ADD COLUMN IF NOT EXISTS battery_pullout_available boolean NOT NULL DEFAULT false;
