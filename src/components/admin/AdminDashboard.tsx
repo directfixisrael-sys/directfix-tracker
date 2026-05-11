@@ -15,6 +15,7 @@ import { useLiveVisitors, Visitor } from '@/hooks/useLiveVisitors';
 import { cn } from '@/lib/utils';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { subDays } from 'date-fns';
+import WordPressClicksCard from './WordPressClicksCard';
 
 interface AdminDashboardProps {
   orders: RepairOrder[];
