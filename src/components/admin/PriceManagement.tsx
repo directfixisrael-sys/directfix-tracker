@@ -818,6 +818,27 @@ const PriceManagement = () => {
                 />
               </div>
             </div>
+
+            {/* Pullout battery option */}
+            <div className="rounded-xl border border-border p-3 bg-muted/30">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold flex items-center gap-1.5">
+                    <Battery className="w-4 h-4 text-emerald-500" />
+                    אפשר ללקוח לבחור סוללה מפירוק
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {modelForm.battery_pullout_available
+                      ? 'הלקוח יוכל לבחור בין "סוללה חדשה" לבין "סוללה אפל מקורית מפירוק" (מומלץ לאייפון 15 ומעלה)'
+                      : 'כבוי - תוצג רק האפשרות הרגילה של הסוללה'}
+                  </p>
+                </div>
+                <Switch
+                  checked={modelForm.battery_pullout_available}
+                  onCheckedChange={(checked) => setModelForm({ ...modelForm, battery_pullout_available: checked })}
+                />
+              </div>
+            </div>
             <div>
               <label className="block text-sm font-medium mb-2">מרווח הזמנה מינימלי (שעות)</label>
               <Input
