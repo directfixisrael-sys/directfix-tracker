@@ -950,6 +950,33 @@ export type Database = {
         }
         Relationships: []
       }
+      wp_button_clicks: {
+        Row: {
+          created_at: string
+          device_type: string | null
+          id: string
+          page_url: string | null
+          referrer: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          page_url?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          page_url?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -15,6 +15,7 @@ import { useLiveVisitors, Visitor } from '@/hooks/useLiveVisitors';
 import { cn } from '@/lib/utils';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { subDays } from 'date-fns';
+import WordPressClicksCard from './WordPressClicksCard';
 
 interface AdminDashboardProps {
   orders: RepairOrder[];
@@ -152,6 +153,9 @@ const AdminDashboard = ({ orders }: AdminDashboardProps) => {
           <p className="text-muted-foreground text-sm">אין גולשים כרגע באתר</p>
         )}
       </Card>
+
+      {/* ===== WORDPRESS BUTTON CLICKS ===== */}
+      <WordPressClicksCard />
 
       {/* ===== KEY METRICS ===== */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
