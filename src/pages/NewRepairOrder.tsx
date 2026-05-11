@@ -243,6 +243,7 @@ interface IphoneModel {
   battery_is_original?: boolean;
   battery_pullout_available?: boolean;
   battery_new_price?: number;
+  battery_pullout_description?: string;
 }
 interface RepairType {
   id: string;
@@ -1812,12 +1813,12 @@ const NewRepairOrder = () => {
                                         <DialogTitle className="text-right">מה זה סוללה מפירוק?</DialogTitle>
                                       </DialogHeader>
                                       <p className="text-base text-muted-foreground text-right leading-relaxed">
-                                        סוללה מקורית של אפל שפורקה ממכשירים שהוחזרו לאפל בתקופה שניתן היה להחזיר סוללות באפל עולמי. הסוללות הללו נשלחו אלינו ומותקנות במכשיר. במכשיר יוצג סטטוס סוללה כרכיב מקורי של אפל - משומש.
+                                        סוללה מקורית של אפל שפורקה ממכשירים שהוחזרו לאפל בתקופה שניתן היה להחזיר סוללות באפל עולמי. הסוללות נשלחו אלינו ומותקנות במכשיר. במכשיר יוצג סטטוס סוללה כרכיב מקורי של אפל.
                                       </p>
                                     </DialogContent>
                                   </Dialog>
                                 </div>
-                                <p className="text-sm text-muted-foreground">רכיב מקורי של אפל (משומש)</p>
+                                <p className="text-sm text-muted-foreground">{selectedModel?.battery_pullout_description || 'רכיב מקורי של אפל 14 ימים'}</p>
                               </div>
                               <span className="text-lg font-bold text-primary">₪{batteryPulloutPrice}</span>
                             </div>

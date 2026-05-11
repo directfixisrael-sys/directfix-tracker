@@ -50,6 +50,7 @@ interface IphoneModel {
   battery_is_original: boolean;
   battery_pullout_available: boolean;
   battery_new_price: number;
+  battery_pullout_description: string;
 }
 
 interface ModelRepairPrice {
@@ -91,6 +92,7 @@ const PriceManagement = () => {
     battery_is_original: true,
     battery_pullout_available: false,
     battery_new_price: 0,
+    battery_pullout_description: 'רכיב מקורי של אפל 14 ימים',
   });
   const [repairPriceForm, setRepairPriceForm] = useState<Record<string, number>>({});
   const [newSeriesName, setNewSeriesName] = useState('');
@@ -233,6 +235,7 @@ const PriceManagement = () => {
         battery_is_original: model.battery_is_original ?? true,
         battery_pullout_available: model.battery_pullout_available ?? false,
         battery_new_price: model.battery_new_price ?? 0,
+        battery_pullout_description: model.battery_pullout_description || 'רכיב מקורי של אפל 14 ימים',
       });
       // Load prices for this model from junction table
       const prices: Record<string, number> = {};
@@ -250,6 +253,7 @@ const PriceManagement = () => {
         battery_is_original: true,
         battery_pullout_available: false,
         battery_new_price: 0,
+        battery_pullout_description: 'רכיב מקורי של אפל 14 ימים',
       });
       // Initialize all prices to 0
       const prices: Record<string, number> = {};
@@ -287,6 +291,7 @@ const PriceManagement = () => {
             battery_is_original: modelForm.battery_is_original,
             battery_pullout_available: modelForm.battery_pullout_available,
             battery_new_price: modelForm.battery_new_price || 0,
+            battery_pullout_description: modelForm.battery_pullout_description || 'רכיב מקורי של אפל 14 ימים',
           })
           .eq('id', editingModel.id);
 
@@ -305,6 +310,7 @@ const PriceManagement = () => {
             battery_is_original: modelForm.battery_is_original,
             battery_pullout_available: modelForm.battery_pullout_available,
             battery_new_price: modelForm.battery_new_price || 0,
+            battery_pullout_description: modelForm.battery_pullout_description || 'רכיב מקורי של אפל 14 ימים',
             sort_order: maxOrder + 1,
           })
           .select('id')
@@ -858,6 +864,19 @@ const PriceManagement = () => {
                   />
                   <p className="text-xs text-muted-foreground mt-1">
                     מחיר עבור אפשרות "סוללה חדשה". אם נשאר 0, יוצג אותו המחיר של סוללה מפירוק.
+                  </p>
+
+                  <label className="block text-sm font-medium mt-4 mb-2">
+                    תיאור סוללה מפירוק (יוצג ללקוח)
+                  </label>
+                  <Input
+                    placeholder="לדוגמה: רכיב מקורי של אפל 14 ימים"
+                    value={modelForm.battery_pullout_description}
+                    onChange={(e) => setModelForm({ ...modelForm, battery_pullout_description: e.target.value })}
+                    dir="rtl"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    הטקסט שיופיע ללקוח מתחת ל"סוללה אפל מקורית מפירוק".
                   </p>
                 </div>
               )}

@@ -1,0 +1,1 @@
+ALTER TABLE public.iphone_models ADD COLUMN IF NOT EXISTS battery_pullout_description text NOT NULL DEFAULT 'רכיב מקורי של אפל 14 ימים';
