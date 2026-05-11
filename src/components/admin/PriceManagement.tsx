@@ -49,6 +49,7 @@ interface IphoneModel {
   min_lead_hours: number;
   battery_is_original: boolean;
   battery_pullout_available: boolean;
+  battery_new_price: number;
 }
 
 interface ModelRepairPrice {
@@ -89,6 +90,7 @@ const PriceManagement = () => {
     min_lead_hours: 0,
     battery_is_original: true,
     battery_pullout_available: false,
+    battery_new_price: 0,
   });
   const [repairPriceForm, setRepairPriceForm] = useState<Record<string, number>>({});
   const [newSeriesName, setNewSeriesName] = useState('');
@@ -230,6 +232,7 @@ const PriceManagement = () => {
         min_lead_hours: model.min_lead_hours || 0,
         battery_is_original: model.battery_is_original ?? true,
         battery_pullout_available: model.battery_pullout_available ?? false,
+        battery_new_price: model.battery_new_price ?? 0,
       });
       // Load prices for this model from junction table
       const prices: Record<string, number> = {};
@@ -246,6 +249,7 @@ const PriceManagement = () => {
         min_lead_hours: 0,
         battery_is_original: true,
         battery_pullout_available: false,
+        battery_new_price: 0,
       });
       // Initialize all prices to 0
       const prices: Record<string, number> = {};
@@ -282,6 +286,7 @@ const PriceManagement = () => {
             min_lead_hours: modelForm.min_lead_hours,
             battery_is_original: modelForm.battery_is_original,
             battery_pullout_available: modelForm.battery_pullout_available,
+            battery_new_price: modelForm.battery_new_price || 0,
           })
           .eq('id', editingModel.id);
 
@@ -299,6 +304,7 @@ const PriceManagement = () => {
             min_lead_hours: modelForm.min_lead_hours,
             battery_is_original: modelForm.battery_is_original,
             battery_pullout_available: modelForm.battery_pullout_available,
+            battery_new_price: modelForm.battery_new_price || 0,
             sort_order: maxOrder + 1,
           })
           .select('id')
@@ -838,6 +844,23 @@ const PriceManagement = () => {
                   onCheckedChange={(checked) => setModelForm({ ...modelForm, battery_pullout_available: checked })}
                 />
               </div>
+              {modelForm.battery_pullout_available && (
+                <div className="mt-3 pt-3 border-t border-border">
+                  <label className="block text-sm font-medium mb-2">
+                    מחיר סוללה חדשה (מקורית)
+                  </label>
+                  <Input
+                    type="number"
+                    min={0}
+                    placeholder="0 = להשתמש במחיר הסוללה הרגיל"
+                    value={modelForm.battery_new_price || ''}
+                    onChange={(e) => setModelForm({ ...modelForm, battery_new_price: Number(e.target.value) })}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    מחיר עבור אפשרות "סוללה חדשה". אם נשאר 0, יוצג אותו המחיר של סוללה מפירוק.
+                  </p>
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">מרווח הזמנה מינימלי (שעות)</label>

@@ -282,6 +282,7 @@ export type Database = {
         Row: {
           back_glass_price: number
           battery_is_original: boolean
+          battery_new_price: number
           battery_price: number
           battery_pullout_available: boolean
           charging_price: number
@@ -299,6 +300,7 @@ export type Database = {
         Insert: {
           back_glass_price?: number
           battery_is_original?: boolean
+          battery_new_price?: number
           battery_price?: number
           battery_pullout_available?: boolean
           charging_price?: number
@@ -316,6 +318,7 @@ export type Database = {
         Update: {
           back_glass_price?: number
           battery_is_original?: boolean
+          battery_new_price?: number
           battery_price?: number
           battery_pullout_available?: boolean
           charging_price?: number

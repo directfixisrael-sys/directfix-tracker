@@ -242,6 +242,7 @@ interface IphoneModel {
   min_lead_hours?: number;
   battery_is_original?: boolean;
   battery_pullout_available?: boolean;
+  battery_new_price?: number;
 }
 interface RepairType {
   id: string;
@@ -386,6 +387,7 @@ const NewRepairOrder = () => {
   const [selectedBackColor, setSelectedBackColor] = useState<string>('');
   const [showBackColorPicker, setShowBackColorPicker] = useState(false);
   const [showBatteryTypePicker, setShowBatteryTypePicker] = useState(false);
+  const [batteryPriceOverride, setBatteryPriceOverride] = useState<number | null>(null);
   const [otherRepairDescription, setOtherRepairDescription] = useState('');
   
   const [additionalRepairs, setAdditionalRepairs] = useState<{ repair: RepairType; price: number; backColor?: string; model: IphoneModel }[]>([]);
@@ -667,6 +669,14 @@ const NewRepairOrder = () => {
   const getRepairPrice = (repair: RepairType, model?: IphoneModel | null) => {
     const m = model || selectedModel;
     if (!m) return 0;
+    // Battery override: when user picked "new" battery option in picker
+    if (
+      batteryPriceOverride !== null &&
+      selectedRepair?.id === repair.id &&
+      repair.name.includes('סוללה')
+    ) {
+      return batteryPriceOverride;
+    }
     return priceMap[m.id]?.[repair.id] || 0;
   };
   const getPrice = () => {
@@ -739,6 +749,7 @@ const NewRepairOrder = () => {
   };
   const handleModelSelect = (model: IphoneModel) => {
     setSelectedModel(model);
+    setBatteryPriceOverride(null);
     gaSelectModel(model.name);
     updateLeadStep('בחירת תיקון', { device_type: model.name });
     goToStep('repair');
@@ -1672,14 +1683,18 @@ const NewRepairOrder = () => {
 
             const info = repair.info_title && repair.info_description ? { title: repair.info_title, description: repair.info_description } : null;
             const IconComponent = getRepairIconComponent(repair.icon);
+            const batteryNewPrice = (selectedModel?.battery_new_price ?? 0) > 0 ? selectedModel!.battery_new_price! : price;
+            const batteryPulloutPrice = price;
             return <div key={repair.id}>
                     <Card onClick={() => {
                       if (isBatteryWithChoice) {
                         setSelectedRepair(repair);
+                        setBatteryPriceOverride(null);
                         setShowBatteryTypePicker(prev => !prev);
                         setShowBackColorPicker(false);
                         return;
                       }
+                      setBatteryPriceOverride(null);
                       handleRepairSelect(repair);
                     }} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 hover:-translate-y-0.5 ${
                       (showBackColorPicker && isBackGlass) || (showBatteryTypePicker && isBatteryWithChoice)
@@ -1740,7 +1755,9 @@ const NewRepairOrder = () => {
                         <div className="pt-3 pb-1 px-1 space-y-3">
                           <div className="text-center">
                             <h3 className="text-lg font-bold">איזו סוללה תרצו?</h3>
-                            <p className="text-sm text-muted-foreground">שתי האפשרויות באותו מחיר</p>
+                            <p className="text-sm text-muted-foreground">
+                              {batteryNewPrice !== batteryPulloutPrice ? 'בחרו את האפשרות המתאימה לכם' : 'שתי האפשרויות באותו מחיר'}
+                            </p>
                           </div>
 
                           {/* New battery option */}
@@ -1748,6 +1765,7 @@ const NewRepairOrder = () => {
                             onClick={(e) => {
                               e.stopPropagation();
                               setShowBatteryTypePicker(false);
+                              setBatteryPriceOverride(batteryNewPrice);
                               const newRepair = { ...repair, name: 'החלפת סוללה חדשה' };
                               handleRepairSelect(newRepair);
                             }}
@@ -1761,7 +1779,7 @@ const NewRepairOrder = () => {
                                 <h4 className="font-semibold text-lg">סוללה חדשה</h4>
                                 <p className="text-sm text-muted-foreground">סוללה חדשה לגמרי באיכות הגבוהה ביותר</p>
                               </div>
-                              <span className="text-lg font-bold text-primary">₪{price}</span>
+                              <span className="text-lg font-bold text-primary">₪{batteryNewPrice}</span>
                             </div>
                           </button>
 
@@ -1770,6 +1788,7 @@ const NewRepairOrder = () => {
                             onClick={(e) => {
                               e.stopPropagation();
                               setShowBatteryTypePicker(false);
+                              setBatteryPriceOverride(null);
                               const newRepair = { ...repair, name: 'החלפת סוללה אפל מקורית מפירוק' };
                               handleRepairSelect(newRepair);
                             }}
@@ -1800,7 +1819,7 @@ const NewRepairOrder = () => {
                                 </div>
                                 <p className="text-sm text-muted-foreground">רכיב מקורי של אפל (משומש)</p>
                               </div>
-                              <span className="text-lg font-bold text-primary">₪{price}</span>
+                              <span className="text-lg font-bold text-primary">₪{batteryPulloutPrice}</span>
                             </div>
                           </button>
                         </div>
