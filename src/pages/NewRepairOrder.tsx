@@ -1663,6 +1663,8 @@ const NewRepairOrder = () => {
             const isCharging = repair.name.includes('טעינה');
             const isBattery = repair.name.includes('סוללה');
             const batteryIsOriginal = selectedModel?.battery_is_original ?? true;
+            const batteryPulloutAvailable = !!selectedModel?.battery_pullout_available;
+            const isBatteryWithChoice = isBattery && batteryPulloutAvailable;
             let price = 0;
             if (selectedModel) {
               price = getRepairPrice(repair);
@@ -1671,8 +1673,16 @@ const NewRepairOrder = () => {
             const info = repair.info_title && repair.info_description ? { title: repair.info_title, description: repair.info_description } : null;
             const IconComponent = getRepairIconComponent(repair.icon);
             return <div key={repair.id}>
-                    <Card onClick={() => handleRepairSelect(repair)} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 hover:-translate-y-0.5 ${
-                      showBackColorPicker && isBackGlass 
+                    <Card onClick={() => {
+                      if (isBatteryWithChoice) {
+                        setSelectedRepair(repair);
+                        setShowBatteryTypePicker(prev => !prev);
+                        setShowBackColorPicker(false);
+                        return;
+                      }
+                      handleRepairSelect(repair);
+                    }} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 hover:-translate-y-0.5 ${
+                      (showBackColorPicker && isBackGlass) || (showBatteryTypePicker && isBatteryWithChoice)
                         ? 'border-primary bg-primary/5 shadow-[4px_4px_0_0_hsl(var(--primary)/0.15)]' 
                         : isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-foreground/15 hover:border-primary/40 hover:bg-primary/5 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[5px_5px_0_0_hsl(var(--foreground)/0.1)]'
                     }`}>
@@ -1684,7 +1694,7 @@ const NewRepairOrder = () => {
                         
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-xl">{isBattery && !batteryIsOriginal ? repair.name.replace('מקורית', 'באיכות גבוהה') : repair.name}</h3>
+                            <h3 className="font-semibold text-xl">{isBattery && !batteryIsOriginal && !isBatteryWithChoice ? repair.name.replace('מקורית', 'באיכות גבוהה') : repair.name}</h3>
                             {!isPhoneOnly && info && <Dialog>
                                 <DialogTrigger asChild>
                                   <button type="button" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-primary transition-colors p-1">
@@ -1701,8 +1711,11 @@ const NewRepairOrder = () => {
                                 </DialogContent>
                               </Dialog>}
                           </div>
-                          {repair.description && !(isBattery && !batteryIsOriginal) && <p className="text-muted-foreground text-base mt-1">{repair.description}</p>}
-                          {!isPhoneOnly && isBattery && selectedModel && (
+                          {repair.description && !(isBattery && !batteryIsOriginal) && !isBatteryWithChoice && <p className="text-muted-foreground text-base mt-1">{repair.description}</p>}
+                          {isBatteryWithChoice && (
+                            <p className="text-muted-foreground text-base mt-1">בחרו את סוג הסוללה</p>
+                          )}
+                          {!isPhoneOnly && isBattery && selectedModel && !isBatteryWithChoice && (
                             <div className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-2.5 py-1 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30">
                               <Battery className="w-3.5 h-3.5" />
                               {batteryIsOriginal
@@ -1720,6 +1733,79 @@ const NewRepairOrder = () => {
                         {!isPhoneOnly && <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />}
                       </div>
                     </Card>
+
+                    {/* Inline Battery Type Picker */}
+                    {isBatteryWithChoice && showBatteryTypePicker && selectedModel && (
+                      <div className="overflow-hidden animate-fade-in">
+                        <div className="pt-3 pb-1 px-1 space-y-3">
+                          <div className="text-center">
+                            <h3 className="text-lg font-bold">איזו סוללה תרצו?</h3>
+                            <p className="text-sm text-muted-foreground">שתי האפשרויות באותו מחיר</p>
+                          </div>
+
+                          {/* New battery option */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowBatteryTypePicker(false);
+                              const newRepair = { ...repair, name: 'החלפת סוללה חדשה' };
+                              handleRepairSelect(newRepair);
+                            }}
+                            className="w-full text-right p-4 rounded-2xl border-2 border-foreground/15 hover:border-primary/40 hover:bg-primary/5 transition-all"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                                <Battery className="w-6 h-6 text-primary" />
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-lg">סוללה חדשה</h4>
+                                <p className="text-sm text-muted-foreground">סוללה חדשה לגמרי באיכות הגבוהה ביותר</p>
+                              </div>
+                              <span className="text-lg font-bold text-primary">₪{price}</span>
+                            </div>
+                          </button>
+
+                          {/* Pullout battery option */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowBatteryTypePicker(false);
+                              const newRepair = { ...repair, name: 'החלפת סוללה אפל מקורית מפירוק' };
+                              handleRepairSelect(newRepair);
+                            }}
+                            className="w-full text-right p-4 rounded-2xl border-2 border-foreground/15 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                <Battery className="w-6 h-6 text-emerald-600" />
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  <h4 className="font-semibold text-lg">סוללה אפל מקורית מפירוק</h4>
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <button type="button" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-primary transition-colors p-1">
+                                        <HelpCircle className="w-5 h-5" />
+                                      </button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-sm" onClick={e => e.stopPropagation()}>
+                                      <DialogHeader>
+                                        <DialogTitle className="text-right">מה זה סוללה מפירוק?</DialogTitle>
+                                      </DialogHeader>
+                                      <p className="text-base text-muted-foreground text-right leading-relaxed">
+                                        סוללה מקורית של אפל שפורקה ממכשירים שהוחזרו לאפל בתקופה שניתן היה להחזיר סוללות באפל עולמי. הסוללות הללו נשלחו אלינו ומותקנות במכשיר. במכשיר יוצג סטטוס סוללה כרכיב מקורי של אפל - משומש.
+                                      </p>
+                                    </DialogContent>
+                                  </Dialog>
+                                </div>
+                                <p className="text-sm text-muted-foreground">רכיב מקורי של אפל (משומש)</p>
+                              </div>
+                              <span className="text-lg font-bold text-primary">₪{price}</span>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Inline Color Picker - slides open under the back glass card */}
                     {isBackGlass && showBackColorPicker && selectedModel && (() => {
