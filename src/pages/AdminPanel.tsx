@@ -2431,6 +2431,7 @@ const AdminPanel = () => {
               {activeTab === 'settings' && 'הגדרות'}
               {activeTab === 'feedback' && 'משוב לקוחות'}
               {activeTab === 'analytics' && 'אנליטיקס'}
+              {activeTab === 'wp_clicks' && 'קליקים וורדפרס'}
               {activeTab === 'promotions' && 'ניהול מבצעים'}
               {activeTab === 'coupons' && 'ניהול קופונים'}
               {activeTab === 'bundles' && 'ניהול חבילות תיקון'}
