@@ -844,6 +844,23 @@ const PriceManagement = () => {
                   onCheckedChange={(checked) => setModelForm({ ...modelForm, battery_pullout_available: checked })}
                 />
               </div>
+              {modelForm.battery_pullout_available && (
+                <div className="mt-3 pt-3 border-t border-border">
+                  <label className="block text-sm font-medium mb-2">
+                    מחיר סוללה חדשה (מקורית)
+                  </label>
+                  <Input
+                    type="number"
+                    min={0}
+                    placeholder="0 = להשתמש במחיר הסוללה הרגיל"
+                    value={modelForm.battery_new_price || ''}
+                    onChange={(e) => setModelForm({ ...modelForm, battery_new_price: Number(e.target.value) })}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    מחיר עבור אפשרות "סוללה חדשה". אם נשאר 0, יוצג אותו המחיר של סוללה מפירוק.
+                  </p>
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">מרווח הזמנה מינימלי (שעות)</label>
