@@ -297,7 +297,18 @@ const PriceManagement = () => {
 
         if (error) throw error;
         modelId = editingModel.id;
-        toast.success('הדגם עודכן בהצלחה');
+
+        // If pullout description changed, propagate to ALL models so the wording stays consistent
+        const newDesc = modelForm.battery_pullout_description || 'רכיב מקורי של אפל 14 ימים';
+        if (newDesc !== (editingModel.battery_pullout_description || 'רכיב מקורי של אפל 14 ימים')) {
+          await supabase
+            .from('iphone_models')
+            .update({ battery_pullout_description: newDesc })
+            .neq('id', editingModel.id);
+          toast.success('הדגם עודכן והתיאור הוחל על כל הדגמים');
+        } else {
+          toast.success('הדגם עודכן בהצלחה');
+        }
       } else {
         const maxOrder = Math.max(...models.map(m => m.sort_order), 0);
         const { data, error } = await supabase
