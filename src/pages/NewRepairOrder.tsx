@@ -385,6 +385,7 @@ const NewRepairOrder = () => {
   const [pendingRepair, setPendingRepair] = useState<RepairType | null>(null);
   const [selectedBackColor, setSelectedBackColor] = useState<string>('');
   const [showBackColorPicker, setShowBackColorPicker] = useState(false);
+  const [showBatteryTypePicker, setShowBatteryTypePicker] = useState(false);
   const [otherRepairDescription, setOtherRepairDescription] = useState('');
   
   const [additionalRepairs, setAdditionalRepairs] = useState<{ repair: RepairType; price: number; backColor?: string; model: IphoneModel }[]>([]);
