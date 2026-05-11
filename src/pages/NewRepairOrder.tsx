@@ -241,6 +241,7 @@ interface IphoneModel {
   charging_price?: number;
   min_lead_hours?: number;
   battery_is_original?: boolean;
+  battery_pullout_available?: boolean;
 }
 interface RepairType {
   id: string;
