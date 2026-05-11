@@ -1754,7 +1754,9 @@ const NewRepairOrder = () => {
                         <div className="pt-3 pb-1 px-1 space-y-3">
                           <div className="text-center">
                             <h3 className="text-lg font-bold">איזו סוללה תרצו?</h3>
-                            <p className="text-sm text-muted-foreground">שתי האפשרויות באותו מחיר</p>
+                            <p className="text-sm text-muted-foreground">
+                              {batteryNewPrice !== batteryPulloutPrice ? 'בחרו את האפשרות המתאימה לכם' : 'שתי האפשרויות באותו מחיר'}
+                            </p>
                           </div>
 
                           {/* New battery option */}
@@ -1762,6 +1764,7 @@ const NewRepairOrder = () => {
                             onClick={(e) => {
                               e.stopPropagation();
                               setShowBatteryTypePicker(false);
+                              setBatteryPriceOverride(batteryNewPrice);
                               const newRepair = { ...repair, name: 'החלפת סוללה חדשה' };
                               handleRepairSelect(newRepair);
                             }}
@@ -1775,7 +1778,7 @@ const NewRepairOrder = () => {
                                 <h4 className="font-semibold text-lg">סוללה חדשה</h4>
                                 <p className="text-sm text-muted-foreground">סוללה חדשה לגמרי באיכות הגבוהה ביותר</p>
                               </div>
-                              <span className="text-lg font-bold text-primary">₪{price}</span>
+                              <span className="text-lg font-bold text-primary">₪{batteryNewPrice}</span>
                             </div>
                           </button>
 
@@ -1784,6 +1787,7 @@ const NewRepairOrder = () => {
                             onClick={(e) => {
                               e.stopPropagation();
                               setShowBatteryTypePicker(false);
+                              setBatteryPriceOverride(null);
                               const newRepair = { ...repair, name: 'החלפת סוללה אפל מקורית מפירוק' };
                               handleRepairSelect(newRepair);
                             }}
@@ -1814,7 +1818,7 @@ const NewRepairOrder = () => {
                                 </div>
                                 <p className="text-sm text-muted-foreground">רכיב מקורי של אפל (משומש)</p>
                               </div>
-                              <span className="text-lg font-bold text-primary">₪{price}</span>
+                              <span className="text-lg font-bold text-primary">₪{batteryPulloutPrice}</span>
                             </div>
                           </button>
                         </div>
