@@ -90,6 +90,7 @@ const PriceManagement = () => {
     min_lead_hours: 0,
     battery_is_original: true,
     battery_pullout_available: false,
+    battery_new_price: 0,
   });
   const [repairPriceForm, setRepairPriceForm] = useState<Record<string, number>>({});
   const [newSeriesName, setNewSeriesName] = useState('');
