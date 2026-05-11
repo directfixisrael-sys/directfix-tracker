@@ -1689,7 +1689,7 @@ const NewRepairOrder = () => {
                                 </DialogContent>
                               </Dialog>}
                           </div>
-                          {repair.description && <p className="text-muted-foreground text-base mt-1">{repair.description}</p>}
+                          {repair.description && !(isBattery && !batteryIsOriginal) && <p className="text-muted-foreground text-base mt-1">{repair.description}</p>}
                           {!isPhoneOnly && isBattery && selectedModel && (
                             <div className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-2.5 py-1 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30">
                               <Battery className="w-3.5 h-3.5" />
