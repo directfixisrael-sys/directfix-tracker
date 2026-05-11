@@ -232,6 +232,7 @@ const PriceManagement = () => {
         min_lead_hours: model.min_lead_hours || 0,
         battery_is_original: model.battery_is_original ?? true,
         battery_pullout_available: model.battery_pullout_available ?? false,
+        battery_new_price: model.battery_new_price ?? 0,
       });
       // Load prices for this model from junction table
       const prices: Record<string, number> = {};
@@ -248,6 +249,7 @@ const PriceManagement = () => {
         min_lead_hours: 0,
         battery_is_original: true,
         battery_pullout_available: false,
+        battery_new_price: 0,
       });
       // Initialize all prices to 0
       const prices: Record<string, number> = {};
