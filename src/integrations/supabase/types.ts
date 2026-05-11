@@ -952,6 +952,7 @@ export type Database = {
       }
       wp_button_clicks: {
         Row: {
+          button_type: string | null
           created_at: string
           device_type: string | null
           id: string
@@ -960,6 +961,7 @@ export type Database = {
           user_agent: string | null
         }
         Insert: {
+          button_type?: string | null
           created_at?: string
           device_type?: string | null
           id?: string
@@ -968,6 +970,7 @@ export type Database = {
           user_agent?: string | null
         }
         Update: {
+          button_type?: string | null
           created_at?: string
           device_type?: string | null
           id?: string

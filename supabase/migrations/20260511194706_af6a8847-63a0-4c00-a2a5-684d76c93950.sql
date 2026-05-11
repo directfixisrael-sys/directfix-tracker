@@ -1,0 +1,1 @@
+ALTER TABLE public.wp_button_clicks ADD COLUMN IF NOT EXISTS button_type text DEFAULT 'main';

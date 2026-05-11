@@ -20,6 +20,8 @@ Deno.serve(async (req) => {
     const ua = req.headers.get("user-agent") || "";
     const referrer = body.referrer || req.headers.get("referer") || null;
     const pageUrl = body.page_url || null;
+    const allowed = ["main", "whatsapp", "call"];
+    const buttonType = allowed.includes(body.button_type) ? body.button_type : "main";
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -31,6 +33,7 @@ Deno.serve(async (req) => {
       page_url: pageUrl,
       user_agent: ua,
       device_type: getDevice(ua),
+      button_type: buttonType,
     });
 
     return new Response(JSON.stringify({ ok: true }), {
