@@ -285,6 +285,7 @@ export type Database = {
           battery_new_price: number
           battery_price: number
           battery_pullout_available: boolean
+          battery_pullout_description: string
           charging_price: number
           compatible_screen_price: number
           created_at: string
@@ -303,6 +304,7 @@ export type Database = {
           battery_new_price?: number
           battery_price?: number
           battery_pullout_available?: boolean
+          battery_pullout_description?: string
           charging_price?: number
           compatible_screen_price?: number
           created_at?: string
@@ -321,6 +323,7 @@ export type Database = {
           battery_new_price?: number
           battery_price?: number
           battery_pullout_available?: boolean
+          battery_pullout_description?: string
           charging_price?: number
           compatible_screen_price?: number
           created_at?: string
