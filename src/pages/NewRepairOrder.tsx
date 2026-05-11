@@ -1777,7 +1777,7 @@ const NewRepairOrder = () => {
                                 <Battery className="w-6 h-6 text-primary" />
                               </div>
                               <div className="flex-1">
-                                <h4 className="font-semibold text-lg">סוללה חדשה</h4>
+                                <h4 className="font-semibold text-lg">סוללה חדשה ומקורית של אפל</h4>
                                 <p className="text-sm text-muted-foreground">סוללה חדשה לגמרי באיכות הגבוהה ביותר</p>
                               </div>
                               <span className="text-lg font-bold text-primary">₪{batteryNewPrice}</span>
