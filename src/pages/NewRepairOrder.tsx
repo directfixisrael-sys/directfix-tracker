@@ -1818,7 +1818,7 @@ const NewRepairOrder = () => {
                                     </DialogContent>
                                   </Dialog>
                                 </div>
-                                <p className="text-sm text-muted-foreground">רכיב מקורי של אפל (משומש)</p>
+                                <p className="text-sm text-muted-foreground">{selectedModel?.battery_pullout_description || 'רכיב מקורי של אפל 14 ימים'}</p>
                               </div>
                               <span className="text-lg font-bold text-primary">₪{batteryPulloutPrice}</span>
                             </div>
