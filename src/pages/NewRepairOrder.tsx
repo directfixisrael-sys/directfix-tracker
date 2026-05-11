@@ -1682,14 +1682,18 @@ const NewRepairOrder = () => {
 
             const info = repair.info_title && repair.info_description ? { title: repair.info_title, description: repair.info_description } : null;
             const IconComponent = getRepairIconComponent(repair.icon);
+            const batteryNewPrice = (selectedModel?.battery_new_price ?? 0) > 0 ? selectedModel!.battery_new_price! : price;
+            const batteryPulloutPrice = price;
             return <div key={repair.id}>
                     <Card onClick={() => {
                       if (isBatteryWithChoice) {
                         setSelectedRepair(repair);
+                        setBatteryPriceOverride(null);
                         setShowBatteryTypePicker(prev => !prev);
                         setShowBackColorPicker(false);
                         return;
                       }
+                      setBatteryPriceOverride(null);
                       handleRepairSelect(repair);
                     }} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 hover:-translate-y-0.5 ${
                       (showBackColorPicker && isBackGlass) || (showBatteryTypePicker && isBatteryWithChoice)
