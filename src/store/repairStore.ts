@@ -6,11 +6,11 @@ interface RepairStore {
   orders: RepairOrder[];
   messages: ChatMessage[];
   currentOrder: RepairOrder | null;
-  activeTab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders' | 'leads' | 'voice_leads' | 'voice_agent' | 'loyalty' | 'ipad_prices';
+  activeTab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders' | 'leads' | 'voice_leads' | 'voice_agent' | 'loyalty' | 'ipad_prices' | 'wp_clicks';
   isLoading: boolean;
   
   // Tab actions
-  setActiveTab: (tab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders' | 'leads' | 'voice_leads' | 'voice_agent' | 'loyalty' | 'ipad_prices') => void;
+  setActiveTab: (tab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders' | 'leads' | 'voice_leads' | 'voice_agent' | 'loyalty' | 'ipad_prices' | 'wp_clicks') => void;
   
   // Data loading
   loadOrders: () => Promise<void>;

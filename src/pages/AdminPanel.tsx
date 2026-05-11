@@ -59,7 +59,8 @@ import {
   Crown,
   Shield,
   Tablet,
-  Bot
+  Bot,
+  MousePointerClick
 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { cn } from '@/lib/utils';
@@ -89,6 +90,7 @@ import VoiceAgentManagement from '@/components/admin/VoiceAgentManagement';
 import IPadPriceManagement from '@/components/admin/IPadPriceManagement';
 import ClubMembersManagement from '@/components/admin/ClubMembersManagement';
 import CustomerProfileView from '@/components/admin/CustomerProfileView';
+import WordPressClicksCard from '@/components/admin/WordPressClicksCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const ADMIN_CODE = 'pp1p1xke';
@@ -578,6 +580,12 @@ const AdminPanel = () => {
         return <VoiceLeadsManagement />;
       case 'voice_agent':
         return <VoiceAgentManagement />;
+      case 'wp_clicks':
+        return (
+          <div className="flex-1 p-4 md:p-6 overflow-y-auto pb-24 md:pb-6">
+            <WordPressClicksCard />
+          </div>
+        );
       case 'live':
         return <LiveView />;
       case 'messages':
@@ -1995,7 +2003,7 @@ const AdminPanel = () => {
               <button 
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]",
-                    ['live', 'analytics', 'messages', 'feedback', 'promotions', 'prices', 'ipad_prices', 'bundles', 'settings', 'announcements', 'coupons', 'leads', 'voice_leads', 'voice_agent'].includes(activeTab)
+                    ['live', 'analytics', 'wp_clicks', 'messages', 'feedback', 'promotions', 'prices', 'ipad_prices', 'bundles', 'settings', 'announcements', 'coupons', 'leads', 'voice_leads', 'voice_agent'].includes(activeTab)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground"
                 )}
@@ -2024,6 +2032,10 @@ const AdminPanel = () => {
               <DropdownMenuItem onClick={() => setActiveTab('analytics')} className={cn("gap-3 py-3", activeTab === 'analytics' && "text-primary font-medium")}>
                 <Activity className="w-4 h-4" />
                 <span>אנליטיקס</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('wp_clicks')} className={cn("gap-3 py-3", activeTab === 'wp_clicks' && "text-primary font-medium")}>
+                <MousePointerClick className="w-4 h-4" />
+                <span>קליקים וורדפרס</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('messages')} className={cn("gap-3 py-3", activeTab === 'messages' && "text-primary font-medium")}>
                 <MessageSquare className="w-4 h-4" />
@@ -2190,6 +2202,18 @@ const AdminPanel = () => {
           >
             <Activity className="w-5 h-5" />
             <span>אנליטיקס</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('wp_clicks')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'wp_clicks' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <MousePointerClick className="w-5 h-5" />
+            <span>קליקים וורדפרס</span>
           </button>
 
           {/* Divider */}
@@ -2407,6 +2431,7 @@ const AdminPanel = () => {
               {activeTab === 'settings' && 'הגדרות'}
               {activeTab === 'feedback' && 'משוב לקוחות'}
               {activeTab === 'analytics' && 'אנליטיקס'}
+              {activeTab === 'wp_clicks' && 'קליקים וורדפרס'}
               {activeTab === 'promotions' && 'ניהול מבצעים'}
               {activeTab === 'coupons' && 'ניהול קופונים'}
               {activeTab === 'bundles' && 'ניהול חבילות תיקון'}
