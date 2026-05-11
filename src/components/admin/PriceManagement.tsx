@@ -49,6 +49,7 @@ interface IphoneModel {
   min_lead_hours: number;
   battery_is_original: boolean;
   battery_pullout_available: boolean;
+  battery_new_price: number;
 }
 
 interface ModelRepairPrice {
