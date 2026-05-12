@@ -26,6 +26,7 @@ import BatteryProgram from "./pages/BatteryProgram";
 import IPadRepair from "./pages/iPadRepair";
 import FAQ from "./pages/FAQ";
 import AIAgentPage from "./pages/AIAgentPage";
+import WpOrderRedirect from "./pages/WpOrderRedirect";
 import MinimalFooter from "./components/MinimalFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { VisitorTracker } from "./components/VisitorTracker";
@@ -66,6 +67,7 @@ const App = () => (
                 <AnnouncementBanner />
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/wp-order" element={<WpOrderRedirect />} />
                   <Route path="/track" element={<CustomerTracker />} />
                   <Route path="/order" element={<NewRepairOrder />} />
                   <Route path="/devices" element={<DevicePurchase />} />
