@@ -44,6 +44,7 @@ const RemindersManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('pending');
+  const [view, setView] = useState<'reminders' | 'notes'>('reminders');
   const [formData, setFormData] = useState({
     task_name: '',
     customer_name: '',
