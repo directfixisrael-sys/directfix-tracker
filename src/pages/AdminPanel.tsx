@@ -578,9 +578,11 @@ const AdminPanel = () => {
       case 'leads':
         return <LeadsManagement />;
       case 'voice_leads':
-        return <VoiceLeadsManagement />;
+        return <AIManagement initialTab="leads" />;
       case 'voice_agent':
-        return <VoiceAgentManagement />;
+        return <AIManagement initialTab="agent" />;
+      case 'ai':
+        return <AIManagement initialTab="leads" />;
       case 'wp_clicks':
         return (
           <div className="flex-1 p-4 md:p-6 overflow-y-auto pb-24 md:pb-6">
