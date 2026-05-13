@@ -195,6 +195,19 @@ const LeadsManagement = () => {
     return recoveryHistory.filter(h => h.leadId === leadId);
   };
 
+  const openWhatsApp = (lead: Lead) => {
+    if (!lead.customer_phone) {
+      toast.error('אין מספר טלפון');
+      return;
+    }
+    let phone = lead.customer_phone.replace(/\D/g, '');
+    if (phone.startsWith('0')) phone = '972' + phone.slice(1);
+    else if (!phone.startsWith('972')) phone = '972' + phone;
+    const firstName = (lead.customer_name || '').trim().split(/\s+/)[0] || '';
+    const msg = `היי ${firstName}, זו שירה מדיירקט פיקס.\nראיתי שניסית לבצע הזמנה באתר אך ללא הצלחה - האם אוכל לעזור?`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
   const searchMatch = (l: Lead) =>
     l.customer_name.includes(search) || l.customer_phone.includes(search) || (l.customer_email && l.customer_email.includes(search));
 
