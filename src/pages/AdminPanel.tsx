@@ -87,6 +87,7 @@ import RemindersManagement from '@/components/admin/RemindersManagement';
 import LeadsManagement from '@/components/admin/LeadsManagement';
 import VoiceLeadsManagement from '@/components/admin/VoiceLeadsManagement';
 import VoiceAgentManagement from '@/components/admin/VoiceAgentManagement';
+import AIManagement from '@/components/admin/AIManagement';
 import IPadPriceManagement from '@/components/admin/IPadPriceManagement';
 import ClubMembersManagement from '@/components/admin/ClubMembersManagement';
 import CustomerProfileView from '@/components/admin/CustomerProfileView';
