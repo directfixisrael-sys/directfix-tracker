@@ -22,6 +22,8 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import StickyNotes from './StickyNotes';
+import { StickyNote } from 'lucide-react';
 
 interface Reminder {
   id: string;
@@ -42,6 +44,7 @@ const RemindersManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('pending');
+  const [view, setView] = useState<'reminders' | 'notes'>('reminders');
   const [formData, setFormData] = useState({
     task_name: '',
     customer_name: '',
@@ -234,6 +237,31 @@ const RemindersManagement = () => {
 
   return (
     <div className="flex-1 p-4 md:p-6 overflow-y-auto pb-24 md:pb-6 space-y-4">
+      {/* Top view switcher */}
+      <div className="flex gap-2 p-1 bg-muted/50 rounded-xl w-fit">
+        <button
+          onClick={() => setView('reminders')}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+            view === 'reminders' ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Bell className="w-4 h-4" />
+          תזכורות
+        </button>
+        <button
+          onClick={() => setView('notes')}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+            view === 'notes' ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <StickyNote className="w-4 h-4" />
+          פתקים
+        </button>
+      </div>
+
+      {view === 'notes' ? <StickyNotes /> : (<>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -477,6 +505,7 @@ const RemindersManagement = () => {
           </div>
         </DialogContent>
       </Dialog>
+      </>)}
     </div>
   );
 };

@@ -87,6 +87,7 @@ import RemindersManagement from '@/components/admin/RemindersManagement';
 import LeadsManagement from '@/components/admin/LeadsManagement';
 import VoiceLeadsManagement from '@/components/admin/VoiceLeadsManagement';
 import VoiceAgentManagement from '@/components/admin/VoiceAgentManagement';
+import AIManagement from '@/components/admin/AIManagement';
 import IPadPriceManagement from '@/components/admin/IPadPriceManagement';
 import ClubMembersManagement from '@/components/admin/ClubMembersManagement';
 import CustomerProfileView from '@/components/admin/CustomerProfileView';
@@ -577,9 +578,9 @@ const AdminPanel = () => {
       case 'leads':
         return <LeadsManagement />;
       case 'voice_leads':
-        return <VoiceLeadsManagement />;
+        return <AIManagement initialTab="leads" />;
       case 'voice_agent':
-        return <VoiceAgentManagement />;
+        return <AIManagement initialTab="agent" />;
       case 'wp_clicks':
         return (
           <div className="flex-1 p-4 md:p-6 overflow-y-auto pb-24 md:pb-6">
@@ -2017,13 +2018,9 @@ const AdminPanel = () => {
                 <Users className="w-4 h-4" />
                 <span>לידים</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setActiveTab('voice_leads')} className={cn("gap-3 py-3", activeTab === 'voice_leads' && "text-primary font-medium")}>
-                <Phone className="w-4 h-4" />
-                <span>לידים מ-AI</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setActiveTab('voice_agent')} className={cn("gap-3 py-3", activeTab === 'voice_agent' && "text-primary font-medium")}>
+              <DropdownMenuItem onClick={() => setActiveTab('voice_leads')} className={cn("gap-3 py-3", (activeTab === 'voice_leads' || activeTab === 'voice_agent') && "text-primary font-medium")}>
                 <Bot className="w-4 h-4" />
-                <span>נציג AI</span>
+                <span>AI - פניות ונציג</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('live')} className={cn("gap-3 py-3", activeTab === 'live' && "text-success font-medium")}>
                 <Eye className="w-4 h-4" />
@@ -2171,25 +2168,13 @@ const AdminPanel = () => {
             onClick={() => setActiveTab('voice_leads')}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              activeTab === 'voice_leads' 
-                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-            )}
-          >
-            <Phone className="w-5 h-5" />
-            <span>פניות AI</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('voice_agent')}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              activeTab === 'voice_agent' 
+              (activeTab === 'voice_leads' || activeTab === 'voice_agent')
                 ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                 : "text-sidebar-foreground hover:bg-sidebar-accent/50"
             )}
           >
             <Bot className="w-5 h-5" />
-            <span>נציג AI</span>
+            <span>AI - פניות ונציג</span>
           </button>
           <button 
             onClick={() => setActiveTab('analytics')}

@@ -144,13 +144,25 @@ const WordPressClicksCard = () => {
             : 'אין קליקים לכפתור הזה.'}
         </p>
       ) : (
-        <div className="border border-border rounded-xl overflow-hidden">
-          <div className="divide-y divide-border max-h-72 overflow-y-auto">
+        <div className="border border-border rounded-xl overflow-hidden w-full max-w-full">
+          <div className="divide-y divide-border max-h-72 overflow-y-auto overflow-x-hidden">
             {filtered.slice(0, 50).map((c) => {
               const meta = buttonMeta(c.button_type);
               const Icon = meta.icon;
+              const rawUrl = c.referrer || c.page_url || '';
+              let displayUrl = 'ישיר';
+              if (rawUrl) {
+                try {
+                  const u = new URL(rawUrl);
+                  const path = decodeURIComponent(u.pathname);
+                  const shortPath = path.length > 24 ? path.slice(0, 22) + '…' : path;
+                  displayUrl = u.hostname + (shortPath === '/' ? '' : shortPath);
+                } catch {
+                  displayUrl = rawUrl.length > 40 ? rawUrl.slice(0, 38) + '…' : rawUrl;
+                }
+              }
               return (
-                <div key={c.id} className="px-3 py-2 text-sm flex items-center gap-3">
+                <div key={c.id} className="px-3 py-2 text-sm flex items-center gap-3 min-w-0">
                   <span className={`flex items-center gap-1 text-xs shrink-0 px-2 py-1 rounded-md ${meta.color}`}>
                     <Icon className="w-3 h-3" />
                     {meta.label}
@@ -160,10 +172,10 @@ const WordPressClicksCard = () => {
                     {deviceLabel(c.device_type)}
                   </span>
                   <span
-                    className="flex-1 truncate text-xs text-primary"
-                    title={c.referrer || c.page_url || ''}
+                    className="flex-1 min-w-0 truncate text-xs text-primary"
+                    title={rawUrl}
                   >
-                    {c.referrer || c.page_url || 'ישיר'}
+                    {displayUrl}
                   </span>
                   <span className="text-xs text-muted-foreground shrink-0">
                     {format(new Date(c.created_at), 'dd/MM HH:mm')}
