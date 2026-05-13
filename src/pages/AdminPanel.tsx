@@ -2168,25 +2168,13 @@ const AdminPanel = () => {
             onClick={() => setActiveTab('voice_leads')}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              activeTab === 'voice_leads' 
-                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-            )}
-          >
-            <Phone className="w-5 h-5" />
-            <span>פניות AI</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('voice_agent')}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-              activeTab === 'voice_agent' 
+              (activeTab === 'voice_leads' || activeTab === 'voice_agent')
                 ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                 : "text-sidebar-foreground hover:bg-sidebar-accent/50"
             )}
           >
             <Bot className="w-5 h-5" />
-            <span>נציג AI</span>
+            <span>AI - פניות ונציג</span>
           </button>
           <button 
             onClick={() => setActiveTab('analytics')}
