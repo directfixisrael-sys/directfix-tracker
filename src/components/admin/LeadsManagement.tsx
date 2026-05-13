@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Phone, User, Clock, Search, Trash2, CheckCircle2, XCircle, Shield, Smartphone, Wrench, Mail, Tag, Eye, Send } from 'lucide-react';
+import { Phone, User, Clock, Search, Trash2, CheckCircle2, XCircle, Shield, Smartphone, Wrench, Mail, Tag, Eye, Send, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { toast } from 'sonner';
