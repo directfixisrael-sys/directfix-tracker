@@ -144,8 +144,8 @@ const WordPressClicksCard = () => {
             : 'אין קליקים לכפתור הזה.'}
         </p>
       ) : (
-        <div className="border border-border rounded-xl overflow-hidden">
-          <div className="divide-y divide-border max-h-72 overflow-y-auto">
+        <div className="border border-border rounded-xl overflow-hidden w-full max-w-full">
+          <div className="divide-y divide-border max-h-72 overflow-y-auto overflow-x-hidden">
             {filtered.slice(0, 50).map((c) => {
               const meta = buttonMeta(c.button_type);
               const Icon = meta.icon;
