@@ -349,6 +349,17 @@ const LeadsManagement = () => {
                         <Mail className="w-4 h-4" />
                       </Button>
                     )}
+                    {lead.customer_phone && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-success"
+                        onClick={() => openWhatsApp(lead)}
+                        title="שלח וואטסאפ"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                      </Button>
+                    )}
                     <Button
                       size="icon"
                       variant="ghost"
