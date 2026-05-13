@@ -505,6 +505,7 @@ const RemindersManagement = () => {
           </div>
         </DialogContent>
       </Dialog>
+      </>)}
     </div>
   );
 };
