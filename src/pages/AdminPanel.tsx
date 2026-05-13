@@ -2018,13 +2018,9 @@ const AdminPanel = () => {
                 <Users className="w-4 h-4" />
                 <span>לידים</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setActiveTab('voice_leads')} className={cn("gap-3 py-3", activeTab === 'voice_leads' && "text-primary font-medium")}>
-                <Phone className="w-4 h-4" />
-                <span>לידים מ-AI</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setActiveTab('voice_agent')} className={cn("gap-3 py-3", activeTab === 'voice_agent' && "text-primary font-medium")}>
+              <DropdownMenuItem onClick={() => setActiveTab('voice_leads')} className={cn("gap-3 py-3", (activeTab === 'voice_leads' || activeTab === 'voice_agent') && "text-primary font-medium")}>
                 <Bot className="w-4 h-4" />
-                <span>נציג AI</span>
+                <span>AI - פניות ונציג</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('live')} className={cn("gap-3 py-3", activeTab === 'live' && "text-success font-medium")}>
                 <Eye className="w-4 h-4" />
