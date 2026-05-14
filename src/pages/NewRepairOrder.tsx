@@ -1382,6 +1382,29 @@ const NewRepairOrder = () => {
                 ))}
               </div>
             </div>
+
+            {/* Features marquee - reverse direction */}
+            <div className="mt-1 relative overflow-hidden" dir="ltr" style={{ maskImage: 'linear-gradient(to right, transparent, black 12%, black 88%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 12%, black 88%, transparent)' }}>
+              <div className="flex gap-6 py-2 whitespace-nowrap w-max animate-[marquee_26s_linear_infinite]" style={{ animationDirection: 'reverse' }}>
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} className="flex gap-6 items-center shrink-0">
+                    {[
+                      { icon: <Zap className="w-3.5 h-3.5" />, text: 'הגעה מהירה' },
+                      { icon: <ShieldCheck className="w-3.5 h-3.5" />, text: 'אחריות על כל תיקון' },
+                      { icon: <CreditCard className="w-3.5 h-3.5" />, text: 'מגוון אמצעי תשלום' },
+                      { icon: <Award className="w-3.5 h-3.5" />, text: '15 שנות מוניטין' },
+                      { icon: <MapPin className="w-3.5 h-3.5" />, text: 'שירות עד הבית' },
+                      { icon: <Star className="w-3.5 h-3.5" />, text: 'אלפי לקוחות מרוצים' },
+                    ].map((f, j) => (
+                      <div key={`f-${i}-${j}`} dir="rtl" className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/50 border border-border/40 text-[11px] font-semibold text-foreground/70 shrink-0">
+                        <span className="text-primary">{f.icon}</span>
+                        <span>{f.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
