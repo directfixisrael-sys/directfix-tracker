@@ -1369,12 +1369,9 @@ const NewRepairOrder = () => {
                       { n: 'Apple', svg: <svg viewBox="0 0 24 24" className="w-7 h-7" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg> },
                       { n: 'Samsung', svg: <span className="text-base font-extrabold tracking-tight">SAMSUNG</span> },
                       { n: 'Google', svg: <svg viewBox="0 0 24 24" className="w-7 h-7"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> },
-                      { n: 'Xiaomi', svg: <span className="text-base font-extrabold" style={{ color: '#FF6900' }}>Xiaomi</span> },
                       { n: 'Pixel', svg: <span className="text-base font-extrabold tracking-tight">Pixel</span> },
-                      { n: 'OnePlus', svg: <span className="text-base font-extrabold tracking-tight" style={{ color: '#EB0028' }}>OnePlus</span> },
-                      { n: 'Huawei', svg: <span className="text-base font-extrabold tracking-tight" style={{ color: '#FF0000' }}>HUAWEI</span> },
                     ].map((b, j) => (
-                      <div key={`${i}-${j}`} className="flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors" style={{ minWidth: '60px' }}>
+                      <div key={`${i}-${j}`} className="flex items-center justify-center text-foreground/60" style={{ minWidth: '60px' }}>
                         {b.svg}
                       </div>
                     ))}
@@ -1383,22 +1380,61 @@ const NewRepairOrder = () => {
               </div>
             </div>
 
-            {/* Features marquee - reverse direction */}
-            <div className="mt-1 relative overflow-hidden" dir="ltr" style={{ maskImage: 'linear-gradient(to right, transparent, black 12%, black 88%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 12%, black 88%, transparent)' }}>
+            {/* Payment methods marquee - reverse direction */}
+            <p className="text-center text-[10px] text-muted-foreground/70 mt-3 mb-1 tracking-wider">אמצעי תשלום</p>
+            <div className="relative overflow-hidden" dir="ltr" style={{ maskImage: 'linear-gradient(to right, transparent, black 12%, black 88%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 12%, black 88%, transparent)' }}>
               <div className="flex gap-6 py-2 whitespace-nowrap w-max animate-[marquee_26s_linear_infinite]" style={{ animationDirection: 'reverse' }}>
                 {[...Array(2)].map((_, i) => (
                   <div key={i} className="flex gap-6 items-center shrink-0">
                     {[
-                      { icon: <Zap className="w-3.5 h-3.5" />, text: 'הגעה מהירה' },
-                      { icon: <ShieldCheck className="w-3.5 h-3.5" />, text: 'אחריות על כל תיקון' },
-                      { icon: <CreditCard className="w-3.5 h-3.5" />, text: 'מגוון אמצעי תשלום' },
-                      { icon: <Award className="w-3.5 h-3.5" />, text: '15 שנות מוניטין' },
-                      { icon: <MapPin className="w-3.5 h-3.5" />, text: 'שירות עד הבית' },
-                      { icon: <Star className="w-3.5 h-3.5" />, text: 'אלפי לקוחות מרוצים' },
-                    ].map((f, j) => (
-                      <div key={`f-${i}-${j}`} dir="rtl" className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/50 border border-border/40 text-[11px] font-semibold text-foreground/70 shrink-0">
-                        <span className="text-primary">{f.icon}</span>
-                        <span>{f.text}</span>
+                      // Apple Pay
+                      { n: 'ApplePay', el: (
+                        <div className="px-3 py-1.5 rounded-lg bg-black text-white flex items-center gap-1 shadow-sm">
+                          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+                          <span className="text-xs font-bold">Pay</span>
+                        </div>
+                      )},
+                      // Google Pay
+                      { n: 'GooglePay', el: (
+                        <div className="px-3 py-1.5 rounded-lg bg-white border border-border flex items-center gap-1 shadow-sm">
+                          <svg viewBox="0 0 24 24" className="w-4 h-4"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                          <span className="text-xs font-bold text-foreground">Pay</span>
+                        </div>
+                      )},
+                      // Bit
+                      { n: 'Bit', el: (
+                        <div className="px-3 py-1.5 rounded-lg text-white flex items-center shadow-sm" style={{ background: '#0066FF' }}>
+                          <span className="text-xs font-extrabold tracking-tight">bit</span>
+                        </div>
+                      )},
+                      // PayBox
+                      { n: 'PayBox', el: (
+                        <div className="px-3 py-1.5 rounded-lg text-white flex items-center shadow-sm" style={{ background: '#00C389' }}>
+                          <span className="text-xs font-extrabold tracking-tight">PayBox</span>
+                        </div>
+                      )},
+                      // Isracard
+                      { n: 'Isracard', el: (
+                        <div className="px-3 py-1.5 rounded-lg text-white flex items-center shadow-sm" style={{ background: '#D6001C' }}>
+                          <span className="text-xs font-extrabold tracking-tight">ISRACARD</span>
+                        </div>
+                      )},
+                      // Visa
+                      { n: 'Visa', el: (
+                        <div className="px-3 py-1.5 rounded-lg text-white flex items-center shadow-sm" style={{ background: '#1A1F71' }}>
+                          <span className="text-xs font-extrabold italic tracking-wider">VISA</span>
+                        </div>
+                      )},
+                      // Mastercard
+                      { n: 'MC', el: (
+                        <div className="px-3 py-1.5 rounded-lg bg-white border border-border flex items-center gap-0 shadow-sm">
+                          <span className="w-4 h-4 rounded-full block" style={{ background: '#EB001B' }} />
+                          <span className="w-4 h-4 rounded-full block -ml-1.5 opacity-90" style={{ background: '#F79E1B' }} />
+                        </div>
+                      )},
+                    ].map((p, j) => (
+                      <div key={`p-${i}-${j}`} className="flex items-center justify-center shrink-0">
+                        {p.el}
                       </div>
                     ))}
                   </div>
@@ -1407,6 +1443,7 @@ const NewRepairOrder = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
     )}
     <div className="min-h-screen bg-background flex flex-col" lang="he">
