@@ -2438,6 +2438,31 @@ const NewRepairOrder = () => {
               <p className="text-muted-foreground">{isGiftOrder ? 'מלאו את פרטי השולח ומקבל המתנה' : 'מלאו את הפרטים ואנחנו בדרך'}</p>
             </div>
 
+            {/* Gift order toggle */}
+            <button
+              type="button"
+              dir="rtl"
+              onClick={() => setIsGiftOrder(!isGiftOrder)}
+              className={`w-full flex flex-row-reverse items-center gap-3 rounded-2xl p-4 border-2 transition-all ${
+                isGiftOrder
+                  ? 'border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-sm'
+                  : 'border-border bg-card hover:border-primary/40'
+              }`}
+            >
+              <div className="text-right flex-1">
+                <p className="font-bold text-foreground text-sm flex items-center gap-1.5">
+                  <Gift className={`w-4 h-4 ${isGiftOrder ? 'text-primary' : 'text-muted-foreground'}`} />
+                  שליחת תיקון במתנה
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  {isGiftOrder ? 'מלאו את פרטיכם ופרטי מקבל המתנה' : 'הפעילו כדי להוסיף את פרטי מקבל המתנה'}
+                </p>
+              </div>
+              <div className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${isGiftOrder ? 'bg-primary' : 'bg-muted'}`}>
+                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-all ${isGiftOrder ? 'right-0.5' : 'right-[22px]'}`} />
+              </div>
+            </button>
+
             {/* Gift sender details */}
             {isGiftOrder && (
               <div className="space-y-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl p-5 border border-primary/20 shadow-sm">
