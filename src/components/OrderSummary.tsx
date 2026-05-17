@@ -42,12 +42,9 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
   
   const totalPrice = order.repairPrice + accessoriesTotal;
 
-  // Detect repair type for discount
-  const issueLC = order.issueDescription.toLowerCase();
-  const isScreenRepair = issueLC.includes('מסך') || issueLC.includes('screen');
-  const isBatteryRepair = issueLC.includes('סוללה') || issueLC.includes('battery');
-  const discountAmount = isScreenRepair ? 35 : isBatteryRepair ? 30 : 0;
-  const discountedTotal = totalPrice - discountAmount;
+  // No fake auto-applied discount in summary
+  const discountAmount = 0;
+  const discountedTotal = totalPrice;
 
   const getPromotionIcon = (icon: string | null) => {
     switch (icon) {
@@ -183,13 +180,13 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
         </div>
 
         {/* Loyalty points earned - only for club members */}
-        {calculatePointsFromPrice(discountAmount > 0 ? discountedTotal : totalPrice) > 0 && (
+        {order.isClubMember && calculatePointsFromPrice(totalPrice) > 0 && (
           <div className="flex justify-between text-base bg-primary/5 rounded-xl p-3 -mx-1 border border-primary/15">
             <span className="text-primary flex items-center gap-1.5 font-medium">
               <Award className="w-4 h-4" />
               נקודות מועדון שנצברו
             </span>
-            <span className="font-bold text-primary text-lg">{calculatePointsFromPrice(discountAmount > 0 ? discountedTotal : totalPrice)}</span>
+            <span className="font-bold text-primary text-lg">{calculatePointsFromPrice(totalPrice)}</span>
           </div>
         )}
 
