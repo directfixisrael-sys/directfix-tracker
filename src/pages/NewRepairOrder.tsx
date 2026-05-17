@@ -1443,8 +1443,6 @@ const NewRepairOrder = () => {
             </div>
           </div>
         </div>
-      </div>
-      </div>
     )}
     <div className="min-h-screen bg-background flex flex-col" lang="he">
       {/* Skip to content */}
