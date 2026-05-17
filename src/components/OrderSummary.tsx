@@ -42,12 +42,9 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
   
   const totalPrice = order.repairPrice + accessoriesTotal;
 
-  // Detect repair type for discount
-  const issueLC = order.issueDescription.toLowerCase();
-  const isScreenRepair = issueLC.includes('מסך') || issueLC.includes('screen');
-  const isBatteryRepair = issueLC.includes('סוללה') || issueLC.includes('battery');
-  const discountAmount = isScreenRepair ? 35 : isBatteryRepair ? 30 : 0;
-  const discountedTotal = totalPrice - discountAmount;
+  // No fake auto-applied discount in summary
+  const discountAmount = 0;
+  const discountedTotal = totalPrice;
 
   const getPromotionIcon = (icon: string | null) => {
     switch (icon) {
