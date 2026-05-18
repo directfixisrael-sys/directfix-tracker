@@ -20,6 +20,7 @@ Deno.serve(async (req) => {
     const ua = req.headers.get("user-agent") || "";
     const referrer = body.referrer || req.headers.get("referer") || null;
     const pageUrl = body.page_url || null;
+    const pageTitle = typeof body.page_title === "string" ? body.page_title.slice(0, 250) : null;
     const allowed = ["main", "whatsapp", "call"];
     const buttonType = allowed.includes(body.button_type) ? body.button_type : "main";
 
@@ -31,6 +32,7 @@ Deno.serve(async (req) => {
     await supabase.from("wp_button_clicks").insert({
       referrer,
       page_url: pageUrl,
+      page_title: pageTitle,
       user_agent: ua,
       device_type: getDevice(ua),
       button_type: buttonType,
