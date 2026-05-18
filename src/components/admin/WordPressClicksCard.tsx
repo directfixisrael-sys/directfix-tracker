@@ -162,6 +162,7 @@ const WordPressClicksCard = () => {
                   displayUrl = rawUrl.length > 40 ? rawUrl.slice(0, 38) + '…' : rawUrl;
                 }
               }
+              const pageLabel = c.page_title?.trim() || displayUrl;
               return (
                 <div key={c.id} className="px-3 py-2 text-sm flex items-center gap-3 min-w-0">
                   <span className={`flex items-center gap-1 text-xs shrink-0 px-2 py-1 rounded-md ${meta.color}`}>
@@ -172,12 +173,22 @@ const WordPressClicksCard = () => {
                     {deviceIcon(c.device_type)}
                     {deviceLabel(c.device_type)}
                   </span>
-                  <span
-                    className="flex-1 min-w-0 truncate text-xs text-primary"
-                    title={rawUrl}
-                  >
-                    {displayUrl}
-                  </span>
+                  <div className="flex-1 min-w-0 flex flex-col">
+                    <span
+                      className="truncate text-xs font-semibold text-foreground"
+                      title={c.page_title || ''}
+                    >
+                      {pageLabel}
+                    </span>
+                    {c.page_title && (
+                      <span
+                        className="hidden sm:block truncate text-[10px] text-muted-foreground"
+                        title={rawUrl}
+                      >
+                        {displayUrl}
+                      </span>
+                    )}
+                  </div>
                   <span className="text-xs text-muted-foreground shrink-0">
                     {format(new Date(c.created_at), 'dd/MM HH:mm')}
                   </span>
