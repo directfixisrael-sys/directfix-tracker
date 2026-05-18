@@ -8,6 +8,7 @@ interface ClickRow {
   id: string;
   referrer: string | null;
   page_url: string | null;
+  page_title: string | null;
   user_agent: string | null;
   device_type: string | null;
   button_type: string | null;
