@@ -956,6 +956,7 @@ export type Database = {
           created_at: string
           device_type: string | null
           id: string
+          page_title: string | null
           page_url: string | null
           referrer: string | null
           user_agent: string | null
@@ -965,6 +966,7 @@ export type Database = {
           created_at?: string
           device_type?: string | null
           id?: string
+          page_title?: string | null
           page_url?: string | null
           referrer?: string | null
           user_agent?: string | null
@@ -974,6 +976,7 @@ export type Database = {
           created_at?: string
           device_type?: string | null
           id?: string
+          page_title?: string | null
           page_url?: string | null
           referrer?: string | null
           user_agent?: string | null
