@@ -171,6 +171,7 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
   // Filter orders by date range
   const filteredOrders = useMemo(() => {
     return orders.filter(order => {
+      if (order.status === 'cancelled') return false;
       const orderDate = new Date(order.createdAt);
       return isWithinInterval(orderDate, { start: dateRange.from, end: dateRange.to });
     });
@@ -229,6 +230,7 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
     const previousFrom = subDays(dateRange.from, periodDays);
     const previousTo = subDays(dateRange.to, periodDays);
     const previousOrders = orders.filter(order => {
+      if (order.status === 'cancelled') return false;
       const orderDate = new Date(order.createdAt);
       return isWithinInterval(orderDate, { start: previousFrom, end: previousTo });
     });

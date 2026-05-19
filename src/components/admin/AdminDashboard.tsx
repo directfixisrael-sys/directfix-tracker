@@ -61,7 +61,7 @@ const AdminDashboard = ({ orders }: AdminDashboardProps) => {
     orders.filter(o => new Date(o.createdAt) >= subDays(new Date(), 30)), [orders]);
 
   const calcRevenue = (list: RepairOrder[]) => 
-    list.reduce((sum, o) => sum + (o.repairPrice || 0), 0);
+    list.filter(o => o.status !== 'cancelled').reduce((sum, o) => sum + (o.repairPrice || 0), 0);
 
   const todayRevenue = calcRevenue(todayOrders);
   const weekRevenue = calcRevenue(weekOrders);
