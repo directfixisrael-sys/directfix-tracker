@@ -230,6 +230,7 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
     const previousFrom = subDays(dateRange.from, periodDays);
     const previousTo = subDays(dateRange.to, periodDays);
     const previousOrders = orders.filter(order => {
+      if (order.status === 'cancelled') return false;
       const orderDate = new Date(order.createdAt);
       return isWithinInterval(orderDate, { start: previousFrom, end: previousTo });
     });
