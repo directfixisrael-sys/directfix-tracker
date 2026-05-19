@@ -1346,7 +1346,7 @@ const NewRepairOrder = () => {
           <label className="flex items-start gap-2.5 mt-3 cursor-pointer">
             <Checkbox checked={introPrivacy} onCheckedChange={checked => setIntroPrivacy(checked === true)} className="mt-0.5 w-4 h-4" />
             <span className="text-[11px] text-muted-foreground leading-relaxed">
-              אני מאשר/ת שקראתי והסכמתי ל<span className="text-primary font-medium">מדיניות הפרטיות</span> ו<span className="text-primary font-medium">תנאי השימוש</span>, ומאשר/ת יצירת קשר לתיאום התיקון
+              אני מאשר/ת שקראתי והסכמתי ל<a href="https://directfix.co.il/privacy-policy/" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-primary font-medium underline">מדיניות הפרטיות</a> ו<a href="/terms" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-primary font-medium underline">תנאי השימוש</a>, ומאשר/ת יצירת קשר לתיאום התיקון
             </span>
           </label>
 
