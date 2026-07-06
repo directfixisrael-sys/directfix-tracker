@@ -22,8 +22,9 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
   };
 
   return (
-    <header className="bg-card/95 backdrop-blur-md border-b-2 border-foreground/10 sticky top-0 z-50 pt-[env(safe-area-inset-top)]" role="banner" aria-label="כותרת עליונה">
-      <nav className="container flex items-center justify-between h-20 px-4" aria-label="ניווט ראשי">
+    <header className="sticky top-0 z-50 pt-[calc(env(safe-area-inset-top)+0.75rem)] px-3 sm:px-6 pb-2" role="banner" aria-label="כותרת עליונה">
+      <nav className="container max-w-6xl mx-auto flex items-center justify-between h-16 px-4 sm:px-6 bg-card/85 backdrop-blur-xl border border-foreground/10 rounded-full shadow-lg shadow-foreground/5" aria-label="ניווט ראשי">
+
         {/* Mobile left buttons - always show profile + menu */}
         <div className="flex items-center gap-2 sm:hidden">
           <CustomerZone />
@@ -78,8 +79,9 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
 
       {/* Mobile menu dropdown */}
       {menuOpen && (
-        <div className="sm:hidden bg-card border-t-2 border-foreground/10 animate-slide-down">
+        <div className="sm:hidden container max-w-6xl mx-auto mt-2 bg-card/90 backdrop-blur-xl border border-foreground/10 rounded-3xl shadow-lg animate-slide-down">
           <div className="flex items-center justify-center gap-4 py-3 px-4">
+
             <a
               href="tel:033106020"
               className="h-12 w-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105"
