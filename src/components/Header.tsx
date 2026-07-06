@@ -22,8 +22,9 @@ const Header = ({ showBackButton, onBack }: HeaderProps) => {
   };
 
   return (
-    <header className="bg-card/95 backdrop-blur-md border-b-2 border-foreground/10 sticky top-0 z-50 pt-[env(safe-area-inset-top)]" role="banner" aria-label="כותרת עליונה">
-      <nav className="container flex items-center justify-between h-20 px-4" aria-label="ניווט ראשי">
+    <header className="sticky top-0 z-50 pt-[calc(env(safe-area-inset-top)+0.75rem)] px-3 sm:px-6 pb-2" role="banner" aria-label="כותרת עליונה">
+      <nav className="container max-w-6xl mx-auto flex items-center justify-between h-16 px-4 sm:px-6 bg-card/85 backdrop-blur-xl border border-foreground/10 rounded-full shadow-lg shadow-foreground/5" aria-label="ניווט ראשי">
+
         {/* Mobile left buttons - always show profile + menu */}
         <div className="flex items-center gap-2 sm:hidden">
           <CustomerZone />
