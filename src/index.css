@@ -56,41 +56,41 @@
   }
 
   .dark {
-    --background: 0 0% 6%;
-    --foreground: 0 0% 93%;
+    --background: 0 0% 5%;
+    --foreground: 0 0% 95%;
 
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 93%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 93%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 211 100% 55%;
+    --primary: 211 100% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 0 0% 88%;
+    --secondary: 0 0% 13%;
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 55%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 62%;
 
-    --accent: 211 100% 55%;
+    --accent: 211 100% 58%;
     --accent-foreground: 0 0% 100%;
 
-    --success: 142 55% 48%;
+    --success: 142 55% 50%;
     --success-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 55%;
+    --destructive: 0 72% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 211 100% 55%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 211 100% 58%;
 
-    --section-cream: 0 0% 8%;
-    --section-lavender: 0 0% 9%;
-    --section-mint: 0 0% 8%;
-    --section-peach: 0 0% 9%;
+    --section-cream: 0 0% 7%;
+    --section-lavender: 0 0% 8%;
+    --section-mint: 0 0% 7%;
+    --section-peach: 0 0% 8%;
   }
 
   /* Gift Mode - Warm & Loving theme */
@@ -238,11 +238,28 @@
 
 @layer components {
   .wolt-card {
-    @apply bg-card rounded-2xl border border-border/60 shadow-sm;
+    @apply bg-card rounded-2xl border border-border/60 shadow-sm transition-all duration-200;
   }
 
   .wolt-card-elevated {
-    @apply bg-card rounded-2xl border border-border/60 shadow-md;
+    @apply bg-card rounded-2xl border border-border/60 shadow-md transition-all duration-200;
+  }
+
+  /* Interactive hover lift */
+  .hover-lift {
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  .press {
+    @apply transition-transform duration-150 active:scale-[0.97];
+  }
+
+  .story-link {
+    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:right-0 after:bg-primary after:origin-bottom-left after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-right;
   }
 
   /* Subtle highlighted text */
@@ -278,15 +295,37 @@
     background-color: hsl(var(--section-peach));
   }
 
-  /* Clean card */
+  /* Clean card with refined shadow */
   .strategly-card {
     @apply bg-card rounded-2xl border border-border/60 p-5 transition-all duration-300;
     box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04);
   }
   .strategly-card:hover {
-    box-shadow: 0 4px 12px 0 rgb(0 0 0 / 0.08);
-    transform: translateY(-1px);
+    box-shadow: 0 8px 24px -8px rgb(0 0 0 / 0.12);
+    transform: translateY(-2px);
+    border-color: hsl(var(--border));
   }
+
+  :is(.dark) .strategly-card {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3);
+  }
+  :is(.dark) .strategly-card:hover {
+    box-shadow: 0 8px 24px -8px hsl(var(--primary) / 0.18);
+  }
+
+  /* Page transition wrapper */
+  .page-enter {
+    @apply animate-fade-in;
+  }
+
+  /* Section headings */
+  .section-title {
+    @apply text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground leading-tight;
+  }
+  .section-subtitle {
+    @apply text-base text-muted-foreground mt-2 leading-relaxed;
+  }
+
 
   .status-dot {
     @apply w-3 h-3 rounded-full relative;

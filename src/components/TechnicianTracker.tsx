@@ -112,49 +112,45 @@ const CountdownTimer = ({ secondsLeft, etaTime }: { secondsLeft: number; etaTime
   const progress = Math.max(0, Math.min(100, 100 - (secondsLeft / 3600) * 100));
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-5 text-primary-foreground">
-      {/* Animated background pulse */}
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-primary/80 p-6 text-primary-foreground shadow-xl shadow-primary/25">
+      {/* Animated background shimmer */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse" />
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+      <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
       
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50" />
-            <span className="text-sm font-medium opacity-90">הטכנאי בדרך אליך</span>
+            <span className="text-sm font-semibold opacity-95">הטכנאי בדרך אליך</span>
           </div>
-          <span className="text-xs opacity-70">הגעה ב-{etaTime}</span>
+          <span className="text-xs opacity-75 tabular-nums">הגעה ב-{etaTime}</span>
         </div>
 
         {/* Big countdown */}
-        <div className="flex items-center justify-center my-4" dir="ltr">
-          <div className="flex items-center gap-3">
-            <div className="bg-white/15 rounded-xl px-4 py-2 min-w-[80px] text-center">
-              <span className="text-5xl font-extrabold tabular-nums">
-                {String(minutes).padStart(2, '0')}
-              </span>
-              <p className="text-[10px] opacity-60 mt-1">דקות</p>
-            </div>
-            <span className="text-4xl font-bold opacity-60 animate-pulse">:</span>
-            <div className="bg-white/15 rounded-xl px-4 py-2 min-w-[80px] text-center">
-              <span className="text-5xl font-extrabold tabular-nums">
-                {String(seconds).padStart(2, '0')}
-              </span>
-              <p className="text-[10px] opacity-60 mt-1">שניות</p>
-            </div>
+        <div className="flex items-center justify-center my-5" dir="ltr">
+          <div className="flex items-baseline gap-2">
+            <span className="text-7xl sm:text-8xl font-black tabular-nums leading-none tracking-tight drop-shadow-lg">
+              {String(minutes).padStart(2, '0')}
+            </span>
+            <span className="text-4xl font-bold opacity-70 animate-pulse">:</span>
+            <span className="text-7xl sm:text-8xl font-black tabular-nums leading-none tracking-tight drop-shadow-lg">
+              {String(seconds).padStart(2, '0')}
+            </span>
           </div>
         </div>
-        <p className="text-center text-sm font-medium opacity-80 mb-4">דקות עד הגעת הטכנאי</p>
+        <p className="text-center text-sm font-medium opacity-85 mb-5 tracking-wide">דקות עד הגעת הטכנאי</p>
 
         {/* Progress bar */}
-        <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+        <div className="w-full h-2.5 bg-white/20 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-white/80 rounded-full transition-all duration-1000 ease-linear"
+            className="h-full bg-gradient-to-r from-white to-white/70 rounded-full transition-all duration-1000 ease-linear shadow-lg"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <div className="flex justify-between mt-1.5">
-          <span className="text-[10px] opacity-50">יצא לדרך</span>
-          <span className="text-[10px] opacity-50">הגעה</span>
+        <div className="flex justify-between mt-2">
+          <span className="text-[11px] opacity-60 font-medium">יצא לדרך</span>
+          <span className="text-[11px] opacity-60 font-medium">הגעה</span>
         </div>
       </div>
     </div>
