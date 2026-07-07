@@ -56,41 +56,41 @@
   }
 
   .dark {
-    --background: 0 0% 6%;
-    --foreground: 0 0% 93%;
+    --background: 0 0% 5%;
+    --foreground: 0 0% 95%;
 
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 93%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 93%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 211 100% 55%;
+    --primary: 211 100% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 0 0% 88%;
+    --secondary: 0 0% 13%;
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 55%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 62%;
 
-    --accent: 211 100% 55%;
+    --accent: 211 100% 58%;
     --accent-foreground: 0 0% 100%;
 
-    --success: 142 55% 48%;
+    --success: 142 55% 50%;
     --success-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 55%;
+    --destructive: 0 72% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 211 100% 55%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 211 100% 58%;
 
-    --section-cream: 0 0% 8%;
-    --section-lavender: 0 0% 9%;
-    --section-mint: 0 0% 8%;
-    --section-peach: 0 0% 9%;
+    --section-cream: 0 0% 7%;
+    --section-lavender: 0 0% 8%;
+    --section-mint: 0 0% 7%;
+    --section-peach: 0 0% 8%;
   }
 
   /* Gift Mode - Warm & Loving theme */
