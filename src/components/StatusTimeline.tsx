@@ -37,8 +37,8 @@ const StatusTimeline = ({ currentStatus, estimatedArrival, updatedAt }: StatusTi
   };
 
   return (
-    <div className="wolt-card p-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-      <h3 className="text-lg font-bold text-foreground mb-6">סטטוס התיקון</h3>
+    <div className="wolt-card p-6 animate-slide-up-soft" style={{ animationDelay: '0.1s' }}>
+      <h3 className="text-xl font-extrabold text-foreground mb-6 tracking-tight">סטטוס התיקון</h3>
       
       <div className="space-y-1">
         {statusOrder.map((status, index) => {
@@ -51,7 +51,7 @@ const StatusTimeline = ({ currentStatus, estimatedArrival, updatedAt }: StatusTi
             <div 
               key={status}
               className={cn(
-                "relative flex items-center gap-4 py-3 transition-all duration-300",
+                "relative flex items-center gap-4 py-3.5 transition-all duration-300",
                 isPending && "opacity-40"
               )}
             >
@@ -59,7 +59,7 @@ const StatusTimeline = ({ currentStatus, estimatedArrival, updatedAt }: StatusTi
               {index < statusOrder.length - 1 && (
                 <div 
                   className={cn(
-                    "absolute right-[18px] top-[42px] w-0.5 h-6 transition-colors duration-500",
+                    "absolute right-[22px] top-[52px] w-0.5 h-7 transition-colors duration-500",
                     index < currentIndex ? "bg-primary" : "bg-border"
                   )}
                 />
@@ -68,16 +68,17 @@ const StatusTimeline = ({ currentStatus, estimatedArrival, updatedAt }: StatusTi
               {/* Status circle */}
               <div 
                 className={cn(
-                  "relative z-10 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 flex-shrink-0",
+                  "relative z-10 rounded-full flex items-center justify-center transition-all duration-300 flex-shrink-0",
+                  isCurrent ? "w-11 h-11" : "w-10 h-10",
                   isCompleted && "bg-primary",
-                  isCurrent && "bg-primary shadow-[0_0_0_4px_hsl(var(--primary)/0.2)]",
+                  isCurrent && "bg-primary shadow-[0_0_0_5px_hsl(var(--primary)/0.18)] animate-soft-pulse",
                   isPending && "bg-muted border-2 border-border"
                 )}
               >
                 {isCompleted ? (
-                  <Check className="w-4 h-4 text-primary-foreground" />
+                  <Check className="w-5 h-5 text-primary-foreground" strokeWidth={3} />
                 ) : isCurrent ? (
-                  <div className="w-3 h-3 bg-primary-foreground rounded-full animate-pulse-slow" />
+                  <div className="w-3 h-3 bg-primary-foreground rounded-full" />
                 ) : (
                   <div className="w-2 h-2 bg-border rounded-full" />
                 )}
@@ -87,20 +88,20 @@ const StatusTimeline = ({ currentStatus, estimatedArrival, updatedAt }: StatusTi
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <p className={cn(
-                    "font-medium text-sm transition-colors",
-                    isCurrent ? "text-primary" : isCompleted ? "text-foreground" : "text-muted-foreground"
+                    "font-semibold transition-colors",
+                    isCurrent ? "text-primary text-base" : isCompleted ? "text-foreground text-sm" : "text-muted-foreground text-sm"
                   )}>
                     {statusLabels[status]}
                   </p>
                   {statusTime && (
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground tabular-nums">
                       {statusTime}
                     </span>
                   )}
                 </div>
                 
                 {status === 'on_the_way' && isCurrent && estimatedArrival && (
-                  <p className="text-xs text-primary font-medium mt-0.5 animate-fade-in">
+                  <p className="text-xs text-primary font-semibold mt-1 animate-fade-in">
                     הגעה משוערת: {estimatedArrival}
                   </p>
                 )}
