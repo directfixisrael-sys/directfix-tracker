@@ -53,53 +53,51 @@ const Index = () => {
       <main id="main-content" className="flex-1 flex flex-col" role="main" aria-label="DirectFix">
         
         {/* Hero Section - Cream Background */}
-        <section className="section-cream border-b-2 border-foreground/10">
-          <div className="max-w-2xl mx-auto px-6 py-12 text-center">
-            <div className="mb-6 animate-fade-in">
-              <Logo size="lg" clickable={false} className="justify-center mb-5" />
-              <h1 className="font-extrabold text-foreground tracking-tight leading-tight mb-3 text-3xl">
+        <section className="section-cream border-b border-border/40">
+          <div className="max-w-2xl mx-auto px-6 pt-14 pb-16 text-center">
+            <div className="mb-8 animate-fade-in">
+              <Logo size="lg" clickable={false} className="justify-center mb-8" />
+              <h1 className="font-extrabold text-foreground tracking-tight leading-[1.05] mb-4 text-4xl sm:text-5xl">
                 {t('home.title')}{' '}
-                <span className="text-primary font-extrabold text-3xl">{t('home.titleHighlight')}</span>
+                <span className="text-primary block sm:inline mt-1 sm:mt-0">{t('home.titleHighlight')}</span>
               </h1>
-              <p className="text-muted-foreground mt-3 max-w-xs mx-auto leading-relaxed text-sm">
+              <p className="text-muted-foreground mt-4 max-w-md mx-auto leading-relaxed text-base sm:text-lg">
                 {t('home.subtitle')}
               </p>
             </div>
 
             {/* CTAs */}
-            <div className="space-y-3 max-w-sm mx-auto animate-fade-in" style={{ animationDelay: '150ms' }}>
+            <div className="space-y-3 max-w-sm mx-auto animate-fade-in" style={{ animationDelay: '120ms' }}>
               <Button
                 size="lg"
-                className="w-full h-14 text-lg font-extrabold rounded-2xl gap-2 border-2 border-foreground/10 shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:shadow-[6px_6px_0_0_hsl(var(--foreground)/0.12)] hover:-translate-y-0.5 transition-all duration-200 bg-[#0073ff]"
+                className="w-full h-16 text-lg font-extrabold rounded-2xl gap-2 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
                 onClick={() => navigate('/order')}>
-                
                 <Wrench className="w-5 h-5" />
                 <span>{t('home.ctaOrder')}</span>
               </Button>
 
               <Button
-                variant="outline"
+                variant="ghost"
                 size="lg"
-                className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
+                className="w-full h-12 text-base font-semibold rounded-2xl gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200"
                 onClick={() => navigate('/track')}>
-                
                 <Smartphone className="w-4 h-4" />
                 <span>{t('home.ctaTrack')}</span>
               </Button>
             </div>
 
             {/* Additional Services */}
-            <div className="max-w-sm mx-auto mt-5 animate-fade-in" style={{ animationDelay: '250ms' }}>
+            <div className="max-w-sm mx-auto mt-6 animate-fade-in" style={{ animationDelay: '220ms' }}>
               <Collapsible>
                 <CollapsibleTrigger className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground transition-colors py-2 group">
-                  <span className="text-sm font-bold">{t('home.moreServices')}</span>
+                  <span className="text-sm font-semibold">{t('home.moreServices')}</span>
                   <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="space-y-2.5 pt-2">
+                <CollapsibleContent className="space-y-2.5 pt-3">
                   <Button
                     variant="outline"
                     size="lg"
-                    className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
+                    className="w-full h-12 text-base font-semibold rounded-2xl gap-2 border border-border/60 hover:border-border hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
                     onClick={() => navigate('/ipad')}>
                     <Tablet className="w-4 h-4" />
                     <span>{t('home.ipadRepair')}</span>
@@ -107,7 +105,7 @@ const Index = () => {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
+                    className="w-full h-12 text-base font-semibold rounded-2xl gap-2 border border-border/60 hover:border-border hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
                     onClick={() => navigate('/consultation')}>
                     <PhoneCall className="w-4 h-4" />
                     <span>{t('home.consultation')}</span>
@@ -115,7 +113,7 @@ const Index = () => {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
+                    className="w-full h-12 text-base font-semibold rounded-2xl gap-2 border border-border/60 hover:border-border hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
                     onClick={() => navigate('/data-transfer')}>
                     <ArrowLeftRight className="w-4 h-4" />
                     <span>{t('home.dataTransfer')}</span>
@@ -123,7 +121,7 @@ const Index = () => {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="w-full h-12 text-base font-bold rounded-2xl gap-2 border-2 border-foreground/15 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[4px_4px_0_0_hsl(var(--foreground)/0.1)] hover:-translate-y-0.5 transition-all duration-200"
+                    className="w-full h-12 text-base font-semibold rounded-2xl gap-2 border border-border/60 hover:border-border hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
                     onClick={() => navigate('/ai-agent')}>
                     <Bot className="w-4 h-4" />
                     <span>{t('home.aiAgent')}</span>
