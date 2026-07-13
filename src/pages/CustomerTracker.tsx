@@ -253,9 +253,8 @@ const CustomerTracker = () => {
     }
   };
 
-  const orderMessages = currentOrder 
-    ? messages.filter(m => m.orderId === currentOrder.id)
-    : [];
+  // orderMessages already maintained in state above
+
 
   // Phone input screen or history list
   if (!currentOrder) {
