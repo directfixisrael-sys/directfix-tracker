@@ -1,60 +1,60 @@
-# תוכנית שיפורי עיצוב מקיפה
+## Wave 1 - Security Hardening (Critical PII lockdown)
 
-עבודה בשבעה גלים נפרדים כדי לשמור על יציבות ולאפשר בדיקה ביניים. כל גל עומד בפני עצמו ולא שובר קיים.
+### Goal
+Close the wide-open RLS policies on customer/PII tables so anonymous users cannot read, modify, or delete customer data. Keep the app functional by routing public operations through Edge Functions and moving admin operations behind real Supabase Auth.
 
-## גל 1 - חיזוק שפת העיצוב (בסיס לכל השאר)
-- הוספת אנימציות חסרות ל-`tailwind.config.ts`: `fade-in`, `scale-in`, `slide-in-right`, `slide-up`, `enter`, `exit`.
-- הוספת utility classes: `.hover-scale`, `.story-link`, `.press` (active:scale-[0.98]).
-- חידוד טוקנים ב-`index.css`: shadows רכים יותר במצב כהה, ring עדין יותר, spacing scale אחיד.
-- הגדרת radius אחיד לכפתורים/כרטיסים/inputs (rounded-2xl לכרטיסים, rounded-xl לכפתורים).
+### Scope of changes
 
-## גל 2 - Dark mode polish
-- כיול ניגודיות: `--card` מעט בהיר יותר מ-`--background`, `--border` עדין יותר.
-- shadows במצב כהה עם glow עדין במקום שחור מלא.
-- וידוא ניגודיות טקסט משני (muted-foreground) לפי WCAG AA.
+**1. Admin authentication (Supabase Auth)**
+- New table `public.user_roles` with enum `app_role` (`admin`, `staff`) and `has_role()` security-definer function.
+- New `/admin/login` route using Supabase email/password auth.
+- `AdminPanel` gated on `has_role(auth.uid(), 'admin')`. Existing password-based admin gate is removed.
+- First admin user provisioned manually via a one-time migration/seed after you provide an email; then the admin logs in with that email + password.
 
-## גל 3 - היררכיה ויזואלית + טיפוגרפיה
-- מבנה כותרות אחיד: H1 גדול ובולט, subtitle ב-muted-foreground קטן יותר.
-- הגדלת ריווחים בין סקשנים בדפי `Index`, `NewRepairOrder`, `CustomerTracker`.
-- הפחתת עומס: מיזוג/הסתרת אלמנטים משניים, שימוש בקבוצות (grouping) עם רקע section עדין.
+**2. RLS lockdown (migration)**
+For every table below, drop the `USING (true)` policies and replace with:
+- `SELECT/UPDATE/DELETE` → admin only (`has_role(auth.uid(),'admin')`)
+- `INSERT` → allow anon only where truly needed (leads, orders, messages from public site), everything else admin only
 
-## גל 4 - דף הבית (Hero חזק)
-- Hero חדש עם CTA ראשי אחד גדול ("התחל הזמנת תיקון") ו-CTA משני קטן (מעקב הזמנה).
-- כותרת ענקית + תת-כותרת + trust badges בשורה אחת מתחת.
-- הזזת רכיבים משניים (טסטמוניאלס, שירותים נוספים) למטה עם ריווח נדיב.
+Tables locked: `orders`, `leads`, `club_members`, `customer_profiles`, `loyalty_points`, `messages`, `referrals`, `voice_leads`, `coupons`, `admin_reminders`, `announcements`, `blocked_dates`, `promotions`, `repair_types`, `repair_bundles`, `model_repair_prices`, `iphone_models`, `ipad_models`, `voice_agent_settings`, `push_subscriptions`, `site_visits`, `wp_button_clicks`.
 
-## גל 5 - Wizard של הזמנה
-- Progress bar חי בראש הדף עם step names וגליל עדין.
-- אנימציית `fade-in`+`slide` בין שלבים.
-- Hover states עשירים על כרטיסי מכשיר/תיקון (scale + shadow lift + border primary).
-- Feedback מיידי בלחיצה (`active:scale-[0.98]`, ripple עדין).
+Publicly readable (needed for the storefront/order flow): `iphone_models`, `ipad_models`, `repair_types`, `repair_bundles`, `model_repair_prices`, `announcements` (active only), `promotions` (active only), `coupons` (validation only via edge function, not direct SELECT).
 
-## גל 6 - מסך מעקב טכנאי
-- טיימר ETA ענק במרכז (60px+), בסגנון Wolt.
-- אנימציית קסדה משופרת: תנועה חלקה על ציר, רקע כביש נע, גלגלים מסתובבים.
-- StatusTimeline מודגש יותר עם step פעיל מודגש (glow + pulse).
-- StickyHeader עם glassmorphism עדין וכפתור התקשרות בולט.
+**3. Public-facing Edge Functions (replace direct client access)**
+- `create-order` — validates + inserts into `orders` with service role. Called from `NewRepairOrder`.
+- `lookup-orders-by-phone` — validates phone, returns orders for the customer tracker (`CustomerTracker`).
+- `submit-lead` — inserts into `leads`.
+- `send-chat-message` — inserts into `messages` scoped to an order id + phone verification.
+- `validate-coupon` — checks a coupon code without exposing the coupons table.
 
-## גל 7 - קונסיסטנטיות ופוליש כללי
-- מעבר כללי: כל הכפתורים לאותו variant system, כל הכרטיסים ל-`wolt-card`/`strategly-card`.
-- וידוא spacing אחיד (p-4/p-6, gap-4).
-- אנימציית עמוד `animate-fade-in` בכניסה לכל route.
-- מעברי hover אחידים (`transition-all duration-200`).
+Existing PBKDF2 customer-auth flow stays as-is for the customer zone; those edge functions already use service role.
 
-## פרטים טכניים
+**4. Client updates**
+- `src/store/repairStore.ts` — replace direct `orders`/`messages` reads/writes with the new edge functions for public paths; keep direct reads for admin panel (now behind admin auth).
+- `src/pages/NewRepairOrder.tsx` — order creation via `create-order`.
+- `src/pages/CustomerTracker.tsx` — phone lookup via `lookup-orders-by-phone`.
+- Admin components keep using `supabase` client directly; RLS lets them through because the admin session has `admin` role.
 
-**קבצים עיקריים לעדכון:**
-- `src/index.css` + `tailwind.config.ts` - טוקנים ואנימציות
-- `src/pages/Index.tsx` - Hero חדש
-- `src/pages/NewRepairOrder.tsx` - Wizard משופר
-- `src/pages/CustomerTracker.tsx` + `src/components/TechnicianTracker.tsx` + `StickyHeader.tsx` - מסך מעקב
-- `src/components/Header.tsx` - קונסיסטנטיות
-- קומפוננטות כרטיסים: `ModelPicker`, `OrderSummary`, `StatusTimeline`
+**5. Storage buckets**
+- `resumes` bucket: keep private, only admin can list/read; upload allowed to anon (already fixed on read).
+- `device-images`: keep public read, admin-only write/delete (already partially fixed).
 
-**אילוצים שנשמרים:**
-- RTL מלא, ללא אמוג'ים, ללא צהוב, ללא glassmorphism כבד (לפי memory).
-- שמירה על Apple-minimal aesthetic הקיים.
-- ללא שינוי לוגיקה עסקית - רק frontend/presentation.
-- שמירה על Rubik font + font-size 22px base.
+### Not in this wave
+- Migrating existing customer PBKDF2 accounts to Supabase Auth.
+- Deep audit of every edge function's own input validation.
+- Rate limiting on public edge functions (recommended follow-up).
 
-**אישור לפני התחלה:** אבצע גל אחר גל, אעצור אחרי גל 3 ואחרי גל 5 כדי שתוכל לראות ולתת פידבק לפני שממשיכים.
+### Rollout order
+1. Migration: `user_roles`, `has_role`, all RLS changes (one migration).
+2. Provision first admin (needs your email — I will ask before running).
+3. Add `/admin/login` + auth guard on `AdminPanel`.
+4. Add the 5 new Edge Functions.
+5. Update client callers.
+6. Verify build + smoke test.
+
+### What you need to provide
+- The email address to use for the first admin login. Password can be set on first login via magic link, or you can give me one to seed.
+
+### Expected downtime / risk
+- Between step 1 and step 3, the admin panel will be unreachable for anyone not yet in `user_roles`. I will provision your admin in the same migration if you give me the email now.
+- Between step 1 and step 5, public order creation/lookup will fail until the edge functions and client updates ship. I will land them in the same message to minimize the window.
