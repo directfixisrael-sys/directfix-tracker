@@ -1143,8 +1143,8 @@ const AdminPanel = () => {
             <Button 
               variant="outline" 
               className="w-full gap-2"
-              onClick={() => {
-                sessionStorage.removeItem('admin-authenticated');
+              onClick={async () => {
+                await supabase.auth.signOut();
                 setIsAuthenticated(false);
               }}
             >
