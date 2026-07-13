@@ -169,12 +169,40 @@ const AdminPanel = () => {
     subscribeToRealtime,
   } = useRepairStore();
 
-  // Check if already authenticated from session
+  // Check Supabase Auth session + admin role
   useEffect(() => {
-    const savedAuth = sessionStorage.getItem('admin-authenticated');
-    if (savedAuth === 'true') {
-      setIsAuthenticated(true);
-    }
+    let mounted = true;
+    const checkAdmin = async (userId: string | undefined) => {
+      if (!userId) {
+        if (mounted) { setIsAuthenticated(false); setAuthChecking(false); }
+        return;
+      }
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .maybeSingle();
+      if (!mounted) return;
+      if (error || !data) {
+        setIsAuthenticated(false);
+        setCodeError('החשבון הזה אינו אדמין. פנה למנהל המערכת.');
+        await supabase.auth.signOut();
+      } else {
+        setIsAuthenticated(true);
+      }
+      setAuthChecking(false);
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setTimeout(() => checkAdmin(session?.user?.id), 0);
+    });
+
+    supabase.auth.getSession().then(({ data }) => {
+      checkAdmin(data.session?.user?.id);
+    });
+
+    return () => { mounted = false; sub.subscription.unsubscribe(); };
   }, []);
 
   // Load data and subscribe to realtime on mount
@@ -206,18 +234,43 @@ const AdminPanel = () => {
     window.location.reload();
   }, []);
 
-  const handleCodeSubmit = (e: React.FormEvent) => {
+  const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (accessCode === ADMIN_CODE) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('admin-authenticated', 'true');
-      setCodeError('');
-    } else {
-      setCodeError('קוד שגוי, נסה שוב');
+    setCodeError('');
+    setLoginLoading(true);
+    try {
+      if (loginMode === 'signup') {
+        const { error } = await supabase.auth.signUp({
+          email: loginEmail.trim(),
+          password: loginPassword,
+          options: { emailRedirectTo: `${window.location.origin}/admin` },
+        });
+        if (error) throw error;
+        setCodeError('נשלח מייל לאימות. אשר אותו ואז התחבר.');
+        setLoginMode('signin');
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: loginEmail.trim(),
+          password: loginPassword,
+        });
+        if (error) throw error;
+      }
+    } catch (err: any) {
+      setCodeError(err?.message || 'שגיאה בהתחברות');
+    } finally {
+      setLoginLoading(false);
     }
   };
 
   // Show login screen if not authenticated
+  if (authChecking) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -227,23 +280,44 @@ const AdminPanel = () => {
             <Lock className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">פאנל ניהול</h1>
-          <p className="text-muted-foreground mb-6">הכנס קוד גישה להמשך</p>
-          
-          <form onSubmit={handleCodeSubmit} className="space-y-4">
+          <p className="text-muted-foreground mb-6">
+            {loginMode === 'signin' ? 'התחבר עם מייל אדמין' : 'הרשם עם מייל האדמין המורשה'}
+          </p>
+
+          <form onSubmit={handleAuthSubmit} className="space-y-4">
+            <Input
+              type="email"
+              value={loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
+              placeholder="מייל"
+              className="text-center"
+              dir="ltr"
+              autoFocus
+              required
+            />
             <Input
               type="password"
-              value={accessCode}
-              onChange={(e) => setAccessCode(e.target.value)}
-              placeholder="קוד גישה"
-              className="text-center text-lg tracking-widest"
-              autoFocus
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              placeholder="סיסמה"
+              className="text-center"
+              dir="ltr"
+              required
+              minLength={8}
             />
             {codeError && (
               <p className="text-destructive text-sm">{codeError}</p>
             )}
-            <Button type="submit" className="w-full">
-              כניסה
+            <Button type="submit" className="w-full" disabled={loginLoading}>
+              {loginLoading ? '...' : (loginMode === 'signin' ? 'כניסה' : 'הרשמה')}
             </Button>
+            <button
+              type="button"
+              className="text-xs text-muted-foreground underline"
+              onClick={() => { setCodeError(''); setLoginMode(loginMode === 'signin' ? 'signup' : 'signin'); }}
+            >
+              {loginMode === 'signin' ? 'התחברות ראשונה? הרשם כאן' : 'כבר יש חשבון? התחבר'}
+            </button>
           </form>
         </div>
       </div>
