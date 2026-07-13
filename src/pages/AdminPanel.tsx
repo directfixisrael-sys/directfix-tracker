@@ -94,7 +94,7 @@ import CustomerProfileView from '@/components/admin/CustomerProfileView';
 import WordPressClicksCard from '@/components/admin/WordPressClicksCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-const ADMIN_CODE = 'pp1p1xke';
+// Admin auth now uses Supabase Auth + user_roles table (has_role check).
 
 const AdminPanel = () => {
   const { toast } = useToast();
