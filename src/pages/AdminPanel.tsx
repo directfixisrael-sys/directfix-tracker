@@ -101,7 +101,11 @@ const AdminPanel = () => {
   const isMobile = useIsMobile();
   const { resolvedTheme, setTheme } = useTheme();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [accessCode, setAccessCode] = useState('');
+  const [authChecking, setAuthChecking] = useState(true);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginMode, setLoginMode] = useState<'signin' | 'signup'>('signin');
+  const [loginLoading, setLoginLoading] = useState(false);
   const [codeError, setCodeError] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
   const [newMessage, setNewMessage] = useState('');
