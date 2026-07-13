@@ -1113,10 +1113,8 @@ const AdminPanel = () => {
                       await Promise.all(registrations.map((r) => r.unregister()));
                     }
 
-                    // 3. Clear localStorage (preserve admin auth)
-                    const adminAuth = sessionStorage.getItem('admin-authenticated');
+                    // 3. Clear localStorage (Supabase auth session persists via its own key)
                     localStorage.clear();
-                    if (adminAuth) sessionStorage.setItem('admin-authenticated', adminAuth);
 
                     toast({
                       title: 'Cache נוקה בהצלחה',
