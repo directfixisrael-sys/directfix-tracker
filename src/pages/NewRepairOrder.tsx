@@ -1795,7 +1795,7 @@ const NewRepairOrder = () => {
                         
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-xl">{isBattery && !batteryIsOriginal && !isBatteryWithChoice ? repair.name.replace('מקורית', 'באיכות גבוהה') : repair.name}</h3>
+                            <h3 className="font-semibold text-xl">{repair.name}</h3>
                             {!isPhoneOnly && info && <Dialog>
                                 <DialogTrigger asChild>
                                   <button type="button" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-primary transition-colors p-1">
