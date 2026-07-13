@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import PhoneInput from '@/components/PhoneInput';
@@ -17,12 +17,64 @@ import RepairHistoryList from '@/components/RepairHistoryList';
 import WarrantyCertificate from '@/components/WarrantyCertificate';
 import LoyaltyPointsDisplay from '@/components/LoyaltyPointsDisplay';
 import { useRepairStore } from '@/store/repairStore';
+import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
 import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { RepairOrder } from '@/types/repair';
+import { RepairOrder, ChatMessage, RepairStatus, PaymentStatus, Accessory } from '@/types/repair';
 import SEO from "@/components/SEO";
 import { seo } from "@/lib/seoData";
+
+const defaultAccessories: Accessory[] = [
+  { id: '1', name: 'מגן מסך רגיל', price: 50, originalPrice: 79, selected: false },
+  { id: '2', name: 'מגן מסך פרימיום', price: 100, originalPrice: 149, selected: false },
+  { id: '3', name: 'מטען מהיר + כבל', price: 70, originalPrice: 119, selected: false },
+  { id: '4', name: 'כיסוי שקוף פרימיום', price: 50, originalPrice: 89, selected: false },
+];
+
+const dbToOrder = (row: any): RepairOrder => ({
+  id: row.id,
+  orderNumber: row.order_number,
+  customerPhone: row.customer_phone,
+  customerName: row.customer_name,
+  customerEmail: row.customer_email || undefined,
+  customerAddress: row.customer_address || '',
+  deviceType: row.device_type || '',
+  issueDescription: row.issue_description || '',
+  status: row.status as RepairStatus,
+  estimatedArrival: row.estimated_arrival,
+  technicianName: row.technician_name,
+  repairPrice: Number(row.repair_price) || 0,
+  accessories: row.accessories || defaultAccessories,
+  notes: row.notes || [],
+  createdAt: new Date(row.created_at),
+  updatedAt: new Date(row.updated_at),
+  completedAt: row.completed_at ? new Date(row.completed_at) : undefined,
+  wantsPromotions: row.wants_promotions || false,
+  rating: row.rating,
+  feedback: row.feedback,
+  lastViewedAt: row.last_viewed_at ? new Date(row.last_viewed_at) : undefined,
+  isViewing: row.is_viewing || false,
+  wazeLink: row.waze_link,
+  invoiceLink: row.invoice_link,
+  paymentLink: row.payment_link,
+  paymentStatus: (row.payment_status as PaymentStatus) || 'none',
+  leadSource: row.lead_source || undefined,
+  deviceImages: row.device_images || [],
+  isClubMember: row.is_club_member || false,
+  warrantyMonths: row.warranty_months || undefined,
+});
+
+const dbToMessage = (row: any): ChatMessage => ({
+  id: row.id,
+  orderId: row.order_id,
+  sender: row.sender as 'customer' | 'support',
+  senderName: row.sender_name,
+  message: row.message,
+  timestamp: new Date(row.timestamp),
+  read: row.read,
+});
+
 
 const CustomerTracker = () => {
   const [searchParams] = useSearchParams();
