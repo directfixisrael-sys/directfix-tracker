@@ -239,22 +239,11 @@ const AdminPanel = () => {
     setCodeError('');
     setLoginLoading(true);
     try {
-      if (loginMode === 'signup') {
-        const { error } = await supabase.auth.signUp({
-          email: loginEmail.trim(),
-          password: loginPassword,
-          options: { emailRedirectTo: `${window.location.origin}/admin` },
-        });
-        if (error) throw error;
-        setCodeError('נשלח מייל לאימות. אשר אותו ואז התחבר.');
-        setLoginMode('signin');
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: loginEmail.trim(),
-          password: loginPassword,
-        });
-        if (error) throw error;
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email: loginEmail.trim(),
+        password: loginPassword,
+      });
+      if (error) throw error;
     } catch (err: any) {
       setCodeError(err?.message || 'שגיאה בהתחברות');
     } finally {
@@ -280,9 +269,7 @@ const AdminPanel = () => {
             <Lock className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">פאנל ניהול</h1>
-          <p className="text-muted-foreground mb-6">
-            {loginMode === 'signin' ? 'התחבר עם מייל אדמין' : 'הרשם עם מייל האדמין המורשה'}
-          </p>
+          <p className="text-muted-foreground mb-6">כניסה למורשים בלבד</p>
 
           <form onSubmit={handleAuthSubmit} className="space-y-4">
             <Input
@@ -309,15 +296,8 @@ const AdminPanel = () => {
               <p className="text-destructive text-sm">{codeError}</p>
             )}
             <Button type="submit" className="w-full" disabled={loginLoading}>
-              {loginLoading ? '...' : (loginMode === 'signin' ? 'כניסה' : 'הרשמה')}
+              {loginLoading ? '...' : 'כניסה'}
             </Button>
-            <button
-              type="button"
-              className="text-xs text-muted-foreground underline"
-              onClick={() => { setCodeError(''); setLoginMode(loginMode === 'signin' ? 'signup' : 'signin'); }}
-            >
-              {loginMode === 'signin' ? 'התחברות ראשונה? הרשם כאן' : 'כבר יש חשבון? התחבר'}
-            </button>
           </form>
         </div>
       </div>
