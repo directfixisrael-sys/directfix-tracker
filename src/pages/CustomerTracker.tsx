@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import PhoneInput from '@/components/PhoneInput';
@@ -17,12 +17,64 @@ import RepairHistoryList from '@/components/RepairHistoryList';
 import WarrantyCertificate from '@/components/WarrantyCertificate';
 import LoyaltyPointsDisplay from '@/components/LoyaltyPointsDisplay';
 import { useRepairStore } from '@/store/repairStore';
+import { supabase } from '@/integrations/supabase/client';
 import Logo from '@/components/Logo';
 import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { RepairOrder } from '@/types/repair';
+import { RepairOrder, ChatMessage, RepairStatus, PaymentStatus, Accessory } from '@/types/repair';
 import SEO from "@/components/SEO";
 import { seo } from "@/lib/seoData";
+
+const defaultAccessories: Accessory[] = [
+  { id: '1', name: 'מגן מסך רגיל', price: 50, originalPrice: 79, selected: false },
+  { id: '2', name: 'מגן מסך פרימיום', price: 100, originalPrice: 149, selected: false },
+  { id: '3', name: 'מטען מהיר + כבל', price: 70, originalPrice: 119, selected: false },
+  { id: '4', name: 'כיסוי שקוף פרימיום', price: 50, originalPrice: 89, selected: false },
+];
+
+const dbToOrder = (row: any): RepairOrder => ({
+  id: row.id,
+  orderNumber: row.order_number,
+  customerPhone: row.customer_phone,
+  customerName: row.customer_name,
+  customerEmail: row.customer_email || undefined,
+  customerAddress: row.customer_address || '',
+  deviceType: row.device_type || '',
+  issueDescription: row.issue_description || '',
+  status: row.status as RepairStatus,
+  estimatedArrival: row.estimated_arrival,
+  technicianName: row.technician_name,
+  repairPrice: Number(row.repair_price) || 0,
+  accessories: row.accessories || defaultAccessories,
+  notes: row.notes || [],
+  createdAt: new Date(row.created_at),
+  updatedAt: new Date(row.updated_at),
+  completedAt: row.completed_at ? new Date(row.completed_at) : undefined,
+  wantsPromotions: row.wants_promotions || false,
+  rating: row.rating,
+  feedback: row.feedback,
+  lastViewedAt: row.last_viewed_at ? new Date(row.last_viewed_at) : undefined,
+  isViewing: row.is_viewing || false,
+  wazeLink: row.waze_link,
+  invoiceLink: row.invoice_link,
+  paymentLink: row.payment_link,
+  paymentStatus: (row.payment_status as PaymentStatus) || 'none',
+  leadSource: row.lead_source || undefined,
+  deviceImages: row.device_images || [],
+  isClubMember: row.is_club_member || false,
+  warrantyMonths: row.warranty_months || undefined,
+});
+
+const dbToMessage = (row: any): ChatMessage => ({
+  id: row.id,
+  orderId: row.order_id,
+  sender: row.sender as 'customer' | 'support',
+  senderName: row.sender_name,
+  message: row.message,
+  timestamp: new Date(row.timestamp),
+  read: row.read,
+});
+
 
 const CustomerTracker = () => {
   const [searchParams] = useSearchParams();
@@ -37,80 +89,48 @@ const CustomerTracker = () => {
     return localStorage.getItem('privacy_consent_accepted') === 'true';
   });
 
-  const {
-    orders,
-    currentOrder,
-    setCurrentOrder,
-    findOrderByPhone,
-    findAllOrdersByPhone,
-    toggleAccessory,
-    setWantsPromotions,
-    setRating,
-    addCustomerMessage,
-    setViewingStatus,
-    messages,
-    loadOrders,
-    loadMessages,
-    subscribeToRealtime,
-  } = useRepairStore();
+  // Local state (replaces the store-loaded orders/messages for public tracker)
+  const [currentOrder, setCurrentOrder] = useState<RepairOrder | null>(null);
+  const [orderMessages, setOrderMessages] = useState<ChatMessage[]>([]);
+  const [verifiedPhone, setVerifiedPhone] = useState<string>('');
+  const pollingRef = useRef<number | null>(null);
 
-  // Track viewing status with heartbeat
+  // Fetch via secure edge function (returns only this phone's data)
+  const fetchForPhone = async (phone: string, orderId?: string) => {
+    const { data, error: fnError } = await supabase.functions.invoke(
+      'customer-tracker-lookup',
+      { body: { phone, orderId } }
+    );
+    if (fnError) throw fnError;
+    const orders: RepairOrder[] = ((data as any)?.orders || []).map(dbToOrder);
+    const messages: ChatMessage[] = ((data as any)?.messages || []).map(dbToMessage);
+    return { orders, messages };
+  };
+
+  // Poll current order every 15s (replaces realtime, which is blocked by RLS for anon)
   useEffect(() => {
-    if (currentOrder) {
-      // Set viewing status immediately
-      setViewingStatus(currentOrder.id, true);
-      
-      // Send heartbeat every 30 seconds to keep "viewing" status accurate
-      const heartbeatInterval = setInterval(() => {
-        setViewingStatus(currentOrder.id, true);
-      }, 30000);
-      
-      // Handle page visibility changes
-      const handleVisibilityChange = () => {
-        if (document.hidden) {
-          setViewingStatus(currentOrder.id, false);
-        } else {
-          setViewingStatus(currentOrder.id, true);
+    if (!currentOrder || !verifiedPhone) return;
+    const tick = async () => {
+      try {
+        const { orders, messages } = await fetchForPhone(verifiedPhone, currentOrder.id);
+        if (orders[0]) {
+          setCurrentOrder(prev => {
+            if (!prev) return orders[0];
+            return JSON.stringify(prev) !== JSON.stringify(orders[0]) ? orders[0] : prev;
+          });
         }
-      };
-      
-      // Handle before unload (when closing tab/browser)
-      const handleBeforeUnload = () => {
-        setViewingStatus(currentOrder.id, false);
-      };
-      
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      window.addEventListener('beforeunload', handleBeforeUnload);
-      
-      // Cleanup when leaving page
-      return () => {
-        clearInterval(heartbeatInterval);
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-        setViewingStatus(currentOrder.id, false);
-      };
-    }
-  }, [currentOrder?.id, setViewingStatus]);
-
-  // Keep currentOrder in sync with orders from store
-  useEffect(() => {
-    if (currentOrder) {
-      const updatedOrder = orders.find(o => o.id === currentOrder.id);
-      if (updatedOrder && JSON.stringify(updatedOrder) !== JSON.stringify(currentOrder)) {
-        console.log('Order updated, syncing...', updatedOrder.status);
-        setCurrentOrder(updatedOrder);
+        setOrderMessages(messages);
+      } catch (e) {
+        console.error('polling error', e);
       }
-    }
-  }, [orders, currentOrder, setCurrentOrder]);
+    };
+    pollingRef.current = window.setInterval(tick, 15000);
+    return () => {
+      if (pollingRef.current) window.clearInterval(pollingRef.current);
+    };
+  }, [currentOrder?.id, verifiedPhone]);
 
-  // Load data and subscribe to realtime on mount
-  useEffect(() => {
-    loadOrders();
-    loadMessages();
-    const unsubscribe = subscribeToRealtime();
-    return () => unsubscribe();
-  }, []);
-
+  // Auto-search when ?phone= is in URL
   useEffect(() => {
     const phone = searchParams.get('phone');
     if (phone) {
@@ -122,7 +142,6 @@ const CustomerTracker = () => {
     const handleScroll = () => {
       setShowStickyHeader(window.scrollY > 300);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -130,34 +149,79 @@ const CustomerTracker = () => {
   const handleSearch = async (phone: string) => {
     setIsSearching(true);
     setError('');
-
-    await new Promise(resolve => setTimeout(resolve, 600));
-
-    const allOrders = findAllOrdersByPhone(phone);
-    if (allOrders.length > 1) {
-      // Multiple orders - show history list
-      setPhoneOrders(allOrders);
-      setShowHistory(true);
-      setCurrentOrder(null);
-      setError('');
-    } else if (allOrders.length === 1) {
-      // Single order - go directly
-      setCurrentOrder(allOrders[0]);
-      setPhoneOrders(allOrders);
-      setShowHistory(false);
-      setError('');
-      if (!hasAcceptedPrivacy) {
-        setShowPrivacyModal(true);
+    try {
+      const { orders, messages } = await fetchForPhone(phone);
+      if (orders.length > 1) {
+        setPhoneOrders(orders);
+        setShowHistory(true);
+        setCurrentOrder(null);
+        setVerifiedPhone(phone);
+      } else if (orders.length === 1) {
+        setCurrentOrder(orders[0]);
+        setOrderMessages(messages);
+        setPhoneOrders(orders);
+        setVerifiedPhone(phone);
+        setShowHistory(false);
+        if (!hasAcceptedPrivacy) setShowPrivacyModal(true);
+      } else {
+        setError('לא נמצאה הזמנה עם מספר הטלפון הזה. וודאו שהמספר נכון או צרו קשר עם התמיכה.');
+        setCurrentOrder(null);
+        setPhoneOrders([]);
+        setShowHistory(false);
       }
-    } else {
-      setError('לא נמצאה הזמנה עם מספר הטלפון הזה. וודאו שהמספר נכון או צרו קשר עם התמיכה.');
-      setCurrentOrder(null);
-      setPhoneOrders([]);
-      setShowHistory(false);
+    } catch (e: any) {
+      setError('שגיאה בטעינת ההזמנה. נסו שוב.');
+    } finally {
+      setIsSearching(false);
     }
-    
-    setIsSearching(false);
   };
+
+  // Send a customer chat message (INSERT still allowed for anon)
+  const addCustomerMessage = async (orderId: string, message: string) => {
+    const { error: insErr } = await supabase.from('messages').insert({
+      order_id: orderId,
+      sender: 'customer',
+      sender_name: currentOrder?.customerName || 'לקוח',
+      message,
+      read: false,
+    });
+    if (insErr) {
+      console.error('send message failed', insErr);
+      return;
+    }
+    // Optimistic refresh
+    if (verifiedPhone && currentOrder) {
+      try {
+        const { messages } = await fetchForPhone(verifiedPhone, currentOrder.id);
+        setOrderMessages(messages);
+      } catch {}
+    }
+    // Fire-and-forget notifications
+    supabase.functions.invoke('send-push-notification', {
+      body: {
+        title: `הודעה חדשה מ-${currentOrder?.customerName || 'לקוח'}`,
+        body: message.substring(0, 100),
+        url: '/admin',
+      },
+    }).catch(() => {});
+    supabase.functions.invoke('notify-customer-message', {
+      body: {
+        orderId,
+        customerName: currentOrder?.customerName || 'לקוח',
+        message,
+        orderNumber: currentOrder?.orderNumber,
+      },
+    }).catch(() => {});
+  };
+
+  // Client-only versions of accessory/promo/rating updates: skipped for now
+  // (they require admin path or an authenticated customer path — safe no-ops on the
+  // public tracker after the RLS lockdown; the admin sees these fields).
+  const toggleAccessory = async (_orderId: string, _accessoryId: string) => {};
+  const setWantsPromotions = async (_orderId: string, _wants: boolean) => {};
+  const setRating = async (_orderId: string, _rating: number, _feedback?: string) => {};
+  const setViewingStatus = async (_orderId: string, _v: boolean) => {};
+
 
   const handleSelectOrder = (order: RepairOrder) => {
     setCurrentOrder(order);
@@ -189,9 +253,8 @@ const CustomerTracker = () => {
     }
   };
 
-  const orderMessages = currentOrder 
-    ? messages.filter(m => m.orderId === currentOrder.id)
-    : [];
+  // orderMessages already maintained in state above
+
 
   // Phone input screen or history list
   if (!currentOrder) {
