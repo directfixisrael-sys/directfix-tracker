@@ -1795,7 +1795,7 @@ const NewRepairOrder = () => {
                         
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-xl">{isBattery && !batteryIsOriginal && !isBatteryWithChoice ? repair.name.replace('מקורית', 'באיכות גבוהה') : repair.name}</h3>
+                            <h3 className="font-semibold text-xl">{repair.name}</h3>
                             {!isPhoneOnly && info && <Dialog>
                                 <DialogTrigger asChild>
                                   <button type="button" onClick={e => e.stopPropagation()} className="text-muted-foreground hover:text-primary transition-colors p-1">
@@ -1820,8 +1820,8 @@ const NewRepairOrder = () => {
                             <div className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-2.5 py-1 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30">
                               <Battery className="w-3.5 h-3.5" />
                               {batteryIsOriginal
-                                ? 'סוללה מקורית'
-                                : 'איכות הגבוהה ביותר · אחריות שנה'}
+                                ? 'סוללה מקורית של אפל · אחריות שנה'
+                                : 'סוללה מקורית של אפל · אחריות שנה'}
                             </div>
                           )}
                           {!isPhoneOnly && selectedModel && price > 0 && (
