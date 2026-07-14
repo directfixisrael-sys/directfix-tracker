@@ -51,6 +51,15 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        "cta-order": {
+          DEFAULT: "hsl(var(--cta-order))",
+          foreground: "hsl(var(--cta-order-foreground))",
+        },
+        "cta-call": {
+          DEFAULT: "hsl(var(--cta-call))",
+          foreground: "hsl(var(--cta-call-foreground))",
+        },
+
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
