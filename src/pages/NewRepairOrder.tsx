@@ -2705,7 +2705,7 @@ const NewRepairOrder = () => {
                 </div>
               </div>
               {getMultiRepairDiscount() > 0 && (
-                <div className="flex justify-between items-center text-base bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg p-2">
+                <div className="flex justify-between items-center text-base bg-success/10 rounded-lg p-2">
                   <span className="text-success font-medium">15% הנחה על התיקון הזול</span>
                   <span className="font-bold text-success">-₪{getMultiRepairDiscount()}</span>
                 </div>
