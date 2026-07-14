@@ -2155,7 +2155,7 @@ const NewRepairOrder = () => {
 
                 {/* Multi-repair discount */}
                 {getMultiRepairDiscount() > 0 && (
-                  <div className="flex justify-between items-center text-sm bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg p-2 -mx-1">
+                  <div className="flex justify-between items-center text-sm bg-success/10 rounded-lg p-2 -mx-1">
                     <span className="text-success font-medium flex items-center gap-1.5">
                       15% הנחה על התיקון הזול
                     </span>
