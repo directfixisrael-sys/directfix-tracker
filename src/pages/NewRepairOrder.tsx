@@ -2155,7 +2155,7 @@ const NewRepairOrder = () => {
 
                 {/* Multi-repair discount */}
                 {getMultiRepairDiscount() > 0 && (
-                  <div className="flex justify-between items-center text-sm bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg p-2 -mx-1">
+                  <div className="flex justify-between items-center text-sm bg-success/10 rounded-lg p-2 -mx-1">
                     <span className="text-success font-medium flex items-center gap-1.5">
                       15% הנחה על התיקון הזול
                     </span>
@@ -2351,7 +2351,7 @@ const NewRepairOrder = () => {
                 
                 {/* Credit Card */}
                 <div className="flex flex-col items-center gap-1">
-                  <div className="w-12 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md flex items-center justify-center">
+                  <div className="w-12 h-8 bg-gradient-to-br from-primary to-primary/80 rounded-md flex items-center justify-center">
                     <svg viewBox="0 0 24 24" className="w-5 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
                       <line x1="1" y1="10" x2="23" y2="10" />
@@ -2705,7 +2705,7 @@ const NewRepairOrder = () => {
                 </div>
               </div>
               {getMultiRepairDiscount() > 0 && (
-                <div className="flex justify-between items-center text-base bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg p-2">
+                <div className="flex justify-between items-center text-base bg-success/10 rounded-lg p-2">
                   <span className="text-success font-medium">15% הנחה על התיקון הזול</span>
                   <span className="font-bold text-success">-₪{getMultiRepairDiscount()}</span>
                 </div>
