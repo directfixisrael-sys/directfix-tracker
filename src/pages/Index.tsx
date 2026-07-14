@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone, Play, Tablet, PhoneCall, ArrowLeftRight, ChevronDown, HelpCircle, Bot } from 'lucide-react';
+import { Smartphone, Wrench, Star, Shield, Clock, MapPin, ChevronLeft, Phone, Play, Tablet, PhoneCall, ArrowLeftRight, ChevronDown, HelpCircle, Bot, Check } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -14,8 +14,10 @@ import paymentPaybox from '@/assets/payment-paybox.png';
 import paymentVisa from '@/assets/payment-visa.png';
 import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
+import heroTechnicians from '@/assets/hero-technicians.jpg';
 import VideoPlayer from '@/components/VideoPlayer';
 import TechnicianRecruitment from '@/components/TechnicianRecruitment';
+import Header from '@/components/Header';
 import SEO from "@/components/SEO";
 import { seo } from "@/lib/seoData";
 
@@ -23,114 +25,133 @@ const Index = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
 
+  const heroBullets = [
+    'זמינות מיידית: הגעה תוך שעה אחת',
+    'מתקנים מסכים במהירות',
+    'חלפים באיכות גבוהה, אחריות מלאה',
+    'מתקנים את כל דגמי האייפון',
+    'אלפי לקוחות מרוצים · מוניטין של 15 שנים',
+  ];
+
   return (
     <div className="min-h-screen bg-background flex flex-col" lang={i18n.language}>
       <SEO {...seo.home} />
-      {/* Skip to content */}
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-lg">
         {t('common.skipToContent')}
       </a>
 
-      {/* Strategly-style Navbar */}
-      <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b-2 border-foreground/10" role="banner">
-        <nav className="max-w-2xl mx-auto flex items-center justify-between px-4 h-14" aria-label={t('common.mainNav')}>
-          <div className="flex items-center gap-2">
-            <CustomerZone />
-            <LanguageToggle />
-            <a
-              href="tel:033106020"
-              className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center border-2 border-foreground/10 transition-transform hover:scale-105 order-last"
-              aria-label={`${t('common.call')} 033106020`}>
-              <Phone className="w-4 h-4 border-0" />
-            </a>
-          </div>
-          <Logo size="sm" />
-        </nav>
-      </header>
+      <Header />
 
-
-      {/* Main Content */}
       <main id="main-content" className="flex-1 flex flex-col" role="main" aria-label="DirectFix">
-        
-        {/* Hero Section - Cream Background */}
-        <section className="section-cream border-b border-border/40">
-          <div className="max-w-2xl mx-auto px-6 pt-14 pb-16 text-center">
-            <div className="mb-8 animate-fade-in">
-              <Logo size="lg" clickable={false} className="justify-center mb-8" />
-              <h1 className="font-extrabold text-foreground tracking-tight leading-[1.05] mb-4 text-4xl sm:text-5xl">
-                {t('home.title')}{' '}
-                <span className="text-primary block sm:inline mt-1 sm:mt-0">{t('home.titleHighlight')}</span>
+
+        {/* Hero - DirectFix.co.il style */}
+        <section className="relative overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: 'var(--gradient-hero)' }}
+          />
+
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-16 grid md:grid-cols-2 gap-10 items-center">
+            <div className="text-center md:text-right animate-fade-in order-2 md:order-1">
+              <h1 className="font-extrabold text-foreground tracking-tight leading-[1.1] mb-6 text-4xl sm:text-5xl lg:text-6xl">
+                דיירקט פיקס — <span className="text-primary">תיקון אייפון עד הבית</span>
               </h1>
-              <p className="text-muted-foreground mt-4 max-w-md mx-auto leading-relaxed text-base sm:text-lg">
-                {t('home.subtitle')}
-              </p>
-            </div>
 
-            {/* CTAs */}
-            <div className="space-y-3 max-w-sm mx-auto animate-fade-in" style={{ animationDelay: '120ms' }}>
-              <Button
-                size="lg"
-                className="w-full h-16 text-lg font-extrabold rounded-2xl gap-2 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
-                onClick={() => navigate('/order')}>
-                <Wrench className="w-5 h-5" />
-                <span>{t('home.ctaOrder')}</span>
-              </Button>
+              <ul className="space-y-2.5 mb-8 inline-block text-right">
+                {heroBullets.map((b) => (
+                  <li key={b} className="flex items-start gap-2.5 text-base sm:text-lg text-foreground/85">
+                    <span className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                      <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                    </span>
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
 
-              <Button
-                variant="ghost"
-                size="lg"
-                className="w-full h-12 text-base font-semibold rounded-2xl gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200"
-                onClick={() => navigate('/track')}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto md:mx-0">
+                <button
+                  onClick={() => navigate('/order')}
+                  className="group h-20 rounded-2xl px-5 flex items-center justify-between gap-3 text-right shadow-lg shadow-black/10 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
+                  style={{ backgroundColor: 'hsl(var(--cta-order))', color: 'hsl(var(--cta-order-foreground))' }}
+                >
+                  <Wrench className="w-7 h-7 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="text-lg font-extrabold leading-tight">הזמנת תיקון</div>
+                    <div className="text-xs opacity-90">פתיחת הזמנה במערכת</div>
+                  </div>
+                  <ChevronLeft className="w-5 h-5 opacity-80 group-hover:-translate-x-1 transition-transform" />
+                </button>
+
+                <a
+                  href="tel:033106020"
+                  className="group h-20 rounded-2xl px-5 flex items-center justify-between gap-3 text-right shadow-lg shadow-black/10 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
+                  style={{ backgroundColor: 'hsl(var(--cta-call))', color: 'hsl(var(--cta-call-foreground))' }}
+                >
+                  <Phone className="w-7 h-7 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="text-lg font-extrabold leading-tight">התקשרו עכשיו</div>
+                    <div className="text-xs opacity-90" dir="ltr">03-3106020</div>
+                  </div>
+                  <ChevronLeft className="w-5 h-5 opacity-80 group-hover:-translate-x-1 transition-transform" />
+                </a>
+              </div>
+
+              <button
+                onClick={() => navigate('/track')}
+                className="mt-4 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5"
+              >
                 <Smartphone className="w-4 h-4" />
-                <span>{t('home.ctaTrack')}</span>
-              </Button>
+                {t('home.ctaTrack')}
+              </button>
             </div>
 
-            {/* Additional Services */}
-            <div className="max-w-sm mx-auto mt-6 animate-fade-in" style={{ animationDelay: '220ms' }}>
-              <Collapsible>
-                <CollapsibleTrigger className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground transition-colors py-2 group">
-                  <span className="text-sm font-semibold">{t('home.moreServices')}</span>
-                  <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-180" />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="space-y-2.5 pt-3">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full h-12 text-base font-semibold rounded-2xl gap-2 border border-border/60 hover:border-border hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
-                    onClick={() => navigate('/ipad')}>
-                    <Tablet className="w-4 h-4" />
-                    <span>{t('home.ipadRepair')}</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full h-12 text-base font-semibold rounded-2xl gap-2 border border-border/60 hover:border-border hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
-                    onClick={() => navigate('/consultation')}>
-                    <PhoneCall className="w-4 h-4" />
-                    <span>{t('home.consultation')}</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full h-12 text-base font-semibold rounded-2xl gap-2 border border-border/60 hover:border-border hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
-                    onClick={() => navigate('/data-transfer')}>
-                    <ArrowLeftRight className="w-4 h-4" />
-                    <span>{t('home.dataTransfer')}</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full h-12 text-base font-semibold rounded-2xl gap-2 border border-border/60 hover:border-border hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
-                    onClick={() => navigate('/ai-agent')}>
-                    <Bot className="w-4 h-4" />
-                    <span>{t('home.aiAgent')}</span>
-                  </Button>
-                </CollapsibleContent>
-              </Collapsible>
+            <div className="relative order-1 md:order-2 animate-fade-in" style={{ animationDelay: '100ms' }}>
+              <div className="relative aspect-square max-w-md mx-auto">
+                <div className="absolute inset-0 rounded-full overflow-hidden ring-8 ring-white/70 dark:ring-white/10 shadow-2xl shadow-primary/20">
+                  <img
+                    src={heroTechnicians}
+                    alt="טכנאי DirectFix מגיע עד הבית"
+                    className="w-full h-full object-cover"
+                    width={1024}
+                    height={1024}
+                  />
+                </div>
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-card/95 backdrop-blur-md rounded-full px-4 py-2 border border-border shadow-lg">
+                  <img src={paymentVisa} alt="Visa" className="h-6 w-auto object-contain" />
+                  <img src={paymentBit} alt="bit" className="h-6 w-auto object-contain" />
+                  <img src={paymentPaybox} alt="PayBox" className="h-6 w-auto object-contain rounded" />
+                  <svg viewBox="0 0 24 24" className="w-5 h-5 text-foreground" fill="currentColor" aria-label="Apple Pay"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.07-.5-2.04-.48-3.16 0-1.4.62-2.14.44-2.98-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09z" /></svg>
+                </div>
+              </div>
             </div>
+          </div>
+
+          <div className="relative max-w-2xl mx-auto px-6 pb-6 -mt-4">
+            <Collapsible>
+              <CollapsibleTrigger className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground transition-colors py-2 group">
+                <span className="text-sm font-semibold">{t('home.moreServices')}</span>
+                <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="grid grid-cols-2 md:grid-cols-4 gap-2.5 pt-3">
+                <Button variant="outline" size="lg" className="h-12 rounded-2xl gap-2 border-border/60" onClick={() => navigate('/ipad')}>
+                  <Tablet className="w-4 h-4" /><span>{t('home.ipadRepair')}</span>
+                </Button>
+                <Button variant="outline" size="lg" className="h-12 rounded-2xl gap-2 border-border/60" onClick={() => navigate('/consultation')}>
+                  <PhoneCall className="w-4 h-4" /><span>{t('home.consultation')}</span>
+                </Button>
+                <Button variant="outline" size="lg" className="h-12 rounded-2xl gap-2 border-border/60" onClick={() => navigate('/data-transfer')}>
+                  <ArrowLeftRight className="w-4 h-4" /><span>{t('home.dataTransfer')}</span>
+                </Button>
+                <Button variant="outline" size="lg" className="h-12 rounded-2xl gap-2 border-border/60" onClick={() => navigate('/ai-agent')}>
+                  <Bot className="w-4 h-4" /><span>{t('home.aiAgent')}</span>
+                </Button>
+              </CollapsibleContent>
+            </Collapsible>
           </div>
         </section>
+
+
 
         {/* How it works - Video Section */}
         <section className="section-peach border-b-2 border-foreground/10">
