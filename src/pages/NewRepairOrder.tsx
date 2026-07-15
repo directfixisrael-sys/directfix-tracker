@@ -315,6 +315,7 @@ const NewRepairOrder = () => {
   // Schedule fields
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
+  const timeSlotRef = useRef<HTMLDivElement | null>(null);
 
   // Form fields
   const [customerName, setCustomerName] = useState(savedIntro?.name || '');
