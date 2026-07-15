@@ -2373,179 +2373,60 @@ const NewRepairOrder = () => {
           </div>}
 
         {/* Step 4: Schedule */}
-        {step === 'schedule' && <div className="space-y-6 animate-fade-in" dir="rtl">
-            {/* Dark glass header */}
-            <div className="relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br from-slate-900 via-slate-900 to-black text-white shadow-xl">
-              <div className="absolute -top-16 -right-16 w-48 h-48 bg-primary/30 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative">
-                <div className="flex justify-end mb-4">
-                  <div className="inline-flex items-center gap-2 border border-white/20 bg-white/5 backdrop-blur rounded-full px-4 py-1.5 text-sm font-semibold">
-                    <Calendar className="w-4 h-4" />
-                    תיאום הגעת טכנאי
-                  </div>
-                </div>
-                <h2 className="text-3xl md:text-4xl font-extrabold mb-2 text-right">בחרו חלון הגעה</h2>
-                <p className="text-white/70 text-right text-sm leading-relaxed">
-                  אנחנו נגיע עם החלק המתאים ונעדכן לפני יציאה אליכם.
-                </p>
+        {step === 'schedule' && <div className="space-y-5 animate-fade-in">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
+                <Calendar className="w-4 h-4" />
+                קביעת מועד
               </div>
+              <h2 className="text-3xl font-extrabold mb-1">מתי נגיע?</h2>
+              <p className="text-muted-foreground">בחרו יום ושעה שנוחים לכם</p>
             </div>
 
-            {/* Step 1: Day selection */}
-            <div className="bg-card rounded-3xl p-5 border border-border/60 shadow-sm">
-              <div className="flex items-start justify-between mb-4">
-                <div className="inline-flex items-center gap-1.5 bg-muted/60 rounded-full px-3 py-1 text-xs font-medium text-muted-foreground">
-                  7 הימים הקרובים
-                </div>
-                <div className="text-right">
-                  <p className="text-xs font-bold text-primary mb-0.5">1 מתוך 2</p>
-                  <h3 className="text-2xl font-extrabold">בחרו יום</h3>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+            {/* Date selection */}
+            <div>
+              <label className="block text-sm font-bold mb-3">בחר יום</label>
+              <div className="grid grid-cols-4 gap-3">
                 {getAvailableDates().map((date, index) => {
                   const dayName = hebrewDays[date.getDay()];
                   const isToday = index === 0;
                   const isSelected = selectedDate?.toDateString() === date.toDateString();
-                  const availableCount = getTimeSlotsForDate(date).filter(slot => isSlotAvailable(date, slot)).length;
-                  const hasAvailableSlots = availableCount > 0;
-                  const dateChip = `${date.getDate()}/${date.getMonth() + 1}`;
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => { setSelectedDate(date); setSelectedTimeSlot(''); }}
-                      disabled={!hasAvailableSlots}
-                      className={`relative overflow-hidden rounded-2xl border text-right transition-all ${
-                        isSelected
-                          ? 'border-primary bg-primary/5 shadow-md'
-                          : hasAvailableSlots
-                            ? 'border-border bg-muted/20 hover:border-primary/40'
-                            : 'border-border/50 bg-muted/10 cursor-not-allowed'
-                      }`}
-                    >
-                      {hasAvailableSlots && (
-                        <div className="absolute top-0 left-0 right-0 h-1.5 bg-emerald-500/80" />
-                      )}
-                      <div className="p-3 pt-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <span className="text-[10px] font-medium bg-muted/70 text-muted-foreground rounded-full px-2 py-0.5">
-                            {dateChip}
-                          </span>
-                          <span className={`text-sm font-semibold ${hasAvailableSlots ? 'text-foreground' : 'text-muted-foreground'}`}>
-                            {isToday ? 'היום' : dayName}
-                          </span>
-                        </div>
-                        <div className={`text-4xl font-extrabold text-right leading-none mb-3 ${hasAvailableSlots ? 'text-foreground' : 'text-muted-foreground/60'}`}>
-                          {date.getDate()}
-                        </div>
-                        <div className={`w-full rounded-xl py-1.5 text-center text-xs font-semibold ${
-                          hasAvailableSlots
-                            ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                            : 'bg-muted/40 text-muted-foreground'
-                        }`}>
-                          {hasAvailableSlots ? `${availableCount} חלונות פנויים` : 'אין זמינות'}
-                        </div>
-                      </div>
-                    </button>
-                  );
+                  const hasAvailableSlots = getTimeSlotsForDate(date).some(slot => isSlotAvailable(date, slot));
+                  return <button key={index} onClick={() => {
+                    setSelectedDate(date);
+                    setSelectedTimeSlot('');
+                    setTimeout(() => {
+                      timeSlotRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                  }} disabled={!hasAvailableSlots} className={`p-3 rounded-2xl border-2 text-center transition-all ${isSelected ? 'border-primary bg-primary/10 text-primary shadow-sm' : hasAvailableSlots ? 'border-border hover:border-primary/40 hover:bg-muted/30' : 'border-border/50 opacity-40 cursor-not-allowed'}`}>
+                      <div className="text-sm font-bold">{isToday ? 'היום' : dayName}</div>
+                      <div className="text-sm text-muted-foreground">{date.getDate()}/{date.getMonth() + 1}</div>
+                    </button>;
                 })}
               </div>
             </div>
 
-            {/* Step 2: Time slot selection */}
-            {selectedDate && (
-              <div className="bg-card rounded-3xl p-5 border border-border/60 shadow-sm animate-fade-in">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="inline-flex items-center gap-1.5 bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-bold">
-                    {hebrewDays[selectedDate.getDay()]} {selectedDate.getDate()}/{selectedDate.getMonth() + 1}
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-bold text-primary mb-0.5">2 מתוך 2</p>
-                    <h3 className="text-2xl font-extrabold">בחרו שעה</h3>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
+            {/* Time slot selection */}
+            {selectedDate && <div ref={timeSlotRef} className="animate-fade-in scroll-mt-24">
+                <label className="block text-sm font-bold mb-3">בחר שעה</label>
+                <div className="grid grid-cols-2 gap-3">
                   {getTimeSlotsForDate(selectedDate).map(slot => {
                     const isAvailable = isSlotAvailable(selectedDate, slot);
                     const isSelected = selectedTimeSlot === slot;
-                    const startHour = parseInt(slot.split('-')[0].split(':')[0]);
-                    const partLabel = startHour < 12 ? 'בוקר' : startHour < 16 ? 'צהריים' : 'אחר הצהריים';
-                    return (
-                      <button
-                        key={slot}
-                        onClick={() => setSelectedTimeSlot(slot)}
-                        disabled={!isAvailable}
-                        className={`w-full flex items-center gap-4 rounded-2xl border p-3 transition-all ${
-                          isSelected
-                            ? 'border-primary bg-primary/5 shadow-md'
-                            : isAvailable
-                              ? 'border-border bg-muted/20 hover:border-primary/40'
-                              : 'border-border/50 bg-muted/10 opacity-50 cursor-not-allowed'
-                        }`}
-                      >
-                        {/* Available badge (left side) */}
-                        <span className={`shrink-0 text-xs font-bold rounded-full px-3 py-1 ${
-                          isSelected
-                            ? 'bg-primary text-primary-foreground'
-                            : isAvailable
-                              ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                              : 'bg-muted text-muted-foreground'
-                        }`}>
-                          {isAvailable ? 'פנוי' : 'תפוס'}
-                        </span>
-
-                        {/* Middle: time range */}
-                        <div className="flex-1 text-right">
-                          <p className="text-xs text-muted-foreground font-medium mb-0.5">{partLabel}</p>
-                          <p className="text-2xl font-extrabold tracking-tight" dir="ltr">{slot}</p>
-                        </div>
-
-                        {/* Right: clock icon square */}
-                        <div className="shrink-0 w-12 h-12 rounded-2xl bg-slate-900 dark:bg-slate-800 text-white flex items-center justify-center">
-                          <Clock className="w-5 h-5" />
-                        </div>
-                      </button>
-                    );
+                    return <button key={slot} onClick={() => setSelectedTimeSlot(slot)} disabled={!isAvailable} className={`p-4 rounded-2xl border-2 text-center transition-all flex items-center justify-center gap-2 ${isSelected ? 'border-primary bg-primary/10 text-primary shadow-sm' : isAvailable ? 'border-border hover:border-primary/40 hover:bg-muted/30' : 'border-border/50 opacity-40 cursor-not-allowed'}`}>
+                        <Clock className="w-4 h-4" />
+                        <span className="text-base font-semibold">{slot}</span>
+                      </button>;
                   })}
                 </div>
-              </div>
-            )}
+              </div>}
 
-            {/* Saved confirmation */}
-            {selectedDate && selectedTimeSlot && (
-              <div className="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg animate-fade-in">
-                <div className="flex items-center justify-between gap-4">
-                  <CheckCircle2 className="w-9 h-9 shrink-0" strokeWidth={2.2} />
-                  <div className="text-right flex-1">
-                    <p className="text-xs font-medium text-white/85 mb-1">המועד נשמר להזמנה</p>
-                    <p className="text-lg font-extrabold leading-tight">
-                      יום {hebrewDays[selectedDate.getDay()]} {selectedDate.getDate()}/{selectedDate.getMonth() + 1} בשעות <span dir="ltr" className="inline-block">{selectedTimeSlot}</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Pre-booking summary */}
-            {selectedDate && selectedTimeSlot && (
-              <div className="bg-card rounded-3xl p-6 border border-emerald-500/30 shadow-sm text-center animate-fade-in">
-                <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 rounded-full px-3 py-1 text-xs font-bold mb-4">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  מחיר שקוף מראש
-                </div>
-                <h3 className="text-3xl font-extrabold mb-2">סיכום לפני תיאום</h3>
-                <p className="text-sm text-muted-foreground mb-5">אישור מחיר התיקון • הגעה עד הבית כלולה</p>
-                <div className="inline-block bg-primary text-primary-foreground rounded-2xl px-8 py-3 shadow-md mb-4">
-                  <span className="text-3xl font-extrabold" dir="ltr">₪{getFinalPrice()}</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {isGiftOrder ? 'התשלום מתבצע מראש להזמנת מתנה.' : 'אין חיוב עכשיו, אלא אם זו הזמנת מתנה.'}
+            {selectedDate && selectedTimeSlot && <Card className="p-4 bg-primary/5 border-primary/20 animate-fade-in">
+                <p className="text-lg text-center">
+                  <span className="text-muted-foreground">מועד נבחר: </span>
+                  <span className="font-semibold">{formatSelectedDateTime()}</span>
                 </p>
-              </div>
-            )}
+              </Card>}
           </div>}
 
         {/* Step 5: Customer Details */}
