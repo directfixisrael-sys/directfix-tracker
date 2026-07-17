@@ -290,21 +290,24 @@ const DevicePurchase = () => {
       }
 
       // Create order in DB first
-      const { data: orderData, error } = await supabase.from('orders').insert({
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        customer_address: customerAddress,
-        customer_email: customerEmail || null,
-        device_type: `${selectedModel?.name} ${selectedStorage} ${selectedColor?.name}`,
-        issue_description: `רכישת מכשיר חדש - ${selectedModel?.name}`,
-        repair_price: getPrice(),
-        notes,
-        status: 'pending',
-        payment_status: 'awaiting_deposit',
-        lead_source: 'device-purchase',
-      }).select('id, order_number').single();
+      const { data, error } = await supabase.functions.invoke('create-order', {
+        body: {
+          customerName,
+          customerPhone,
+          customerAddress,
+          customerEmail: customerEmail || null,
+          deviceType: `${selectedModel?.name} ${selectedStorage} ${selectedColor?.name}`,
+          issueDescription: `רכישת מכשיר חדש - ${selectedModel?.name}`,
+          repairPrice: getPrice(),
+          notes,
+          status: 'pending',
+          paymentStatus: 'awaiting_deposit',
+          leadSource: 'device-purchase',
+        },
+      });
 
-      if (error) throw error;
+      if (error || !data?.order) throw error || new Error('Failed to create order');
+      const orderData = data.order;
 
       // Create Cardcom payment page
       const currentUrl = window.location.origin;
