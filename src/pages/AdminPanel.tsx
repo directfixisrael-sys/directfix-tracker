@@ -205,13 +205,14 @@ const AdminPanel = () => {
     return () => { mounted = false; sub.subscription.unsubscribe(); };
   }, []);
 
-  // Load data and subscribe to realtime on mount
+  // Load admin data only after the user is confirmed as admin
   useEffect(() => {
+    if (!isAuthenticated) return;
     loadOrders();
     loadMessages();
     const unsubscribe = subscribeToRealtime();
     return () => unsubscribe();
-  }, []);
+  }, [isAuthenticated, loadOrders, loadMessages, subscribeToRealtime]);
 
   // Scroll to top when switching tabs
   useEffect(() => {

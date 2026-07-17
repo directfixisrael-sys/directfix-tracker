@@ -111,6 +111,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
     
     if (error) {
       console.error('Error loading orders:', error);
+      set({ isLoading: false });
     } else {
       const orders = (data || []).map(dbToOrder);
       set({ orders, isLoading: false });
@@ -134,6 +135,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
     
     if (error) {
       console.error('Error loading messages:', error);
+      set({ messages: [] });
     } else {
       set({ messages: (data || []).map(dbToMessage) });
     }
