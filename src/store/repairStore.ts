@@ -111,6 +111,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
     
     if (error) {
       console.error('Error loading orders:', error);
+      set({ isLoading: false });
     } else {
       const orders = (data || []).map(dbToOrder);
       set({ orders, isLoading: false });
@@ -134,6 +135,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
     
     if (error) {
       console.error('Error loading messages:', error);
+      set({ messages: [] });
     } else {
       set({ messages: (data || []).map(dbToMessage) });
     }
@@ -282,34 +284,35 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
 
   addOrder: async (orderData) => {
     console.log('Adding order:', orderData);
-    const { data, error } = await supabase
-      .from('orders')
-      .insert({
-        customer_phone: orderData.customerPhone,
-        customer_name: orderData.customerName,
-        customer_address: orderData.customerAddress,
-        device_type: orderData.deviceType,
-        issue_description: orderData.issueDescription,
+    const { data, error } = await supabase.functions.invoke('create-order', {
+      body: {
+        customerPhone: orderData.customerPhone,
+        customerName: orderData.customerName,
+        customerAddress: orderData.customerAddress,
+        deviceType: orderData.deviceType,
+        issueDescription: orderData.issueDescription,
         status: orderData.status,
-        estimated_arrival: orderData.estimatedArrival,
-        technician_name: orderData.technicianName,
-        repair_price: orderData.repairPrice,
-        accessories: defaultAccessories as unknown as any,
+        estimatedArrival: orderData.estimatedArrival,
+        technicianName: orderData.technicianName,
+        repairPrice: orderData.repairPrice,
+        accessories: (orderData as any).accessories?.length ? (orderData as any).accessories : defaultAccessories,
         notes: orderData.notes || [],
-        wants_promotions: orderData.wantsPromotions,
-        lead_source: (orderData as any).leadSource || null,
-        customer_email: (orderData as any).customerEmail || null,
-        device_images: (orderData as any).deviceImages || [],
-      })
-      .select()
-      .single();
+        wantsPromotions: orderData.wantsPromotions,
+        leadSource: (orderData as any).leadSource || null,
+        customerEmail: (orderData as any).customerEmail || null,
+        deviceImages: (orderData as any).deviceImages || [],
+        isClubMember: (orderData as any).isClubMember || false,
+        warrantyMonths: (orderData as any).warrantyMonths || null,
+        paymentStatus: (orderData as any).paymentStatus || null,
+      },
+    });
 
     if (error) {
       console.error('Error adding order:', error);
       return null;
     } else {
-      console.log('Order added successfully:', data);
-      return data;
+      console.log('Order added successfully:', data?.order);
+      return data?.order || null;
     }
   },
 

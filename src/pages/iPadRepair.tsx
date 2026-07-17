@@ -156,21 +156,24 @@ const iPadRepair = () => {
       const notes = [`שירות איסוף והחזרה - iPad`, `טווח איסוף: ${selectedTime}`];
       if (selectedModel.has_display_option) notes.splice(1, 0, `תצוגה: ${displayStatus}`);
       
-      const { data, error } = await supabase.from('orders').insert({
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        customer_address: customerAddress,
-        customer_email: customerEmail || null,
-        device_type: selectedModel.name,
-        issue_description: issueDesc,
-        repair_price: selectedModel.screen_price,
-        status: 'pending',
-        estimated_arrival: `${dateStr}, ${selectedTime}`,
-        notes,
-      }).select('order_number').single();
+      const { data, error } = await supabase.functions.invoke('create-order', {
+        body: {
+          customerName,
+          customerPhone,
+          customerAddress,
+          customerEmail: customerEmail || null,
+          deviceType: selectedModel.name,
+          issueDescription: issueDesc,
+          repairPrice: selectedModel.screen_price,
+          status: 'pending',
+          estimatedArrival: `${dateStr}, ${selectedTime}`,
+          notes,
+        },
+      });
 
-      if (error) throw error;
-      setOrderNumber(data.order_number);
+      if (error || !data?.order) throw error || new Error('Failed to create order');
+      const createdOrder = data.order;
+      setOrderNumber(createdOrder.order_number);
 
       // Mark lead as converted
       if (currentLeadId) {
@@ -192,7 +195,7 @@ const iPadRepair = () => {
             repairPrice: selectedModel.screen_price,
             scheduledTime: `${dateStr2}, ${selectedTime}`,
             customerEmail: customerEmail?.trim() || undefined,
-            orderNumber: data.order_number,
+            orderNumber: createdOrder.order_number,
             notes: '',
           }
         });
