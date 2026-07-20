@@ -95,6 +95,108 @@ const ClubMembersManagement = () => {
   const [emailHistory, setEmailHistory] = useState<EmailHistoryEntry[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
+  // WhatsApp template messaging
+  type WATemplateKey = 'general' | 'battery' | 'screen' | 'seasonal' | 'expiring' | 'vip';
+  const ORDER_URL = 'https://directfix.co.il/';
+  const buildWATemplates = (name: string, points: number, value: number) => {
+    const first = (name || 'לקוח/ה').split(' ')[0];
+    const link = ORDER_URL;
+    return {
+      general: { label: 'תזכורת כללית', text:
+`היי ${first},
+רצינו להזכיר לך שיש לך *${points} נקודות נאמנות* אצלנו בדיירקט פיקס - שוות *${value.toFixed(0)} ש"ח הנחה* על התיקון הבא.
+
+הנקודות ייכנסו אוטומטית ברגע שתזין את מספר הטלפון שלך בהזמנה:
+${link}
+
+נשמח לעזור בכל דבר!
+צוות דיירקט פיקס` },
+      battery: { label: 'סוללה נחלשת', text:
+`היי ${first},
+הסוללה של האייפון שלך התחילה להיחלש? זה הזמן המושלם להחליף.
+במיוחד בשבילך: יש לך אצלנו *${points} נקודות = ${value.toFixed(0)} ש"ח הנחה* על החלפת סוללה מקורית של אפל עם שנה אחריות מלאה.
+
+הזמנה מהירה - הטכנאי מגיע אליך עד הבית:
+${link}
+
+הנקודות יתעדכנו אוטומטית בהזנת מספר הטלפון.` },
+      screen: { label: 'מסך שבור', text:
+`היי ${first},
+מסך שבור או שריטה שמפריעה? אצלנו יש לך *${points} נקודות שוות ${value.toFixed(0)} ש"ח הנחה* על החלפת מסך.
+
+טכנאי מוסמך אצלך בבית או בעבודה, החלפה תוך 30 דקות עם אחריות מלאה:
+${link}` },
+      seasonal: { label: 'מבצע עונתי', text:
+`היי ${first},
+מבצע מיוחד ללקוחות המועדון - וגם לך יש כבר *${points} נקודות שוות ${value.toFixed(0)} ש"ח הנחה* מצטברת שמחכה להתממש.
+
+הזמן את התיקון הבא שלך והנקודות ירדו אוטומטית מהמחיר:
+${link}` },
+      expiring: { label: 'נקודות פגות תוקף', text:
+`היי ${first},
+רצינו לעדכן אותך שהנקודות שצברת אצלנו יפוגו בקרוב.
+יש לך *${points} נקודות = ${value.toFixed(0)} ש"ח הנחה* שממתינות לך.
+
+כדי לממש - פשוט הזמן תיקון והזן את מספר הטלפון שלך:
+${link}
+
+נשמח לראותך שוב!` },
+      vip: { label: 'לקוח VIP - תודה', text:
+`${first} היקר/ה,
+תודה שאתה חלק ממשפחת דיירקט פיקס.
+צברת אצלנו *${points} נקודות נאמנות = ${value.toFixed(0)} ש"ח הנחה* שממתינות לך לתיקון הבא.
+
+מוזמן/ת להזמין בכל עת:
+${link}
+
+תמיד לשירותך.` },
+    } as Record<WATemplateKey, { label: string; text: string }>;
+  };
+
+  const [waCustomer, setWaCustomer] = useState<ClubMember | null>(null);
+  const [waTemplate, setWaTemplate] = useState<WATemplateKey>('general');
+  const [waText, setWaText] = useState('');
+
+  const openWaDialog = (m: ClubMember) => {
+    setWaCustomer(m);
+    setWaTemplate('general');
+    const tpl = buildWATemplates(m.name, m.totalPoints, m.totalValue);
+    setWaText(tpl.general.text);
+  };
+
+  const pickWaTemplate = (k: WATemplateKey) => {
+    if (!waCustomer) return;
+    setWaTemplate(k);
+    const tpl = buildWATemplates(waCustomer.name, waCustomer.totalPoints, waCustomer.totalValue);
+    setWaText(tpl[k].text);
+  };
+
+  const sendWa = () => {
+    if (!waCustomer) return;
+    const phone = waCustomer.phone.startsWith('0') ? '972' + waCustomer.phone.slice(1) : waCustomer.phone;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(waText)}`, '_blank');
+    setWaCustomer(null);
+  };
+
+  // History dialog
+  interface HistRow { id: string; points: number; type: string; description: string | null; created_at: string; }
+  const [histCustomer, setHistCustomer] = useState<ClubMember | null>(null);
+  const [histRows, setHistRows] = useState<HistRow[]>([]);
+  const [histLoading, setHistLoading] = useState(false);
+
+  const openHistory = async (m: ClubMember) => {
+    setHistCustomer(m);
+    setHistLoading(true);
+    setHistRows([]);
+    const { data } = await supabase
+      .from('loyalty_points')
+      .select('id, points, type, description, created_at')
+      .eq('customer_phone', m.phone)
+      .order('created_at', { ascending: false });
+    setHistRows((data as HistRow[]) || []);
+    setHistLoading(false);
+  };
+
   const loadMembers = async () => {
     setIsLoading(true);
 
@@ -493,12 +595,17 @@ const ClubMembersManagement = () => {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => {
-                          const phone = c.phone.startsWith('0') ? '972' + c.phone.slice(1) : c.phone;
-                          const msg = `היי ${c.name} 👋\nתודה שהצטרפת למועדון דיירקט פיקס! 🎉\n\nיש לך קוד קופון הנחה מיוחד:\n🎁 *CLUB10* — 10% הנחה על התיקון הבא!\n\nלמימוש: https://directfix-tracker.lovable.app/store\n\nצוות דיירקט פיקס 💙`;
-                          window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-                        }}
-                        title="שלח קופון בוואטסאפ"
+                        onClick={() => openHistory(c)}
+                        title="היסטוריית נקודות"
+                      >
+                        <History className="w-4 h-4 text-primary" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => openWaDialog(c)}
+                        title="שלח הודעת וואטסאפ"
                       >
                         <MessageCircle className="w-4 h-4 text-green-500" />
                       </Button>
@@ -960,6 +1067,98 @@ const ClubMembersManagement = () => {
               <Mail className="w-4 h-4 ml-2" />
               שלח עכשיו
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* WhatsApp templates dialog */}
+      <Dialog open={!!waCustomer} onOpenChange={o => !o && setWaCustomer(null)}>
+        <DialogContent className="max-w-lg" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageCircle className="w-5 h-5 text-green-500" />
+              שלח הודעה ל{waCustomer?.name}
+            </DialogTitle>
+            <DialogDescription>
+              {waCustomer?.totalPoints} נקודות = ₪{waCustomer?.totalValue.toFixed(0)} הנחה
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm font-semibold mb-2">בחר תבנית</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(['general','battery','screen','seasonal','expiring','vip'] as WATemplateKey[]).map(k => {
+                  const tpl = waCustomer ? buildWATemplates(waCustomer.name, waCustomer.totalPoints, waCustomer.totalValue)[k] : { label: k };
+                  return (
+                    <Button
+                      key={k}
+                      type="button"
+                      size="sm"
+                      variant={waTemplate === k ? 'default' : 'outline'}
+                      onClick={() => pickWaTemplate(k)}
+                    >
+                      {tpl.label}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+            <Textarea
+              value={waText}
+              onChange={e => setWaText(e.target.value)}
+              rows={10}
+              className="text-sm"
+              dir="rtl"
+            />
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setWaCustomer(null)} className="flex-1">ביטול</Button>
+              <Button onClick={sendWa} className="flex-1 gap-2 bg-[#25D366] hover:bg-[#25D366]/90 text-white">
+                <Send className="w-4 h-4" />
+                שלח בוואטסאפ
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Points history dialog */}
+      <Dialog open={!!histCustomer} onOpenChange={o => !o && setHistCustomer(null)}>
+        <DialogContent className="max-w-lg" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="w-5 h-5 text-primary" />
+              היסטוריית נקודות - {histCustomer?.name}
+            </DialogTitle>
+            <DialogDescription>
+              סה"כ {histCustomer?.totalPoints} נקודות (₪{histCustomer?.totalValue.toFixed(0)})
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto space-y-2">
+            {histLoading ? (
+              <p className="text-center text-muted-foreground py-6">טוען...</p>
+            ) : histRows.length === 0 ? (
+              <p className="text-center text-muted-foreground py-6">אין תנועות עדיין</p>
+            ) : (
+              histRows.map(h => {
+                const isEarn = h.type === 'earned';
+                const isRedeem = h.type === 'redeemed';
+                const sign = isRedeem ? '-' : '+';
+                const color = isEarn ? 'text-green-600' : isRedeem ? 'text-destructive' : 'text-amber-600';
+                const label = isEarn ? 'צבירה' : isRedeem ? 'מימוש' : 'התאמה ידנית';
+                return (
+                  <div key={h.id} className="flex items-center justify-between border rounded-lg p-3">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm">{label}</p>
+                      {h.description && <p className="text-xs text-muted-foreground truncate">{h.description}</p>}
+                      <p className="text-[10px] text-muted-foreground/70">
+                        {new Date(h.created_at).toLocaleString('he-IL')}
+                      </p>
+                    </div>
+                    <p className={`font-bold ${color}`}>{sign}{h.points}</p>
+                  </div>
+                );
+              })
+            )}
           </div>
         </DialogContent>
       </Dialog>
