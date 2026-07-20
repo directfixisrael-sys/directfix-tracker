@@ -595,12 +595,17 @@ ${link}
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => {
-                          const phone = c.phone.startsWith('0') ? '972' + c.phone.slice(1) : c.phone;
-                          const msg = `היי ${c.name} 👋\nתודה שהצטרפת למועדון דיירקט פיקס! 🎉\n\nיש לך קוד קופון הנחה מיוחד:\n🎁 *CLUB10* — 10% הנחה על התיקון הבא!\n\nלמימוש: https://directfix-tracker.lovable.app/store\n\nצוות דיירקט פיקס 💙`;
-                          window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-                        }}
-                        title="שלח קופון בוואטסאפ"
+                        onClick={() => openHistory(c)}
+                        title="היסטוריית נקודות"
+                      >
+                        <History className="w-4 h-4 text-primary" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => openWaDialog(c)}
+                        title="שלח הודעת וואטסאפ"
                       >
                         <MessageCircle className="w-4 h-4 text-green-500" />
                       </Button>
