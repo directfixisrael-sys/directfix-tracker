@@ -95,6 +95,108 @@ const ClubMembersManagement = () => {
   const [emailHistory, setEmailHistory] = useState<EmailHistoryEntry[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
+  // WhatsApp template messaging
+  type WATemplateKey = 'general' | 'battery' | 'screen' | 'seasonal' | 'expiring' | 'vip';
+  const ORDER_URL = 'https://directfix.co.il/';
+  const buildWATemplates = (name: string, points: number, value: number) => {
+    const first = (name || 'לקוח/ה').split(' ')[0];
+    const link = ORDER_URL;
+    return {
+      general: { label: 'תזכורת כללית', text:
+`היי ${first},
+רצינו להזכיר לך שיש לך *${points} נקודות נאמנות* אצלנו בדיירקט פיקס - שוות *${value.toFixed(0)} ש"ח הנחה* על התיקון הבא.
+
+הנקודות ייכנסו אוטומטית ברגע שתזין את מספר הטלפון שלך בהזמנה:
+${link}
+
+נשמח לעזור בכל דבר!
+צוות דיירקט פיקס` },
+      battery: { label: 'סוללה נחלשת', text:
+`היי ${first},
+הסוללה של האייפון שלך התחילה להיחלש? זה הזמן המושלם להחליף.
+במיוחד בשבילך: יש לך אצלנו *${points} נקודות = ${value.toFixed(0)} ש"ח הנחה* על החלפת סוללה מקורית של אפל עם שנה אחריות מלאה.
+
+הזמנה מהירה - הטכנאי מגיע אליך עד הבית:
+${link}
+
+הנקודות יתעדכנו אוטומטית בהזנת מספר הטלפון.` },
+      screen: { label: 'מסך שבור', text:
+`היי ${first},
+מסך שבור או שריטה שמפריעה? אצלנו יש לך *${points} נקודות שוות ${value.toFixed(0)} ש"ח הנחה* על החלפת מסך.
+
+טכנאי מוסמך אצלך בבית או בעבודה, החלפה תוך 30 דקות עם אחריות מלאה:
+${link}` },
+      seasonal: { label: 'מבצע עונתי', text:
+`היי ${first},
+מבצע מיוחד ללקוחות המועדון - וגם לך יש כבר *${points} נקודות שוות ${value.toFixed(0)} ש"ח הנחה* מצטברת שמחכה להתממש.
+
+הזמן את התיקון הבא שלך והנקודות ירדו אוטומטית מהמחיר:
+${link}` },
+      expiring: { label: 'נקודות פגות תוקף', text:
+`היי ${first},
+רצינו לעדכן אותך שהנקודות שצברת אצלנו יפוגו בקרוב.
+יש לך *${points} נקודות = ${value.toFixed(0)} ש"ח הנחה* שממתינות לך.
+
+כדי לממש - פשוט הזמן תיקון והזן את מספר הטלפון שלך:
+${link}
+
+נשמח לראותך שוב!` },
+      vip: { label: 'לקוח VIP - תודה', text:
+`${first} היקר/ה,
+תודה שאתה חלק ממשפחת דיירקט פיקס.
+צברת אצלנו *${points} נקודות נאמנות = ${value.toFixed(0)} ש"ח הנחה* שממתינות לך לתיקון הבא.
+
+מוזמן/ת להזמין בכל עת:
+${link}
+
+תמיד לשירותך.` },
+    } as Record<WATemplateKey, { label: string; text: string }>;
+  };
+
+  const [waCustomer, setWaCustomer] = useState<ClubMember | null>(null);
+  const [waTemplate, setWaTemplate] = useState<WATemplateKey>('general');
+  const [waText, setWaText] = useState('');
+
+  const openWaDialog = (m: ClubMember) => {
+    setWaCustomer(m);
+    setWaTemplate('general');
+    const tpl = buildWATemplates(m.name, m.totalPoints, m.totalValue);
+    setWaText(tpl.general.text);
+  };
+
+  const pickWaTemplate = (k: WATemplateKey) => {
+    if (!waCustomer) return;
+    setWaTemplate(k);
+    const tpl = buildWATemplates(waCustomer.name, waCustomer.totalPoints, waCustomer.totalValue);
+    setWaText(tpl[k].text);
+  };
+
+  const sendWa = () => {
+    if (!waCustomer) return;
+    const phone = waCustomer.phone.startsWith('0') ? '972' + waCustomer.phone.slice(1) : waCustomer.phone;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(waText)}`, '_blank');
+    setWaCustomer(null);
+  };
+
+  // History dialog
+  interface HistRow { id: string; points: number; type: string; description: string | null; created_at: string; }
+  const [histCustomer, setHistCustomer] = useState<ClubMember | null>(null);
+  const [histRows, setHistRows] = useState<HistRow[]>([]);
+  const [histLoading, setHistLoading] = useState(false);
+
+  const openHistory = async (m: ClubMember) => {
+    setHistCustomer(m);
+    setHistLoading(true);
+    setHistRows([]);
+    const { data } = await supabase
+      .from('loyalty_points')
+      .select('id, points, type, description, created_at')
+      .eq('customer_phone', m.phone)
+      .order('created_at', { ascending: false });
+    setHistRows((data as HistRow[]) || []);
+    setHistLoading(false);
+  };
+
   const loadMembers = async () => {
     setIsLoading(true);
 
