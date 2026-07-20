@@ -1070,6 +1070,98 @@ ${link}
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* WhatsApp templates dialog */}
+      <Dialog open={!!waCustomer} onOpenChange={o => !o && setWaCustomer(null)}>
+        <DialogContent className="max-w-lg" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageCircle className="w-5 h-5 text-green-500" />
+              שלח הודעה ל{waCustomer?.name}
+            </DialogTitle>
+            <DialogDescription>
+              {waCustomer?.totalPoints} נקודות = ₪{waCustomer?.totalValue.toFixed(0)} הנחה
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm font-semibold mb-2">בחר תבנית</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(['general','battery','screen','seasonal','expiring','vip'] as WATemplateKey[]).map(k => {
+                  const tpl = waCustomer ? buildWATemplates(waCustomer.name, waCustomer.totalPoints, waCustomer.totalValue)[k] : { label: k };
+                  return (
+                    <Button
+                      key={k}
+                      type="button"
+                      size="sm"
+                      variant={waTemplate === k ? 'default' : 'outline'}
+                      onClick={() => pickWaTemplate(k)}
+                    >
+                      {tpl.label}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+            <Textarea
+              value={waText}
+              onChange={e => setWaText(e.target.value)}
+              rows={10}
+              className="text-sm"
+              dir="rtl"
+            />
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setWaCustomer(null)} className="flex-1">ביטול</Button>
+              <Button onClick={sendWa} className="flex-1 gap-2 bg-[#25D366] hover:bg-[#25D366]/90 text-white">
+                <Send className="w-4 h-4" />
+                שלח בוואטסאפ
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Points history dialog */}
+      <Dialog open={!!histCustomer} onOpenChange={o => !o && setHistCustomer(null)}>
+        <DialogContent className="max-w-lg" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="w-5 h-5 text-primary" />
+              היסטוריית נקודות - {histCustomer?.name}
+            </DialogTitle>
+            <DialogDescription>
+              סה"כ {histCustomer?.totalPoints} נקודות (₪{histCustomer?.totalValue.toFixed(0)})
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto space-y-2">
+            {histLoading ? (
+              <p className="text-center text-muted-foreground py-6">טוען...</p>
+            ) : histRows.length === 0 ? (
+              <p className="text-center text-muted-foreground py-6">אין תנועות עדיין</p>
+            ) : (
+              histRows.map(h => {
+                const isEarn = h.type === 'earned';
+                const isRedeem = h.type === 'redeemed';
+                const sign = isRedeem ? '-' : '+';
+                const color = isEarn ? 'text-green-600' : isRedeem ? 'text-destructive' : 'text-amber-600';
+                const label = isEarn ? 'צבירה' : isRedeem ? 'מימוש' : 'התאמה ידנית';
+                return (
+                  <div key={h.id} className="flex items-center justify-between border rounded-lg p-3">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm">{label}</p>
+                      {h.description && <p className="text-xs text-muted-foreground truncate">{h.description}</p>}
+                      <p className="text-[10px] text-muted-foreground/70">
+                        {new Date(h.created_at).toLocaleString('he-IL')}
+                      </p>
+                    </div>
+                    <p className={`font-bold ${color}`}>{sign}{h.points}</p>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
