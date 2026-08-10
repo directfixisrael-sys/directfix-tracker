@@ -1986,6 +1986,63 @@ const NewRepairOrder = () => {
                       ) : null;
                     })()}
 
+                    {/* Inline Speaker Type Picker */}
+                    {isSpeaker && showSpeakerTypePicker && selectedModel && (
+                      <div className="overflow-hidden animate-fade-in">
+                        <div className="pt-3 pb-1 px-1 space-y-3">
+                          <div className="text-center">
+                            <h3 className="text-lg font-bold">איזה רמקול צריך תיקון?</h3>
+                            <p className="text-sm text-muted-foreground">רמקול מקורי - בחרו את המיקום במכשיר</p>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            {[
+                              {
+                                key: 'top',
+                                title: 'רמקול עליון',
+                                sub: 'אפרכסת - שמיעה בשיחה',
+                                img: speakerTopImg,
+                                price: SPEAKER_TOP_PRICE,
+                                name: 'תיקון רמקול עליון (אפרכסת)',
+                              },
+                              {
+                                key: 'bottom',
+                                title: 'רמקול תחתון',
+                                sub: 'מוזיקה ורמקול דיבור',
+                                img: speakerBottomImg,
+                                price: SPEAKER_BOTTOM_PRICE,
+                                name: 'תיקון רמקול תחתון',
+                              },
+                            ].map((opt) => (
+                              <button
+                                key={opt.key}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setShowSpeakerTypePicker(false);
+                                  setSpeakerPriceOverride(opt.price);
+                                  handleRepairSelect({ ...repair, name: opt.name });
+                                }}
+                                className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-foreground/15 hover:border-primary/40 hover:bg-primary/5 transition-all duration-200 active:scale-[0.98]"
+                              >
+                                <img
+                                  src={opt.img}
+                                  alt={opt.title}
+                                  loading="lazy"
+                                  width={512}
+                                  height={512}
+                                  className="w-24 h-24 object-contain"
+                                />
+                                <span className="font-bold text-base">{opt.title}</span>
+                                <span className="text-xs text-muted-foreground text-center leading-tight">{opt.sub}</span>
+                                <span className="text-lg font-bold text-primary">₪{opt.price}</span>
+                              </button>
+                            ))}
+                          </div>
+
+                          <p className="text-center text-xs text-muted-foreground">כל הרמקולים מקוריים</p>
+                        </div>
+                      </div>
+                    )}
 
 
                   </div>;
