@@ -33,6 +33,11 @@ import LoyaltyPointsDisplay, { getCustomerPoints, calculatePointsFromPrice, calc
 import SEO from "@/components/SEO";
 import { seo } from "@/lib/seoData";
 import PointsEarnedAnimation from '@/components/PointsEarnedAnimation';
+import speakerTopImg from '@/assets/speaker-top.png';
+import speakerBottomImg from '@/assets/speaker-bottom.png';
+
+const SPEAKER_TOP_PRICE = 370;
+const SPEAKER_BOTTOM_PRICE = 350;
 
 // iPhone back glass colors per model family
 const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
@@ -390,6 +395,8 @@ const NewRepairOrder = () => {
   const [showBackColorPicker, setShowBackColorPicker] = useState(false);
   const [showBatteryTypePicker, setShowBatteryTypePicker] = useState(false);
   const [batteryPriceOverride, setBatteryPriceOverride] = useState<number | null>(null);
+  const [showSpeakerTypePicker, setShowSpeakerTypePicker] = useState(false);
+  const [speakerPriceOverride, setSpeakerPriceOverride] = useState<number | null>(null);
   const [otherRepairDescription, setOtherRepairDescription] = useState('');
   
   const [additionalRepairs, setAdditionalRepairs] = useState<{ repair: RepairType; price: number; backColor?: string; model: IphoneModel }[]>([]);
@@ -678,6 +685,14 @@ const NewRepairOrder = () => {
       repair.name.includes('סוללה')
     ) {
       return batteryPriceOverride;
+    }
+    // Speaker override: top vs bottom speaker
+    if (
+      speakerPriceOverride !== null &&
+      selectedRepair?.id === repair.id &&
+      repair.name.includes('רמקול')
+    ) {
+      return speakerPriceOverride;
     }
     return priceMap[m.id]?.[repair.id] || 0;
   };
@@ -1763,6 +1778,7 @@ const NewRepairOrder = () => {
             const batteryIsOriginal = selectedModel?.battery_is_original ?? true;
             const batteryPulloutAvailable = !!selectedModel?.battery_pullout_available;
             const isBatteryWithChoice = isBattery && batteryPulloutAvailable;
+            const isSpeaker = repair.name.includes('רמקול');
             let price = 0;
             if (selectedModel) {
               price = getRepairPrice(repair);
@@ -1779,12 +1795,23 @@ const NewRepairOrder = () => {
                         setBatteryPriceOverride(null);
                         setShowBatteryTypePicker(prev => !prev);
                         setShowBackColorPicker(false);
+                        setShowSpeakerTypePicker(false);
+                        return;
+                      }
+                      if (isSpeaker) {
+                        setSelectedRepair(repair);
+                        setSpeakerPriceOverride(null);
+                        setShowSpeakerTypePicker(prev => !prev);
+                        setShowBackColorPicker(false);
+                        setShowBatteryTypePicker(false);
                         return;
                       }
                       setBatteryPriceOverride(null);
+                      setSpeakerPriceOverride(null);
+                      setShowSpeakerTypePicker(false);
                       handleRepairSelect(repair);
                     }} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 hover:-translate-y-0.5 ${
-                      (showBackColorPicker && isBackGlass) || (showBatteryTypePicker && isBatteryWithChoice)
+                      (showBackColorPicker && isBackGlass) || (showBatteryTypePicker && isBatteryWithChoice) || (showSpeakerTypePicker && isSpeaker)
                         ? 'border-primary bg-primary/5 shadow-[4px_4px_0_0_hsl(var(--primary)/0.15)]' 
                         : isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-foreground/15 hover:border-primary/40 hover:bg-primary/5 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[5px_5px_0_0_hsl(var(--foreground)/0.1)]'
                     }`}>
@@ -1827,6 +1854,7 @@ const NewRepairOrder = () => {
                           )}
                           {!isPhoneOnly && selectedModel && price > 0 && (
                             <div className="flex items-center gap-2 mt-2">
+                              {isSpeaker && <span className="text-sm text-muted-foreground">החל מ־</span>}
                               <span className="text-2xl font-bold text-primary">₪{price}</span>
                             </div>
                           )}
@@ -1959,6 +1987,63 @@ const NewRepairOrder = () => {
                       ) : null;
                     })()}
 
+                    {/* Inline Speaker Type Picker */}
+                    {isSpeaker && showSpeakerTypePicker && selectedModel && (
+                      <div className="overflow-hidden animate-fade-in">
+                        <div className="pt-3 pb-1 px-1 space-y-3">
+                          <div className="text-center">
+                            <h3 className="text-lg font-bold">איזה רמקול צריך תיקון?</h3>
+                            <p className="text-sm text-muted-foreground">רמקול מקורי - בחרו את המיקום במכשיר</p>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            {[
+                              {
+                                key: 'top',
+                                title: 'רמקול עליון',
+                                sub: 'אפרכסת - שמיעה בשיחה',
+                                img: speakerTopImg,
+                                price: SPEAKER_TOP_PRICE,
+                                name: 'תיקון רמקול עליון (אפרכסת)',
+                              },
+                              {
+                                key: 'bottom',
+                                title: 'רמקול תחתון',
+                                sub: 'מוזיקה ורמקול דיבור',
+                                img: speakerBottomImg,
+                                price: SPEAKER_BOTTOM_PRICE,
+                                name: 'תיקון רמקול תחתון',
+                              },
+                            ].map((opt) => (
+                              <button
+                                key={opt.key}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setShowSpeakerTypePicker(false);
+                                  setSpeakerPriceOverride(opt.price);
+                                  handleRepairSelect({ ...repair, name: opt.name });
+                                }}
+                                className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-foreground/15 hover:border-primary/40 hover:bg-primary/5 transition-all duration-200 active:scale-[0.98]"
+                              >
+                                <img
+                                  src={opt.img}
+                                  alt={opt.title}
+                                  loading="lazy"
+                                  width={512}
+                                  height={512}
+                                  className="w-24 h-24 object-contain"
+                                />
+                                <span className="font-bold text-base">{opt.title}</span>
+                                <span className="text-xs text-muted-foreground text-center leading-tight">{opt.sub}</span>
+                                <span className="text-lg font-bold text-primary">₪{opt.price}</span>
+                              </button>
+                            ))}
+                          </div>
+
+                          <p className="text-center text-xs text-muted-foreground">כל הרמקולים מקוריים</p>
+                        </div>
+                      </div>
+                    )}
 
 
                   </div>;
