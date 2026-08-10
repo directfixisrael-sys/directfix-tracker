@@ -686,6 +686,14 @@ const NewRepairOrder = () => {
     ) {
       return batteryPriceOverride;
     }
+    // Speaker override: top vs bottom speaker
+    if (
+      speakerPriceOverride !== null &&
+      selectedRepair?.id === repair.id &&
+      repair.name.includes('רמקול')
+    ) {
+      return speakerPriceOverride;
+    }
     return priceMap[m.id]?.[repair.id] || 0;
   };
   const getPrice = () => {
