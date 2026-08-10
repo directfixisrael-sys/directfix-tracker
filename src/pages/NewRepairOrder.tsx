@@ -33,6 +33,11 @@ import LoyaltyPointsDisplay, { getCustomerPoints, calculatePointsFromPrice, calc
 import SEO from "@/components/SEO";
 import { seo } from "@/lib/seoData";
 import PointsEarnedAnimation from '@/components/PointsEarnedAnimation';
+import speakerTopImg from '@/assets/speaker-top.png';
+import speakerBottomImg from '@/assets/speaker-bottom.png';
+
+const SPEAKER_TOP_PRICE = 370;
+const SPEAKER_BOTTOM_PRICE = 350;
 
 // iPhone back glass colors per model family
 const iphoneBackColors: Record<string, { name: string; hex: string }[]> = {
@@ -390,6 +395,8 @@ const NewRepairOrder = () => {
   const [showBackColorPicker, setShowBackColorPicker] = useState(false);
   const [showBatteryTypePicker, setShowBatteryTypePicker] = useState(false);
   const [batteryPriceOverride, setBatteryPriceOverride] = useState<number | null>(null);
+  const [showSpeakerTypePicker, setShowSpeakerTypePicker] = useState(false);
+  const [speakerPriceOverride, setSpeakerPriceOverride] = useState<number | null>(null);
   const [otherRepairDescription, setOtherRepairDescription] = useState('');
   
   const [additionalRepairs, setAdditionalRepairs] = useState<{ repair: RepairType; price: number; backColor?: string; model: IphoneModel }[]>([]);
