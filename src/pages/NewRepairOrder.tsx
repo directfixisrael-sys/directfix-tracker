@@ -1778,6 +1778,7 @@ const NewRepairOrder = () => {
             const batteryIsOriginal = selectedModel?.battery_is_original ?? true;
             const batteryPulloutAvailable = !!selectedModel?.battery_pullout_available;
             const isBatteryWithChoice = isBattery && batteryPulloutAvailable;
+            const isSpeaker = repair.name.includes('רמקול');
             let price = 0;
             if (selectedModel) {
               price = getRepairPrice(repair);
@@ -1794,12 +1795,23 @@ const NewRepairOrder = () => {
                         setBatteryPriceOverride(null);
                         setShowBatteryTypePicker(prev => !prev);
                         setShowBackColorPicker(false);
+                        setShowSpeakerTypePicker(false);
+                        return;
+                      }
+                      if (isSpeaker) {
+                        setSelectedRepair(repair);
+                        setSpeakerPriceOverride(null);
+                        setShowSpeakerTypePicker(prev => !prev);
+                        setShowBackColorPicker(false);
+                        setShowBatteryTypePicker(false);
                         return;
                       }
                       setBatteryPriceOverride(null);
+                      setSpeakerPriceOverride(null);
+                      setShowSpeakerTypePicker(false);
                       handleRepairSelect(repair);
                     }} className={`p-5 cursor-pointer transition-all duration-200 active:scale-[0.98] rounded-2xl border-2 hover:-translate-y-0.5 ${
-                      (showBackColorPicker && isBackGlass) || (showBatteryTypePicker && isBatteryWithChoice)
+                      (showBackColorPicker && isBackGlass) || (showBatteryTypePicker && isBatteryWithChoice) || (showSpeakerTypePicker && isSpeaker)
                         ? 'border-primary bg-primary/5 shadow-[4px_4px_0_0_hsl(var(--primary)/0.15)]' 
                         : isPhoneOnly ? 'border-dashed border-muted-foreground/30' : 'border-foreground/15 hover:border-primary/40 hover:bg-primary/5 shadow-[3px_3px_0_0_hsl(var(--foreground)/0.06)] hover:shadow-[5px_5px_0_0_hsl(var(--foreground)/0.1)]'
                     }`}>
