@@ -1854,6 +1854,7 @@ const NewRepairOrder = () => {
                           )}
                           {!isPhoneOnly && selectedModel && price > 0 && (
                             <div className="flex items-center gap-2 mt-2">
+                              {isSpeaker && <span className="text-sm text-muted-foreground">החל מ־</span>}
                               <span className="text-2xl font-bold text-primary">₪{price}</span>
                             </div>
                           )}
