@@ -64,6 +64,7 @@ const IPadPriceManagement = () => {
         series: form.series,
         sort_order: form.sort_order,
         has_display_option: form.has_display_option,
+        brand: form.brand,
       }).eq('id', editModel.id);
       if (error) { toast.error('שגיאה בעדכון'); return; }
       toast.success('הדגם עודכן');
@@ -74,6 +75,7 @@ const IPadPriceManagement = () => {
         series: form.series,
         sort_order: form.sort_order,
         has_display_option: form.has_display_option,
+        brand: form.brand,
       });
       if (error) { toast.error('שגיאה בהוספה'); return; }
       toast.success('דגם נוסף');
