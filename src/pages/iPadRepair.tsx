@@ -78,12 +78,14 @@ const iPadRepair = () => {
     topRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
   }, [step]);
 
-  const groupedModels = models.reduce<Record<string, IPadModel[]>>((acc, m) => {
-    const key = m.series || 'Other';
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(m);
-    return acc;
-  }, {});
+  const groupedModels = models
+    .filter(m => (m.brand || 'apple') === brand)
+    .reduce<Record<string, IPadModel[]>>((acc, m) => {
+      const key = m.series || 'Other';
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(m);
+      return acc;
+    }, {});
 
   const getAvailableDates = () => {
     const dates: Date[] = [];
