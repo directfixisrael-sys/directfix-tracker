@@ -1349,14 +1349,22 @@ const NewRepairOrder = () => {
               className="h-16 text-lg rounded-xl px-5"
               autoFocus
             />
-            <Input
-              placeholder="מספר טלפון *"
-              value={introPhone}
-              onChange={(e) => setIntroPhone(e.target.value)}
-              type="tel"
-              dir="ltr"
-              className="h-16 text-lg rounded-xl px-5 text-right"
-            />
+            <div className="relative">
+              <Input
+                placeholder="מספר טלפון *"
+                value={introPhone}
+                onChange={(e) => setIntroPhone(e.target.value)}
+                type="tel"
+                dir="ltr"
+                className={`h-16 text-lg rounded-xl px-5 text-right transition-colors ${/^0(5\d{8}|[2-4,8-9]\d{7})$/.test(introPhone.replace(/\D/g, '')) ? 'border-2 border-success pl-12' : ''}`}
+              />
+              {/^0(5\d{8}|[2-4,8-9]\d{7})$/.test(introPhone.replace(/\D/g, '')) && (
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-success flex items-center justify-center animate-scale-in">
+                  <Check className="w-4 h-4 text-success-foreground" strokeWidth={3} />
+                </div>
+              )}
+            </div>
+
           </div>
 
           <label className="flex items-start gap-2.5 mt-3 cursor-pointer">
