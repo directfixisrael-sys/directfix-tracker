@@ -22,6 +22,7 @@ interface IPadModel {
   sort_order: number;
   is_active: boolean;
   has_display_option: boolean;
+  brand: string;
 }
 
 const IPadPriceManagement = () => {
@@ -30,7 +31,8 @@ const IPadPriceManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editModel, setEditModel] = useState<IPadModel | null>(null);
-  const [form, setForm] = useState({ name: '', screen_price: 400, series: 'iPad', sort_order: 0, has_display_option: true });
+  const [brandFilter, setBrandFilter] = useState<'apple' | 'samsung'>('apple');
+  const [form, setForm] = useState({ name: '', screen_price: 400, series: 'iPad', sort_order: 0, has_display_option: true, brand: 'apple' });
 
   const fetchModels = async () => {
     const { data } = await supabase.from('ipad_models').select('*').order('sort_order');
@@ -42,13 +44,13 @@ const IPadPriceManagement = () => {
 
   const openAdd = () => {
     setEditModel(null);
-    setForm({ name: '', screen_price: 400, series: 'iPad', sort_order: models.length, has_display_option: true });
+    setForm({ name: '', screen_price: 400, series: brandFilter === 'apple' ? 'iPad' : 'Galaxy Tab A', sort_order: models.length, has_display_option: true, brand: brandFilter });
     setDialogOpen(true);
   };
 
   const openEdit = (m: IPadModel) => {
     setEditModel(m);
-    setForm({ name: m.name, screen_price: m.screen_price, series: m.series, sort_order: m.sort_order, has_display_option: m.has_display_option });
+    setForm({ name: m.name, screen_price: m.screen_price, series: m.series, sort_order: m.sort_order, has_display_option: m.has_display_option, brand: m.brand || 'apple' });
     setDialogOpen(true);
   };
 
