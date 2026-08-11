@@ -46,6 +46,7 @@ const iPadRepair = () => {
   const [selectedModel, setSelectedModel] = useState<IPadModel | null>(null);
   const [brand, setBrand] = useState<'apple' | 'samsung'>('apple');
   const [displayWorking, setDisplayWorking] = useState<boolean | null>(null);
+  const askDisplay = !!selectedModel?.has_display_option && (selectedModel?.brand ?? 'apple') !== 'samsung';
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState('');
   const [blockedDates, setBlockedDates] = useState<any[]>([]);
@@ -108,11 +109,11 @@ const iPadRepair = () => {
   const createiPadLead = async (modelName: string) => {
     try {
       const { data } = await supabase.from('leads').insert({
-        customer_name: 'iPad Lead',
+        customer_name: 'Tablet Lead',
         customer_phone: '',
         device_type: modelName,
-        last_step: 'בחירת דגם iPad',
-        repair_type: 'תיקון מסך iPad',
+        last_step: 'בחירת דגם טאבלט',
+        repair_type: 'תיקון מסך טאבלט',
       }).select('id').single();
       if (data) setCurrentLeadId(data.id);
     } catch (e) {
@@ -144,7 +145,7 @@ const iPadRepair = () => {
           customer_name: customerName.trim(),
           customer_phone: customerPhone.trim().replace(/\D/g, ''),
           customer_email: customerEmail?.trim() || null,
-          last_step: 'שליחת הזמנה iPad',
+          last_step: 'שליחת הזמנה טאבלט',
         }).eq('id', currentLeadId);
       } catch (e) {
         console.error('Error updating iPad lead details:', e);
@@ -154,11 +155,11 @@ const iPadRepair = () => {
     try {
       const dateStr = selectedDate.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
       const displayStatus = displayWorking ? 'תצוגה תקינה' : 'תצוגה לא עובדת';
-      const issueDesc = selectedModel.has_display_option 
-        ? `תיקון מסך iPad - ${displayStatus}` 
-        : `תיקון מסך iPad`;
-      const notes = [`שירות איסוף והחזרה - iPad`, `טווח איסוף: ${selectedTime}`];
-      if (selectedModel.has_display_option) notes.splice(1, 0, `תצוגה: ${displayStatus}`);
+      const issueDesc = askDisplay
+        ? `תיקון מסך טאבלט - ${displayStatus}` 
+        : `תיקון מסך טאבלט`;
+      const notes = [`שירות איסוף והחזרה - טאבלט`, `טווח איסוף: ${selectedTime}`];
+      if (askDisplay) notes.splice(1, 0, `תצוגה: ${displayStatus}`);
       
       const { data, error } = await supabase.functions.invoke('create-order', {
         body: {
@@ -182,7 +183,7 @@ const iPadRepair = () => {
       // Mark lead as converted
       if (currentLeadId) {
         try {
-          await supabase.from('leads').update({ converted: true, last_step: 'הזמנה הושלמה iPad' }).eq('id', currentLeadId);
+          await supabase.from('leads').update({ converted: true, last_step: 'הזמנה הושלמה טאבלט' }).eq('id', currentLeadId);
         } catch (e) { console.error('Error marking iPad lead converted:', e); }
       }
 
@@ -232,7 +233,7 @@ const iPadRepair = () => {
         {/* Header */}
         <div className="text-center mb-6">
           <Logo />
-          <h1 className="text-2xl font-bold mt-4">תיקון מסך iPad</h1>
+          <h1 className="text-2xl font-bold mt-4">תיקון מסך טאבלט</h1>
           <p className="text-muted-foreground mt-1">שירות איסוף והחזרה עד הבית</p>
         </div>
 
@@ -249,7 +250,7 @@ const iPadRepair = () => {
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">1</div>
-                  <span className="text-sm">אנחנו אוספים את ה-iPad מהבית שלכם</span>
+                  <span className="text-sm">אנחנו אוספים את הטאבלט מהבית שלכם</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">2</div>
@@ -445,7 +446,7 @@ const iPadRepair = () => {
               <button onClick={() => setStep('model')} className="text-primary flex items-center gap-1 text-sm">
                 <ArrowRight className="w-4 h-4" /> חזרה
               </button>
-              <h2 className="text-lg font-bold">{selectedModel.has_display_option ? 'מצב המסך' : 'תיקון מסך'}</h2>
+              <h2 className="text-lg font-bold">{askDisplay ? 'מצב המסך' : 'תיקון מסך'}</h2>
             </div>
 
             <Card className="p-4 text-center">
@@ -454,7 +455,7 @@ const iPadRepair = () => {
               <p className="text-primary font-bold text-xl mt-1">{selectedModel.screen_price} ש"ח</p>
             </Card>
 
-            {!selectedModel.has_display_option && (
+            {!askDisplay && (
               <Button 
                 onClick={() => { setDisplayWorking(true); setStep('schedule'); updateiPadLeadStep('תיקון מסך - ללא שאלת תצוגה'); }}
                 className="w-full h-14 text-base font-bold rounded-xl"
@@ -463,7 +464,7 @@ const iPadRepair = () => {
               </Button>
             )}
 
-            {selectedModel.has_display_option && <>
+            {askDisplay && <>
             <p className="text-sm text-muted-foreground text-center">זה עוזר לנו להתכונן עם החלקים הנכונים</p>
 
             <div className="grid grid-cols-2 gap-3">
@@ -595,7 +596,7 @@ const iPadRepair = () => {
             {selectedDate && selectedTime && (
               <Button
                 className="w-full h-12 text-base rounded-xl animate-fade-in"
-                onClick={() => { setStep('details'); updateiPadLeadStep('פרטי איסוף iPad'); }}
+                onClick={() => { setStep('details'); updateiPadLeadStep('פרטי איסוף טאבלט'); }}
               >
                 המשך לפרטי איסוף
               </Button>
@@ -626,7 +627,7 @@ const iPadRepair = () => {
                   {selectedDate?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </span>
               </div>
-              {selectedModel?.has_display_option && (
+              {askDisplay && (
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>{displayWorking ? 'תצוגה תקינה' : 'תצוגה לא עובדת'}</span>
                   <span>מצב תצוגה</span>
