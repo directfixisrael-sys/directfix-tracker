@@ -99,23 +99,39 @@ const IPadPriceManagement = () => {
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin" /></div>;
 
-  const grouped = models.reduce<Record<string, IPadModel[]>>((acc, m) => {
-    const key = m.series || 'Other';
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(m);
-    return acc;
-  }, {});
+  const grouped = models
+    .filter(m => (m.brand || 'apple') === brandFilter)
+    .reduce<Record<string, IPadModel[]>>((acc, m) => {
+      const key = m.series || 'Other';
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(m);
+      return acc;
+    }, {});
 
   return (
     <div className="space-y-4" dir="rtl">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold flex items-center gap-2">
-          <Tablet className="w-5 h-5" /> ניהול דגמי iPad
+          <Tablet className="w-5 h-5" /> ניהול דגמי טאבלט
         </h2>
         <Button onClick={openAdd} size="sm" className="gap-2">
           <Plus className="w-4 h-4" /> הוספת דגם
         </Button>
       </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        {(['apple', 'samsung'] as const).map(b => (
+          <Button
+            key={b}
+            variant={brandFilter === b ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setBrandFilter(b)}
+          >
+            {b === 'apple' ? 'Apple iPad' : 'Samsung Galaxy Tab'}
+          </Button>
+        ))}
+      </div>
+
 
       {Object.entries(grouped).map(([series, seriesModels]) => (
         <div key={series} className="space-y-2">
