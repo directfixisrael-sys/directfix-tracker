@@ -334,8 +334,31 @@ const iPadRepair = () => {
               <button onClick={() => setStep('intro')} className="text-primary flex items-center gap-1 text-sm">
                 <ArrowRight className="w-4 h-4" /> חזרה
               </button>
-              <h2 className="text-lg font-bold">בחרו את דגם ה-iPad</h2>
+              <h2 className="text-lg font-bold">בחרו את דגם הטאבלט</h2>
             </div>
+
+            {/* Brand selection */}
+            <div className="grid grid-cols-2 gap-3" dir="rtl">
+              {([
+                { key: 'apple' as const, label: 'Apple iPad' },
+                { key: 'samsung' as const, label: 'Samsung Galaxy Tab' },
+              ]).map(b => (
+                <button
+                  key={b.key}
+                  onClick={() => setBrand(b.key)}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1.5 py-4 rounded-2xl border transition-all active:scale-[0.98]",
+                    brand === b.key
+                      ? "border-primary bg-primary/10 text-primary shadow-sm"
+                      : "border-border bg-card hover:border-primary/40"
+                  )}
+                >
+                  <Tablet className="w-5 h-5" />
+                  <span className="font-semibold text-sm">{b.label}</span>
+                </button>
+              ))}
+            </div>
+
 
             {/* How to identify model */}
             <Collapsible open={identifyOpen} onOpenChange={setIdentifyOpen}>
