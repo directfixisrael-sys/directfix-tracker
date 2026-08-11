@@ -27,6 +27,7 @@ interface IPadModel {
   screen_price: number;
   series: string;
   has_display_option: boolean;
+  brand: string;
 }
 
 const TIME_SLOTS = [
@@ -43,6 +44,7 @@ const iPadRepair = () => {
   const [models, setModels] = useState<IPadModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedModel, setSelectedModel] = useState<IPadModel | null>(null);
+  const [brand, setBrand] = useState<'apple' | 'samsung'>('apple');
   const [displayWorking, setDisplayWorking] = useState<boolean | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState('');
@@ -76,12 +78,14 @@ const iPadRepair = () => {
     topRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
   }, [step]);
 
-  const groupedModels = models.reduce<Record<string, IPadModel[]>>((acc, m) => {
-    const key = m.series || 'Other';
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(m);
-    return acc;
-  }, {});
+  const groupedModels = models
+    .filter(m => (m.brand || 'apple') === brand)
+    .reduce<Record<string, IPadModel[]>>((acc, m) => {
+      const key = m.series || 'Other';
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(m);
+      return acc;
+    }, {});
 
   const getAvailableDates = () => {
     const dates: Date[] = [];
@@ -330,8 +334,31 @@ const iPadRepair = () => {
               <button onClick={() => setStep('intro')} className="text-primary flex items-center gap-1 text-sm">
                 <ArrowRight className="w-4 h-4" /> חזרה
               </button>
-              <h2 className="text-lg font-bold">בחרו את דגם ה-iPad</h2>
+              <h2 className="text-lg font-bold">בחרו את דגם הטאבלט</h2>
             </div>
+
+            {/* Brand selection */}
+            <div className="grid grid-cols-2 gap-3" dir="rtl">
+              {([
+                { key: 'apple' as const, label: 'Apple iPad' },
+                { key: 'samsung' as const, label: 'Samsung Galaxy Tab' },
+              ]).map(b => (
+                <button
+                  key={b.key}
+                  onClick={() => setBrand(b.key)}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1.5 py-4 rounded-2xl border transition-all active:scale-[0.98]",
+                    brand === b.key
+                      ? "border-primary bg-primary/10 text-primary shadow-sm"
+                      : "border-border bg-card hover:border-primary/40"
+                  )}
+                >
+                  <Tablet className="w-5 h-5" />
+                  <span className="font-semibold text-sm">{b.label}</span>
+                </button>
+              ))}
+            </div>
+
 
             {/* How to identify model */}
             <Collapsible open={identifyOpen} onOpenChange={setIdentifyOpen}>
@@ -339,7 +366,7 @@ const iPadRepair = () => {
                 <button className="w-full flex items-center justify-between p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
                   <span className="flex items-center gap-2 flex-row-reverse text-sm font-medium">
                     <HelpCircle className="w-4 h-4 text-primary" />
-                    איך מזהים את דגם ה-iPad?
+                    איך מזהים את דגם הטאבלט?
                   </span>
                   {identifyOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>

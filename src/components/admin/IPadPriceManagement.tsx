@@ -22,6 +22,7 @@ interface IPadModel {
   sort_order: number;
   is_active: boolean;
   has_display_option: boolean;
+  brand: string;
 }
 
 const IPadPriceManagement = () => {
@@ -30,7 +31,8 @@ const IPadPriceManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editModel, setEditModel] = useState<IPadModel | null>(null);
-  const [form, setForm] = useState({ name: '', screen_price: 400, series: 'iPad', sort_order: 0, has_display_option: true });
+  const [brandFilter, setBrandFilter] = useState<'apple' | 'samsung'>('apple');
+  const [form, setForm] = useState({ name: '', screen_price: 400, series: 'iPad', sort_order: 0, has_display_option: true, brand: 'apple' });
 
   const fetchModels = async () => {
     const { data } = await supabase.from('ipad_models').select('*').order('sort_order');
@@ -42,13 +44,13 @@ const IPadPriceManagement = () => {
 
   const openAdd = () => {
     setEditModel(null);
-    setForm({ name: '', screen_price: 400, series: 'iPad', sort_order: models.length, has_display_option: true });
+    setForm({ name: '', screen_price: 400, series: brandFilter === 'apple' ? 'iPad' : 'Galaxy Tab A', sort_order: models.length, has_display_option: true, brand: brandFilter });
     setDialogOpen(true);
   };
 
   const openEdit = (m: IPadModel) => {
     setEditModel(m);
-    setForm({ name: m.name, screen_price: m.screen_price, series: m.series, sort_order: m.sort_order, has_display_option: m.has_display_option });
+    setForm({ name: m.name, screen_price: m.screen_price, series: m.series, sort_order: m.sort_order, has_display_option: m.has_display_option, brand: m.brand || 'apple' });
     setDialogOpen(true);
   };
 
@@ -62,6 +64,7 @@ const IPadPriceManagement = () => {
         series: form.series,
         sort_order: form.sort_order,
         has_display_option: form.has_display_option,
+        brand: form.brand,
       }).eq('id', editModel.id);
       if (error) { toast.error('שגיאה בעדכון'); return; }
       toast.success('הדגם עודכן');
@@ -72,6 +75,7 @@ const IPadPriceManagement = () => {
         series: form.series,
         sort_order: form.sort_order,
         has_display_option: form.has_display_option,
+        brand: form.brand,
       });
       if (error) { toast.error('שגיאה בהוספה'); return; }
       toast.success('דגם נוסף');
@@ -95,23 +99,39 @@ const IPadPriceManagement = () => {
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin" /></div>;
 
-  const grouped = models.reduce<Record<string, IPadModel[]>>((acc, m) => {
-    const key = m.series || 'Other';
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(m);
-    return acc;
-  }, {});
+  const grouped = models
+    .filter(m => (m.brand || 'apple') === brandFilter)
+    .reduce<Record<string, IPadModel[]>>((acc, m) => {
+      const key = m.series || 'Other';
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(m);
+      return acc;
+    }, {});
 
   return (
     <div className="space-y-4" dir="rtl">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold flex items-center gap-2">
-          <Tablet className="w-5 h-5" /> ניהול דגמי iPad
+          <Tablet className="w-5 h-5" /> ניהול דגמי טאבלט
         </h2>
         <Button onClick={openAdd} size="sm" className="gap-2">
           <Plus className="w-4 h-4" /> הוספת דגם
         </Button>
       </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        {(['apple', 'samsung'] as const).map(b => (
+          <Button
+            key={b}
+            variant={brandFilter === b ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setBrandFilter(b)}
+          >
+            {b === 'apple' ? 'Apple iPad' : 'Samsung Galaxy Tab'}
+          </Button>
+        ))}
+      </div>
+
 
       {Object.entries(grouped).map(([series, seriesModels]) => (
         <div key={series} className="space-y-2">
@@ -145,6 +165,22 @@ const IPadPriceManagement = () => {
             <DialogTitle>{editModel ? 'עריכת דגם' : 'הוספת דגם חדש'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-1 block">יצרן</label>
+              <div className="grid grid-cols-2 gap-2">
+                {(['apple', 'samsung'] as const).map(b => (
+                  <Button
+                    key={b}
+                    type="button"
+                    variant={form.brand === b ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setForm(f => ({ ...f, brand: b }))}
+                  >
+                    {b === 'apple' ? 'Apple' : 'Samsung'}
+                  </Button>
+                ))}
+              </div>
+            </div>
             <div>
               <label className="text-sm font-medium mb-1 block">שם הדגם</label>
               <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="iPad דור 11" dir="rtl" />

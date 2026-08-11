@@ -1,0 +1,1 @@
+ALTER TABLE public.ipad_models ADD COLUMN IF NOT EXISTS brand text NOT NULL DEFAULT 'apple';
