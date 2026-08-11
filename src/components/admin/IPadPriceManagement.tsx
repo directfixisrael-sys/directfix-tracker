@@ -166,6 +166,22 @@ const IPadPriceManagement = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div>
+              <label className="text-sm font-medium mb-1 block">יצרן</label>
+              <div className="grid grid-cols-2 gap-2">
+                {(['apple', 'samsung'] as const).map(b => (
+                  <Button
+                    key={b}
+                    type="button"
+                    variant={form.brand === b ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setForm(f => ({ ...f, brand: b }))}
+                  >
+                    {b === 'apple' ? 'Apple' : 'Samsung'}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div>
               <label className="text-sm font-medium mb-1 block">שם הדגם</label>
               <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="iPad דור 11" dir="rtl" />
             </div>
