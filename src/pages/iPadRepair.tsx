@@ -366,7 +366,7 @@ const iPadRepair = () => {
                 <button className="w-full flex items-center justify-between p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
                   <span className="flex items-center gap-2 flex-row-reverse text-sm font-medium">
                     <HelpCircle className="w-4 h-4 text-primary" />
-                    איך מזהים את דגם ה-iPad?
+                    איך מזהים את דגם הטאבלט?
                   </span>
                   {identifyOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
