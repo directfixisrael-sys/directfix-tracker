@@ -27,6 +27,7 @@ interface IPadModel {
   screen_price: number;
   series: string;
   has_display_option: boolean;
+  brand: string;
 }
 
 const TIME_SLOTS = [
