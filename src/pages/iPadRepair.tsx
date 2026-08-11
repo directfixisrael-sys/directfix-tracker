@@ -44,6 +44,7 @@ const iPadRepair = () => {
   const [models, setModels] = useState<IPadModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedModel, setSelectedModel] = useState<IPadModel | null>(null);
+  const [brand, setBrand] = useState<'apple' | 'samsung'>('apple');
   const [displayWorking, setDisplayWorking] = useState<boolean | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState('');
