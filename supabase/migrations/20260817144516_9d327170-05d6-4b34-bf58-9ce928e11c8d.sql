@@ -1,0 +1,3 @@
+DELETE FROM public.orders WHERE id = '2885237e-d3f8-4ff1-8559-13ea09334f38';
+INSERT INTO public.orders (customer_name, customer_phone, customer_address, device_type, issue_description, repair_price, status, estimated_arrival, lead_source, created_at)
+VALUES ('שלמה יהודה', '0532490258', 'חיל חימוש 28, ראשון לציון, ישראל', 'iPhone 15 Pro Max', 'החלפת מסך תואם', 580, 'pending', 'יום שני 17/8 בשעות 20:00-22:00', 'ישיר', '2026-08-17T14:40:22Z');
