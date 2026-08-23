@@ -509,10 +509,33 @@ const PriceManagement = () => {
     }
   };
 
+  // Export full price list to CSV
+  const exportPricesToCsv = () => {
+    const activeRepairs = repairTypes.filter(rt => rt.is_active);
+    const header = ['דגם', 'סדרה', 'פעיל', ...activeRepairs.map(rt => rt.name)];
+    const rows = models.map(model => [
+      model.name,
+      model.series || '',
+      model.is_active ? 'כן' : 'לא',
+      ...activeRepairs.map(rt => String(getModelRepairPrice(model.id, rt.id) || 0)),
+    ]);
+    const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
+    const csv = [header, ...rows].map(r => r.map(escape).join(',')).join('\r\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `directfix-pricelist-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('המחירון יוצא לקובץ CSV');
+  };
+
   // Filter models
   const filteredModels = models.filter(model =>
     model.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
 
   const getRepairIcon = getRepairIconComponent;
 
