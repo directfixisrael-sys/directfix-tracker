@@ -651,6 +651,66 @@ export type Database = {
         }
         Relationships: []
       }
+      price_promotions: {
+        Row: {
+          badge_text: string
+          created_at: string
+          discount_percent: number | null
+          ends_at: string | null
+          id: string
+          info_text: string
+          is_active: boolean
+          model_id: string | null
+          promo_price: number | null
+          repair_type_id: string | null
+          starts_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          badge_text?: string
+          created_at?: string
+          discount_percent?: number | null
+          ends_at?: string | null
+          id?: string
+          info_text?: string
+          is_active?: boolean
+          model_id?: string | null
+          promo_price?: number | null
+          repair_type_id?: string | null
+          starts_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          badge_text?: string
+          created_at?: string
+          discount_percent?: number | null
+          ends_at?: string | null
+          id?: string
+          info_text?: string
+          is_active?: boolean
+          model_id?: string | null
+          promo_price?: number | null
+          repair_type_id?: string | null
+          starts_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_promotions_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "iphone_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_promotions_repair_type_id_fkey"
+            columns: ["repair_type_id"]
+            isOneToOne: false
+            referencedRelation: "repair_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       promotions: {
         Row: {
           badge_text: string | null
