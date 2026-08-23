@@ -309,6 +309,26 @@ const PricePromotionsTab = ({ models, repairTypes }: Props) => {
               </div>
             )}
 
+            {basePrice != null && (
+              <div className={`rounded-xl border p-3 text-sm ${previewPrice != null && previewPrice >= basePrice ? 'border-destructive/40 bg-destructive/5 text-destructive' : 'border-border bg-muted/40'}`}>
+                <div>מחיר רגיל היום: <span className="font-bold">₪{basePrice}</span></div>
+                {previewPrice != null && (
+                  <div className="mt-1">
+                    הלקוח יראה: <span className="line-through opacity-70">₪{basePrice}</span>{' '}
+                    <span className="font-bold">₪{previewPrice}</span>
+                    {previewPrice < basePrice
+                      ? <span className="font-bold"> · חיסכון ₪{basePrice - previewPrice}</span>
+                      : <span className="font-bold"> · אין חיסכון, המבצע לא יוצג ללקוח</span>}
+                  </div>
+                )}
+              </div>
+            )}
+            {form.repair_type_id && form.model_id === 'all' && (
+              <p className="text-xs text-muted-foreground">בחירת דגם ספציפי תציג כאן תצוגה מקדימה של המחיר שהלקוח יראה.</p>
+            )}
+
+
+
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-sm font-medium mb-1 block">תאריך התחלה</label>
