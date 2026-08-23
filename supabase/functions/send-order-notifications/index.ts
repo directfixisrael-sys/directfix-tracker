@@ -248,6 +248,13 @@ const handler = async (req: Request): Promise<Response> => {
       hasBusinessTemplate: !!twilioBusinessTemplateSid,
     });
 
+    // Compute Twilio request params once (used by sendWhatsApp below).
+    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
+    const authString = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
+    const fromNumber = twilioWhatsAppNumber.startsWith('+')
+      ? twilioWhatsAppNumber
+      : `+${twilioWhatsAppNumber}`;
+
     /**
      * Send a WhatsApp message via Twilio. If a ContentSid is provided, the message is
      * sent as an approved template (required for business-initiated conversations);
@@ -289,14 +296,6 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (twilioAccountSid && twilioAuthToken && twilioWhatsAppNumber) {
-      const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
-      const authString = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
-
-      // Format the From number - ensure it has + prefix
-      const fromNumber = twilioWhatsAppNumber.startsWith('+')
-        ? twilioWhatsAppNumber
-        : `+${twilioWhatsAppNumber}`;
-
       // 2a. Send WhatsApp to customer
       try {
         // Format phone number for WhatsApp (Israel format)
