@@ -2288,15 +2288,30 @@ const NewRepairOrder = () => {
                   </div>
                 ))}
                 {/* Current repair */}
-                {selectedRepair && selectedModel && (
-                  <div className="flex justify-between items-center text-sm py-1 border-b border-border/30 last:border-0">
-                    <div className="flex-1">
-                      <span className="font-semibold">{selectedModel.name}</span>
-                      <span className="text-muted-foreground"> · {getRepairTypeName()}{selectedBackColor ? ` (${selectedBackColor})` : ''}</span>
+                {selectedRepair && selectedModel && (() => {
+                  const promo = getPromoFor(selectedRepair);
+                  const basePrice = getBaseRepairPrice(selectedRepair);
+                  const hasPromo = !!promo && basePrice > getPrice();
+                  return (
+                    <div className="flex justify-between items-center text-sm py-1 border-b border-border/30 last:border-0">
+                      <div className="flex-1">
+                        <span className="font-semibold">{selectedModel.name}</span>
+                        <span className="text-muted-foreground"> · {getRepairTypeName()}{selectedBackColor ? ` (${selectedBackColor})` : ''}</span>
+                        {hasPromo && (
+                          <span className="mr-2 inline-flex items-center gap-1 text-[11px] font-bold rounded-full px-2 py-0.5 bg-accent/10 text-accent border border-accent/30 align-middle">
+                            <BadgePercent className="w-3 h-3" />
+                            {promo!.badge_text}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {hasPromo && <span className="text-xs line-through text-muted-foreground">₪{basePrice}</span>}
+                        <span className="font-bold">₪{getPrice()}</span>
+                      </div>
                     </div>
-                    <span className="font-bold">₪{getPrice()}</span>
-                  </div>
-                )}
+                  );
+                })()}
+
                 
                 {/* Bundle Addon */}
                 {selectedBundleAddon && currentBundle && selectedModel && <div className="flex justify-between items-center text-sm bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-2 -mx-1">
