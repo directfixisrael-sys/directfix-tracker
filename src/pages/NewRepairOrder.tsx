@@ -35,6 +35,8 @@ import { seo } from "@/lib/seoData";
 import PointsEarnedAnimation from '@/components/PointsEarnedAnimation';
 import speakerTopImg from '@/assets/speaker-top.png';
 import speakerBottomImg from '@/assets/speaker-bottom.png';
+import { PricePromotion, findPromo, applyPromo, promoDaysLeft } from '@/lib/pricePromotions';
+
 
 const SPEAKER_TOP_PRICE = 370;
 const SPEAKER_BOTTOM_PRICE = 350;
@@ -307,6 +309,8 @@ const NewRepairOrder = () => {
   const [activePromotion, setActivePromotion] = useState<Promotion | null>(null);
   const [repairBundles, setRepairBundles] = useState<RepairBundle[]>([]);
   const [priceMap, setPriceMap] = useState<PriceMap>({});
+  const [pricePromotions, setPricePromotions] = useState<PricePromotion[]>([]);
+
   const [selectedBundleAddon, setSelectedBundleAddon] = useState<boolean>(false);
   const [currentBundle, setCurrentBundle] = useState<RepairBundle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -510,8 +514,10 @@ const NewRepairOrder = () => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [modelsRes, repairsRes, blockedRes, bundlesRes, pricesRes] = await Promise.all([supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), supabase.from('blocked_dates').select('date, start_time, end_time'), supabase.from('repair_bundles').select('*').eq('is_active', true), supabase.from('model_repair_prices').select('*')]);
+        const [modelsRes, repairsRes, blockedRes, bundlesRes, pricesRes, pricePromosRes] = await Promise.all([supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), supabase.from('blocked_dates').select('date, start_time, end_time'), supabase.from('repair_bundles').select('*').eq('is_active', true), supabase.from('model_repair_prices').select('*'), supabase.from('price_promotions').select('*').eq('is_active', true)]);
+        if (pricePromosRes.data) setPricePromotions(pricePromosRes.data as PricePromotion[]);
         if (modelsRes.data) setModels(modelsRes.data);
+
         if (repairsRes.data) setRepairTypes(repairsRes.data);
         if (pricesRes.data) {
           const map: PriceMap = {};
@@ -675,7 +681,13 @@ const NewRepairOrder = () => {
     return true;
   };
   const filteredModels = models.filter(model => model.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  const getRepairPrice = (repair: RepairType, model?: IphoneModel | null) => {
+  // Limited-time promotion for a repair type + model (null when none active)
+  const getPromoFor = (repair: RepairType, model?: IphoneModel | null) => {
+    const m = model || selectedModel;
+    return findPromo(pricePromotions, repair?.id, m?.id);
+  };
+  /** Price before any limited-time promotion */
+  const getBaseRepairPrice = (repair: RepairType, model?: IphoneModel | null) => {
     const m = model || selectedModel;
     if (!m) return 0;
     // Battery override: when user picked "new" battery option in picker
@@ -696,6 +708,11 @@ const NewRepairOrder = () => {
     }
     return priceMap[m.id]?.[repair.id] || 0;
   };
+  const getRepairPrice = (repair: RepairType, model?: IphoneModel | null) => {
+    const base = getBaseRepairPrice(repair, model);
+    return applyPromo(base, getPromoFor(repair, model));
+  };
+
   const getPrice = () => {
     if (!selectedModel || !selectedRepair) return 0;
     return getRepairPrice(selectedRepair);
@@ -1860,12 +1877,58 @@ const NewRepairOrder = () => {
                                 : 'סוללה מקורית של אפל · אחריות שנה'}
                             </div>
                           )}
-                          {!isPhoneOnly && selectedModel && price > 0 && (
-                            <div className="flex items-center gap-2 mt-2">
-                              {isSpeaker && <span className="text-sm text-muted-foreground">החל מ־</span>}
-                              <span className="text-2xl font-bold text-primary">₪{price}</span>
-                            </div>
-                          )}
+                          {!isPhoneOnly && selectedModel && price > 0 && (() => {
+                            const promo = getPromoFor(repair);
+                            const basePrice = getBaseRepairPrice(repair);
+                            const hasPromo = !!promo && basePrice > price;
+                            const daysLeft = promo ? promoDaysLeft(promo) : null;
+                            return (
+                              <div className="mt-2 space-y-1.5">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  {isSpeaker && <span className="text-sm text-muted-foreground">החל מ־</span>}
+                                  {hasPromo && (
+                                    <span className="text-base text-muted-foreground line-through">₪{basePrice}</span>
+                                  )}
+                                  <span className="text-2xl font-bold text-primary">₪{price}</span>
+                                </div>
+                                {hasPromo && (
+                                  <div className="inline-flex items-center gap-1.5 text-xs font-bold rounded-full px-2.5 py-1 bg-accent/10 text-accent border border-accent/30">
+                                    <BadgePercent className="w-3.5 h-3.5" />
+                                    <span>{promo!.badge_text}</span>
+                                    {daysLeft != null && daysLeft > 0 && (
+                                      <span className="font-medium opacity-80">· נותרו {daysLeft} ימים</span>
+                                    )}
+                                    <Dialog>
+                                      <DialogTrigger asChild>
+                                        <button
+                                          type="button"
+                                          aria-label="מידע על המבצע"
+                                          onClick={e => e.stopPropagation()}
+                                          className="hover:opacity-70 transition-opacity"
+                                        >
+                                          <HelpCircle className="w-3.5 h-3.5" />
+                                        </button>
+                                      </DialogTrigger>
+                                      <DialogContent className="max-w-sm" onClick={e => e.stopPropagation()}>
+                                        <DialogHeader>
+                                          <DialogTitle className="text-right">{promo!.badge_text}</DialogTitle>
+                                        </DialogHeader>
+                                        <p className="text-base text-muted-foreground text-right leading-relaxed">
+                                          {promo!.info_text}
+                                        </p>
+                                        {promo!.ends_at && (
+                                          <p className="text-sm text-right text-foreground font-semibold">
+                                            המבצע בתוקף עד {new Date(promo!.ends_at).toLocaleDateString('he-IL')}
+                                          </p>
+                                        )}
+                                      </DialogContent>
+                                    </Dialog>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
+
                         </div>
                         
                         {!isPhoneOnly && <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />}
@@ -2225,15 +2288,30 @@ const NewRepairOrder = () => {
                   </div>
                 ))}
                 {/* Current repair */}
-                {selectedRepair && selectedModel && (
-                  <div className="flex justify-between items-center text-sm py-1 border-b border-border/30 last:border-0">
-                    <div className="flex-1">
-                      <span className="font-semibold">{selectedModel.name}</span>
-                      <span className="text-muted-foreground"> · {getRepairTypeName()}{selectedBackColor ? ` (${selectedBackColor})` : ''}</span>
+                {selectedRepair && selectedModel && (() => {
+                  const promo = getPromoFor(selectedRepair);
+                  const basePrice = getBaseRepairPrice(selectedRepair);
+                  const hasPromo = !!promo && basePrice > getPrice();
+                  return (
+                    <div className="flex justify-between items-center text-sm py-1 border-b border-border/30 last:border-0">
+                      <div className="flex-1">
+                        <span className="font-semibold">{selectedModel.name}</span>
+                        <span className="text-muted-foreground"> · {getRepairTypeName()}{selectedBackColor ? ` (${selectedBackColor})` : ''}</span>
+                        {hasPromo && (
+                          <span className="mr-2 inline-flex items-center gap-1 text-[11px] font-bold rounded-full px-2 py-0.5 bg-accent/10 text-accent border border-accent/30 align-middle">
+                            <BadgePercent className="w-3 h-3" />
+                            {promo!.badge_text}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {hasPromo && <span className="text-xs line-through text-muted-foreground">₪{basePrice}</span>}
+                        <span className="font-bold">₪{getPrice()}</span>
+                      </div>
                     </div>
-                    <span className="font-bold">₪{getPrice()}</span>
-                  </div>
-                )}
+                  );
+                })()}
+
                 
                 {/* Bundle Addon */}
                 {selectedBundleAddon && currentBundle && selectedModel && <div className="flex justify-between items-center text-sm bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-2 -mx-1">

@@ -29,11 +29,15 @@ import {
   Search,
   Loader2,
   GripVertical,
-  Save
+  Save,
+  Download,
+  Timer
 } from 'lucide-react';
 import { REPAIR_ICON_OPTIONS, getRepairIconComponent } from '@/lib/repairIcons';
 import IconPickerField from '@/components/IconPickerField';
+import PricePromotionsTab from '@/components/admin/PricePromotionsTab';
 import { toast } from 'sonner';
+
 
 interface IphoneModel {
   id: string;
@@ -71,7 +75,7 @@ interface RepairType {
   info_description: string;
 }
 
-type TabType = 'models' | 'repairs';
+type TabType = 'models' | 'repairs' | 'promos';
 
 const PriceManagement = () => {
   const [activeTab, setActiveTab] = useState<TabType>('models');
@@ -505,10 +509,33 @@ const PriceManagement = () => {
     }
   };
 
+  // Export full price list to CSV
+  const exportPricesToCsv = () => {
+    const activeRepairs = repairTypes.filter(rt => rt.is_active);
+    const header = ['דגם', 'סדרה', 'פעיל', ...activeRepairs.map(rt => rt.name)];
+    const rows = models.map(model => [
+      model.name,
+      model.series || '',
+      model.is_active ? 'כן' : 'לא',
+      ...activeRepairs.map(rt => String(getModelRepairPrice(model.id, rt.id) || 0)),
+    ]);
+    const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
+    const csv = [header, ...rows].map(r => r.map(escape).join(',')).join('\r\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `directfix-pricelist-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('המחירון יוצא לקובץ CSV');
+  };
+
   // Filter models
   const filteredModels = models.filter(model =>
     model.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
 
   const getRepairIcon = getRepairIconComponent;
 
@@ -529,7 +556,7 @@ const PriceManagement = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-4">
         <Button
           variant={activeTab === 'models' ? 'default' : 'outline'}
           onClick={() => setActiveTab('models')}
@@ -546,7 +573,19 @@ const PriceManagement = () => {
           <Battery className="w-4 h-4" />
           סוגי תיקון
         </Button>
+        <Button
+          variant={activeTab === 'promos' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('promos')}
+          className="gap-2"
+        >
+          <Timer className="w-4 h-4" />
+          מבצעים לזמן מוגבל
+        </Button>
       </div>
+
+      {activeTab === 'promos' && (
+        <PricePromotionsTab models={models} repairTypes={repairTypes} />
+      )}
 
       {activeTab === 'models' && (
         <>
@@ -561,11 +600,16 @@ const PriceManagement = () => {
                 className="pr-10"
               />
             </div>
+            <Button onClick={exportPricesToCsv} variant="outline" className="gap-2">
+              <Download className="w-4 h-4" />
+              ייצוא מחירון CSV
+            </Button>
             <Button onClick={() => openModelDialog()} className="gap-2">
               <Plus className="w-4 h-4" />
               הוסף דגם
             </Button>
           </div>
+
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3 mb-4">
