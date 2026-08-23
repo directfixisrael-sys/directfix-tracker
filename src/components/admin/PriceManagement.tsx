@@ -75,7 +75,7 @@ interface RepairType {
   info_description: string;
 }
 
-type TabType = 'models' | 'repairs';
+type TabType = 'models' | 'repairs' | 'promos';
 
 const PriceManagement = () => {
   const [activeTab, setActiveTab] = useState<TabType>('models');
