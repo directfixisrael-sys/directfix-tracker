@@ -232,20 +232,69 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // 2. Send WhatsApp to customer and business owner
+    // WhatsApp Business requires a pre-approved template for business-initiated
+    // conversations (customer hasn't messaged first). We send via Content API when a
+    // template SID is configured; otherwise we fall back to a free-text body, which only
+    // succeeds within a 24h customer-initiated session window or the WhatsApp Sandbox.
+    const twilioCustomerTemplateSid = Deno.env.get("TWILIO_CUSTOMER_TEMPLATE_SID");
+    const twilioBusinessTemplateSid = Deno.env.get("TWILIO_BUSINESS_TEMPLATE_SID");
+
     console.log("Twilio config check:", {
       hasSid: !!twilioAccountSid,
       hasToken: !!twilioAuthToken,
       hasWhatsAppNumber: !!twilioWhatsAppNumber,
-      whatsAppNumber: twilioWhatsAppNumber
+      whatsAppNumber: twilioWhatsAppNumber,
+      hasCustomerTemplate: !!twilioCustomerTemplateSid,
+      hasBusinessTemplate: !!twilioBusinessTemplateSid,
     });
+
+    /**
+     * Send a WhatsApp message via Twilio. If a ContentSid is provided, the message is
+     * sent as an approved template (required for business-initiated conversations);
+     * variables are mapped positionally to the template placeholders {{1}}, {{2}}, ...
+     * Otherwise a free-text body is used (works only within a 24h session window).
+     */
+    async function sendWhatsApp(
+      toE164: string,
+      body: string,
+      contentSid?: string,
+      templateVars?: string[],
+    ) {
+      const params: Record<string, string> = {
+        From: `whatsapp:${fromNumber}`,
+        To: `whatsapp:${toE164}`,
+      };
+      if (contentSid) {
+        params.ContentSid = contentSid;
+        // Twilio expects a JSON array of variable values, mapped to {{1}}, {{2}}...
+        if (templateVars && templateVars.length) {
+          params.ContentVariables = JSON.stringify(templateVars);
+        }
+      } else {
+        params.Body = body;
+      }
+      const response = await fetch(twilioUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${authString}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(params),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        console.error(`WhatsApp send failed [${response.status}]:`, JSON.stringify(result));
+      }
+      return result;
+    }
 
     if (twilioAccountSid && twilioAuthToken && twilioWhatsAppNumber) {
       const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
       const authString = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
 
       // Format the From number - ensure it has + prefix
-      const fromNumber = twilioWhatsAppNumber.startsWith('+') 
-        ? twilioWhatsAppNumber 
+      const fromNumber = twilioWhatsAppNumber.startsWith('+')
+        ? twilioWhatsAppNumber
         : `+${twilioWhatsAppNumber}`;
 
       // 2a. Send WhatsApp to customer
@@ -259,42 +308,48 @@ const handler = async (req: Request): Promise<Response> => {
           formattedPhone = '972' + formattedPhone;
         }
 
+        // Free-text fallback body (no emojis - WhatsApp templates reject them and
+        // the project has a strict no-emoji rule). Used only within a 24h session.
+        const customerWhatsappBody = [
+          "ההזמנה התקבלה",
+          "",
+          `היי ${orderData.customerName},`,
+          "תודה שבחרת בדיירקט פיקס.",
+          "",
+          "פרטי ההזמנה:",
+          `דגם: ${orderData.deviceType}`,
+          `תיקון: ${orderData.repairType}`,
+          `מחיר: ₪${orderData.repairPrice}`,
+          `מועד: ${orderData.scheduledTime}`,
+          orderData.promotionTitle ? `מבצע: ${orderData.promotionTitle}` : "",
+          "",
+          "ניצור איתך קשר לאישור המועד.",
+          "לכל שאלה - אנחנו כאן.",
+        ].filter(Boolean).join("\n");
+
+        // Template variables (positional {{1}}, {{2}}, ...) must match the approved
+        // template submitted in Twilio Content Templates.
+        const customerTemplateVars = [
+          orderData.customerName,
+          orderData.deviceType,
+          orderData.repairType,
+          String(orderData.repairPrice),
+          orderData.scheduledTime,
+          orderData.promotionTitle || "",
+        ];
+
         console.log("Sending WhatsApp to customer:", {
           from: `whatsapp:${fromNumber}`,
-          to: `whatsapp:+${formattedPhone}`
+          to: `whatsapp:+${formattedPhone}`,
+          mode: twilioCustomerTemplateSid ? "template" : "free-text",
         });
 
-        const customerWhatsappMessage = `🎉 *ההזמנה התקבלה!*
-
-היי ${orderData.customerName}! 👋
-
-תודה שבחרת בנו! 💜
-
-*פרטי ההזמנה:*
-📱 ${orderData.deviceType}
-🔧 ${orderData.repairType}
-💰 מחיר: ₪${orderData.repairPrice}
-📅 ${orderData.scheduledTime}
-
-${orderData.promotionTitle ? `🎁 *${orderData.promotionTitle}*\n` : ''}
-ניצור איתך קשר לאישור המועד.
-
-לכל שאלה - אנחנו כאן! 📞`;
-
-        const customerWhatsappResponse = await fetch(twilioUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Basic ${authString}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            From: `whatsapp:${fromNumber}`,
-            To: `whatsapp:+${formattedPhone}`,
-            Body: customerWhatsappMessage,
-          }),
-        });
-
-        const customerWhatsappResult = await customerWhatsappResponse.json();
+        const customerWhatsappResult = await sendWhatsApp(
+          `+${formattedPhone}`,
+          customerWhatsappBody,
+          twilioCustomerTemplateSid,
+          customerTemplateVars,
+        );
         results.whatsapp = customerWhatsappResult;
         console.log("Customer WhatsApp response:", JSON.stringify(customerWhatsappResult));
       } catch (whatsappError: unknown) {
@@ -305,38 +360,48 @@ ${orderData.promotionTitle ? `🎁 *${orderData.promotionTitle}*\n` : ''}
 
       // 2b. Send WhatsApp to business owner
       try {
+        const businessParts = [
+          "הזמנה חדשה",
+          "",
+          `לקוח: ${orderData.customerName}`,
+          `טלפון: ${orderData.customerPhone}`,
+          `כתובת: ${orderData.customerAddress}`,
+          "",
+          `דגם: ${orderData.deviceType}`,
+          `תיקון: ${orderData.repairType}`,
+          `מחיר: ₪${orderData.repairPrice}`,
+          `מועד: ${orderData.scheduledTime}`,
+          orderData.leadSource ? `מקור ליד: ${orderData.leadSource}` : "",
+          orderData.notes ? `הערות: ${orderData.notes}` : "",
+          orderData.promotionTitle ? `מבצע: ${orderData.promotionTitle}` : "",
+        ].filter(Boolean);
+        const businessWhatsappBody = businessParts.join("\n");
+
+        const businessTemplateVars = [
+          orderData.customerName,
+          orderData.customerPhone,
+          orderData.customerAddress,
+          orderData.deviceType,
+          orderData.repairType,
+          String(orderData.repairPrice),
+          orderData.scheduledTime,
+          orderData.leadSource || "",
+          orderData.notes || "",
+          orderData.promotionTitle || "",
+        ];
+
         console.log("Sending WhatsApp to business:", {
           from: `whatsapp:${fromNumber}`,
-          to: `whatsapp:+${businessPhone}`
+          to: `whatsapp:+${businessPhone}`,
+          mode: twilioBusinessTemplateSid ? "template" : "free-text",
         });
 
-        const businessWhatsappMessage = `🔔 *הזמנה חדשה!*
-
-👤 *לקוח:* ${orderData.customerName}
-📞 *טלפון:* ${orderData.customerPhone}
-📍 *כתובת:* ${orderData.customerAddress}
-
-📱 *דגם:* ${orderData.deviceType}
-🔧 *תיקון:* ${orderData.repairType}
-💰 *מחיר:* ₪${orderData.repairPrice}
-📅 *מועד:* ${orderData.scheduledTime}
-
-${orderData.leadSource ? `📊 *מקור ליד:* ${orderData.leadSource}\n` : ''}${orderData.notes ? `📝 *הערות:* ${orderData.notes}\n` : ''}${orderData.promotionTitle ? `🎁 *מבצע:* ${orderData.promotionTitle}` : ''}`;
-
-        const businessWhatsappResponse = await fetch(twilioUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Basic ${authString}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            From: `whatsapp:${fromNumber}`,
-            To: `whatsapp:+${businessPhone}`,
-            Body: businessWhatsappMessage,
-          }),
-        });
-
-        const businessWhatsappResult = await businessWhatsappResponse.json();
+        const businessWhatsappResult = await sendWhatsApp(
+          `+${businessPhone}`,
+          businessWhatsappBody,
+          twilioBusinessTemplateSid,
+          businessTemplateVars,
+        );
         results.businessWhatsapp = businessWhatsappResult;
         console.log("Business WhatsApp response:", JSON.stringify(businessWhatsappResult));
       } catch (businessWhatsappError: unknown) {
