@@ -29,11 +29,15 @@ import {
   Search,
   Loader2,
   GripVertical,
-  Save
+  Save,
+  Download,
+  Timer
 } from 'lucide-react';
 import { REPAIR_ICON_OPTIONS, getRepairIconComponent } from '@/lib/repairIcons';
 import IconPickerField from '@/components/IconPickerField';
+import PricePromotionsTab from '@/components/admin/PricePromotionsTab';
 import { toast } from 'sonner';
+
 
 interface IphoneModel {
   id: string;
