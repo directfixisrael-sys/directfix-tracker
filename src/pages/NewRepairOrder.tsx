@@ -35,6 +35,8 @@ import { seo } from "@/lib/seoData";
 import PointsEarnedAnimation from '@/components/PointsEarnedAnimation';
 import speakerTopImg from '@/assets/speaker-top.png';
 import speakerBottomImg from '@/assets/speaker-bottom.png';
+import { PricePromotion, findPromo, applyPromo, promoDaysLeft } from '@/lib/pricePromotions';
+
 
 const SPEAKER_TOP_PRICE = 370;
 const SPEAKER_BOTTOM_PRICE = 350;
