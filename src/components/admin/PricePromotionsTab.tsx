@@ -126,6 +126,11 @@ const PricePromotionsTab = ({ models, repairTypes }: Props) => {
       toast.error('יש להזין מחיר מבצע או אחוז הנחה');
       return;
     }
+    if (basePrice != null && previewPrice != null && previewPrice >= basePrice) {
+      toast.error(`מחיר המבצע חייב להיות נמוך מהמחיר הרגיל (₪${basePrice}) — אחרת הלקוח לא יראה מבצע`);
+      return;
+    }
+
     const { error } = editingId
       ? await supabase.from('price_promotions').update(payload).eq('id', editingId)
       : await supabase.from('price_promotions').insert(payload);
