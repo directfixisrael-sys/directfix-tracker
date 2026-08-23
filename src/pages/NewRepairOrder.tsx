@@ -514,8 +514,10 @@ const NewRepairOrder = () => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [modelsRes, repairsRes, blockedRes, bundlesRes, pricesRes] = await Promise.all([supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), supabase.from('blocked_dates').select('date, start_time, end_time'), supabase.from('repair_bundles').select('*').eq('is_active', true), supabase.from('model_repair_prices').select('*')]);
+        const [modelsRes, repairsRes, blockedRes, bundlesRes, pricesRes, pricePromosRes] = await Promise.all([supabase.from('iphone_models').select('*').eq('is_active', true).order('sort_order'), supabase.from('repair_types').select('*').eq('is_active', true).order('sort_order'), supabase.from('blocked_dates').select('date, start_time, end_time'), supabase.from('repair_bundles').select('*').eq('is_active', true), supabase.from('model_repair_prices').select('*'), supabase.from('price_promotions').select('*').eq('is_active', true)]);
+        if (pricePromosRes.data) setPricePromotions(pricePromosRes.data as PricePromotion[]);
         if (modelsRes.data) setModels(modelsRes.data);
+
         if (repairsRes.data) setRepairTypes(repairsRes.data);
         if (pricesRes.data) {
           const map: PriceMap = {};
