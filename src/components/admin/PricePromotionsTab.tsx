@@ -38,21 +38,44 @@ const PricePromotionsTab = ({ models, repairTypes }: Props) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [priceMap, setPriceMap] = useState<Record<string, Record<string, number>>>({});
 
   const load = async () => {
     setIsLoading(true);
-    const { data, error } = await supabase
-      .from('price_promotions')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const [{ data, error }, pricesRes] = await Promise.all([
+      supabase.from('price_promotions').select('*').order('created_at', { ascending: false }),
+      supabase.from('model_repair_prices').select('model_id, repair_type_id, price'),
+    ]);
     if (error) toast.error('שגיאה בטעינת המבצעים');
     setPromos((data as PricePromotion[]) || []);
+    const map: Record<string, Record<string, number>> = {};
+    (pricesRes.data || []).forEach((row: any) => {
+      map[row.model_id] = map[row.model_id] || {};
+      map[row.model_id][row.repair_type_id] = Number(row.price);
+    });
+    setPriceMap(map);
     setIsLoading(false);
   };
+
+  /** Regular price for the currently selected repair + model (null when "all models") */
+  const basePrice =
+    form.repair_type_id && form.model_id !== 'all'
+      ? priceMap[form.model_id]?.[form.repair_type_id] ?? null
+      : null;
+
+  const previewPrice = (() => {
+    if (basePrice == null) return null;
+    if (form.mode === 'percent' && Number(form.discount_percent) > 0) {
+      return Math.max(0, Math.round(basePrice * (1 - Number(form.discount_percent) / 100)));
+    }
+    if (form.mode === 'price' && Number(form.promo_price) > 0) return Math.round(Number(form.promo_price));
+    return null;
+  })();
 
   useEffect(() => {
     load();
   }, []);
+
 
   const openDialog = (promo?: PricePromotion) => {
     if (promo) {
@@ -103,6 +126,11 @@ const PricePromotionsTab = ({ models, repairTypes }: Props) => {
       toast.error('יש להזין מחיר מבצע או אחוז הנחה');
       return;
     }
+    if (basePrice != null && previewPrice != null && previewPrice >= basePrice) {
+      toast.error(`מחיר המבצע חייב להיות נמוך מהמחיר הרגיל (₪${basePrice}) — אחרת הלקוח לא יראה מבצע`);
+      return;
+    }
+
     const { error } = editingId
       ? await supabase.from('price_promotions').update(payload).eq('id', editingId)
       : await supabase.from('price_promotions').insert(payload);
@@ -280,6 +308,26 @@ const PricePromotionsTab = ({ models, repairTypes }: Props) => {
                 />
               </div>
             )}
+
+            {basePrice != null && (
+              <div className={`rounded-xl border p-3 text-sm ${previewPrice != null && previewPrice >= basePrice ? 'border-destructive/40 bg-destructive/5 text-destructive' : 'border-border bg-muted/40'}`}>
+                <div>מחיר רגיל היום: <span className="font-bold">₪{basePrice}</span></div>
+                {previewPrice != null && (
+                  <div className="mt-1">
+                    הלקוח יראה: <span className="line-through opacity-70">₪{basePrice}</span>{' '}
+                    <span className="font-bold">₪{previewPrice}</span>
+                    {previewPrice < basePrice
+                      ? <span className="font-bold"> · חיסכון ₪{basePrice - previewPrice}</span>
+                      : <span className="font-bold"> · אין חיסכון, המבצע לא יוצג ללקוח</span>}
+                  </div>
+                )}
+              </div>
+            )}
+            {form.repair_type_id && form.model_id === 'all' && (
+              <p className="text-xs text-muted-foreground">בחירת דגם ספציפי תציג כאן תצוגה מקדימה של המחיר שהלקוח יראה.</p>
+            )}
+
+
 
             <div className="grid grid-cols-2 gap-3">
               <div>
