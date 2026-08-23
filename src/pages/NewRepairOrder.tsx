@@ -681,7 +681,13 @@ const NewRepairOrder = () => {
     return true;
   };
   const filteredModels = models.filter(model => model.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  const getRepairPrice = (repair: RepairType, model?: IphoneModel | null) => {
+  // Limited-time promotion for a repair type + model (null when none active)
+  const getPromoFor = (repair: RepairType, model?: IphoneModel | null) => {
+    const m = model || selectedModel;
+    return findPromo(pricePromotions, repair?.id, m?.id);
+  };
+  /** Price before any limited-time promotion */
+  const getBaseRepairPrice = (repair: RepairType, model?: IphoneModel | null) => {
     const m = model || selectedModel;
     if (!m) return 0;
     // Battery override: when user picked "new" battery option in picker
@@ -702,6 +708,11 @@ const NewRepairOrder = () => {
     }
     return priceMap[m.id]?.[repair.id] || 0;
   };
+  const getRepairPrice = (repair: RepairType, model?: IphoneModel | null) => {
+    const base = getBaseRepairPrice(repair, model);
+    return applyPromo(base, getPromoFor(repair, model));
+  };
+
   const getPrice = () => {
     if (!selectedModel || !selectedRepair) return 0;
     return getRepairPrice(selectedRepair);
