@@ -1877,12 +1877,58 @@ const NewRepairOrder = () => {
                                 : 'סוללה מקורית של אפל · אחריות שנה'}
                             </div>
                           )}
-                          {!isPhoneOnly && selectedModel && price > 0 && (
-                            <div className="flex items-center gap-2 mt-2">
-                              {isSpeaker && <span className="text-sm text-muted-foreground">החל מ־</span>}
-                              <span className="text-2xl font-bold text-primary">₪{price}</span>
-                            </div>
-                          )}
+                          {!isPhoneOnly && selectedModel && price > 0 && (() => {
+                            const promo = getPromoFor(repair);
+                            const basePrice = getBaseRepairPrice(repair);
+                            const hasPromo = !!promo && basePrice > price;
+                            const daysLeft = promo ? promoDaysLeft(promo) : null;
+                            return (
+                              <div className="mt-2 space-y-1.5">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  {isSpeaker && <span className="text-sm text-muted-foreground">החל מ־</span>}
+                                  {hasPromo && (
+                                    <span className="text-base text-muted-foreground line-through">₪{basePrice}</span>
+                                  )}
+                                  <span className="text-2xl font-bold text-primary">₪{price}</span>
+                                </div>
+                                {hasPromo && (
+                                  <div className="inline-flex items-center gap-1.5 text-xs font-bold rounded-full px-2.5 py-1 bg-accent/10 text-accent border border-accent/30">
+                                    <BadgePercent className="w-3.5 h-3.5" />
+                                    <span>{promo!.badge_text}</span>
+                                    {daysLeft != null && daysLeft > 0 && (
+                                      <span className="font-medium opacity-80">· נותרו {daysLeft} ימים</span>
+                                    )}
+                                    <Dialog>
+                                      <DialogTrigger asChild>
+                                        <button
+                                          type="button"
+                                          aria-label="מידע על המבצע"
+                                          onClick={e => e.stopPropagation()}
+                                          className="hover:opacity-70 transition-opacity"
+                                        >
+                                          <HelpCircle className="w-3.5 h-3.5" />
+                                        </button>
+                                      </DialogTrigger>
+                                      <DialogContent className="max-w-sm" onClick={e => e.stopPropagation()}>
+                                        <DialogHeader>
+                                          <DialogTitle className="text-right">{promo!.badge_text}</DialogTitle>
+                                        </DialogHeader>
+                                        <p className="text-base text-muted-foreground text-right leading-relaxed">
+                                          {promo!.info_text}
+                                        </p>
+                                        {promo!.ends_at && (
+                                          <p className="text-sm text-right text-foreground font-semibold">
+                                            המבצע בתוקף עד {new Date(promo!.ends_at).toLocaleDateString('he-IL')}
+                                          </p>
+                                        )}
+                                      </DialogContent>
+                                    </Dialog>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
+
                         </div>
                         
                         {!isPhoneOnly && <ArrowRight className="w-5 h-5 text-muted-foreground rotate-180" />}
