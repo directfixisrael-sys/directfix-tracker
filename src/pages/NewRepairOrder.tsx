@@ -1882,51 +1882,71 @@ const NewRepairOrder = () => {
                             const basePrice = getBaseRepairPrice(repair);
                             const hasPromo = !!promo && basePrice > price;
                             const daysLeft = promo ? promoDaysLeft(promo) : null;
+                            const saving = hasPromo ? basePrice - price : 0;
                             return (
-                              <div className="mt-2 space-y-1.5">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  {isSpeaker && <span className="text-sm text-muted-foreground">החל מ־</span>}
-                                  {hasPromo && (
-                                    <span className="text-base text-muted-foreground line-through">₪{basePrice}</span>
-                                  )}
-                                  <span className="text-2xl font-bold text-primary">₪{price}</span>
-                                </div>
-                                {hasPromo && (
-                                  <div className="inline-flex items-center gap-1.5 text-xs font-bold rounded-full px-2.5 py-1 bg-accent/10 text-accent border border-accent/30">
-                                    <BadgePercent className="w-3.5 h-3.5" />
-                                    <span>{promo!.badge_text}</span>
-                                    {daysLeft != null && daysLeft > 0 && (
-                                      <span className="font-medium opacity-80">· נותרו {daysLeft} ימים</span>
-                                    )}
-                                    <Dialog>
-                                      <DialogTrigger asChild>
-                                        <button
-                                          type="button"
-                                          aria-label="מידע על המבצע"
-                                          onClick={e => e.stopPropagation()}
-                                          className="hover:opacity-70 transition-opacity"
-                                        >
-                                          <HelpCircle className="w-3.5 h-3.5" />
-                                        </button>
-                                      </DialogTrigger>
-                                      <DialogContent className="max-w-sm" onClick={e => e.stopPropagation()}>
-                                        <DialogHeader>
-                                          <DialogTitle className="text-right">{promo!.badge_text}</DialogTitle>
-                                        </DialogHeader>
-                                        <p className="text-base text-muted-foreground text-right leading-relaxed">
-                                          {promo!.info_text}
-                                        </p>
-                                        {promo!.ends_at && (
-                                          <p className="text-sm text-right text-foreground font-semibold">
-                                            המבצע בתוקף עד {new Date(promo!.ends_at).toLocaleDateString('he-IL')}
-                                          </p>
+                              <div className="mt-2 space-y-2">
+                                {hasPromo ? (
+                                  <div className="relative overflow-hidden rounded-2xl border-2 border-accent/40 bg-gradient-to-l from-accent/15 via-accent/5 to-transparent p-3">
+                                    <div className="absolute -top-8 -left-8 w-24 h-24 rounded-full bg-accent/20 blur-2xl" />
+                                    <div className="relative flex items-center justify-between gap-3 flex-wrap">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="inline-flex items-center gap-1.5 text-xs font-extrabold rounded-full px-2.5 py-1 bg-accent text-accent-foreground shadow-lg animate-pulse">
+                                          <BadgePercent className="w-3.5 h-3.5" />
+                                          {promo!.badge_text}
+                                        </span>
+                                        {daysLeft != null && daysLeft > 0 && (
+                                          <span className="inline-flex items-center gap-1 text-xs font-bold rounded-full px-2.5 py-1 bg-destructive/10 text-destructive border border-destructive/30">
+                                            <Clock className="w-3.5 h-3.5" />
+                                            נותרו {daysLeft} ימים
+                                          </span>
                                         )}
-                                      </DialogContent>
-                                    </Dialog>
+                                        <Dialog>
+                                          <DialogTrigger asChild>
+                                            <button
+                                              type="button"
+                                              aria-label="מידע על המבצע"
+                                              onClick={e => e.stopPropagation()}
+                                              className="text-muted-foreground hover:text-foreground transition-colors"
+                                            >
+                                              <HelpCircle className="w-4 h-4" />
+                                            </button>
+                                          </DialogTrigger>
+                                          <DialogContent className="max-w-sm" onClick={e => e.stopPropagation()}>
+                                            <DialogHeader>
+                                              <DialogTitle className="text-right">{promo!.badge_text}</DialogTitle>
+                                            </DialogHeader>
+                                            <p className="text-base text-muted-foreground text-right leading-relaxed">
+                                              {promo!.info_text}
+                                            </p>
+                                            {promo!.ends_at && (
+                                              <p className="text-sm text-right text-foreground font-semibold">
+                                                המבצע בתוקף עד {new Date(promo!.ends_at).toLocaleDateString('he-IL')}
+                                              </p>
+                                            )}
+                                          </DialogContent>
+                                        </Dialog>
+                                      </div>
+                                      <div className="flex items-baseline gap-2">
+                                        {isSpeaker && <span className="text-sm text-muted-foreground">החל מ־</span>}
+                                        <span className="text-base text-muted-foreground line-through decoration-destructive/60">₪{basePrice}</span>
+                                        <span className="text-3xl font-extrabold text-accent">₪{price}</span>
+                                      </div>
+                                    </div>
+                                    {saving > 0 && (
+                                      <div className="relative mt-2 text-sm font-bold text-accent">
+                                        חוסכים ₪{saving} · המחיר יחזור לקדמותו בתום המבצע
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    {isSpeaker && <span className="text-sm text-muted-foreground">החל מ־</span>}
+                                    <span className="text-2xl font-bold text-primary">₪{price}</span>
                                   </div>
                                 )}
                               </div>
                             );
+
                           })()}
 
                         </div>
