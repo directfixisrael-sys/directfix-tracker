@@ -249,11 +249,13 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     // Compute Twilio request params once (used by sendWhatsApp below).
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
-    const authString = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
-    const fromNumber = twilioWhatsAppNumber.startsWith('+')
-      ? twilioWhatsAppNumber
-      : `+${twilioWhatsAppNumber}`;
+    const fromNumber = (twilioWhatsAppNumber || "").startsWith('+')
+      ? (twilioWhatsAppNumber || "")
+      : `+${twilioWhatsAppNumber || ""}`;
+    const twilioUrl = twilioAccountSid
+      ? `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`
+      : "";
+    const authString = btoa(`${twilioAccountSid || ""}:${twilioAuthToken || ""}`);
 
     /**
      * Send a WhatsApp message via Twilio. If a ContentSid is provided, the message is
