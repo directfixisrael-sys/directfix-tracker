@@ -556,7 +556,7 @@ const PriceManagement = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-4">
         <Button
           variant={activeTab === 'models' ? 'default' : 'outline'}
           onClick={() => setActiveTab('models')}
@@ -573,7 +573,19 @@ const PriceManagement = () => {
           <Battery className="w-4 h-4" />
           סוגי תיקון
         </Button>
+        <Button
+          variant={activeTab === 'promos' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('promos')}
+          className="gap-2"
+        >
+          <Timer className="w-4 h-4" />
+          מבצעים לזמן מוגבל
+        </Button>
       </div>
+
+      {activeTab === 'promos' && (
+        <PricePromotionsTab models={models} repairTypes={repairTypes} />
+      )}
 
       {activeTab === 'models' && (
         <>
@@ -588,11 +600,16 @@ const PriceManagement = () => {
                 className="pr-10"
               />
             </div>
+            <Button onClick={exportPricesToCsv} variant="outline" className="gap-2">
+              <Download className="w-4 h-4" />
+              ייצוא מחירון CSV
+            </Button>
             <Button onClick={() => openModelDialog()} className="gap-2">
               <Plus className="w-4 h-4" />
               הוסף דגם
             </Button>
           </div>
+
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3 mb-4">
