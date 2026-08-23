@@ -309,6 +309,8 @@ const NewRepairOrder = () => {
   const [activePromotion, setActivePromotion] = useState<Promotion | null>(null);
   const [repairBundles, setRepairBundles] = useState<RepairBundle[]>([]);
   const [priceMap, setPriceMap] = useState<PriceMap>({});
+  const [pricePromotions, setPricePromotions] = useState<PricePromotion[]>([]);
+
   const [selectedBundleAddon, setSelectedBundleAddon] = useState<boolean>(false);
   const [currentBundle, setCurrentBundle] = useState<RepairBundle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
