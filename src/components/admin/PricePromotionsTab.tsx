@@ -38,21 +38,44 @@ const PricePromotionsTab = ({ models, repairTypes }: Props) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [priceMap, setPriceMap] = useState<Record<string, Record<string, number>>>({});
 
   const load = async () => {
     setIsLoading(true);
-    const { data, error } = await supabase
-      .from('price_promotions')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const [{ data, error }, pricesRes] = await Promise.all([
+      supabase.from('price_promotions').select('*').order('created_at', { ascending: false }),
+      supabase.from('model_repair_prices').select('model_id, repair_type_id, price'),
+    ]);
     if (error) toast.error('שגיאה בטעינת המבצעים');
     setPromos((data as PricePromotion[]) || []);
+    const map: Record<string, Record<string, number>> = {};
+    (pricesRes.data || []).forEach((row: any) => {
+      map[row.model_id] = map[row.model_id] || {};
+      map[row.model_id][row.repair_type_id] = Number(row.price);
+    });
+    setPriceMap(map);
     setIsLoading(false);
   };
+
+  /** Regular price for the currently selected repair + model (null when "all models") */
+  const basePrice =
+    form.repair_type_id && form.model_id !== 'all'
+      ? priceMap[form.model_id]?.[form.repair_type_id] ?? null
+      : null;
+
+  const previewPrice = (() => {
+    if (basePrice == null) return null;
+    if (form.mode === 'percent' && Number(form.discount_percent) > 0) {
+      return Math.max(0, Math.round(basePrice * (1 - Number(form.discount_percent) / 100)));
+    }
+    if (form.mode === 'price' && Number(form.promo_price) > 0) return Math.round(Number(form.promo_price));
+    return null;
+  })();
 
   useEffect(() => {
     load();
   }, []);
+
 
   const openDialog = (promo?: PricePromotion) => {
     if (promo) {
