@@ -480,6 +480,8 @@ const NewRepairOrder = () => {
       contentRef.current.scrollTop = 0;
     }
     window.dispatchEvent(new CustomEvent('repair-step-change', { detail: { step: 'model' } }));
+    // Meta: entering the repair-order funnel
+    trackMetaEvent('ViewContent', { contentName: 'repair_order', contentCategory: 'repair' });
   }, []);
 
   // Check privacy consent on mount
