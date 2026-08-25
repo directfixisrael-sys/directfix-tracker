@@ -20,6 +20,7 @@ import VideoPlayer from '@/components/VideoPlayer';
 import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
 import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
+import { trackMetaEvent } from '@/lib/metaTracking';
 import { gaSelectModel, gaSelectRepair, gaBundleDecision, gaConfirmPrice, gaSelectSchedule, gaFillDetails, gaConversion, gaCouponApplied, gaStartOrder } from '@/lib/gtag';
 import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
 import SmartRepairInput from '@/components/SmartRepairInput';
