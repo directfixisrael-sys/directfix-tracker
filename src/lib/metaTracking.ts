@@ -3,6 +3,9 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
+// Pixel ID is public (safe in client code). Access token stays server side.
+export const META_PIXEL_ID = '700713421501028';
+
 const ATTR_KEY = 'df_meta_attribution';
 const FIRED_KEY = 'df_meta_fired_events';
 
@@ -164,17 +167,8 @@ export const initMetaPixel = (): Promise<string | null> => {
 
   pixelReady = (async () => {
     try {
-      const cached = sessionStorage.getItem('df_meta_pixel_id');
-      if (cached) {
-        loadPixel(cached);
-        return cached;
-      }
-      const { data } = await supabase.functions.invoke('meta-capi', { body: { action: 'config' } });
-      const pixelId = data?.pixelId as string | undefined;
-      if (!pixelId) return null;
-      sessionStorage.setItem('df_meta_pixel_id', pixelId);
-      loadPixel(pixelId);
-      return pixelId;
+      loadPixel(META_PIXEL_ID);
+      return META_PIXEL_ID;
     } catch (e) {
       console.warn('Meta pixel init failed', e);
       return null;
