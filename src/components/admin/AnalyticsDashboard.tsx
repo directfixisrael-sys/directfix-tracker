@@ -18,6 +18,7 @@ import {
 import { RepairOrder } from '@/types/repair';
 import { cn } from '@/lib/utils';
 import DateRangePicker, { DateRange } from './DateRangePicker';
+import MarketingFunnel from './MarketingFunnel';
 import { subDays, startOfDay, endOfDay, isWithinInterval, format, eachDayOfInterval, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend, AreaChart, Area } from 'recharts';
@@ -359,6 +360,9 @@ const AnalyticsDashboard = ({ orders }: AnalyticsDashboardProps) => {
 
       {/* Real-time Visitors Section */}
       <LiveVisitorsCard activeViewers={activeViewers} />
+
+      {/* Meta marketing funnel */}
+      <MarketingFunnel from={dateRange.from} to={dateRange.to} label={dateRange.label} />
 
       {/* Lead Source Stats */}
       {filteredOrders.some(o => o.leadSource) && (

@@ -1119,6 +1119,16 @@ const NewRepairOrder = () => {
   const handleGiftPaymentSuccess = async () => {
     if (giftOrderResult?.id) {
       await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', giftOrderResult.id);
+      // Meta: Purchase — only after the payment was approved
+      trackPurchase(getFinalPrice());
+      trackMetaEvent('Purchase', {
+        value: getFinalPrice(),
+        contentName: `${selectedModel?.name || ''} - ${getRepairTypeName()}`.trim(),
+        orderId: giftOrderResult.id,
+        email: customerEmail.trim() || null,
+        phone: customerPhone.trim() || null,
+        firstName: customerName.trim() || null,
+      });
     }
     const scheduleNote = formatSelectedDateTime();
     const allRepairNames = getAllRepairNames();
@@ -1265,13 +1275,11 @@ const NewRepairOrder = () => {
           setCompletedOrderNumber(orderResult?.order_number || null);
           goToStep('success');
         }
-        // Track
-        trackPurchase(getFinalPrice());
+        // Track (Purchase is reported only after payment approval)
         gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
       } else {
         // Regular flow: send notifications immediately
         await sendOrderNotifications(orderResult, repairDescription, scheduleNote);
-        trackPurchase(getFinalPrice());
         gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
         setCompletedOrderNumber(orderResult?.order_number || null);
         
