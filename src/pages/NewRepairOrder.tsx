@@ -1210,6 +1210,24 @@ const NewRepairOrder = () => {
         deviceImages: deviceImages.length > 0 ? deviceImages : [],
       } as any);
 
+      // Order must be saved in the database before any conversion is reported
+      if (!orderResult?.id) {
+        toast.error('שגיאה בשמירת ההזמנה, נסו שוב או התקשרו אלינו');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Meta: Lead — only after the order was successfully saved
+      trackMetaEvent('Lead', {
+        value: getFinalPrice(),
+        contentName: `${selectedModel?.name || ''} - ${getRepairTypeName()}`.trim(),
+        orderId: orderResult.id,
+        email: customerEmail.trim() || null,
+        phone: customerPhone.trim() || null,
+        firstName: customerName.trim() || null,
+      });
+
+
       // For gift orders: create PayPlus payment link and go to payment step
       // For gift orders: create PayPlus payment link and go to payment step
       if (isGiftOrder) {
