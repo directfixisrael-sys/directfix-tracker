@@ -2,11 +2,12 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import "./i18n";
-import { initFacebookPixel } from "./lib/fbPixel";
 import { initGA } from "./lib/gtag";
+import { captureAttribution, initMetaPixel } from "./lib/metaTracking";
 
-// Initialize Facebook Pixel & Google Analytics
-initFacebookPixel();
+// Capture marketing attribution, then initialize Meta Pixel & Google Analytics
+captureAttribution();
+initMetaPixel();
 initGA();
 
 createRoot(document.getElementById("root")!).render(<App />);
