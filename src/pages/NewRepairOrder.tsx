@@ -789,6 +789,12 @@ const NewRepairOrder = () => {
     setBatteryPriceOverride(null);
     gaSelectModel(model.name);
     updateLeadStep('בחירת תיקון', { device_type: model.name });
+    // Meta: first meaningful selection completed -> order started (once per session)
+    trackMetaEvent('InitiateCheckout', {
+      contentName: model.name,
+      contentCategory: 'repair_order',
+      onceKey: 'initiate_checkout',
+    });
     goToStep('repair');
   };
 
