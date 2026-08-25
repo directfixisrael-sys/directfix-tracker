@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { gaPageView } from '@/lib/gtag';
 import { getLeadSource } from '@/lib/leadSource';
+import { trackMetaEvent } from '@/lib/metaTracking';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 const getDeviceType = (ua: string): string => {
@@ -184,6 +185,8 @@ export const VisitorTracker = () => {
     updatePresence();
     persistVisit(getVisitorId(), location.pathname, null);
     gaPageView(location.pathname);
+    // Meta: PageView (browser pixel + Conversions API, shared event_id)
+    trackMetaEvent('PageView');
   }, [location.pathname]);
 
   return null;

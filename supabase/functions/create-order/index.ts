@@ -39,6 +39,16 @@ const bodySchema = z.object({
   isClubMember: z.boolean().optional().default(false),
   warrantyMonths: z.coerce.number().int().min(0).max(120).optional().nullable(),
   paymentStatus: z.string().trim().max(50).optional().nullable(),
+  utmSource: nullableText(200),
+  utmMedium: nullableText(200),
+  utmCampaign: nullableText(200),
+  utmContent: nullableText(200),
+  utmTerm: nullableText(200),
+  placement: nullableText(200),
+  fbclid: nullableText(400),
+  fbp: nullableText(200),
+  fbc: nullableText(400),
+  firstLandingUrl: nullableText(1000),
 });
 
 serve(async (req) => {
@@ -85,6 +95,16 @@ serve(async (req) => {
       lead_source: order.leadSource || null,
       device_images: order.deviceImages,
       is_club_member: order.isClubMember,
+      utm_source: order.utmSource || null,
+      utm_medium: order.utmMedium || null,
+      utm_campaign: order.utmCampaign || null,
+      utm_content: order.utmContent || null,
+      utm_term: order.utmTerm || null,
+      placement: order.placement || null,
+      fbclid: order.fbclid || null,
+      fbp: order.fbp || null,
+      fbc: order.fbc || null,
+      first_landing_url: order.firstLandingUrl || null,
     };
 
     if (order.warrantyMonths != null) insertData.warranty_months = order.warrantyMonths;

@@ -20,6 +20,7 @@ import VideoPlayer from '@/components/VideoPlayer';
 import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
 import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
+import { trackMetaEvent } from '@/lib/metaTracking';
 import { gaSelectModel, gaSelectRepair, gaBundleDecision, gaConfirmPrice, gaSelectSchedule, gaFillDetails, gaConversion, gaCouponApplied, gaStartOrder } from '@/lib/gtag';
 import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
 import SmartRepairInput from '@/components/SmartRepairInput';
@@ -479,6 +480,8 @@ const NewRepairOrder = () => {
       contentRef.current.scrollTop = 0;
     }
     window.dispatchEvent(new CustomEvent('repair-step-change', { detail: { step: 'model' } }));
+    // Meta: entering the repair-order funnel
+    trackMetaEvent('ViewContent', { contentName: 'repair_order', contentCategory: 'repair' });
   }, []);
 
   // Check privacy consent on mount
@@ -786,6 +789,12 @@ const NewRepairOrder = () => {
     setBatteryPriceOverride(null);
     gaSelectModel(model.name);
     updateLeadStep('בחירת תיקון', { device_type: model.name });
+    // Meta: first meaningful selection completed -> order started (once per session)
+    trackMetaEvent('InitiateCheckout', {
+      contentName: model.name,
+      contentCategory: 'repair_order',
+      onceKey: 'initiate_checkout',
+    });
     goToStep('repair');
   };
 
@@ -1200,6 +1209,24 @@ const NewRepairOrder = () => {
         customerEmail: customerEmail.trim() || undefined,
         deviceImages: deviceImages.length > 0 ? deviceImages : [],
       } as any);
+
+      // Order must be saved in the database before any conversion is reported
+      if (!orderResult?.id) {
+        toast.error('שגיאה בשמירת ההזמנה, נסו שוב או התקשרו אלינו');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Meta: Lead — only after the order was successfully saved
+      trackMetaEvent('Lead', {
+        value: getFinalPrice(),
+        contentName: `${selectedModel?.name || ''} - ${getRepairTypeName()}`.trim(),
+        orderId: orderResult.id,
+        email: customerEmail.trim() || null,
+        phone: customerPhone.trim() || null,
+        firstName: customerName.trim() || null,
+      });
+
 
       // For gift orders: create PayPlus payment link and go to payment step
       // For gift orders: create PayPlus payment link and go to payment step
