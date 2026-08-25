@@ -19,7 +19,7 @@ import Logo from '@/components/Logo';
 import VideoPlayer from '@/components/VideoPlayer';
 import midragLogo from '@/assets/midrag-logo.png';
 import easyLogo from '@/assets/easy-logo.png';
-import { trackPurchase, trackAddToCart } from '@/lib/fbPixel';
+import { trackAddToCart } from '@/lib/fbPixel';
 import { trackMetaEvent } from '@/lib/metaTracking';
 import { gaSelectModel, gaSelectRepair, gaBundleDecision, gaConfirmPrice, gaSelectSchedule, gaFillDetails, gaConversion, gaCouponApplied, gaStartOrder } from '@/lib/gtag';
 import OrderPrivacyConsent from '@/components/OrderPrivacyConsent';
@@ -1120,7 +1120,6 @@ const NewRepairOrder = () => {
     if (giftOrderResult?.id) {
       await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', giftOrderResult.id);
       // Meta: Purchase — only after the payment was approved
-      trackPurchase(getFinalPrice());
       trackMetaEvent('Purchase', {
         value: getFinalPrice(),
         contentName: `${selectedModel?.name || ''} - ${getRepairTypeName()}`.trim(),
