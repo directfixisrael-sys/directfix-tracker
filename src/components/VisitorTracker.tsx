@@ -185,6 +185,8 @@ export const VisitorTracker = () => {
     updatePresence();
     persistVisit(getVisitorId(), location.pathname, null);
     gaPageView(location.pathname);
+    // Meta: PageView (browser pixel + Conversions API, shared event_id)
+    trackMetaEvent('PageView');
   }, [location.pathname]);
 
   return null;
