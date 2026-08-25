@@ -424,6 +424,75 @@ export type Database = {
           },
         ]
       }
+      marketing_events: {
+        Row: {
+          created_at: string
+          currency: string
+          event_id: string
+          event_name: string
+          fbc: string | null
+          fbclid: string | null
+          fbp: string | null
+          first_landing_url: string | null
+          id: string
+          order_id: string | null
+          page: string | null
+          placement: string | null
+          referrer: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          value: number | null
+          visitor_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          event_id: string
+          event_name: string
+          fbc?: string | null
+          fbclid?: string | null
+          fbp?: string | null
+          first_landing_url?: string | null
+          id?: string
+          order_id?: string | null
+          page?: string | null
+          placement?: string | null
+          referrer?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          value?: number | null
+          visitor_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          event_id?: string
+          event_name?: string
+          fbc?: string | null
+          fbclid?: string | null
+          fbp?: string | null
+          first_landing_url?: string | null
+          id?: string
+          order_id?: string | null
+          page?: string | null
+          placement?: string | null
+          referrer?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          value?: number | null
+          visitor_id?: string | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           id: string
@@ -520,7 +589,11 @@ export type Database = {
           device_images: string[] | null
           device_type: string
           estimated_arrival: string | null
+          fbc: string | null
+          fbclid: string | null
+          fbp: string | null
           feedback: string | null
+          first_landing_url: string | null
           id: string
           invoice_link: string | null
           is_club_member: boolean
@@ -532,11 +605,17 @@ export type Database = {
           order_number: number
           payment_link: string | null
           payment_status: string | null
+          placement: string | null
           rating: number | null
           repair_price: number
           status: string
           technician_name: string | null
           updated_at: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
           wants_promotions: boolean
           warranty_expiry: string | null
           warranty_months: number | null
@@ -557,7 +636,11 @@ export type Database = {
           device_images?: string[] | null
           device_type?: string
           estimated_arrival?: string | null
+          fbc?: string | null
+          fbclid?: string | null
+          fbp?: string | null
           feedback?: string | null
+          first_landing_url?: string | null
           id?: string
           invoice_link?: string | null
           is_club_member?: boolean
@@ -569,11 +652,17 @@ export type Database = {
           order_number?: number
           payment_link?: string | null
           payment_status?: string | null
+          placement?: string | null
           rating?: number | null
           repair_price?: number
           status?: string
           technician_name?: string | null
           updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
           wants_promotions?: boolean
           warranty_expiry?: string | null
           warranty_months?: number | null
@@ -594,7 +683,11 @@ export type Database = {
           device_images?: string[] | null
           device_type?: string
           estimated_arrival?: string | null
+          fbc?: string | null
+          fbclid?: string | null
+          fbp?: string | null
           feedback?: string | null
+          first_landing_url?: string | null
           id?: string
           invoice_link?: string | null
           is_club_member?: boolean
@@ -606,11 +699,17 @@ export type Database = {
           order_number?: number
           payment_link?: string | null
           payment_status?: string | null
+          placement?: string | null
           rating?: number | null
           repair_price?: number
           status?: string
           technician_name?: string | null
           updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
           wants_promotions?: boolean
           warranty_expiry?: string | null
           warranty_months?: number | null
