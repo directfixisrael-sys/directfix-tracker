@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import { RepairOrder, ChatMessage, RepairStatus, Accessory, PaymentStatus } from '@/types/repair';
+import { getOrderAttribution } from '@/lib/metaTracking';
 
 interface RepairStore {
   orders: RepairOrder[];
