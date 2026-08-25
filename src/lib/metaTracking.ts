@@ -4,7 +4,7 @@
 import { supabase } from '@/integrations/supabase/client';
 
 // Pixel ID is public (safe in client code). Access token stays server side.
-export const META_PIXEL_ID = '700713421501028';
+export const META_PIXEL_ID = '1404099044750782';
 
 const ATTR_KEY = 'df_meta_attribution';
 const FIRED_KEY = 'df_meta_fired_events';

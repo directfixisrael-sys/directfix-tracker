@@ -71,7 +71,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
-  const PIXEL_ID = Deno.env.get("META_PIXEL_ID") || "700713421501028";
+  const PIXEL_ID = Deno.env.get("META_PIXEL_ID") || "1404099044750782";
   const ACCESS_TOKEN = Deno.env.get("META_CAPI_ACCESS_TOKEN");
 
   try {
