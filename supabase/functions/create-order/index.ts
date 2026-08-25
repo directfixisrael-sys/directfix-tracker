@@ -95,6 +95,16 @@ serve(async (req) => {
       lead_source: order.leadSource || null,
       device_images: order.deviceImages,
       is_club_member: order.isClubMember,
+      utm_source: order.utmSource || null,
+      utm_medium: order.utmMedium || null,
+      utm_campaign: order.utmCampaign || null,
+      utm_content: order.utmContent || null,
+      utm_term: order.utmTerm || null,
+      placement: order.placement || null,
+      fbclid: order.fbclid || null,
+      fbp: order.fbp || null,
+      fbc: order.fbc || null,
+      first_landing_url: order.firstLandingUrl || null,
     };
 
     if (order.warrantyMonths != null) insertData.warranty_months = order.warrantyMonths;
