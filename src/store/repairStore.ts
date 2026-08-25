@@ -305,6 +305,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
         isClubMember: (orderData as any).isClubMember || false,
         warrantyMonths: (orderData as any).warrantyMonths || null,
         paymentStatus: (orderData as any).paymentStatus || null,
+        ...getOrderAttribution(),
       },
     });
 
