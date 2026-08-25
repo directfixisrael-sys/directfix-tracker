@@ -39,6 +39,16 @@ const bodySchema = z.object({
   isClubMember: z.boolean().optional().default(false),
   warrantyMonths: z.coerce.number().int().min(0).max(120).optional().nullable(),
   paymentStatus: z.string().trim().max(50).optional().nullable(),
+  utmSource: nullableText(200),
+  utmMedium: nullableText(200),
+  utmCampaign: nullableText(200),
+  utmContent: nullableText(200),
+  utmTerm: nullableText(200),
+  placement: nullableText(200),
+  fbclid: nullableText(400),
+  fbp: nullableText(200),
+  fbc: nullableText(400),
+  firstLandingUrl: nullableText(1000),
 });
 
 serve(async (req) => {
