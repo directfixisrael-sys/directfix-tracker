@@ -33,7 +33,6 @@ import GiftOrderToggle from '@/components/GiftOrderToggle';
 import LoyaltyPointsDisplay, { getCustomerPoints, calculatePointsFromPrice, calculateDiscountFromPoints } from '@/components/LoyaltyPointsDisplay';
 import SEO from "@/components/SEO";
 import { seo } from "@/lib/seoData";
-import PointsEarnedAnimation from '@/components/PointsEarnedAnimation';
 import speakerTopImg from '@/assets/speaker-top.png';
 import speakerBottomImg from '@/assets/speaker-bottom.png';
 import { PricePromotion, findPromo, applyPromo, promoDaysLeft } from '@/lib/pricePromotions';
@@ -281,7 +280,7 @@ interface RepairBundle {
   addon_repair_type: string;
   discount_percent: number;
 }
-type Step = 'model' | 'repair' | 'bundle' | 'points' | 'price' | 'schedule' | 'details' | 'gift_payment' | 'success';
+type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'gift_payment' | 'success';
 const NewRepairOrder = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -422,12 +421,12 @@ const NewRepairOrder = () => {
   // Loyalty points
   const [customerLoyaltyPoints, setCustomerLoyaltyPoints] = useState(0);
   const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
-  const [showPointsInfo, setShowPointsInfo] = useState(false);
   const [joinedClub, setJoinedClub] = useState(false);
   const [isExistingClubMember, setIsExistingClubMember] = useState(false);
 
-  // Check if customer is already a club member and skip points step if so
+  // Preserve existing club membership without interrupting checkout
   const checkClubMemberAndNavigate = async () => {
+    goToStep('price');
     const phone = (customerPhone || introPhone).replace(/\D/g, '');
     if (phone) {
       const { data } = await supabase
@@ -439,11 +438,9 @@ const NewRepairOrder = () => {
       if (data && data.length > 0) {
         setIsExistingClubMember(true);
         setJoinedClub(true); // auto-mark as club member
-        goToStep('price');
         return;
       }
     }
-    goToStep('points');
   };
 
   const handleGiftToggle = () => {
@@ -570,7 +567,7 @@ const NewRepairOrder = () => {
   // Read URL params for lead recovery (step, coupon, name, email, device, repair)
   useEffect(() => {
     if (isLoading) return;
-    const urlStep = searchParams.get('step') as Step | null;
+    const urlStep = searchParams.get('step') as Step | 'points' | null;
     const urlCoupon = searchParams.get('coupon');
     const urlDiscount = searchParams.get('discount');
     const urlName = searchParams.get('name');
@@ -615,7 +612,7 @@ const NewRepairOrder = () => {
     // Skip intro and jump to step
     if (urlStep && ['model', 'repair', 'bundle', 'points', 'price', 'schedule', 'details'].includes(urlStep)) {
       setShowIntroCard(false);
-      setStep(urlStep);
+      setStep(urlStep === 'points' ? 'price' : urlStep);
     }
   }, [isLoading]);
 
@@ -759,7 +756,6 @@ const NewRepairOrder = () => {
     model: 'בחירת דגם',
     repair: 'בחירת תיקון',
     bundle: 'חבילה',
-    points: 'נקודות',
     price: 'אישור מחיר',
     schedule: 'תיאום מועד',
     details: 'מילוי פרטים',
@@ -1044,7 +1040,6 @@ const NewRepairOrder = () => {
   const getFinalPrice = () => {
     return Math.max(0, getTotalPrice() - getDiscount() - loyaltyDiscount);
   };
-  const getPointsToEarn = () => calculatePointsFromPrice(getFinalPrice());
 
   // Image upload
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1537,9 +1532,9 @@ const NewRepairOrder = () => {
             if (step === 'model') {
               if (additionalRepairs.length > 0) goToStep('price');
               else navigate('/');
-            } else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'points') {
+            } else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
               if (currentBundle) goToStep('bundle');else goToStep('repair');
-            } else if (step === 'price') goToStep('points');else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
+            } else if (step === 'schedule') goToStep('price');else if (step === 'details') goToStep('schedule');else navigate('/');
           }} className="h-10 w-10 rounded-xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors border-2 border-foreground/10" aria-label="חזור לשלב הקודם">
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -2304,17 +2299,6 @@ const NewRepairOrder = () => {
             </p>
           </div>}
 
-        {/* Step 2.7: Points Earned Animation */}
-        {step === 'points' && (
-          <PointsEarnedAnimation
-            repairPrice={getTotalPrice()}
-            onContinue={(joined) => {
-              setJoinedClub(joined);
-              goToStep('price');
-            }}
-          />
-        )}
-
         {/* Step 3: Price Confirmation */}
         {step === 'price' && <div className="space-y-5 animate-fade-in">
             <div className="text-center mb-5">
@@ -2324,9 +2308,7 @@ const NewRepairOrder = () => {
               </div>
               <h2 className="font-extrabold mb-1 text-3xl">סיכום הזמנה</h2>
               <p className="text-muted-foreground">אישור מחיר התיקון</p>
-              <div className="mt-3 inline-flex items-center bg-primary text-primary-foreground text-xl font-bold px-5 py-2 rounded-2xl shadow-md">
-                ₪{getTotalPrice()}
-              </div>
+
             </div>
 
             <Card className="p-5 bg-gradient-to-br from-card via-card to-primary/5 border-2 border-primary/20 shadow-lg">
@@ -2467,55 +2449,6 @@ const NewRepairOrder = () => {
                   </div>
                 )}
 
-                {/* Points to earn */}
-                {joinedClub && getPointsToEarn() > 0 && (
-                  <div className="bg-gradient-to-r from-amber-500/5 to-primary/10 rounded-xl p-3 -mx-1 border border-amber-500/20 space-y-2">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
-                        <Crown className="w-4 h-4" />
-                        נקודות מועדון שתצברו
-                      </span>
-                      <span className="font-bold text-primary text-lg">+{getPointsToEarn()}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowPointsInfo(!showPointsInfo)}
-                      className="w-full flex items-center justify-between bg-primary/5 hover:bg-primary/10 rounded-lg px-3 py-2 transition-colors"
-                    >
-                      <span className="text-xs font-semibold text-primary flex items-center gap-1.5">
-                        <HelpCircle className="w-3.5 h-3.5" />
-                        איך זה עובד?
-                      </span>
-                      <ChevronDown className={`w-4 h-4 text-primary transition-transform duration-200 ${showPointsInfo ? 'rotate-180' : ''}`} />
-                    </button>
-                    {showPointsInfo && (
-                      <div className="bg-card/80 rounded-lg p-3 border border-border/50 space-y-2.5 animate-slide-up">
-                        <div className="flex items-start gap-2.5">
-                          <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span className="text-[10px] font-bold text-primary">1</span>
-                          </div>
-                          <p className="text-xs text-foreground/80">כל <strong className="text-foreground">100 ש"ח</strong> בתיקון = <strong className="text-primary">10 נקודות</strong></p>
-                        </div>
-                        <div className="flex items-start gap-2.5">
-                          <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span className="text-[10px] font-bold text-primary">2</span>
-                          </div>
-                          <p className="text-xs text-foreground/80">כל נקודה שווה <strong className="text-primary">0.50 ש"ח</strong> הנחה</p>
-                        </div>
-                        <div className="flex items-start gap-2.5">
-                          <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span className="text-[10px] font-bold text-primary">3</span>
-                          </div>
-                          <p className="text-xs text-foreground/80">בהזמנה הבאה הזינו את <strong className="text-foreground">מספר הטלפון</strong> — ההנחה תופיע אוטומטית!</p>
-                        </div>
-                        <p className="text-xs text-muted-foreground leading-relaxed pt-2 border-t border-border/30">
-                          תנאי תוכנית הנאמנות: הנקודות תקפות ל-24 חודשים. החברה רשאית לשנות או לבטל את התוכנית בכל עת בכפוף לחוק. נקודות אינן ניתנות להמרה למזומן.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 <div className="border-t border-border pt-3 mt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-bold">סה"כ</span>
@@ -2536,6 +2469,23 @@ const NewRepairOrder = () => {
                 </div>
               </div>
             </Card>
+
+            <ul className="space-y-2 text-sm text-foreground px-1" dir="rtl" aria-label="ההבטחות שלנו">
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-success shrink-0" aria-hidden="true" />
+                <span>{isGiftOrder ? 'תשלום מאובטח מראש להזמנת מתנה' : 'תשלום רק אחרי שהתיקון עובד'}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-success shrink-0" aria-hidden="true" />
+                <span>{selectedRepair?.name.includes('סוללה') || selectedBundleAddon
+                  ? 'אחריות שנה על סוללה מקורית של אפל'
+                  : 'אחריות על התיקון בהתאם לסוג התיקון'}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-success shrink-0" aria-hidden="true" />
+                <span>הטכנאי מגיע אליך בלי עלות נוספת</span>
+              </li>
+            </ul>
 
             {/* Payment Info with Icons */}
             <div className="bg-gradient-to-br from-muted/60 to-accent/5 rounded-2xl p-4 border border-border/50">
@@ -2779,6 +2729,25 @@ const NewRepairOrder = () => {
                   </div>
                 </div>}
             </div>
+
+            {/* Optional club enrollment stays at the end, never a separate step. */}
+            {!isExistingClubMember && (
+              <div className="mt-5 border-t border-border pt-4 space-y-1.5" dir="rtl">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <Checkbox
+                    checked={joinedClub}
+                    onCheckedChange={checked => setJoinedClub(checked === true)}
+                    className="mt-0.5 w-5 h-5 shrink-0"
+                    aria-label="הצטרפות חינם למועדון דיירקט פיקס"
+                  />
+                  <span className="text-sm font-medium text-foreground">רוצה להצטרף בחינם למועדון דיירקט פיקס (לא חובה)</span>
+                </label>
+                <p className="text-xs text-muted-foreground leading-relaxed pr-8">
+                  בהצטרפות אני מאשר/ת קבלת מבצעים ועדכונים ב־WhatsApp, SMS ואימייל. ניתן לבטל בכל עת. בכפוף ל{' '}
+                  <a href="/club-terms" target="_blank" rel="noopener noreferrer" className="text-primary underline">תקנון המועדון</a>.
+                </p>
+              </div>
+            )}
 
             {/* Consent Checkboxes */}
             <div className="space-y-4 mt-6 pt-6 border-t border-border">
