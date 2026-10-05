@@ -20,7 +20,7 @@ import TechnicianRecruitment from '@/components/TechnicianRecruitment';
 import Header from '@/components/Header';
 import SEO from "@/components/SEO";
 import { seo } from "@/lib/seoData";
-import { useHomeStats, HeroPriceAnchor, HeroLiveProof } from '@/components/HomeSalesBoost';
+import { useHomeStats, HeroLiveProof } from '@/components/HomeSalesBoost';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -60,7 +60,6 @@ const Index = () => {
                 טכנאי אייפון עד הבית <span className="text-primary">תוך שעות</span>
               </h1>
               <p className="text-lg sm:text-xl text-foreground/80 mb-5">מחיר ידוע מראש, בלי הפתעות. משלמים רק אחרי שהתיקון עובד.</p>
-              <HeroPriceAnchor stats={stats} />
               <HeroLiveProof stats={stats} />
 
               <ul className="space-y-2.5 mb-8 inline-block text-right">
