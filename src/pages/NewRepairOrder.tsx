@@ -281,6 +281,9 @@ interface RepairBundle {
   discount_percent: number;
 }
 type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'gift_payment' | 'success';
+const OCTOBER_PROMO_CODE = 'FIX35';
+const OCTOBER_PROMO_VALUE = 35;
+
 const NewRepairOrder = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
