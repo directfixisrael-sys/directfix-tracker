@@ -281,6 +281,9 @@ interface RepairBundle {
   discount_percent: number;
 }
 type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'gift_payment' | 'success';
+const OCTOBER_PROMO_CODE = 'FIX35';
+const OCTOBER_PROMO_VALUE = 35;
+
 const NewRepairOrder = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -1032,10 +1035,19 @@ const NewRepairOrder = () => {
   };
   const getDiscount = () => {
     if (!appliedCoupon) return 0;
+    if (appliedCoupon.code === OCTOBER_PROMO_CODE) {
+      const names = [selectedRepair?.name, ...additionalRepairs.map(r => r.repair.name)].filter(Boolean) as string[];
+      return names.some(n => !n.includes('סוללה')) ? OCTOBER_PROMO_VALUE : 0;
+    }
     if (appliedCoupon.discount_type === 'percentage') {
       return Math.round(getTotalPrice() * (appliedCoupon.discount_value / 100));
     }
     return appliedCoupon.discount_value;
+  };
+  const octoberActive = appliedCoupon?.code === OCTOBER_PROMO_CODE;
+  const toggleOctoberPromo = () => {
+    if (octoberActive) { removeCoupon(); return; }
+    setAppliedCoupon({ code: OCTOBER_PROMO_CODE, discount_type: 'fixed', discount_value: OCTOBER_PROMO_VALUE });
   };
   const getFinalPrice = () => {
     return Math.max(0, getTotalPrice() - getDiscount() - loyaltyDiscount);
@@ -1816,6 +1828,15 @@ const NewRepairOrder = () => {
 
 
             {additionalRepairs.length > 0 && renderRepairCart()}
+
+            {(!appliedCoupon || octoberActive) && <div dir="rtl" className="rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3 space-y-2">
+                <p className="font-bold text-base leading-snug">מבצע אוקטובר: מגוון תיקונים באקסטרה הנחה של ₪{OCTOBER_PROMO_VALUE} בסימון קוד {OCTOBER_PROMO_CODE} (לא כולל סוללות, ללא כפל מבצעים)</p>
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <input type="checkbox" checked={octoberActive} onChange={toggleOctoberPromo} aria-label={`הפעלת קוד ${OCTOBER_PROMO_CODE} להנחה של ${OCTOBER_PROMO_VALUE} שקלים`} className="w-6 h-6 rounded-md accent-[hsl(var(--accent))] cursor-pointer" />
+                  <span className="font-extrabold text-accent font-mono">{OCTOBER_PROMO_CODE}</span>
+                  <span className="text-sm text-muted-foreground">{octoberActive ? `ההנחה הופעלה — חוסכים ₪${OCTOBER_PROMO_VALUE} במסך, טעינה, רמקול ועוד` : 'סמנו את הקוד וקבלו הנחה נוספת'}</span>
+                </label>
+              </div>}
 
             <div className="space-y-3">
               {repairTypes.filter(repair => {
