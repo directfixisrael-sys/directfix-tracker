@@ -2378,7 +2378,12 @@ const NewRepairOrder = () => {
                 {selectedRepair && selectedModel && (() => {
                   const promo = getPromoFor(selectedRepair);
                   const basePrice = getBaseRepairPrice(selectedRepair);
-                  const hasPromo = !!promo && basePrice > getPrice();
+                  const linePrice = getPrice();
+                  const octoberOff = octoberActive && !selectedRepair.name.includes('סוללה') ? OCTOBER_PROMO_VALUE : 0;
+                  const finalLinePrice = Math.max(0, linePrice - octoberOff);
+                  const hasPromo = !!promo && basePrice > linePrice;
+                  const strikePrice = hasPromo ? basePrice : linePrice;
+                  const showStrike = hasPromo || octoberOff > 0;
                   return (
                     <div className="flex justify-between items-center text-sm py-1 border-b border-border/30 last:border-0">
                       <div className="flex-1">
@@ -2390,14 +2395,21 @@ const NewRepairOrder = () => {
                             {promo!.badge_text}
                           </span>
                         )}
+                        {octoberOff > 0 && (
+                          <span className="mr-2 inline-flex items-center gap-1 text-[11px] font-bold rounded-full px-2 py-0.5 bg-success/10 text-success border border-success/30 align-middle">
+                            <Tag className="w-3 h-3" />
+                            מבצע אוקטובר
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
-                        {hasPromo && <span className="text-xs line-through text-muted-foreground">₪{basePrice}</span>}
-                        <span className="font-bold">₪{getPrice()}</span>
+                        {showStrike && <span className="text-xs line-through text-muted-foreground">₪{strikePrice}</span>}
+                        <span className={`font-bold ${octoberOff > 0 ? 'text-success' : ''}`}>₪{finalLinePrice}</span>
                       </div>
                     </div>
                   );
                 })()}
+
 
                 
                 {/* Bundle Addon */}
