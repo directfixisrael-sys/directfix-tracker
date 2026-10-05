@@ -567,7 +567,7 @@ const NewRepairOrder = () => {
   // Read URL params for lead recovery (step, coupon, name, email, device, repair)
   useEffect(() => {
     if (isLoading) return;
-    const urlStep = searchParams.get('step') as Step | null;
+    const urlStep = searchParams.get('step') as Step | 'points' | null;
     const urlCoupon = searchParams.get('coupon');
     const urlDiscount = searchParams.get('discount');
     const urlName = searchParams.get('name');
