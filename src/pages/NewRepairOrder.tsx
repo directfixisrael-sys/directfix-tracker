@@ -2329,10 +2329,6 @@ const NewRepairOrder = () => {
                     המחיר כולל את השירות, ההגעה והחלקים. אין שום עלות נוספת.
                   </p>
                 </div>
-                <div className="ms-auto ps-3 border-s border-primary/20 flex items-center gap-1.5 flex-shrink-0">
-                  <Wrench className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
-                  <span className="text-[11px] font-bold text-primary/80 whitespace-nowrap">הבטחת Direct Fix</span>
-                </div>
               </div>
             </div>
 
