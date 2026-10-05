@@ -2311,6 +2311,31 @@ const NewRepairOrder = () => {
 
             </div>
 
+            {/* Branded payment reassurance banner */}
+            <div
+              className="relative overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-l from-primary/12 via-card to-accent/10 p-4 shadow-[0_14px_40px_-24px_hsl(var(--primary)/0.75)]"
+              dir="rtl"
+              role="status"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-full bg-primary/12 border border-primary/25 flex items-center justify-center flex-shrink-0">
+                  <ShieldCheck className="w-6 h-6 text-primary" aria-hidden="true" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-extrabold text-lg leading-tight">
+                    {isGiftOrder ? 'התשלום אושר מראש — בלי חיוב נוסף' : 'אין דאגה — התשלום בסוף התיקון'}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1 leading-snug">
+                    המחיר כולל את השירות, ההגעה והחלקים. אין שום עלות נוספת.
+                  </p>
+                </div>
+                <div className="ms-auto ps-3 border-s border-primary/20 flex items-center gap-1.5 flex-shrink-0">
+                  <Wrench className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
+                  <span className="text-[11px] font-bold text-primary/80 whitespace-nowrap">הבטחת Direct Fix</span>
+                </div>
+              </div>
+            </div>
+
             <Card className="p-5 bg-gradient-to-br from-card via-card to-primary/5 border-2 border-primary/20 shadow-lg">
               <div className="space-y-3">
                 {/* All repairs as line items */}
@@ -2471,10 +2496,6 @@ const NewRepairOrder = () => {
             </Card>
 
             <ul className="space-y-2 text-sm text-foreground px-1" dir="rtl" aria-label="ההבטחות שלנו">
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-success shrink-0" aria-hidden="true" />
-                <span>{isGiftOrder ? 'תשלום מאובטח מראש להזמנת מתנה' : 'תשלום רק אחרי שהתיקון עובד'}</span>
-              </li>
               <li className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-success shrink-0" aria-hidden="true" />
                 <span>{selectedRepair?.name.includes('סוללה') || selectedBundleAddon
