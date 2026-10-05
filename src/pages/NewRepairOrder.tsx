@@ -2352,6 +2352,16 @@ const NewRepairOrder = () => {
               </div>
             </div>
 
+            {/* October promo opt-in */}
+            {octoberEligible && (!appliedCoupon || octoberActive) && <div dir="rtl" className="rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3 space-y-2">
+                <p className="font-bold text-base leading-snug">מבצע אוקטובר: אקסטרה הנחה של ₪{OCTOBER_PROMO_VALUE} על התיקון שלכם</p>
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <input type="checkbox" checked={octoberActive} onChange={toggleOctoberPromo} aria-label={`הפעלת קוד ${OCTOBER_PROMO_CODE} להנחה של ${OCTOBER_PROMO_VALUE} שקלים`} className="w-6 h-6 rounded-md accent-[hsl(var(--accent))] cursor-pointer" />
+                  <span className="font-extrabold text-accent font-mono">{OCTOBER_PROMO_CODE}</span>
+                  <span className="text-sm text-muted-foreground">{octoberActive ? `ההנחה הופעלה — חוסכים ₪${OCTOBER_PROMO_VALUE}` : 'סמנו וקבלו את ההנחה'}</span>
+                </label>
+              </div>}
+
             <Card className="p-5 bg-gradient-to-br from-card via-card to-primary/5 border-2 border-primary/20 shadow-lg">
               <div className="space-y-3">
                 {/* All repairs as line items */}
