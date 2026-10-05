@@ -20,10 +20,12 @@ import TechnicianRecruitment from '@/components/TechnicianRecruitment';
 import Header from '@/components/Header';
 import SEO from "@/components/SEO";
 import { seo } from "@/lib/seoData";
+import { useHomeStats, HeroPriceAnchor, HeroLiveProof } from '@/components/HomeSalesBoost';
 
 const Index = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const stats = useHomeStats();
 
   const heroBullets = [
     'זמינות מיידית: הגעה תוך שעה אחת',
@@ -54,9 +56,12 @@ const Index = () => {
 
           <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-16 grid md:grid-cols-2 gap-10 items-center">
             <div className="text-center md:text-right animate-fade-in order-2 md:order-1">
-              <h1 className="font-extrabold text-foreground tracking-tight leading-[1.1] mb-6 text-4xl sm:text-5xl lg:text-6xl">
-                דיירקט פיקס — <span className="text-primary">תיקון אייפון עד הבית</span>
+              <h1 className="font-extrabold text-foreground tracking-tight leading-[1.1] mb-4 text-4xl sm:text-5xl lg:text-6xl">
+                טכנאי אייפון עד הבית <span className="text-primary">תוך שעות</span>
               </h1>
+              <p className="text-lg sm:text-xl text-foreground/80 mb-5">מחיר ידוע מראש, בלי הפתעות. משלמים רק אחרי שהתיקון עובד.</p>
+              <HeroPriceAnchor stats={stats} />
+              <HeroLiveProof stats={stats} />
 
               <ul className="space-y-2.5 mb-8 inline-block text-right">
                 {heroBullets.map((b) => (
