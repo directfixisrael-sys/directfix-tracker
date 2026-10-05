@@ -14,20 +14,6 @@ export const useHomeStats = () => {
   return stats;
 };
 
-export const HeroPriceAnchor = ({ stats }: { stats: Stats | null }) => {
-  const price = stats?.min_price ?? null;
-  if (!price) return null;
-  const lab = Math.round((price * 1.4) / 10) * 10;
-  return (
-    <div className="inline-flex flex-row-reverse items-center gap-3 rounded-2xl border border-primary/20 bg-card/80 backdrop-blur px-4 py-2.5 mb-6 shadow-sm">
-      <div className="text-right">
-        <div className="text-xs text-muted-foreground">מחיר רגיל במעבדה: <span className="line-through">₪{lab}</span></div>
-        <div className="text-lg font-extrabold text-foreground">תיקון אצלנו החל מ־<span className="text-primary">₪{price}</span></div>
-      </div>
-      <span className="rounded-full bg-primary/10 text-primary text-xs font-bold px-2.5 py-1">חוסכים ₪{lab - price}</span>
-    </div>
-  );
-};
 
 export const HeroLiveProof = ({ stats }: { stats: Stats | null }) => {
   if (!stats) return null;
