@@ -19,12 +19,12 @@ Deno.serve(async (req) => {
     const c = j.candidates?.[0];
     if (!c) {
       console.error('google-reviews no candidate', j.status, j.error_message);
-      return new Response(JSON.stringify({ error: j.status, details: j.error_message }), { status: 502, headers: { ...cors, 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify({ error: j.status, details: j.error_message }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
     const data = { rating: c.rating ?? null, count: c.user_ratings_total ?? 0, place_id: c.place_id, name: c.name };
     cache = { at: Date.now(), data };
     return new Response(JSON.stringify(data), { headers: { ...cors, 'Content-Type': 'application/json' } });
   } catch (e) {
-    return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ error: String(e) }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } });
   }
 });
