@@ -1045,6 +1045,9 @@ const NewRepairOrder = () => {
     return appliedCoupon.discount_value;
   };
   const octoberActive = appliedCoupon?.code === OCTOBER_PROMO_CODE;
+  const octoberEligible = [selectedRepair?.name, ...additionalRepairs.map(r => r.repair.name)]
+    .filter(Boolean)
+    .some(n => !(n as string).includes('סוללה'));
   const toggleOctoberPromo = () => {
     if (octoberActive) { removeCoupon(); return; }
     setAppliedCoupon({ code: OCTOBER_PROMO_CODE, discount_type: 'fixed', discount_value: OCTOBER_PROMO_VALUE });
@@ -1829,14 +1832,10 @@ const NewRepairOrder = () => {
 
             {additionalRepairs.length > 0 && renderRepairCart()}
 
-            {(!appliedCoupon || octoberActive) && <div dir="rtl" className="rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3 space-y-2">
-                <p className="font-bold text-base leading-snug">מבצע אוקטובר: מגוון תיקונים באקסטרה הנחה של ₪{OCTOBER_PROMO_VALUE} בסימון קוד {OCTOBER_PROMO_CODE} (לא כולל סוללות, ללא כפל מבצעים)</p>
-                <label className="flex items-center gap-3 cursor-pointer select-none">
-                  <input type="checkbox" checked={octoberActive} onChange={toggleOctoberPromo} aria-label={`הפעלת קוד ${OCTOBER_PROMO_CODE} להנחה של ${OCTOBER_PROMO_VALUE} שקלים`} className="w-6 h-6 rounded-md accent-[hsl(var(--accent))] cursor-pointer" />
-                  <span className="font-extrabold text-accent font-mono">{OCTOBER_PROMO_CODE}</span>
-                  <span className="text-sm text-muted-foreground">{octoberActive ? `ההנחה הופעלה — חוסכים ₪${OCTOBER_PROMO_VALUE} במסך, טעינה, רמקול ועוד` : 'סמנו את הקוד וקבלו הנחה נוספת'}</span>
-                </label>
-              </div>}
+            <div dir="rtl" className="rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3">
+                <p className="font-bold text-base leading-snug">מבצע אוקטובר: מסך, טעינה, רמקול ועוד באקסטרה הנחה של ₪{OCTOBER_PROMO_VALUE} (לא כולל סוללות)</p>
+                <p className="text-sm text-muted-foreground mt-1">בוחרים תיקון — והסימון להנחה יחכה לכם באישור המחיר</p>
+              </div>
 
             <div className="space-y-3">
               {repairTypes.filter(repair => {
