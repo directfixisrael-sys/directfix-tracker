@@ -9,7 +9,15 @@ const DAILY_CAPACITY = 8;
 export const useHomeStats = () => {
   const [stats, setStats] = useState<Stats | null>(null);
   useEffect(() => {
-    (supabase.rpc as any)('get_home_stats').then(({ data }: any) => data && setStats(data as Stats));
+    Promise.all([
+      (supabase.rpc as any)('get_home_stats').then(({ data }: any) => data),
+      supabase.functions.invoke('google-reviews').then(({ data }) => data).catch(() => null),
+    ]).then(([base, g]: any) => {
+      if (!base) return;
+      const s = { ...base } as Stats;
+      if (g?.rating) { s.avg_rating = g.rating; s.rating_count = g.count; }
+      setStats(s);
+    });
   }, []);
   return stats;
 };
