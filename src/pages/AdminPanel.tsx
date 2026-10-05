@@ -1448,6 +1448,11 @@ const AdminPanel = () => {
                             לא חבר מועדון
                           </span>
                         )}
+                        {selectedOrder.couponCode && (
+                          <span className="inline-flex items-center gap-1 bg-success/10 text-success rounded-full px-2.5 py-0.5 text-xs font-bold mt-1 mr-1">
+                            קופון {selectedOrder.couponCode}{selectedOrder.couponDiscount ? ` · -₪${selectedOrder.couponDiscount}` : ''}
+                          </span>
+                        )}
                       </div>
                     </div>
                     

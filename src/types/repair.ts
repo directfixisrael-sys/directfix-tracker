@@ -41,6 +41,8 @@ export interface RepairOrder {
   deviceImages?: string[];
   isClubMember?: boolean;
   warrantyMonths?: number;
+  couponCode?: string;
+  couponDiscount?: number;
 }
 
 export interface Accessory {

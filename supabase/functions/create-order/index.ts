@@ -39,6 +39,8 @@ const bodySchema = z.object({
   isClubMember: z.boolean().optional().default(false),
   warrantyMonths: z.coerce.number().int().min(0).max(120).optional().nullable(),
   paymentStatus: z.string().trim().max(50).optional().nullable(),
+  couponCode: nullableText(50),
+  couponDiscount: z.coerce.number().min(0).max(100000).optional().nullable(),
   utmSource: nullableText(200),
   utmMedium: nullableText(200),
   utmCampaign: nullableText(200),
@@ -108,6 +110,8 @@ serve(async (req) => {
     };
 
     if (order.warrantyMonths != null) insertData.warranty_months = order.warrantyMonths;
+    if (order.couponCode) insertData.coupon_code = order.couponCode.toUpperCase();
+    if (order.couponDiscount != null) insertData.coupon_discount = order.couponDiscount;
     if (order.paymentStatus) insertData.payment_status = order.paymentStatus;
 
     const { data, error } = await supabase

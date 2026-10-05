@@ -81,6 +81,8 @@ const dbToOrder = (row: any): RepairOrder => ({
   deviceImages: row.device_images || [],
   isClubMember: row.is_club_member || false,
   warrantyMonths: row.warranty_months || undefined,
+  couponCode: row.coupon_code || undefined,
+  couponDiscount: row.coupon_discount != null ? Number(row.coupon_discount) : undefined,
 });
 
 // Convert database row to ChatMessage
@@ -305,6 +307,8 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
         isClubMember: (orderData as any).isClubMember || false,
         warrantyMonths: (orderData as any).warrantyMonths || null,
         paymentStatus: (orderData as any).paymentStatus || null,
+        couponCode: (orderData as any).couponCode || null,
+        couponDiscount: (orderData as any).couponDiscount ?? null,
         ...getOrderAttribution(),
       },
     });

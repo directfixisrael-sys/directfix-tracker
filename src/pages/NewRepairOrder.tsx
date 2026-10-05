@@ -282,7 +282,6 @@ interface RepairBundle {
 }
 type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'gift_payment' | 'success';
 const OCTOBER_PROMO_CODE = 'FIX35';
-const OCTOBER_PROMO_VALUE = 35;
 
 const NewRepairOrder = () => {
   const navigate = useNavigate();
@@ -392,6 +391,19 @@ const NewRepairOrder = () => {
     discount_value: number;
   } | null>(null);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  // October promo is managed from the admin coupons tab (code FIX35)
+  const [octoberPromo, setOctoberPromo] = useState<{ value: number } | null>(null);
+  useEffect(() => {
+    supabase.from('coupons').select('discount_value,is_active,start_date,end_date,max_uses,current_uses').eq('code', OCTOBER_PROMO_CODE).maybeSingle().then(({ data }) => {
+      if (!data || !data.is_active) return;
+      const today = new Date().toISOString().slice(0, 10);
+      if (data.start_date && today < data.start_date) return;
+      if (data.end_date && today > data.end_date) return;
+      if (data.max_uses != null && data.current_uses >= data.max_uses) return;
+      setOctoberPromo({ value: Number(data.discount_value) || 0 });
+    });
+  }, []);
+  const OCTOBER_PROMO_VALUE = octoberPromo?.value ?? 0;
 
   // Image upload
   const [deviceImages, setDeviceImages] = useState<string[]>([]);
@@ -1045,7 +1057,7 @@ const NewRepairOrder = () => {
     return appliedCoupon.discount_value;
   };
   const octoberActive = appliedCoupon?.code === OCTOBER_PROMO_CODE;
-  const octoberEligible = [selectedRepair?.name, ...additionalRepairs.map(r => r.repair.name)]
+  const octoberEligible = !!octoberPromo && [selectedRepair?.name, ...additionalRepairs.map(r => r.repair.name)]
     .filter(Boolean)
     .some(n => !(n as string).includes('סוללה'));
   const toggleOctoberPromo = () => {
@@ -1227,6 +1239,8 @@ const NewRepairOrder = () => {
         leadSource: leadSource.source,
         customerEmail: customerEmail.trim() || undefined,
         deviceImages: deviceImages.length > 0 ? deviceImages : [],
+        couponCode: appliedCoupon?.code || null,
+        couponDiscount: appliedCoupon ? getDiscount() : null,
       } as any);
 
       // Order must be saved in the database before any conversion is reported
@@ -1832,10 +1846,10 @@ const NewRepairOrder = () => {
 
             {additionalRepairs.length > 0 && renderRepairCart()}
 
-            <div dir="rtl" className="rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3">
+            {octoberPromo && <div dir="rtl" className="rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3">
                 <p className="font-bold text-base leading-snug">מבצע אוקטובר: מסך, טעינה, רמקול ועוד באקסטרה הנחה של ₪{OCTOBER_PROMO_VALUE} (לא כולל סוללות)</p>
                 <p className="text-sm text-muted-foreground mt-1">בוחרים תיקון — והסימון להנחה יחכה לכם באישור המחיר</p>
-              </div>
+              </div>}
 
             <div className="space-y-3">
               {repairTypes.filter(repair => {
