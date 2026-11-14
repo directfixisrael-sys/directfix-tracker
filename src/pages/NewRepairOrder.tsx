@@ -3242,9 +3242,10 @@ const NewRepairOrder = () => {
             <Button variant="outline" onClick={() => navigate('/')} className="w-full h-10 rounded-xl">
               חזרה לדף הבית
             </Button>
-            <SupportChat orderNumber={completedOrderNumber} name={customerName} phone={customerPhone} />
           </div>}
       </main>
+
+      {step === 'success' && <SupportChat orderNumber={completedOrderNumber} name={customerName} phone={customerPhone} />}
 
       {showFloatingCart && <div className="h-28" aria-hidden="true" />}
       {showFloatingCart && <RepairCart

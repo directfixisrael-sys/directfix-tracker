@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import type { ChatStatus } from 'ai';
 import { X, MessageCircle, UserRound, Package, Tag, Headset, RotateCcw } from 'lucide-react';
 import shiraAvatar from '@/assets/shira-avatar.png';
@@ -79,7 +78,6 @@ function ToolCard({ tool }: { tool: SupportTool }) {
 interface SupportChatProps { orderNumber?: number | null; name?: string; phone?: string }
 
 const SupportChat = ({ orderNumber, name, phone }: SupportChatProps) => {
-  useLocation();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<SupportMessage[]>([]);
   const [convStatus, setConvStatus] = useState<SupportStatus>('bot');
