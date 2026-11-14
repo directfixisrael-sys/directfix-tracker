@@ -132,18 +132,7 @@ const TOOLS = [
     },
     strict: true,
   },
-  {
-    type: "function" as const,
-    name: "handoff_to_human",
-    description: "העברת השיחה לנציג אנושי. להשתמש כשאין תשובה ודאית במידע, כשהלקוח מבקש נציג, בתלונה, החזר כספי, תביעת אחריות, שינוי או ביטול הזמנה, או כל נושא רגיש.",
-    parameters: {
-      type: "object",
-      properties: { reason: { type: "string", description: "סיכום קצר בעברית למה צריך נציג" } },
-      required: ["reason"],
-      additionalProperties: false,
-    },
-    strict: true,
-  },
+
 ];
 
 async function failedLookupsLastHour(conversationId: string) {
@@ -241,7 +230,7 @@ async function buildInstructions(conv: any) {
   let verified = "";
   if (conv.verified_order_id) {
     const { data } = await supabase.from("orders").select("*").eq("id", conv.verified_order_id).maybeSingle();
-    if (data) verified = `\n\nהזמנה מאומתת של הלקוח בשיחה הזו (כבר אומתה בטלפון ומספר הזמנה, אין צורך לבקש שוב):\n${JSON.stringify(orderSummary(data))}`;
+    if (data) verified = `\n\nהזמנה מאומתת של הלקוח בשיחה הזו (כבר אומתה בטלפון ומספר הזמנה, אין צורך לבקש שוב):\n${JSON.stringify(orderSummary(data))}\nקישור המעקב האישי של הלקוח: https://track.directfix.co.il/track?phone=${encodeURIComponent(normalizePhone(data.customer_phone))}`;
   }
   return `את העוזרת החכמה של Direct Fix (דיירקט פיקס), שירות תיקון סלולר עד הבית. עונה בעברית, בגוף שני, קצר וחם (2-4 משפטים), בלי אימוג'ים.
 
@@ -249,10 +238,11 @@ async function buildInstructions(conv: any) {
 - עני רק לפי המידע למטה, תוצאות הכלים, או ההזמנה המאומתת. אל תמציאי מחירים, מועדים, סטטוסים או מדיניות.
 - מחיר לדגם: השתמשי ב-get_repair_prices.
 - שאלה על הזמנה קיימת: בקשי טלפון ומספר הזמנה, ואז lookup_order. אל תמסרי פרטי הזמנה בלי התאמה של שניהם. אל תמסרי כתובת.
-- אם את לא בטוחה, אין מידע, הלקוח מבקש נציג, או מדובר בתלונה/החזר/אחריות/ביטול/שינוי מועד - קראי ל-handoff_to_human.
+- אין שיחה עם נציג בצ'אט. אם את לא בטוחה, אין מידע, או מדובר בתלונה/החזר/אחריות/ביטול/שינוי מועד - כתבי בנימוס שאפשר להתקשר אלינו 033106020.
 - להזמנת תיקון הפני לעמוד ההזמנה /order. למעקב - /track.
 - אל תבטיחי הגעה תוך שעה.
-- הצ'אט נפתח ללקוח אחרי שביצע הזמנה. שאלות נפוצות: מתי הטכנאי מגיע (נציג מתקשר לאשר את המועד; סטטוס חי ב-/track), איך משלמים (בסוף התיקון, אחרי שהמכשיר עובד), מה להכין (לגבות את המכשיר, לזכור את קוד הנעילה, להיות זמינים בטלפון), משך התיקון ואחריות. שינוי מועד, ביטול או עדכון כתובת - handoff_to_human.
+- כתבי את שם העסק בעברית: דיירקט פיקס.
+- הצ'אט נפתח ללקוח אחרי שביצע הזמנה. שאלות נפוצות: איך משלמים (בסוף התיקון, אחרי שהמכשיר עובד, כל אמצעי התשלום כולל העברה בנקאית ישירה), מה להכין (לגבות את המכשיר, לזכור את קוד הנעילה, להיות זמינים בטלפון), משך התיקון, האם הטכנאי יכול לתקן ברכב שלו (כן, ומומלץ - חוסך ללקוח זמן), ואיך עוקבים אחרי ההזמנה (תמיד לצרף את קישור המעקב כקישור markdown). שינוי מועד, ביטול או עדכון כתובת - להתקשר 033106020.
 
 ${HELP_DOCS}${verified}`;
 }
@@ -384,7 +374,7 @@ Deno.serve(async (req) => {
               input.push({ type: "function_call_output", call_id: c.call_id, output: JSON.stringify(result) });
             }
           }
-          if (!text.trim()) text = state.handoffReason ? "העברתי את השיחה לנציג. נחזור אליכם כאן בהקדם." : "לא הצלחתי לענות על זה. רוצים שאעביר לנציג?";
+          if (!text.trim()) text = "לא הצלחתי לענות על זה. אפשר להתקשר אלינו 033106020.";
           const botMsg = await insertMessage(conv.id, "bot", text, toolLog.length ? toolLog : null);
           let status = "bot";
           let sys = null;
