@@ -288,7 +288,7 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
                   const isUser = m.role === 'customer';
                   return (
                     <Message key={m.id} from={isUser ? 'user' : 'assistant'}>
-                      {m.role === 'admin' && <span className="text-xs font-bold text-accent flex items-center gap-1"><UserRound className="w-3.5 h-3.5" aria-hidden="true" />נציג Direct Fix</span>}
+                      {m.role === 'admin' && <span className="text-xs font-bold text-accent flex items-center gap-1"><UserRound className="w-3.5 h-3.5" aria-hidden="true" />נציג דיירקט פיקס</span>}
                       {m.tool_calls?.map((t, i) => <ToolCard key={i} tool={t} />)}
                       <MessageContent className={cn('text-base', isUser && 'group-[.is-user]:bg-primary group-[.is-user]:text-primary-foreground group-[.is-user]:rounded-2xl')}>
                         {isUser ? <p className="whitespace-pre-wrap">{m.content}</p> : <MessageResponse linkSafety={linkSafety}>{m.content}</MessageResponse>}
