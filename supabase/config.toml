@@ -64,3 +64,5 @@ verify_jwt = false
 
 [functions.google-reviews]
 verify_jwt = false
+[functions.public-upload]
+verify_jwt = false

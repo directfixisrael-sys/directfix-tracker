@@ -27,14 +27,9 @@ const StoreLogin = ({ onLogin }: StoreLoginProps) => {
       const normalizedPhone = phone.replace(/\D/g, '');
 
       // Check club membership first
-      const { data: clubData } = await supabase
-        .from('club_members')
-        .select('*')
-        .eq('phone', normalizedPhone)
-        .eq('is_active', true)
-        .maybeSingle();
+      const { data: isMember } = await supabase.rpc('is_active_club_member', { _phone: normalizedPhone });
 
-      if (!clubData) {
+      if (!isMember) {
         toast.error('החנות פתוחה לחברי מועדון בלבד');
         setLoading(false);
         return;
@@ -52,16 +47,9 @@ const StoreLogin = ({ onLogin }: StoreLoginProps) => {
       }
 
       // Get loyalty points
-      const { data: pointsData } = await supabase
-        .from('loyalty_points')
-        .select('points, type')
-        .eq('customer_phone', normalizedPhone);
+      const { data: totalPoints } = await supabase.rpc('get_loyalty_balance', { _phone: normalizedPhone });
 
-      const totalPoints = (pointsData || []).reduce(
-        (sum, p) => sum + (p.type === 'earned' ? p.points : -p.points), 0
-      );
-
-      onLogin(normalizedPhone, data.name || clubData.name, Math.max(0, totalPoints));
+      onLogin(normalizedPhone, data.name || '', Math.max(0, Number(totalPoints) || 0));
     } catch {
       toast.error('שגיאה בהתחברות');
     }

@@ -108,14 +108,14 @@ const iPadRepair = () => {
   // Lead tracking
   const createiPadLead = async (modelName: string) => {
     try {
-      const { data } = await supabase.from('leads').insert({
-        customer_name: 'Tablet Lead',
-        customer_phone: '',
-        device_type: modelName,
-        last_step: 'בחירת דגם טאבלט',
-        repair_type: 'תיקון מסך טאבלט',
-      }).select('id').single();
-      if (data) setCurrentLeadId(data.id);
+      const { data: leadId } = await supabase.rpc('create_lead', {
+        _customer_name: 'Tablet Lead',
+        _customer_phone: '',
+        _device_type: modelName,
+        _last_step: 'בחירת דגם טאבלט',
+        _repair_type: 'תיקון מסך טאבלט',
+      });
+      if (leadId) setCurrentLeadId(leadId as string);
     } catch (e) {
       console.error('Error creating iPad lead:', e);
     }
@@ -124,7 +124,12 @@ const iPadRepair = () => {
   const updateiPadLeadStep = async (stepName: string, extra?: Record<string, string>) => {
     if (!currentLeadId) return;
     try {
-      await supabase.from('leads').update({ last_step: stepName, ...extra }).eq('id', currentLeadId);
+      await supabase.rpc('update_lead', {
+        _lead_id: currentLeadId,
+        _last_step: stepName,
+        _device_type: extra?.device_type,
+        _repair_type: extra?.repair_type,
+      });
     } catch (e) {
       console.error('Error updating iPad lead:', e);
     }
@@ -141,12 +146,13 @@ const iPadRepair = () => {
     // Update lead with customer info
     if (currentLeadId) {
       try {
-        await supabase.from('leads').update({
-          customer_name: customerName.trim(),
-          customer_phone: customerPhone.trim().replace(/\D/g, ''),
-          customer_email: customerEmail?.trim() || null,
-          last_step: 'שליחת הזמנה טאבלט',
-        }).eq('id', currentLeadId);
+        await supabase.rpc('update_lead', {
+          _lead_id: currentLeadId,
+          _customer_name: customerName.trim(),
+          _customer_phone: customerPhone.trim().replace(/\D/g, ''),
+          _customer_email: customerEmail?.trim() || undefined,
+          _last_step: 'שליחת הזמנה טאבלט',
+        });
       } catch (e) {
         console.error('Error updating iPad lead details:', e);
       }
@@ -183,7 +189,7 @@ const iPadRepair = () => {
       // Mark lead as converted
       if (currentLeadId) {
         try {
-          await supabase.from('leads').update({ converted: true, last_step: 'הזמנה הושלמה טאבלט' }).eq('id', currentLeadId);
+          await supabase.rpc('update_lead', { _lead_id: currentLeadId, _converted: true, _last_step: 'הזמנה הושלמה טאבלט' });
         } catch (e) { console.error('Error marking iPad lead converted:', e); }
       }
 

@@ -13,6 +13,7 @@ import { getRepairIconComponent } from '@/lib/repairIcons';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
+import { publicUpload } from '@/lib/publicUpload';
 import CustomerZone from '@/components/CustomerZone';
 import { toast } from 'sonner';
 import Logo from '@/components/Logo';
@@ -341,7 +342,12 @@ const NewRepairOrder = () => {
   const updateLeadStep = async (stepName: string, extra?: Record<string, string>) => {
     if (!currentLeadId) return;
     try {
-      await supabase.from('leads').update({ last_step: stepName, ...extra }).eq('id', currentLeadId);
+      await supabase.rpc('update_lead', {
+        _lead_id: currentLeadId,
+        _last_step: stepName,
+        _device_type: extra?.device_type,
+        _repair_type: extra?.repair_type,
+      });
     } catch (e) {
       console.error('Error updating lead step:', e);
     }
@@ -367,15 +373,14 @@ const NewRepairOrder = () => {
 
     // Save lead to DB
     try {
-      const { data: leadData } = await supabase.from('leads').insert({
-        customer_name: introName.trim(),
-        customer_phone: introPhone.trim().replace(/\D/g, ''),
-        customer_email: '',
-        privacy_accepted: introPrivacy,
-        is_returning_customer: false,
-        last_step: 'בחירת דגם',
-      }).select('id').single();
-      if (leadData) setCurrentLeadId(leadData.id);
+      const { data: leadId } = await supabase.rpc('create_lead', {
+        _customer_name: introName.trim(),
+        _customer_phone: introPhone.trim().replace(/\D/g, ''),
+        _customer_email: '',
+        _privacy_accepted: introPrivacy,
+        _last_step: 'בחירת דגם',
+      });
+      if (leadId) setCurrentLeadId(leadId as string);
     } catch (e) {
       console.error('Error saving lead:', e);
     }
@@ -444,13 +449,8 @@ const NewRepairOrder = () => {
     goToStep('price');
     const phone = (customerPhone || introPhone).replace(/\D/g, '');
     if (phone) {
-      const { data } = await supabase
-        .from('club_members')
-        .select('phone')
-        .eq('phone', phone)
-        .eq('is_active', true)
-        .limit(1);
-      if (data && data.length > 0) {
+      const { data: isMember } = await supabase.rpc('is_active_club_member', { _phone: phone });
+      if (isMember) {
         setIsExistingClubMember(true);
         setJoinedClub(true); // auto-mark as club member
         return;
@@ -1080,17 +1080,8 @@ const NewRepairOrder = () => {
     try {
       for (const file of Array.from(files)) {
         if (deviceImages.length >= 3) break;
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const {
-          data,
-          error
-        } = await supabase.storage.from('device-images').upload(fileName, file);
-        if (error) throw error;
-        const {
-          data: urlData
-        } = supabase.storage.from('device-images').getPublicUrl(fileName);
-        setDeviceImages(prev => [...prev, urlData.publicUrl]);
+        const publicUrl = await publicUpload('device-images', file);
+        setDeviceImages(prev => [...prev, publicUrl]);
       }
       toast.success('התמונה הועלתה בהצלחה');
     } catch (err) {
@@ -1306,47 +1297,13 @@ const NewRepairOrder = () => {
         gaConversion(getFinalPrice(), selectedModel?.name || '', getRepairTypeName());
         setCompletedOrderNumber(orderResult?.order_number || null);
         
-        // Mark lead as converted
-        const normalizedPhone = customerPhone.replace(/\D/g, '');
-        await supabase.from('leads').update({ converted: true }).eq('customer_phone', normalizedPhone);
-        
-        // Redeem loyalty points if used
-        if (loyaltyDiscount > 0 && customerLoyaltyPoints > 0) {
-          await supabase.from('loyalty_points').insert({
-            customer_phone: normalizedPhone,
-            points: customerLoyaltyPoints,
-            type: 'redeemed',
-            description: `מימוש נקודות - הזמנה`,
-            order_id: orderResult?.id || null,
+        // Mark lead converted, redeem/award loyalty points and save club membership (server-side)
+        if (orderResult?.id) {
+          await supabase.rpc('finalize_order_loyalty', {
+            _order_id: orderResult.id,
+            _join_club: joinedClub,
+            _redeem_points: loyaltyDiscount > 0 ? customerLoyaltyPoints : 0,
           });
-        }
-        
-        // Award new loyalty points and save club member only if joined club
-        if (joinedClub) {
-          // Save as club member (upsert)
-          await supabase.from('club_members').upsert({
-            phone: normalizedPhone,
-            name: customerName,
-            email: customerEmail || null,
-            wants_promotions: true,
-            is_active: true,
-          }, { onConflict: 'phone' });
-
-          // Also update the order as club member
-          if (orderResult?.id) {
-            await supabase.from('orders').update({ is_club_member: true }).eq('id', orderResult.id);
-          }
-
-          const pointsToEarn = calculatePointsFromPrice(getFinalPrice());
-          if (pointsToEarn > 0) {
-            await supabase.from('loyalty_points').insert({
-              customer_phone: normalizedPhone,
-              points: pointsToEarn,
-              type: 'earned',
-              description: `צבירה מתיקון - חבר מועדון`,
-              order_id: orderResult?.id || null,
-            });
-          }
         }
         
         goToStep('success');

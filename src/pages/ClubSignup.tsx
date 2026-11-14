@@ -43,33 +43,18 @@ const ClubSignup = () => {
     try {
       const normalizedPhone = form.phone.replace(/\D/g, '');
 
-      const { data: existing } = await supabase
-        .from('club_members')
-        .select('phone')
-        .eq('phone', normalizedPhone)
-        .maybeSingle();
+      const { data: result, error: clubError } = await supabase.rpc('join_club', {
+        _phone: normalizedPhone,
+        _name: form.name.trim(),
+      });
+      if (clubError) throw clubError;
 
-      if (existing) {
+      if (result === 'exists') {
         toast({ title: 'מספר זה כבר רשום במועדון', description: 'אתה כבר חבר מועדון פעיל' });
         setLoading(false);
         return;
       }
-
-      const { error: clubError } = await supabase.from('club_members').insert({
-        phone: normalizedPhone,
-        name: form.name.trim(),
-        email: null,
-        is_active: true,
-        wants_promotions: true,
-      });
-      if (clubError) throw clubError;
-
-      await supabase.from('loyalty_points').insert({
-        customer_phone: normalizedPhone,
-        points: 50,
-        type: 'earned',
-        description: 'בונוס הצטרפות למועדון — מבצע מרץ 2026'
-      });
+      if (result !== 'ok') throw new Error('join_failed');
 
       setSuccess(true);
     } catch (err) {

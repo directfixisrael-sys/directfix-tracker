@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
 import { Phone, Mail, Upload, CheckCircle2, Wrench, Smartphone, Shield, Zap, MapPin, FileText, Loader2, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { publicUpload } from '@/lib/publicUpload';
 import { toast } from 'sonner';
 
 const serviceAreas = [
@@ -79,19 +80,11 @@ const TechnicianRecruitment = () => {
 
       if (resumeFile) {
         resumeFileName = resumeFile.name;
-        const filePath = `${Date.now()}_${resumeFile.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage.
-        from('resumes').
-        upload(filePath, resumeFile);
-
-        if (uploadError) {
+        try {
+          resumeUrl = await publicUpload('resumes', resumeFile);
+        } catch (uploadError) {
           console.error('Upload error:', uploadError);
           toast.error('שגיאה בהעלאת קורות החיים');
-        } else {
-          const { data: urlData } = supabase.storage.
-          from('resumes').
-          getPublicUrl(filePath);
-          resumeUrl = urlData.publicUrl;
         }
       }
 
