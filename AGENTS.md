@@ -1,2 +1,2 @@
 # Architecture rules
-- Repair checkout keeps optional club enrollment in the final details step, while legacy points recovery links resolve to price confirmation, so loyalty never interrupts checkout.
+- Repair checkout keeps optional club enrollment in the final details step, while legacy points recovery links resolve to price confirmation, so loyalty never interrupts checkout.- Customer-facing pages never read or write private tables (leads, club members, loyalty points) directly; they call narrow validated database functions, and public file uploads go through the public-upload server function, so visitors cannot see or change other customers' data.
