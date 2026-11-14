@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import OrderPageSkeleton from '@/components/OrderPageSkeleton';
+import AvailabilityCheckScreen, { type AvailabilityResult } from '@/components/AvailabilityCheckScreen';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -317,6 +318,12 @@ const NewRepairOrder = () => {
   const [selectedBundleAddon, setSelectedBundleAddon] = useState<boolean>(false);
   const [currentBundle, setCurrentBundle] = useState<RepairBundle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Short "תכף מתחילים" availability check, once per session; skipped for recovery deep links
+  const [showAvailabilityCheck, setShowAvailabilityCheck] = useState(() => {
+    try {
+      return !sessionStorage.getItem('df_avail_checked') && !new URLSearchParams(window.location.search).get('step');
+    } catch { return false; }
+  });
   const [selectedModel, setSelectedModel] = useState<IphoneModel | null>(null);
   const [selectedRepair, setSelectedRepair] = useState<RepairType | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -1358,6 +1365,32 @@ const NewRepairOrder = () => {
     </div>
   );
 
+
+  // Real next free slot (same rules as the schedule step, default lead time)
+  const getNextAvailableSlot = (): AvailabilityResult => {
+    const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+    const todayStr = new Date().toDateString();
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+    for (const date of getAvailableDates()) {
+      const slot = getTimeSlotsForDate(date).find(s => isSlotAvailable(date, s));
+      if (slot) {
+        const dayLabel = date.toDateString() === todayStr ? 'היום' : date.toDateString() === tomorrow.toDateString() ? 'מחר' : `ביום ${days[date.getDay()]}`;
+        return { dayLabel, slot };
+      }
+    }
+    return null;
+  };
+
+  if (showAvailabilityCheck) {
+    return <AvailabilityCheckScreen
+      ready={!isLoading}
+      result={isLoading ? null : getNextAvailableSlot()}
+      onDone={() => {
+        try { sessionStorage.setItem('df_avail_checked', '1'); } catch { /* ignore */ }
+        setShowAvailabilityCheck(false);
+      }}
+    />;
+  }
 
   if (isLoading) {
     return <OrderPageSkeleton />;

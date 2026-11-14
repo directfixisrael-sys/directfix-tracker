@@ -22,12 +22,14 @@ const MESSAGES = [
 const AvailabilityCheckScreen = ({ ready, result, onDone }: Props) => {
   const [minElapsed, setMinElapsed] = useState(false);
   const [msgIndex, setMsgIndex] = useState(0);
+  const [started, setStarted] = useState(false);
   const found = minElapsed && ready;
 
   useEffect(() => {
+    const t0 = setTimeout(() => setStarted(true), 30);
     const t1 = setTimeout(() => setMsgIndex(1), SEARCH_MIN_MS / 2);
     const t2 = setTimeout(() => setMinElapsed(true), SEARCH_MIN_MS);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
   useEffect(() => {
@@ -90,7 +92,7 @@ const AvailabilityCheckScreen = ({ ready, result, onDone }: Props) => {
           <div
             className={`h-full rounded-full transition-all ease-out ${found ? 'bg-success' : 'bg-primary'}`}
             style={{
-              width: found ? '100%' : minElapsed ? '92%' : '75%',
+              width: found ? '100%' : minElapsed ? '92%' : started ? '80%' : '0%',
               transitionDuration: found ? '300ms' : `${SEARCH_MIN_MS}ms`,
             }}
           />
