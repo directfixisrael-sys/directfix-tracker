@@ -218,6 +218,14 @@ const RepairCart = ({
                     <Button type="submit" variant="outline" disabled={!coupon.code.trim() || coupon.isValidating} className="h-11 rounded-xl px-4">
                       {coupon.isValidating ? <Loader2 className="w-4 h-4 animate-spin" aria-label="בודק קופון" /> : 'הפעלה'}
                     </Button>
+                    <button
+                      type="button"
+                      onClick={() => { setCouponOpen(false); coupon.onCodeChange(''); }}
+                      aria-label="סגירת שדה הקופון"
+                      className="w-11 h-11 flex-shrink-0 rounded-xl bg-muted/70 hover:bg-muted border border-border flex items-center justify-center"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
                   </form>
                 )}
               </div>
