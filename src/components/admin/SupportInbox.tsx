@@ -20,9 +20,9 @@ type Conv = {
 type Msg = { id: string; role: 'customer' | 'bot' | 'admin' | 'system'; content: string; tool_calls: any; created_at: string };
 
 const STATUS: Record<Conv['status'], { label: string; cls: string }> = {
-  waiting_human: { label: 'ממתין לנציג', cls: 'bg-destructive/10 text-destructive border-destructive/30' },
-  human: { label: 'בטיפול נציג', cls: 'bg-accent/10 text-accent border-accent/30' },
-  bot: { label: 'הבוט עונה', cls: 'bg-success/10 text-success border-success/30' },
+  waiting_human: { label: 'פעיל', cls: 'bg-success/10 text-success border-success/30' },
+  human: { label: 'פעיל', cls: 'bg-success/10 text-success border-success/30' },
+  bot: { label: 'פעיל', cls: 'bg-success/10 text-success border-success/30' },
   closed: { label: 'סגור', cls: 'bg-muted text-muted-foreground border-border' },
 };
 
@@ -32,9 +32,6 @@ const SupportInbox = () => {
   const [convs, setConvs] = useState<Conv[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [msgs, setMsgs] = useState<Msg[]>([]);
-  const [reply, setReply] = useState('');
-  const [filter, setFilter] = useState<'open' | 'all'>('open');
-  const [sending, setSending] = useState(false);
 
   const loadConvs = useCallback(async () => {
     const { data } = await supabase.from('support_conversations').select('id, customer_name, customer_phone, verified_order_id, status, handoff_reason, admin_unread, last_message_at').order('last_message_at', { ascending: false }).limit(200);
@@ -61,9 +58,8 @@ const SupportInbox = () => {
   }, [selectedId, loadMsgs, loadConvs]);
 
   const visible = useMemo(() => {
-    const list = filter === 'open' ? convs.filter((c) => c.status === 'waiting_human' || c.status === 'human' || c.admin_unread) : convs;
-    return [...list].sort((a, b) => Number(b.status === 'waiting_human') - Number(a.status === 'waiting_human'));
-  }, [convs, filter]);
+    return convs;
+  }, [convs]);
   const selected = convs.find((c) => c.id === selectedId) || null;
 
   const setStatus = async (status: Conv['status']) => {
@@ -73,17 +69,6 @@ const SupportInbox = () => {
     if (status === 'bot') await supabase.from('support_messages').insert({ conversation_id: selected.id, role: 'system', content: 'העוזרת החכמה חזרה לענות בשיחה.' });
     if (status === 'closed') await supabase.from('support_messages').insert({ conversation_id: selected.id, role: 'system', content: 'השיחה נסגרה. אפשר לכתוב שוב בכל זמן.' });
     loadConvs(); loadMsgs(selected.id);
-  };
-
-  const sendReply = async () => {
-    if (!selected || !reply.trim()) return;
-    setSending(true);
-    const { error } = await supabase.from('support_messages').insert({ conversation_id: selected.id, role: 'admin', content: reply.trim() });
-    if (error) { toast.error('ההודעה לא נשלחה'); setSending(false); return; }
-    await supabase.from('support_conversations').update({ status: 'human', admin_unread: false, last_message_at: new Date().toISOString() }).eq('id', selected.id);
-    setReply('');
-    setSending(false);
-    loadMsgs(selected.id); loadConvs();
   };
 
   const remove = async () => {
@@ -98,13 +83,12 @@ const SupportInbox = () => {
     <div dir="rtl" className="grid gap-4 lg:grid-cols-[320px_1fr]">
       <Card className="p-3 space-y-2 max-h-[75vh] overflow-y-auto">
         <div className="flex gap-2 mb-2">
-          <Button size="sm" variant={filter === 'open' ? 'default' : 'outline'} onClick={() => setFilter('open')}>דורש טיפול</Button>
-          <Button size="sm" variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>כל השיחות</Button>
+          <p className="font-bold text-sm self-center">כל השיחות</p>
           <Button size="sm" variant="ghost" asChild className="mr-auto">
             <a href="/chat-preview" target="_blank" rel="noopener noreferrer">צפייה בצ'אט</a>
           </Button>
         </div>
-        {visible.length === 0 && <p className="text-sm text-muted-foreground p-4 text-center">אין שיחות {filter === 'open' ? 'שממתינות לך' : 'עדיין'}</p>}
+        {visible.length === 0 && <p className="text-sm text-muted-foreground p-4 text-center">אין שיחות עדיין</p>}
         {visible.map((c) => (
           <button
             key={c.id}
@@ -120,7 +104,6 @@ const SupportInbox = () => {
               <span className={cn('text-[11px] font-bold rounded-full border px-2 py-0.5', STATUS[c.status].cls)}>{STATUS[c.status].label}</span>
               <span className="text-[11px] text-muted-foreground">{fmt(c.last_message_at)}</span>
             </div>
-            {c.handoff_reason && c.status === 'waiting_human' && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{c.handoff_reason}</p>}
           </button>
         ))}
       </Card>
@@ -143,7 +126,6 @@ const SupportInbox = () => {
                   <a href={`https://wa.me/${waPhone}`} target="_blank" rel="noopener noreferrer"><Phone className="w-4 h-4 ml-1" />ווטסאפ</a>
                 </Button>
               )}
-              {selected.status !== 'bot' && <Button size="sm" variant="outline" onClick={() => setStatus('bot')}><Bot className="w-4 h-4 ml-1" />החזרה לבוט</Button>}
               {selected.status !== 'closed' && <Button size="sm" variant="outline" onClick={() => setStatus('closed')}><CheckCheck className="w-4 h-4 ml-1" />סגירה</Button>}
               <Button size="sm" variant="ghost" onClick={remove} aria-label="מחיקת שיחה"><Trash2 className="w-4 h-4 text-destructive" /></Button>
             </div>
@@ -168,16 +150,7 @@ const SupportInbox = () => {
               })}
             </div>
 
-            <div className="border-t border-border p-3 flex gap-2 items-end">
-              <Textarea
-                value={reply}
-                onChange={(e) => setReply(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply(); } }}
-                placeholder="כתבו תשובה ללקוח... (הבוט מפסיק לענות כשאתם עונים)"
-                className="min-h-[48px] max-h-40 text-sm"
-              />
-              <Button onClick={sendReply} disabled={!reply.trim() || sending} size="icon" aria-label="שליחת תשובה"><Send className="w-4 h-4" /></Button>
-            </div>
+            <p className="border-t border-border p-3 text-xs text-muted-foreground">הצ'אט עונה אוטומטית בלבד. שאלות מעבר מופנות לווטסאפ.</p>
           </>
         )}
       </Card>
