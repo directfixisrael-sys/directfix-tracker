@@ -2,6 +2,8 @@
 const STORAGE_KEY = 'df_support_chat';
 const FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/support-chat`;
 const KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+/** Where customers go for questions beyond what the assistant answers. */
+export const SUPPORT_WHATSAPP_URL = 'https://wa.me/97233106020';
 
 export type SupportRole = 'customer' | 'bot' | 'admin' | 'system';
 export type SupportStatus = 'bot' | 'waiting_human' | 'human' | 'closed';
@@ -75,13 +77,6 @@ export async function fetchHistory(): Promise<{ status: SupportStatus; messages:
   const res = await post({ action: 'history', ...s });
   if (res.status === 404) { clearSession(); return null; }
   if (!res.ok) throw new Error('history_failed');
-  return res.json();
-}
-
-export async function requestHuman(): Promise<{ status: SupportStatus; messages: SupportMessage[]; whatsappUrl: string }> {
-  const s = await ensureSession();
-  const res = await post({ action: 'handoff', ...s });
-  if (!res.ok) throw new Error('handoff_failed');
   return res.json();
 }
 

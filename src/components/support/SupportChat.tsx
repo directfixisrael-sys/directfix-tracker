@@ -8,7 +8,7 @@ import { PromptInput, PromptInputTextarea, PromptInputFooter, PromptInputSubmit,
 import { Tool, ToolHeader, ToolContent, ToolOutput } from '@/components/ai-elements/tool';
 import { cn } from '@/lib/utils';
 import {
-  fetchHistory, fetchFaqQuestions, getSession, sendMessage, clearSession, setChatContext,
+  fetchHistory, fetchFaqQuestions, getSession, sendMessage, clearSession, setChatContext, SUPPORT_WHATSAPP_URL,
   type SupportMessage, type SupportStatus, type SupportTool,
 } from '@/lib/supportChat';
 
@@ -21,12 +21,12 @@ const TOOL_TITLES: Record<string, string> = {
 };
 
 // Our own links (like the order tracking page) open straight away, others ask first
-const linkSafety = { enabled: true, onLinkCheck: (url: string) => /^https:\/\/([a-z0-9-]+\.)?directfix\.co\.il(\/|$)/i.test(url) };
+const linkSafety = { enabled: true, onLinkCheck: (url: string) => /^https:\/\/(([a-z0-9-]+\.)?directfix\.co\.il|wa\.me)(\/|$)/i.test(url) };
 
 const statusLine: Record<SupportStatus, string> = {
   bot: 'עונה מיד, 24/7',
-  waiting_human: 'ממתינים לנציג',
-  human: 'נציג בשיחה',
+  waiting_human: 'עונה מיד, 24/7',
+  human: 'עונה מיד, 24/7',
   closed: 'השיחה נסגרה',
 };
 
@@ -140,13 +140,6 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
     lastAdminCount.current = 0;
     focusInput();
   };
-
-  // While a person handles the chat, check for replies
-  useEffect(() => {
-    if (convStatus === 'bot' || chatStatus !== 'ready') return;
-    const t = setInterval(loadHistory, open ? 5000 : 20000);
-    return () => clearInterval(t);
-  }, [convStatus, chatStatus, open, loadHistory]);
 
   useEffect(() => {
     if (!open) return;
@@ -269,15 +262,6 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
               <X className="w-5 h-5" />
             </button>
           </div>
-
-          {(convStatus === 'waiting_human' || convStatus === 'human') && (
-            <div className="flex items-center justify-between gap-3 px-4 py-2.5 bg-accent/10 border-b border-accent/20 text-sm">
-              <span className="flex items-center gap-2 font-medium"><Headset className="w-4 h-4 text-accent" aria-hidden="true" />{convStatus === 'human' ? 'נציג מהצוות עונה לך כאן' : 'נציג יחזור אליך כאן בהקדם'}</span>
-              {whatsappUrl && (
-                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="font-bold text-success underline whitespace-nowrap">המשך בווטסאפ</a>
-              )}
-            </div>
-          )}
 
           <Conversation className="min-h-0">
             <ConversationContent className="gap-5 text-base">

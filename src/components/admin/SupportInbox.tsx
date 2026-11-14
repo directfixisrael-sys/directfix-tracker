@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { Bot, Headset, Send, Trash2, CheckCheck, Phone, Package } from 'lucide-react';
+import { Bot, Headset, Trash2, CheckCheck, Phone, Package } from 'lucide-react';
 
 type Conv = {
   id: string;
@@ -66,7 +65,6 @@ const SupportInbox = () => {
     if (!selected) return;
     const { error } = await supabase.from('support_conversations').update({ status }).eq('id', selected.id);
     if (error) { toast.error('לא הצלחנו לעדכן'); return; }
-    if (status === 'bot') await supabase.from('support_messages').insert({ conversation_id: selected.id, role: 'system', content: 'העוזרת החכמה חזרה לענות בשיחה.' });
     if (status === 'closed') await supabase.from('support_messages').insert({ conversation_id: selected.id, role: 'system', content: 'השיחה נסגרה. אפשר לכתוב שוב בכל זמן.' });
     loadConvs(); loadMsgs(selected.id);
   };
