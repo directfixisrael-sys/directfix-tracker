@@ -1,5 +1,6 @@
 import { createPortal } from 'react-dom';
-import { ShoppingBag, X, Trash2, ChevronLeft, Plus, BadgePercent } from 'lucide-react';
+import { ShoppingBag, X, Trash2, ChevronLeft, Plus, BadgePercent, Tag, Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Drawer, DrawerContent, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 
@@ -30,6 +31,14 @@ interface RepairCartProps {
   onContinue?: () => void;
   continueLabel?: string;
   onAddRepair?: () => void;
+  coupon?: {
+    code: string;
+    onCodeChange: (code: string) => void;
+    onApply: () => void;
+    onRemove: () => void;
+    appliedCode: string | null;
+    isValidating: boolean;
+  };
 }
 
 export const cartCountLabel = (n: number) => (n === 1 ? 'תיקון אחד' : `${n} תיקונים`);
@@ -44,8 +53,9 @@ const RepairCart = ({
   variant,
   note,
   onContinue,
-  continueLabel = 'המשך להזמנה',
+  continueLabel = 'סיום הזמנה',
   onAddRepair,
+  coupon,
 }: RepairCartProps) => {
   const count = lines.length;
   if (count === 0) return null;
@@ -156,10 +166,48 @@ const RepairCart = ({
               ))}
             </ul>
 
-            {count === 1 && onAddRepair && (
-              <p className="mt-3 text-sm text-muted-foreground text-center">
-                מוסיפים עוד תיקון? מקבלים 15% הנחה על הזול מביניהם
-              </p>
+            {onAddRepair && (
+              <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-primary/5 border border-primary/15 px-4 py-2.5">
+                <p className="text-sm text-muted-foreground leading-snug">
+                  {count === 1 ? 'מוסיפים עוד תיקון? 15% הנחה על הזול מביניהם' : 'רוצים להוסיף עוד תיקון?'}
+                </p>
+                <Button size="sm" variant="outline" onClick={onAddRepair} className="h-9 rounded-full gap-1 px-3 flex-shrink-0 border-primary/30 text-primary">
+                  <Plus className="w-4 h-4" aria-hidden="true" />
+                  הוסף תיקון
+                </Button>
+              </div>
+            )}
+
+            {coupon && (
+              <div className="mt-3">
+                {coupon.appliedCode ? (
+                  <div className="flex items-center justify-between gap-3 rounded-2xl border border-success/30 bg-success/10 px-4 py-2.5">
+                    <span className="flex items-center gap-2 text-sm font-semibold text-success">
+                      <Tag className="w-4 h-4" aria-hidden="true" />
+                      קופון <span className="font-mono">{coupon.appliedCode}</span> הופעל
+                    </span>
+                    <button type="button" onClick={coupon.onRemove} className="text-sm text-muted-foreground underline">
+                      הסרה
+                    </button>
+                  </div>
+                ) : (
+                  <form
+                    className="flex items-center gap-2"
+                    onSubmit={(e) => { e.preventDefault(); coupon.onApply(); }}
+                  >
+                    <Input
+                      value={coupon.code}
+                      onChange={(e) => coupon.onCodeChange(e.target.value.toUpperCase())}
+                      placeholder="יש לכם קוד קופון?"
+                      aria-label="קוד קופון"
+                      className="h-11 rounded-xl font-mono text-base flex-1"
+                    />
+                    <Button type="submit" variant="outline" disabled={!coupon.code.trim() || coupon.isValidating} className="h-11 rounded-xl px-4">
+                      {coupon.isValidating ? <Loader2 className="w-4 h-4 animate-spin" aria-label="בודק קופון" /> : 'הפעלה'}
+                    </Button>
+                  </form>
+                )}
+              </div>
             )}
 
             <div className="mt-4 pt-4 border-t-2 border-dashed border-border space-y-2">
@@ -189,12 +237,6 @@ const RepairCart = ({
               {onContinue && (
                 <Button onClick={onContinue} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg">
                   {continueLabel}
-                </Button>
-              )}
-              {onAddRepair && (
-                <Button variant="outline" onClick={onAddRepair} className="w-full h-12 text-sm rounded-2xl gap-2">
-                  <Plus className="w-4 h-4" />
-                  הוספת תיקון נוסף
                 </Button>
               )}
             </div>

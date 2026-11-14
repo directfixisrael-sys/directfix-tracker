@@ -1,25 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { Check, MapPin, Wrench } from 'lucide-react';
-
-export type AvailabilityResult = { dayLabel: string; slot: string } | null;
+import { MapPin, Wrench } from 'lucide-react';
 
 type Props = {
-  /** True once the order page data (models, slots, blocks) has loaded */
+  /** True once the order page data has loaded */
   ready: boolean;
-  /** Real next free slot, computed from the same rules the schedule step uses */
-  result: AvailabilityResult;
   onDone: () => void;
+  title?: string;
+  messages?: string[];
 };
 
 const SEARCH_MIN_MS = 1400;
-const FOUND_MS = 1100;
+const FINISH_MS = 350;
 
-const MESSAGES = [
+const DEFAULT_MESSAGES = [
   'בודקים זמינות באזור השרון, המרכז וגוש דן...',
-  'מאתרים טכנאי פנוי עבורך...',
+  'מכינים עבורך את ההזמנה...',
 ];
 
-const AvailabilityCheckScreen = ({ ready, result, onDone }: Props) => {
+const AvailabilityCheckScreen = ({ ready, onDone, title = 'תכף מתחילים', messages = DEFAULT_MESSAGES }: Props) => {
   const [minElapsed, setMinElapsed] = useState(false);
   const [msgIndex, setMsgIndex] = useState(0);
   const [started, setStarted] = useState(false);
@@ -36,7 +34,7 @@ const AvailabilityCheckScreen = ({ ready, result, onDone }: Props) => {
 
   useEffect(() => {
     if (!found) return;
-    const t = setTimeout(() => onDoneRef.current(), FOUND_MS);
+    const t = setTimeout(() => onDoneRef.current(), FINISH_MS);
     return () => clearTimeout(t);
   }, [found]);
 
@@ -46,53 +44,28 @@ const AvailabilityCheckScreen = ({ ready, result, onDone }: Props) => {
       dir="rtl"
       role="status"
       aria-live="polite"
-      onClick={() => found && onDoneRef.current()}
     >
       <div className="w-full max-w-sm text-center">
         {/* Icon */}
         <div className="relative mx-auto mb-8 h-24 w-24">
-          {!found && (
-            <>
-              <span className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
-              <span className="absolute inset-2 rounded-full bg-primary/10" />
-            </>
-          )}
-          <div
-            className={`relative flex h-24 w-24 items-center justify-center rounded-full shadow-lg transition-colors duration-300 ${
-              found ? 'bg-success text-success-foreground animate-scale-in' : 'bg-card text-primary border-2 border-primary/30'
-            }`}
-          >
-            {found ? <Check className="h-12 w-12" strokeWidth={3} /> : <MapPin className="h-11 w-11" />}
+          <span className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+          <span className="absolute inset-2 rounded-full bg-primary/10" />
+          <div className="relative flex h-24 w-24 items-center justify-center rounded-full shadow-lg bg-card text-primary border-2 border-primary/30">
+            <MapPin className="h-11 w-11" />
           </div>
         </div>
 
-        {found ? (
-          <div className="animate-fade-in">
-            <h2 className="text-2xl font-extrabold text-foreground">
-              {result ? 'נמצא טכנאי פנוי' : 'הכל מוכן'}
-            </h2>
-            {result ? (
-              <p className="mt-3 text-lg text-foreground/85">
-                {result.dayLabel} · <span dir="ltr" className="font-bold text-success">{result.slot}</span>
-              </p>
-            ) : (
-              <p className="mt-3 text-lg text-foreground/85">בוחרים מועד בהמשך</p>
-            )}
-            <p className="mt-2 text-sm text-muted-foreground">תכף מתחילים</p>
-          </div>
-        ) : (
-          <div>
-            <h2 className="text-2xl font-extrabold text-foreground">תכף מתחילים</h2>
-            <p key={msgIndex} className="mt-3 min-h-[3.5rem] text-base text-muted-foreground animate-fade-in">
-              {MESSAGES[msgIndex]}
-            </p>
-          </div>
-        )}
+        <div>
+          <h2 className="text-2xl font-extrabold text-foreground">{title}</h2>
+          <p key={msgIndex} className="mt-3 min-h-[3.5rem] text-base text-muted-foreground animate-fade-in">
+            {messages[Math.min(msgIndex, messages.length - 1)]}
+          </p>
+        </div>
 
         {/* Progress bar */}
         <div className="mx-auto mt-8 h-2 w-full max-w-xs overflow-hidden rounded-full bg-muted" dir="ltr">
           <div
-            className={`h-full rounded-full transition-all ease-out ${found ? 'bg-success' : 'bg-primary'}`}
+            className="h-full rounded-full transition-all ease-out bg-primary"
             style={{
               width: found ? '100%' : minElapsed ? '92%' : started ? '80%' : '0%',
               transitionDuration: found ? '300ms' : `${SEARCH_MIN_MS}ms`,
