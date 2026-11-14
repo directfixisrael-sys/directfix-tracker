@@ -204,7 +204,17 @@ async function runTool(conv: any, name: string, args: any, failedSoFar: { n: num
     const q = String(args.model || "").trim().slice(0, 60);
     if (!q) return { models: [] };
     const { data: models } = await supabase.from("iphone_models").select("id, name").eq("is_active", true).ilike("name", `%${q}%`).limit(4);
-    if (!models?.length) return { models: [], note: "הדגם לא נמצא במחירון. אפשר לבדוק בעמוד ההזמנה או להעביר לנציג." };
+    if (!models?.length) {
+      // Tablets and other brands (iPad, Samsung) only have a screen price
+      const { data: tablets } = await supabase.from("ipad_models").select("name, screen_price").eq("is_active", true).ilike("name", `%${q}%`).gt("screen_price", 0).limit(4);
+      if (tablets?.length) {
+        return {
+          models: tablets.map((t) => ({ model: t.name, repairs: [{ repair: "החלפת מסך", price: Number(t.screen_price) }] })),
+          note: "מחירים לפני מבצעים. המחיר הסופי מוצג בעמוד ההזמנה.",
+        };
+      }
+      return { models: [], note: "הדגם לא נמצא במחירון. אפשר לבדוק בעמוד ההזמנה או להעביר לנציג." };
+    }
     const { data: prices } = await supabase
       .from("model_repair_prices")
       .select("model_id, price, repair_types(name, is_active)")
@@ -214,7 +224,7 @@ async function runTool(conv: any, name: string, args: any, failedSoFar: { n: num
       models: models.map((m) => ({
         model: m.name,
         repairs: (prices || [])
-          .filter((p: any) => p.model_id === m.id && p.repair_types?.is_active)
+          .filter((p: any) => p.model_id === m.id && p.repair_types?.is_active && Number(p.price) > 0)
           .map((p: any) => ({ repair: p.repair_types.name, price: Number(p.price) })),
       })),
       note: "מחירים לפני מבצעים. המחיר הסופי מוצג בעמוד ההזמנה.",
