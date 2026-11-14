@@ -808,11 +808,15 @@ const NewRepairOrder = () => {
       });
     }, 200);
   };
-  const handleModelSelect = (model: IphoneModel) => {
+  // Switching to another model keeps the already chosen repair in the cart
+  const keepCurrentInCartFor = (model: IphoneModel) => {
     if (mainInCart && selectedModel && selectedModel.id !== model.id) {
       moveCurrentToCart();
       toast.success('התיקון הקודם נשמר בסל');
     }
+  };
+  const handleModelSelect = (model: IphoneModel) => {
+    keepCurrentInCartFor(model);
     setSelectedModel(model);
     setBatteryPriceOverride(null);
     gaSelectModel(model.name);
@@ -2013,7 +2017,7 @@ const NewRepairOrder = () => {
             {/* Smart AI Search */}
             <SmartRepairInput models={models} repairTypes={repairTypes} priceMap={priceMap} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
 
-            <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => setSelectedModel(model)} onConfirm={model => handleModelSelect(model)} />
+            <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => { keepCurrentInCartFor(model); setSelectedModel(model); }} onConfirm={model => handleModelSelect(model)} />
 
             {/* Testimonials Slider */}
             <TestimonialsSlider />
