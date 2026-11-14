@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import OrderPageSkeleton from '@/components/OrderPageSkeleton';
 import AvailabilityCheckScreen from '@/components/AvailabilityCheckScreen';
 import { useNavigate, useSearchParams } from 'react-router-dom';
