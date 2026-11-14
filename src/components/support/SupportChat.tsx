@@ -87,7 +87,8 @@ const SupportChat = () => {
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [unread, setUnread] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const focusInput = () => panelRef.current?.querySelector('textarea')?.focus();
   const lastAdminCount = useRef(0);
 
   const loadHistory = useCallback(async () => {
@@ -116,7 +117,7 @@ const SupportChat = () => {
     if (!open) return;
     setUnread(false);
     loadHistory();
-    const t = setTimeout(() => textareaRef.current?.focus(), 150);
+    const t = setTimeout(focusInput, 150);
     return () => clearTimeout(t);
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -168,7 +169,7 @@ const SupportChat = () => {
       setMessages((prev) => [...prev, { id: `err-${Date.now()}`, role: 'system', content: 'אין חיבור כרגע. נסו שוב בעוד רגע.', tool_calls: null, created_at: new Date().toISOString() }]);
       setChatStatus('ready');
     } finally {
-      textareaRef.current?.focus();
+      focusInput();
     }
   };
 
@@ -208,6 +209,7 @@ const SupportChat = () => {
 
       {open && (
         <div
+          ref={panelRef}
           role="dialog"
           aria-label="צ'אט תמיכה Direct Fix"
           dir="rtl"
@@ -291,7 +293,6 @@ const SupportChat = () => {
           <div className="border-t border-border p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:pb-3 bg-card/60">
             <PromptInput onSubmit={handleSubmit}>
               <PromptInputTextarea
-                ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="כתבו הודעה..."
