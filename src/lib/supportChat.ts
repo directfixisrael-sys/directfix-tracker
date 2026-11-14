@@ -127,3 +127,13 @@ export async function sendMessage(text: string, onEvent: (e: SendEvent) => void,
   }
   if (!finished) onEvent({ type: 'error', message: 'החיבור נקטע. נסו שוב.' });
 }
+
+/** The after-order questions the business set in the admin panel (shown ones only). */
+export async function fetchFaqQuestions(): Promise<string[] | null> {
+  try {
+    const res = await post({ action: 'faqs' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return Array.isArray(data.questions) ? data.questions.filter((q: unknown) => typeof q === 'string') : null;
+  } catch { return null; }
+}
