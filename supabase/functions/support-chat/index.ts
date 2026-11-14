@@ -6,7 +6,6 @@ import { HELP_DOCS } from "./knowledge.ts";
 
 const MODEL = "openai/gpt-6-astra";
 const WHATSAPP_NUMBER = "97233106020";
-const ADMIN_EMAIL = "directfixil@gmail.com";
 const MAX_CUSTOMER_MSGS_PER_10_MIN = 20;
 const MAX_FAILED_LOOKUPS_PER_HOUR = 5;
 
@@ -65,41 +64,6 @@ async function insertMessage(conversationId: string, role: string, content: stri
   if (error) throw error;
   await supabase.from("support_conversations").update({ last_message_at: new Date().toISOString() }).eq("id", conversationId);
   return data;
-}
-
-async function notifyAdmin(conv: { id: string; customer_name?: string | null; customer_phone?: string | null }, reason: string, lastMessage: string) {
-  const key = Deno.env.get("RESEND_API_KEY");
-  if (!key) return;
-  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
-  try {
-    await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: "דיירקט פיקס <orders@directfix.co.il>",
-        to: [ADMIN_EMAIL],
-        subject: `לקוח מבקש נציג בצ'אט${conv.customer_name ? ` - ${conv.customer_name}` : ""}`,
-        html: `<div dir="rtl" style="font-family:Arial,sans-serif;font-size:16px;line-height:1.6">
-          <h2 style="margin:0 0 12px">לקוח בצ'אט התמיכה מחכה לנציג</h2>
-          <p><b>סיבה:</b> ${esc(reason)}</p>
-          ${conv.customer_name ? `<p><b>שם:</b> ${esc(conv.customer_name)}</p>` : ""}
-          ${conv.customer_phone ? `<p><b>טלפון:</b> ${esc(conv.customer_phone)}</p>` : ""}
-          <p><b>הודעה אחרונה:</b> ${esc(lastMessage)}</p>
-          <p><a href="https://track.directfix.co.il/admin">לפתיחת הצ'אט בפאנל הניהול</a></p>
-        </div>`,
-      }),
-    });
-  } catch (e) {
-    console.error("handoff email failed", e);
-  }
-}
-
-async function startHandoff(conv: any, reason: string, lastMessage: string) {
-  if (conv.status === "waiting_human" || conv.status === "human") return null;
-  await supabase.from("support_conversations").update({ status: "waiting_human", handoff_reason: reason, admin_unread: true }).eq("id", conv.id);
-  const sys = await insertMessage(conv.id, "system", "השיחה הועברה לנציג. נחזור אליכם כאן בצ'אט בהקדם, או שאפשר להמשיך בווטסאפ.");
-  notifyAdmin(conv, reason, lastMessage);
-  return sys;
 }
 
 // ---------- Tools ----------
@@ -172,7 +136,7 @@ function orderSummary(o: any) {
   };
 }
 
-async function runTool(conv: any, name: string, args: any, failedSoFar: { n: number }, state: { handoffReason: string | null }) {
+async function runTool(conv: any, name: string, args: any, failedSoFar: { n: number }) {
   if (name === "lookup_order") {
     if (failedSoFar.n >= MAX_FAILED_LOOKUPS_PER_HOUR) {
       return { found: false, error: "יותר מדי ניסיונות. להפנות את הלקוח לווטסאפ." };
@@ -222,10 +186,6 @@ async function runTool(conv: any, name: string, args: any, failedSoFar: { n: num
       })),
       note: "מחירים לפני מבצעים. המחיר הסופי מוצג בעמוד ההזמנה.",
     };
-  }
-  if (name === "handoff_to_human") {
-    state.handoffReason = String(args.reason || "הלקוח צריך נציג").slice(0, 300);
-    return { ok: true, message: "השיחה הועברה לנציג. ספר ללקוח שנציג יחזור אליו כאן בצ'אט, ושאפשר גם לפנות בווטסאפ." };
   }
   return { error: "unknown tool" };
 }
@@ -348,7 +308,6 @@ Deno.serve(async (req) => {
       .limit(30);
     const instructions = await buildInstructions(conv);
     const failed = { n: await failedLookupsLastHour(conv.id) };
-    const state = { handoffReason: null as string | null };
 
     const enc = new TextEncoder();
     const stream = new ReadableStream({
@@ -387,7 +346,7 @@ Deno.serve(async (req) => {
             for (const c of calls) {
               let args: any = {};
               try { args = JSON.parse(c.arguments || "{}"); } catch { /* ignore */ }
-              const result = await runTool(conv, c.name, args, failed, state);
+              const result = await runTool(conv, c.name, args, failed);
               const entry = { name: c.name, input: args, output: result, state: (result as any)?.error ? "output-error" : "output-available" };
               toolLog.push(entry);
               send({ type: "tool", tool: entry });
