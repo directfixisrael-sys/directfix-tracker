@@ -21,7 +21,17 @@ export interface SupportMessage {
   created_at: string;
 }
 
-interface Session { conversationId: string; token: string }
+interface Session { conversationId: string; token: string; orderNumber?: number | null }
+
+export interface ChatContext { name?: string; phone?: string; orderNumber?: number | null }
+let chatContext: ChatContext = {};
+/** Order details the chat starts with, so the assistant already knows the order the customer just placed. */
+export const setChatContext = (ctx: ChatContext) => {
+  chatContext = ctx;
+  const s = getSession();
+  // A different order gets a fresh conversation
+  if (s && ctx.orderNumber && s.orderNumber !== ctx.orderNumber) clearSession();
+};
 
 export const getSession = (): Session | null => {
   try {
@@ -43,15 +53,18 @@ const post = (body: unknown, signal?: AbortSignal) =>
 export async function ensureSession(): Promise<Session> {
   const existing = getSession();
   if (existing) return existing;
-  let name: string | undefined; let phone: string | undefined;
-  try {
-    const intro = JSON.parse(localStorage.getItem('df_intro_lead') || 'null');
-    name = intro?.name || undefined; phone = intro?.phone || undefined;
-  } catch { /* ignore */ }
-  const res = await post({ action: 'start', name, phone });
+  let name = chatContext.name || undefined; let phone = chatContext.phone || undefined;
+  if (!name || !phone) {
+    try {
+      const intro = JSON.parse(localStorage.getItem('df_intro_lead') || 'null');
+      name = name || intro?.name || undefined; phone = phone || intro?.phone || undefined;
+    } catch { /* ignore */ }
+  }
+  const orderNumber = chatContext.orderNumber || undefined;
+  const res = await post({ action: 'start', name, phone, orderNumber });
   if (!res.ok) throw new Error('start_failed');
   const data = await res.json();
-  const s = { conversationId: data.conversationId, token: data.token };
+  const s = { conversationId: data.conversationId, token: data.token, orderNumber: orderNumber ?? null };
   saveSession(s);
   return s;
 }

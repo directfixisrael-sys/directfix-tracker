@@ -28,7 +28,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 const Auth = z.object({ conversationId: z.string().uuid(), token: z.string().min(20).max(200) });
 const Body = z.discriminatedUnion("action", [
-  z.object({ action: z.literal("start"), name: z.string().trim().max(80).optional(), phone: z.string().trim().max(20).optional() }),
+  z.object({ action: z.literal("start"), name: z.string().trim().max(80).optional(), phone: z.string().trim().max(20).optional(), orderNumber: z.number().int().positive().max(10000000).optional() }),
   Auth.extend({ action: z.literal("history") }),
   Auth.extend({ action: z.literal("send"), message: z.string().trim().min(1).max(1000), page: z.string().max(200).optional() }),
   Auth.extend({ action: z.literal("handoff") }),
@@ -252,6 +252,7 @@ async function buildInstructions(conv: any) {
 - אם את לא בטוחה, אין מידע, הלקוח מבקש נציג, או מדובר בתלונה/החזר/אחריות/ביטול/שינוי מועד - קראי ל-handoff_to_human.
 - להזמנת תיקון הפני לעמוד ההזמנה /order. למעקב - /track.
 - אל תבטיחי הגעה תוך שעה.
+- הצ'אט נפתח ללקוח אחרי שביצע הזמנה. שאלות נפוצות: מתי הטכנאי מגיע (נציג מתקשר לאשר את המועד; סטטוס חי ב-/track), איך משלמים (בסוף התיקון, אחרי שהמכשיר עובד), מה להכין (לגבות את המכשיר, לזכור את קוד הנעילה, להיות זמינים בטלפון), משך התיקון ואחריות. שינוי מועד, ביטול או עדכון כתובת - handoff_to_human.
 
 ${HELP_DOCS}${verified}`;
 }
@@ -283,9 +284,15 @@ Deno.serve(async (req) => {
     if (body.action === "start") {
       const token = crypto.randomUUID() + crypto.randomUUID();
       const phone = body.phone ? normalizePhone(body.phone) : null;
+      // Link the order just placed, only when its phone matches too
+      let verifiedOrderId: string | null = null;
+      if (phone && body.orderNumber) {
+        const { data: o } = await supabase.from("orders").select("id, customer_phone").eq("order_number", body.orderNumber).maybeSingle();
+        if (o && normalizePhone(o.customer_phone) === phone) verifiedOrderId = o.id;
+      }
       const { data, error } = await supabase
         .from("support_conversations")
-        .insert({ token_hash: await sha256(token), customer_name: body.name || null, customer_phone: phone && phone.length >= 9 ? phone : null })
+        .insert({ token_hash: await sha256(token), customer_name: body.name || null, customer_phone: phone && phone.length >= 9 ? phone : null, verified_order_id: verifiedOrderId })
         .select("id")
         .single();
       if (error) throw error;

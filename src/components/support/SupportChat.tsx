@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import type { ChatStatus } from 'ai';
-import { X, MessageCircle, UserRound, Package, Tag, Headset } from 'lucide-react';
+import { X, MessageCircle, UserRound, Package, Tag, Headset, RotateCcw } from 'lucide-react';
 import shiraAvatar from '@/assets/shira-avatar.png';
 import { Conversation, ConversationContent, ConversationEmptyState, ConversationScrollButton } from '@/components/ai-elements/conversation';
 import { Message, MessageContent, MessageResponse } from '@/components/ai-elements/message';
@@ -11,12 +11,12 @@ import { Tool, ToolHeader, ToolContent, ToolOutput } from '@/components/ai-eleme
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
-  fetchHistory, getSession, requestHuman, sendMessage,
+  fetchHistory, getSession, requestHuman, sendMessage, clearSession, setChatContext,
   type SupportMessage, type SupportStatus, type SupportTool,
 } from '@/lib/supportChat';
 
-const HIDDEN_PATHS = ['/admin', '/track'];
-const SUGGESTIONS = ['כמה עולה החלפת מסך?', 'איפה ההזמנה שלי?', 'איזו אחריות יש על תיקון?', 'לאילו אזורים אתם מגיעים?'];
+// Questions customers ask after placing an order
+const SUGGESTIONS = ['מתי הטכנאי מגיע?', 'איך משלמים בסוף התיקון?', 'מה להכין לפני שהטכנאי מגיע?', 'אפשר לשנות את מועד ההגעה?', 'כמה זמן לוקח התיקון?', 'מה האחריות על התיקון?'];
 const TOOL_TITLES: Record<string, string> = {
   lookup_order: 'בדיקת הזמנה',
   get_repair_prices: 'בדיקת מחירון',
@@ -76,8 +76,10 @@ function ToolCard({ tool }: { tool: SupportTool }) {
   );
 }
 
-const SupportChat = () => {
-  const { pathname } = useLocation();
+interface SupportChatProps { orderNumber?: number | null; name?: string; phone?: string }
+
+const SupportChat = ({ orderNumber, name, phone }: SupportChatProps) => {
+  useLocation();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<SupportMessage[]>([]);
   const [convStatus, setConvStatus] = useState<SupportStatus>('bot');
@@ -87,6 +89,7 @@ const SupportChat = () => {
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [unread, setUnread] = useState(false);
+  const busy = chatStatus === 'submitted' || chatStatus === 'streaming';
   const panelRef = useRef<HTMLDivElement>(null);
   const focusInput = () => panelRef.current?.querySelector('textarea')?.focus();
   const lastAdminCount = useRef(0);
@@ -104,7 +107,21 @@ const SupportChat = () => {
     } catch { /* ignore */ }
   }, [open]);
 
-  useEffect(() => { loadHistory(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    setChatContext({ orderNumber, name, phone });
+    loadHistory();
+  }, [orderNumber]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const restart = () => {
+    if (busy) return;
+    clearSession();
+    setMessages([]);
+    setConvStatus('bot');
+    setWhatsappUrl(null);
+    setInput('');
+    lastAdminCount.current = 0;
+    focusInput();
+  };
 
   // While a person handles the chat, check for replies
   useEffect(() => {
@@ -186,9 +203,7 @@ const SupportChat = () => {
     }
   };
 
-  if (HIDDEN_PATHS.some((p) => pathname.startsWith(p))) return null;
-  const busy = chatStatus === 'submitted' || chatStatus === 'streaming';
-  const launcherBottom = pathname.startsWith('/order') ? 'bottom-[calc(env(safe-area-inset-bottom)+8.5rem)]' : 'bottom-[calc(env(safe-area-inset-bottom)+1.25rem)]';
+  const launcherBottom = 'bottom-[calc(env(safe-area-inset-bottom)+1.25rem)]';
 
   return (
     <>
@@ -203,7 +218,7 @@ const SupportChat = () => {
             <img src={shiraAvatar} alt="" className="w-11 h-11 rounded-full object-cover" />
             <span className={cn('absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full border-2 border-card', unread ? 'bg-accent animate-pulse' : 'bg-success')} aria-hidden="true" />
           </span>
-          <span className="hidden sm:block text-sm font-bold pl-3">צריכים עזרה?</span>
+          <span className="text-sm font-bold pl-3">שאלות על ההזמנה?</span>
         </button>
       )}
 
@@ -225,6 +240,18 @@ const SupportChat = () => {
                 {statusLine[convStatus]}
               </p>
             </div>
+            {messages.length > 0 && (
+              <button
+                type="button"
+                onClick={restart}
+                disabled={busy}
+                aria-label="התחלת שיחה מחדש"
+                className="h-10 px-3 rounded-xl bg-muted/70 hover:bg-muted border border-border flex items-center gap-1.5 text-xs font-bold disabled:opacity-50"
+              >
+                <RotateCcw className="w-4 h-4" aria-hidden="true" />
+                התחל מחדש
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setOpen(false)}
@@ -250,8 +277,8 @@ const SupportChat = () => {
                 <ConversationEmptyState className="gap-4">
                   <img src={shiraAvatar} alt="" className="w-20 h-20 rounded-full object-cover border-4 border-primary/20" />
                   <div className="space-y-1">
-                    <h3 className="font-extrabold text-xl">היי, איך אפשר לעזור?</h3>
-                    <p className="text-muted-foreground text-sm">מחירים, אחריות, אזורי שירות או סטטוס הזמנה. אם לא אדע, אעביר לנציג.</p>
+                    <h3 className="font-extrabold text-xl">{orderNumber ? `יש שאלה על הזמנה #${orderNumber}?` : 'יש שאלה על ההזמנה?'}</h3>
+                    <p className="text-muted-foreground text-sm">הגעת הטכנאי, תשלום, הכנה לתיקון ואחריות. אם לא אדע, אעביר לנציג.</p>
                   </div>
                   <div className="flex flex-wrap justify-center gap-2">
                     {SUGGESTIONS.map((s) => (
