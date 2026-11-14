@@ -100,6 +100,9 @@ const SupportInbox = () => {
         <div className="flex gap-2 mb-2">
           <Button size="sm" variant={filter === 'open' ? 'default' : 'outline'} onClick={() => setFilter('open')}>דורש טיפול</Button>
           <Button size="sm" variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>כל השיחות</Button>
+          <Button size="sm" variant="ghost" asChild className="mr-auto">
+            <a href="/chat-preview" target="_blank" rel="noopener noreferrer">צפייה בצ'אט</a>
+          </Button>
         </div>
         {visible.length === 0 && <p className="text-sm text-muted-foreground p-4 text-center">אין שיחות {filter === 'open' ? 'שממתינות לך' : 'עדיין'}</p>}
         {visible.map((c) => (
