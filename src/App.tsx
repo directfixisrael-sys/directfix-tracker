@@ -32,6 +32,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import { VisitorTracker } from "./components/VisitorTracker";
 import AnnouncementBanner from "./components/AnnouncementBanner";
 import { VoiceAgentButton } from "./components/VoiceAgentButton";
+import SupportChat from "./components/support/SupportChat";
 
 import { captureLeadSource } from "./lib/leadSource";
 
@@ -84,6 +85,7 @@ const App = () => (
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <MinimalFooter />
+                <SupportChat />
                 {/* <VoiceAgentButton /> - הוסתר זמנית, נחזור להציג בהמשך */}
               </>
             } />
