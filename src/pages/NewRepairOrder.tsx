@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import OrderPageSkeleton from '@/components/OrderPageSkeleton';
-import AvailabilityCheckScreen, { type AvailabilityResult } from '@/components/AvailabilityCheckScreen';
+import AvailabilityCheckScreen from '@/components/AvailabilityCheckScreen';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -437,6 +437,7 @@ const NewRepairOrder = () => {
   const [additionalRepairs, setAdditionalRepairs] = useState<{ repair: RepairType; price: number; backColor?: string; model: IphoneModel }[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [cartReady, setCartReady] = useState(false);
+  const [showAddRepairLoading, setShowAddRepairLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   // Privacy consent
@@ -460,6 +461,9 @@ const NewRepairOrder = () => {
   // Preserve existing club membership without interrupting checkout
   const checkClubMemberAndNavigate = async () => {
     goToStep('price');
+    await checkExistingClubMember();
+  };
+  const checkExistingClubMember = async () => {
     const phone = (customerPhone || introPhone).replace(/\D/g, '');
     if (phone) {
       const { data: isMember } = await supabase.rpc('is_active_club_member', { _phone: phone });
@@ -1125,7 +1129,7 @@ const NewRepairOrder = () => {
     moveCurrentToCart();
     setSelectedModel(null);
     setCartOpen(false);
-    goToStep('model');
+    setShowAddRepairLoading(true);
   };
 
   // Move the last saved item back into the "current repair" slot (used when the current one is removed)
@@ -1171,6 +1175,31 @@ const NewRepairOrder = () => {
     setCartOpen(false);
     if (!mainInCart && !promoteLastToMain()) return;
     checkClubMemberAndNavigate();
+  };
+
+  // "סיום הזמנה" from the cart: straight to details, or to time selection when no time was picked
+  const finishOrderFromCart = () => {
+    setCartOpen(false);
+    if (!mainInCart && !promoteLastToMain()) return;
+    if (step !== 'schedule' && step !== 'details') {
+      gaConfirmPrice(getTotalPrice());
+      checkExistingClubMember();
+    }
+    if (selectedDate && selectedTimeSlot) {
+      if (step !== 'details') goToStep('details');
+      return;
+    }
+    if (step === 'schedule') toast.info('בחרו יום ושעה להגעת הטכנאי');
+    else goToStep('schedule');
+  };
+
+  const cartCoupon = {
+    code: couponCode,
+    onCodeChange: setCouponCode,
+    onApply: validateCoupon,
+    onRemove: removeCoupon,
+    appliedCode: appliedCoupon?.code || null,
+    isValidating: isValidatingCoupon,
   };
 
   const cartLines: RepairCartLine[] = additionalRepairs.map((ar, idx) => ({
@@ -1577,28 +1606,12 @@ const NewRepairOrder = () => {
   );
 
 
-  // Real next free slot (same rules as the schedule step, default lead time)
-  const getNextAvailableSlot = (): AvailabilityResult => {
-    const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
-    const todayStr = new Date().toDateString();
-    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-    for (const date of getAvailableDates()) {
-      const slot = getTimeSlotsForDate(date).find(s => isSlotAvailable(date, s));
-      if (slot) {
-        const dayLabel = date.toDateString() === todayStr ? 'היום' : date.toDateString() === tomorrow.toDateString() ? 'מחר' : `ביום ${days[date.getDay()]}`;
-        return { dayLabel, slot };
-      }
-    }
-    return null;
-  };
-
   const showFloatingCart = (step === 'model' || step === 'repair') && cartLines.length > 0 && !showIntroCard && !showPrivacyConsent;
   const cartNote = isGiftOrder ? 'הזמנת מתנה: התשלום מתבצע בסוף ההזמנה' : 'משלמים רק בסוף התיקון. בלי עלויות נוספות.';
 
   if (showAvailabilityCheck) {
     return <AvailabilityCheckScreen
       ready={!isLoading}
-      result={isLoading ? null : getNextAvailableSlot()}
       onDone={() => {
         try { sessionStorage.setItem('df_avail_checked', '1'); } catch { /* ignore */ }
         setShowAvailabilityCheck(false);
@@ -3232,8 +3245,15 @@ const NewRepairOrder = () => {
         open={cartOpen}
         onOpenChange={setCartOpen}
         note={cartNote}
-        onContinue={continueFromCart}
+        onContinue={finishOrderFromCart}
         onAddRepair={handleAddAnotherRepair}
+        coupon={cartCoupon}
+      />}
+      {showAddRepairLoading && <AvailabilityCheckScreen
+        ready
+        title="מוסיפים תיקון"
+        messages={['שומרים את התיקון הקודם בסל...', 'מכינים לך 15% הנחה על התיקון הזול...']}
+        onDone={() => { setShowAddRepairLoading(false); goToStep('model'); }}
       />}
 
       {/* Disclaimer */}
@@ -3269,9 +3289,10 @@ const NewRepairOrder = () => {
                 open={cartOpen}
                 onOpenChange={setCartOpen}
                 note={cartNote}
-                onContinue={() => setCartOpen(false)}
-                continueLabel="חזרה להזמנה"
+                onContinue={step === 'details' ? () => setCartOpen(false) : finishOrderFromCart}
+                continueLabel={step === 'details' ? 'חזרה למילוי פרטים' : 'סיום הזמנה'}
                 onAddRepair={handleAddAnotherRepair}
+                coupon={cartCoupon}
               />
             </div>}
 
