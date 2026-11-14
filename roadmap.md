@@ -8,3 +8,4 @@
 - [x] "סיום הזמנה" button in the cart: jumps to details, or to time selection if no time picked yet.
 - [x] Small "הוסף תיקון" button next to the add-repair hint, showing the short loading screen.
 - [x] Remove the "נמצא טכנאי פנוי מחר" part from the loading screen.
+- [ ] Coupon box in the cart closed by default; opens on "יש לי קוד קופון".

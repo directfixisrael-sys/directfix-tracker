@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ShoppingBag, X, Trash2, ChevronLeft, Plus, BadgePercent, Tag, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -57,6 +58,7 @@ const RepairCart = ({
   onAddRepair,
   coupon,
 }: RepairCartProps) => {
+  const [couponOpen, setCouponOpen] = useState(false);
   const count = lines.length;
   if (count === 0) return null;
   const hasDiscount = total < subtotal;
@@ -190,6 +192,16 @@ const RepairCart = ({
                       הסרה
                     </button>
                   </div>
+                ) : !couponOpen ? (
+                  <button
+                    type="button"
+                    onClick={() => setCouponOpen(true)}
+                    aria-expanded={false}
+                    className="flex items-center gap-2 text-sm font-semibold text-primary underline-offset-4 hover:underline py-1"
+                  >
+                    <Tag className="w-4 h-4" aria-hidden="true" />
+                    יש לי קוד קופון
+                  </button>
                 ) : (
                   <form
                     className="flex items-center gap-2"
@@ -198,8 +210,9 @@ const RepairCart = ({
                     <Input
                       value={coupon.code}
                       onChange={(e) => coupon.onCodeChange(e.target.value.toUpperCase())}
-                      placeholder="יש לכם קוד קופון?"
+                      placeholder="הכניסו קוד קופון"
                       aria-label="קוד קופון"
+                      autoFocus
                       className="h-11 rounded-xl font-mono text-base flex-1"
                     />
                     <Button type="submit" variant="outline" disabled={!coupon.code.trim() || coupon.isValidating} className="h-11 rounded-xl px-4">
