@@ -73,7 +73,7 @@ import { useTheme } from '@/components/ThemeProvider';
 import { Sun, Moon } from 'lucide-react';
 import SwipeableOrderCard from '@/components/SwipeableOrderCard';
 import AdminLiveChat from '@/components/AdminLiveChat';
-import SupportInbox from '@/components/admin/SupportInbox';
+import SupportAdmin from '@/components/admin/SupportAdmin';
 import { Headset } from 'lucide-react';
 import PullToRefresh from '@/components/PullToRefresh';
 import PriceManagement from '@/components/admin/PriceManagement';
@@ -1149,7 +1149,7 @@ const AdminPanel = () => {
         return <CouponManagement />;
 
       case 'support':
-        return <SupportInbox />;
+        return <SupportAdmin />;
 
       case 'reminders':
         return <RemindersManagement />;
