@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import OrderPageSkeleton from '@/components/OrderPageSkeleton';
 import AvailabilityCheckScreen from '@/components/AvailabilityCheckScreen';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -39,7 +39,8 @@ import speakerTopImg from '@/assets/speaker-top.png';
 import speakerBottomImg from '@/assets/speaker-bottom.png';
 import { PricePromotion, findPromo, applyPromo, promoDaysLeft } from '@/lib/pricePromotions';
 import RepairCart, { type RepairCartLine, type RepairCartAdjustment } from '@/components/order/RepairCart';
-import SupportChat from '@/components/support/SupportChat';
+// Loaded only on the success screen so the chat's libraries stay out of the main bundle
+const SupportChat = lazy(() => import('@/components/support/SupportChat'));
 
 
 const SPEAKER_TOP_PRICE = 370;
@@ -3245,7 +3246,7 @@ const NewRepairOrder = () => {
           </div>}
       </main>
 
-      {step === 'success' && <SupportChat orderNumber={completedOrderNumber} name={customerName} phone={customerPhone} />}
+      {step === 'success' && <Suspense fallback={null}><SupportChat orderNumber={completedOrderNumber} name={customerName} phone={customerPhone} /></Suspense>}
 
       {showFloatingCart && <div className="h-28" aria-hidden="true" />}
       {showFloatingCart && <RepairCart
