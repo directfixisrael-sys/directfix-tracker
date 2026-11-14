@@ -66,3 +66,6 @@ verify_jwt = false
 verify_jwt = false
 [functions.public-upload]
 verify_jwt = false
+
+[functions.support-chat]
+verify_jwt = false

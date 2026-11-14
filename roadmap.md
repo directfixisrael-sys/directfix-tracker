@@ -10,4 +10,5 @@
 - [x] Remove the "נמצא טכנאי פנוי מחר" part from the loading screen.
 - [x] Coupon box in the cart closed by default; opens on "יש לי קוד קופון".
 - [x] Close (X) button for the opened coupon box in the cart.
-- [ ] AI support chat: answers from help docs + order data, hands off to a person when unsure (waiting on answers).
+- [x] AI support chat: answers from help docs + order data, hands off to a person when unsure.
+- [x] Chat only on the order completion screen, with after-order questions and a "התחל מחדש" button.

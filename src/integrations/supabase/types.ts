@@ -1034,6 +1034,83 @@ export type Database = {
         }
         Relationships: []
       }
+      support_conversations: {
+        Row: {
+          admin_unread: boolean
+          created_at: string
+          customer_name: string | null
+          customer_phone: string | null
+          handoff_reason: string | null
+          id: string
+          last_message_at: string
+          status: string
+          token_hash: string
+          updated_at: string
+          verified_order_id: string | null
+        }
+        Insert: {
+          admin_unread?: boolean
+          created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          handoff_reason?: string | null
+          id?: string
+          last_message_at?: string
+          status?: string
+          token_hash: string
+          updated_at?: string
+          verified_order_id?: string | null
+        }
+        Update: {
+          admin_unread?: boolean
+          created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          handoff_reason?: string | null
+          id?: string
+          last_message_at?: string
+          status?: string
+          token_hash?: string
+          updated_at?: string
+          verified_order_id?: string | null
+        }
+        Relationships: []
+      }
+      support_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+          tool_calls: Json | null
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+          tool_calls?: Json | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+          tool_calls?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "support_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string

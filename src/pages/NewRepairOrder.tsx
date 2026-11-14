@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, ShieldCheck, Star, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send, Zap, Award, ChevronDown, Crown, Menu, BadgePercent } from 'lucide-react';
+import { ArrowRight, Smartphone, Battery, Phone, CheckCircle2, Sparkles, Wrench, MapPin, Loader2, HelpCircle, Moon, Sun, Calendar, Clock, Gift, Shield, ShieldCheck, Star, Tag, Camera, X, Image, Accessibility, Check, FlipVertical, Heart, CreditCard, Send, Zap, Award, ChevronDown, Crown, Menu, BadgePercent, MessageCircle } from 'lucide-react';
 import { getRepairIconComponent } from '@/lib/repairIcons';
 import { useRepairStore } from '@/store/repairStore';
 import { useTheme } from '@/components/ThemeProvider';
@@ -39,6 +39,7 @@ import speakerTopImg from '@/assets/speaker-top.png';
 import speakerBottomImg from '@/assets/speaker-bottom.png';
 import { PricePromotion, findPromo, applyPromo, promoDaysLeft } from '@/lib/pricePromotions';
 import RepairCart, { type RepairCartLine, type RepairCartAdjustment } from '@/components/order/RepairCart';
+import SupportChat from '@/components/support/SupportChat';
 
 
 const SPEAKER_TOP_PRICE = 370;
@@ -3229,11 +3230,22 @@ const NewRepairOrder = () => {
               <p className="text-xs text-muted-foreground mt-1">מומלץ לבדוק גם בתיבת הספאם</p>
             </div>}
             
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event('open-support-chat'))}
+              className="w-full flex items-center justify-center gap-2 h-12 rounded-xl border border-primary/30 bg-primary/5 text-primary font-bold text-base hover:bg-primary/10"
+            >
+              <MessageCircle className="w-5 h-5" aria-hidden="true" />
+              יש שאלה על ההזמנה? צ'אט איתנו
+            </button>
+
             <Button variant="outline" onClick={() => navigate('/')} className="w-full h-10 rounded-xl">
               חזרה לדף הבית
             </Button>
           </div>}
       </main>
+
+      {step === 'success' && <SupportChat orderNumber={completedOrderNumber} name={customerName} phone={customerPhone} />}
 
       {showFloatingCart && <div className="h-28" aria-hidden="true" />}
       {showFloatingCart && <RepairCart
