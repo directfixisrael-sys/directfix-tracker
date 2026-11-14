@@ -28,6 +28,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 const Auth = z.object({ conversationId: z.string().uuid(), token: z.string().min(20).max(200) });
 const Body = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("faqs") }),
   z.object({ action: z.literal("start"), name: z.string().trim().max(80).optional(), phone: z.string().trim().max(20).optional(), orderNumber: z.number().int().positive().max(10000000).optional() }),
   Auth.extend({ action: z.literal("history") }),
   Auth.extend({ action: z.literal("send"), message: z.string().trim().min(1).max(1000), page: z.string().max(200).optional() }),
@@ -226,7 +227,21 @@ async function runTool(conv: any, name: string, args: any, failedSoFar: { n: num
   return { error: "unknown tool" };
 }
 
+async function loadFaqs() {
+  const { data } = await supabase
+    .from("support_faqs")
+    .select("question, answer")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .limit(50);
+  return data || [];
+}
+
 async function buildInstructions(conv: any) {
+  const faqs = await loadFaqs();
+  const faqText = faqs.length
+    ? `\n\n## שאלות ותשובות שהעסק הגדיר (עדיפות ראשונה - עני לפיהן כשהלקוח שואל שאלה דומה)\n${faqs.map((f) => `ש: ${f.question}\nת: ${f.answer}`).join("\n\n")}`
+    : "";
   let verified = "";
   if (conv.verified_order_id) {
     const { data } = await supabase.from("orders").select("*").eq("id", conv.verified_order_id).maybeSingle();
@@ -244,7 +259,7 @@ async function buildInstructions(conv: any) {
 - כתבי את שם העסק בעברית: דיירקט פיקס.
 - הצ'אט נפתח ללקוח אחרי שביצע הזמנה. שאלות נפוצות: איך משלמים (בסוף התיקון, אחרי שהמכשיר עובד, כל אמצעי התשלום כולל העברה בנקאית ישירה), מה להכין (לגבות את המכשיר, לזכור את קוד הנעילה, להיות זמינים בטלפון), משך התיקון, האם הטכנאי יכול לתקן ברכב שלו (כן, ומומלץ - חוסך ללקוח זמן), ואיך עוקבים אחרי ההזמנה (תמיד לצרף את קישור המעקב כקישור markdown). שינוי מועד, ביטול או עדכון כתובת - להתקשר 033106020.
 
-${HELP_DOCS}${verified}`;
+${HELP_DOCS}${faqText}${verified}`;
 }
 
 function historyToInput(rows: any[]) {
@@ -271,6 +286,11 @@ Deno.serve(async (req) => {
   }
 
   try {
+    if (body.action === "faqs") {
+      const faqs = await loadFaqs();
+      return json({ questions: faqs.map((f) => f.question) });
+    }
+
     if (body.action === "start") {
       const token = crypto.randomUUID() + crypto.randomUUID();
       const phone = body.phone ? normalizePhone(body.phone) : null;
