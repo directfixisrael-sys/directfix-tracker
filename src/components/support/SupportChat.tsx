@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ChatStatus } from 'ai';
-import { X, UserRound, Package, Tag, Headset, RotateCcw } from 'lucide-react';
+import { X, UserRound, Package, Tag, RotateCcw, MessageCircle } from 'lucide-react';
 import shiraAvatar from '@/assets/shira-avatar.png';
 import { Conversation, ConversationContent, ConversationEmptyState, ConversationScrollButton } from '@/components/ai-elements/conversation';
 import { Message, MessageContent, MessageResponse } from '@/components/ai-elements/message';
@@ -37,6 +37,15 @@ function TypingDots() {
         <span key={i} className="w-2.5 h-2.5 rounded-full bg-muted-foreground/70 animate-typing-dot" style={{ animationDelay: `${i * 0.18}s` }} aria-hidden="true" />
       ))}
     </span>
+  );
+}
+
+function WhatsAppLink() {
+  return (
+    <a href={SUPPORT_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm font-bold text-success underline underline-offset-4">
+      <MessageCircle className="w-4 h-4" aria-hidden="true" />
+      שאלה אחרת? כתבו לנו בווטסאפ
+    </a>
   );
 }
 
@@ -95,7 +104,6 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
   const [chatStatus, setChatStatus] = useState<ChatStatus>('ready');
   const [streamText, setStreamText] = useState('');
   const [streamTools, setStreamTools] = useState<SupportTool[]>([]);
-  const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [unread, setUnread] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -135,7 +143,6 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
     clearSession();
     setMessages([]);
     setConvStatus('bot');
-    setWhatsappUrl(null);
     setInput('');
     lastAdminCount.current = 0;
     focusInput();
@@ -176,18 +183,15 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
         } else if (ev.type === 'done') {
           setMessages((prev) => [...prev, ev.message, ...(ev.system ? [ev.system] : [])]);
           setConvStatus(ev.status);
-          if (ev.whatsappUrl) setWhatsappUrl(ev.whatsappUrl);
           setStreamText('');
           setStreamTools([]);
           setChatStatus('ready');
         } else if (ev.type === 'queued') {
           setMessages((prev) => prev.map((m) => (m.id === optimistic.id ? ev.messages[0] || m : m)));
           setConvStatus(ev.status);
-          if (ev.whatsappUrl) setWhatsappUrl(ev.whatsappUrl);
           setChatStatus('ready');
         } else if (ev.type === 'error') {
           setMessages((prev) => [...prev, { id: `err-${Date.now()}`, role: 'system', content: ev.message, tool_calls: null, created_at: new Date().toISOString() }]);
-          if (ev.whatsappUrl) setWhatsappUrl(ev.whatsappUrl);
           setStreamText('');
           setStreamTools([]);
           setChatStatus('ready');
@@ -279,6 +283,7 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
                       </button>
                     ))}
                   </div>
+                  <WhatsAppLink />
                 </ConversationEmptyState>
               ) : (
                 messages.map((m) => {
@@ -297,16 +302,21 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
                   );
                 })
               )}
-              {!busy && messages.length > 0 && messages[messages.length - 1].role !== 'customer' && remaining.length > 0 && (
+              {!busy && messages.length > 0 && messages[messages.length - 1].role !== 'customer' && (
                 <div className="flex flex-col gap-2" aria-label="שאלות נוספות">
-                  <p className="text-xs font-bold text-muted-foreground">שאלות נוספות</p>
-                  <div className="flex flex-wrap gap-2">
-                    {remaining.map((q) => (
-                      <button key={q} type="button" onClick={() => send(q)} className="rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10">
-                        {q}
-                      </button>
-                    ))}
-                  </div>
+                  {remaining.length > 0 && (
+                    <>
+                      <p className="text-xs font-bold text-muted-foreground">שאלות נוספות</p>
+                      <div className="flex flex-wrap gap-2">
+                        {remaining.map((q) => (
+                          <button key={q} type="button" onClick={() => send(q)} className="rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10">
+                            {q}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                  <WhatsAppLink />
                 </div>
               )}
               {busy && (
