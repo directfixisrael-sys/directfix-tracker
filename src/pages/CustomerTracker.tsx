@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import PhoneInput from '@/components/PhoneInput';
@@ -6,7 +6,6 @@ import StatusTimeline from '@/components/StatusTimeline';
 import TechnicianTracker from '@/components/TechnicianTracker';
 import RepairInProgress from '@/components/RepairInProgress';
 import AccessoriesUpsell from '@/components/AccessoriesUpsell';
-import LiveChat from '@/components/LiveChat';
 import RatingPrompt from '@/components/RatingPrompt';
 import PromotionsOptIn from '@/components/PromotionsOptIn';
 import OrderSummary from '@/components/OrderSummary';
@@ -23,6 +22,7 @@ import { FileText, Download, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RepairOrder, ChatMessage, RepairStatus, PaymentStatus, Accessory } from '@/types/repair';
 import SEO from "@/components/SEO";
+const SupportChat = lazy(() => import('@/components/support/SupportChat'));
 import { seo } from "@/lib/seoData";
 
 const defaultAccessories: Accessory[] = [
@@ -91,7 +91,6 @@ const CustomerTracker = () => {
 
   // Local state (replaces the store-loaded orders/messages for public tracker)
   const [currentOrder, setCurrentOrder] = useState<RepairOrder | null>(null);
-  const [orderMessages, setOrderMessages] = useState<ChatMessage[]>([]);
   const [verifiedPhone, setVerifiedPhone] = useState<string>('');
   const pollingRef = useRef<number | null>(null);
 
@@ -112,14 +111,13 @@ const CustomerTracker = () => {
     if (!currentOrder || !verifiedPhone) return;
     const tick = async () => {
       try {
-        const { orders, messages } = await fetchForPhone(verifiedPhone, currentOrder.id);
+        const { orders } = await fetchForPhone(verifiedPhone, currentOrder.id);
         if (orders[0]) {
           setCurrentOrder(prev => {
             if (!prev) return orders[0];
             return JSON.stringify(prev) !== JSON.stringify(orders[0]) ? orders[0] : prev;
           });
         }
-        setOrderMessages(messages);
       } catch (e) {
         console.error('polling error', e);
       }
@@ -150,7 +148,7 @@ const CustomerTracker = () => {
     setIsSearching(true);
     setError('');
     try {
-      const { orders, messages } = await fetchForPhone(phone);
+      const { orders } = await fetchForPhone(phone);
       if (orders.length > 1) {
         setPhoneOrders(orders);
         setShowHistory(true);
@@ -158,7 +156,6 @@ const CustomerTracker = () => {
         setVerifiedPhone(phone);
       } else if (orders.length === 1) {
         setCurrentOrder(orders[0]);
-        setOrderMessages(messages);
         setPhoneOrders(orders);
         setVerifiedPhone(phone);
         setShowHistory(false);
@@ -176,43 +173,7 @@ const CustomerTracker = () => {
     }
   };
 
-  // Send a customer chat message (INSERT still allowed for anon)
-  const addCustomerMessage = async (orderId: string, message: string) => {
-    const { error: insErr } = await supabase.from('messages').insert({
-      order_id: orderId,
-      sender: 'customer',
-      sender_name: currentOrder?.customerName || 'לקוח',
-      message,
-      read: false,
-    });
-    if (insErr) {
-      console.error('send message failed', insErr);
-      return;
-    }
-    // Optimistic refresh
-    if (verifiedPhone && currentOrder) {
-      try {
-        const { messages } = await fetchForPhone(verifiedPhone, currentOrder.id);
-        setOrderMessages(messages);
-      } catch {}
-    }
-    // Fire-and-forget notifications
-    supabase.functions.invoke('send-push-notification', {
-      body: {
-        title: `הודעה חדשה מ-${currentOrder?.customerName || 'לקוח'}`,
-        body: message.substring(0, 100),
-        url: '/admin',
-      },
-    }).catch(() => {});
-    supabase.functions.invoke('notify-customer-message', {
-      body: {
-        orderId,
-        customerName: currentOrder?.customerName || 'לקוח',
-        message,
-        orderNumber: currentOrder?.orderNumber,
-      },
-    }).catch(() => {});
-  };
+
 
   // Client-only versions of accessory/promo/rating updates: skipped for now
   // (they require admin path or an authenticated customer path — safe no-ops on the
@@ -472,11 +433,10 @@ const CustomerTracker = () => {
         />
       </main>
 
-      {/* Live chat */}
-      <LiveChat
-        messages={orderMessages}
-        onSendMessage={(message) => addCustomerMessage(currentOrder.id, message)}
-      />
+      {/* After-order assistant (automatic answers only) */}
+      <Suspense fallback={null}>
+        <SupportChat orderNumber={currentOrder.orderNumber} name={currentOrder.customerName} phone={verifiedPhone || currentOrder.customerPhone} />
+      </Suspense>
     </div>
   );
 };
