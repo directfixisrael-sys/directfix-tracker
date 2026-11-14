@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import OrderPageSkeleton from '@/components/OrderPageSkeleton';
-import AvailabilityCheckScreen, { type AvailabilityResult } from '@/components/AvailabilityCheckScreen';
+import AvailabilityCheckScreen from '@/components/AvailabilityCheckScreen';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,6 +38,7 @@ import { seo } from "@/lib/seoData";
 import speakerTopImg from '@/assets/speaker-top.png';
 import speakerBottomImg from '@/assets/speaker-bottom.png';
 import { PricePromotion, findPromo, applyPromo, promoDaysLeft } from '@/lib/pricePromotions';
+import RepairCart, { type RepairCartLine, type RepairCartAdjustment } from '@/components/order/RepairCart';
 
 
 const SPEAKER_TOP_PRICE = 370;
@@ -284,6 +285,9 @@ interface RepairBundle {
 }
 type Step = 'model' | 'repair' | 'bundle' | 'price' | 'schedule' | 'details' | 'gift_payment' | 'success';
 const OCTOBER_PROMO_CODE = 'FIX35';
+// Saved cart survives accidental back/refresh; expires after 48h
+const CART_STORAGE_KEY = 'df_cart_v1';
+const CART_TTL_MS = 48 * 60 * 60 * 1000;
 
 const NewRepairOrder = () => {
   const navigate = useNavigate();
@@ -431,6 +435,9 @@ const NewRepairOrder = () => {
   const [otherRepairDescription, setOtherRepairDescription] = useState('');
   
   const [additionalRepairs, setAdditionalRepairs] = useState<{ repair: RepairType; price: number; backColor?: string; model: IphoneModel }[]>([]);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cartReady, setCartReady] = useState(false);
+  const [showAddRepairLoading, setShowAddRepairLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   // Privacy consent
@@ -454,6 +461,9 @@ const NewRepairOrder = () => {
   // Preserve existing club membership without interrupting checkout
   const checkClubMemberAndNavigate = async () => {
     goToStep('price');
+    await checkExistingClubMember();
+  };
+  const checkExistingClubMember = async () => {
     const phone = (customerPhone || introPhone).replace(/\D/g, '');
     if (phone) {
       const { data: isMember } = await supabase.rpc('is_active_club_member', { _phone: phone });
@@ -802,7 +812,15 @@ const NewRepairOrder = () => {
       });
     }, 200);
   };
+  // Switching to another model keeps the already chosen repair in the cart
+  const keepCurrentInCartFor = (model: IphoneModel) => {
+    if (mainInCart && selectedModel && selectedModel.id !== model.id) {
+      moveCurrentToCart();
+      toast.success('התיקון הקודם נשמר בסל');
+    }
+  };
   const handleModelSelect = (model: IphoneModel) => {
+    keepCurrentInCartFor(model);
     setSelectedModel(model);
     setBatteryPriceOverride(null);
     gaSelectModel(model.name);
@@ -821,6 +839,7 @@ const NewRepairOrder = () => {
     const model = models.find(m => m.name === modelName);
     const repair = repairTypes.find(r => r.name === repairName);
     if (model && repair) {
+      if (mainInCart && (selectedModel?.id !== model.id || selectedRepair?.id !== repair.id)) moveCurrentToCart();
       setSelectedModel(model);
       setSelectedRepair(repair);
 
@@ -1074,6 +1093,227 @@ const NewRepairOrder = () => {
   const getFinalPrice = () => {
     return Math.max(0, getTotalPrice() - getDiscount() - loyaltyDiscount);
   };
+
+  // ---------- Cart ----------
+  // The current repair counts as "in the cart" once it is fully chosen (no open option picker)
+  const mainInCart = !!(
+    selectedModel && selectedRepair &&
+    !selectedRepair.name.includes('תיקון אחר') &&
+    getPrice() > 0 &&
+    !(step === 'repair' && (showBatteryTypePicker || showSpeakerTypePicker || showBackColorPicker))
+  );
+
+  const moveCurrentToCart = () => {
+    if (mainInCart && selectedRepair && selectedModel) {
+      const items: typeof additionalRepairs = [{
+        repair: selectedRepair,
+        price: getRepairPrice(selectedRepair),
+        backColor: selectedBackColor || undefined,
+        model: selectedModel,
+      }];
+      if (selectedBundleAddon && currentBundle) {
+        const batteryRepair = repairTypes.find(r => r.name.includes('סוללה'));
+        if (batteryRepair) items.push({ repair: batteryRepair, price: getBundleAddonPrice(), model: selectedModel });
+      }
+      setAdditionalRepairs(prev => [...prev, ...items]);
+    }
+    setSelectedBundleAddon(false);
+    setCurrentBundle(null);
+    setSelectedRepair(null);
+    setSelectedBackColor('');
+    setBatteryPriceOverride(null);
+    setSpeakerPriceOverride(null);
+  };
+
+  const handleAddAnotherRepair = () => {
+    moveCurrentToCart();
+    setSelectedModel(null);
+    setCartOpen(false);
+    setShowAddRepairLoading(true);
+  };
+
+  // Move the last saved item back into the "current repair" slot (used when the current one is removed)
+  const promoteLastToMain = () => {
+    const last = additionalRepairs[additionalRepairs.length - 1];
+    if (!last) return false;
+    setAdditionalRepairs(prev => prev.slice(0, -1));
+    setSelectedModel(last.model);
+    setSelectedRepair(last.repair);
+    setSelectedBackColor(last.backColor || '');
+    const normal = applyPromo(priceMap[last.model.id]?.[last.repair.id] || 0, getPromoFor(last.repair, last.model));
+    const differs = normal !== last.price;
+    setBatteryPriceOverride(differs && last.repair.name.includes('סוללה') ? last.price : null);
+    setSpeakerPriceOverride(differs && last.repair.name.includes('רמקול') ? last.price : null);
+    setSelectedBundleAddon(false);
+    setCurrentBundle(null);
+    return true;
+  };
+
+  const leaveCheckoutIfEmpty = (backTo: Step) => {
+    setCartOpen(false);
+    if (['bundle', 'price', 'schedule', 'details'].includes(step)) goToStep(backTo);
+  };
+
+  const removeMainFromCart = () => {
+    if (promoteLastToMain()) return;
+    const hadModel = !!selectedModel;
+    setSelectedBundleAddon(false);
+    setCurrentBundle(null);
+    setSelectedRepair(null);
+    setSelectedBackColor('');
+    setBatteryPriceOverride(null);
+    setSpeakerPriceOverride(null);
+    leaveCheckoutIfEmpty(hadModel ? 'repair' : 'model');
+  };
+
+  const removeAdditionalFromCart = (index: number) => {
+    setAdditionalRepairs(prev => prev.filter((_, i) => i !== index));
+    if (!mainInCart && additionalRepairs.length <= 1) leaveCheckoutIfEmpty('model');
+  };
+
+  const continueFromCart = () => {
+    setCartOpen(false);
+    if (!mainInCart && !promoteLastToMain()) return;
+    checkClubMemberAndNavigate();
+  };
+
+  // "סיום הזמנה" from the cart: straight to details, or to time selection when no time was picked
+  const finishOrderFromCart = () => {
+    setCartOpen(false);
+    if (!mainInCart && !promoteLastToMain()) return;
+    if (step !== 'schedule' && step !== 'details') {
+      gaConfirmPrice(getTotalPrice());
+      checkExistingClubMember();
+    }
+    if (selectedDate && selectedTimeSlot) {
+      if (step !== 'details') goToStep('details');
+      return;
+    }
+    if (step === 'schedule') toast.info('בחרו יום ושעה להגעת הטכנאי');
+    else goToStep('schedule');
+  };
+
+  const cartCoupon = {
+    code: couponCode,
+    onCodeChange: setCouponCode,
+    onApply: validateCoupon,
+    onRemove: removeCoupon,
+    appliedCode: appliedCoupon?.code || null,
+    isValidating: isValidatingCoupon,
+  };
+
+  const cartLines: RepairCartLine[] = additionalRepairs.map((ar, idx) => ({
+    key: `extra-${idx}-${ar.model.id}-${ar.repair.id}`,
+    model: ar.model.name,
+    repair: `${ar.repair.name}${ar.backColor ? ` (${ar.backColor})` : ''}`,
+    price: ar.price,
+    onRemove: () => removeAdditionalFromCart(idx),
+  }));
+  if (mainInCart && selectedModel && selectedRepair) {
+    const promo = getPromoFor(selectedRepair);
+    const base = getBaseRepairPrice(selectedRepair);
+    const linePrice = getPrice();
+    const hasPromo = !!promo && base > linePrice;
+    cartLines.push({
+      key: 'current',
+      model: selectedModel.name,
+      repair: `${selectedRepair.name}${selectedBackColor ? ` (${selectedBackColor})` : ''}`,
+      price: linePrice,
+      originalPrice: hasPromo ? base : undefined,
+      badge: hasPromo ? promo!.badge_text : undefined,
+      onRemove: removeMainFromCart,
+    });
+    if (selectedBundleAddon && currentBundle) {
+      cartLines.push({
+        key: 'bundle',
+        model: selectedModel.name,
+        repair: `החלפת סוללה (חבילה -${currentBundle.discount_percent}%)`,
+        price: getBundleAddonPrice(),
+        originalPrice: getBatteryBasePrice(),
+        onRemove: () => setSelectedBundleAddon(false),
+      });
+    }
+  }
+  const cartSubtotal = cartLines.reduce((sum, l) => sum + l.price, 0);
+  const cartRepairPrices = [...additionalRepairs.map(r => r.price), ...(mainInCart ? [getPrice()] : [])];
+  const cartMultiDiscount = cartRepairPrices.length >= 2 ? Math.round(Math.min(...cartRepairPrices) * 0.15) : 0;
+  const cartAdjustments: RepairCartAdjustment[] = [];
+  if (cartMultiDiscount > 0) cartAdjustments.push({ label: '15% הנחה על התיקון הזול', amount: cartMultiDiscount });
+  const cartCouponDiscount = appliedCoupon ? getDiscount() : 0;
+  if (appliedCoupon && cartCouponDiscount > 0) {
+    cartAdjustments.push({ label: octoberActive ? `מבצע אוקטובר · ${OCTOBER_PROMO_CODE}` : `קופון ${appliedCoupon.code}`, amount: cartCouponDiscount });
+  }
+  if (loyaltyDiscount > 0) cartAdjustments.push({ label: 'הנחת נקודות מועדון', amount: loyaltyDiscount });
+  const cartTotal = Math.max(0, cartSubtotal - cartAdjustments.reduce((sum, a) => sum + a.amount, 0));
+
+  // Restore a saved cart once catalog data is loaded (skipped for recovery deep links)
+  useEffect(() => {
+    if (isLoading || cartReady) return;
+    const params = new URLSearchParams(window.location.search);
+    if (!params.get('step') && !params.get('device') && !params.get('coupon')) {
+      try {
+        const saved = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || 'null');
+        if (saved && Date.now() - (saved.savedAt || 0) < CART_TTL_MS) {
+          const findModel = (id: string) => models.find(m => m.id === id);
+          const findRepair = (id: string) => repairTypes.find(r => r.id === id);
+          const restored: typeof additionalRepairs = [];
+          for (const a of saved.additional || []) {
+            const m = findModel(a.modelId);
+            const r = findRepair(a.repairId);
+            if (!m || !r) continue;
+            const optionDependent = r.name.includes('סוללה') || r.name.includes('רמקול');
+            const current = applyPromo(priceMap[m.id]?.[r.id] || 0, findPromo(pricePromotions, r.id, m.id));
+            const price = optionDependent ? Number(a.price) || current : current;
+            if (price > 0) restored.push({ model: m, repair: r, price, backColor: a.backColor || undefined });
+          }
+          const main = saved.main;
+          const mainModel = main ? findModel(main.modelId) : undefined;
+          const mainRepair = main ? findRepair(main.repairId) : undefined;
+          if (restored.length > 0) setAdditionalRepairs(restored);
+          if (mainModel && mainRepair) {
+            setSelectedModel(mainModel);
+            setSelectedRepair(mainRepair);
+            setSelectedBackColor(main.backColor || '');
+            setBatteryPriceOverride(typeof main.batteryOverride === 'number' ? main.batteryOverride : null);
+            setSpeakerPriceOverride(typeof main.speakerOverride === 'number' ? main.speakerOverride : null);
+            const bundle = main.bundleId ? repairBundles.find(b => b.id === main.bundleId) : undefined;
+            if (bundle) {
+              setCurrentBundle(bundle);
+              setSelectedBundleAddon(!!main.bundleAddon);
+            }
+          }
+          if (saved.coupon?.code) setAppliedCoupon(saved.coupon);
+          if (restored.length > 0 || (mainModel && mainRepair)) toast.success('הסל שלכם נשמר מהביקור הקודם');
+        }
+      } catch { /* ignore */ }
+    }
+    setCartReady(true);
+  }, [isLoading]);
+
+  // Save the cart on every change; clear it once the order is placed
+  useEffect(() => {
+    if (!cartReady) return;
+    try {
+      if (step === 'success' || step === 'gift_payment' || cartLines.length === 0) {
+        localStorage.removeItem(CART_STORAGE_KEY);
+        return;
+      }
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({
+        savedAt: Date.now(),
+        main: mainInCart && selectedModel && selectedRepair ? {
+          modelId: selectedModel.id,
+          repairId: selectedRepair.id,
+          backColor: selectedBackColor || undefined,
+          batteryOverride: batteryPriceOverride,
+          speakerOverride: speakerPriceOverride,
+          bundleId: currentBundle?.id,
+          bundleAddon: selectedBundleAddon,
+        } : null,
+        additional: additionalRepairs.map(a => ({ modelId: a.model.id, repairId: a.repair.id, price: a.price, backColor: a.backColor })),
+        coupon: appliedCoupon,
+      }));
+    } catch { /* ignore */ }
+  }, [cartReady, step, mainInCart, selectedModel?.id, selectedRepair?.id, selectedBackColor, batteryPriceOverride, speakerPriceOverride, selectedBundleAddon, currentBundle?.id, additionalRepairs, appliedCoupon]);
 
   // Image upload
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1366,25 +1606,12 @@ const NewRepairOrder = () => {
   );
 
 
-  // Real next free slot (same rules as the schedule step, default lead time)
-  const getNextAvailableSlot = (): AvailabilityResult => {
-    const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
-    const todayStr = new Date().toDateString();
-    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-    for (const date of getAvailableDates()) {
-      const slot = getTimeSlotsForDate(date).find(s => isSlotAvailable(date, s));
-      if (slot) {
-        const dayLabel = date.toDateString() === todayStr ? 'היום' : date.toDateString() === tomorrow.toDateString() ? 'מחר' : `ביום ${days[date.getDay()]}`;
-        return { dayLabel, slot };
-      }
-    }
-    return null;
-  };
+  const showFloatingCart = (step === 'model' || step === 'repair') && cartLines.length > 0 && !showIntroCard && !showPrivacyConsent;
+  const cartNote = isGiftOrder ? 'הזמנת מתנה: התשלום מתבצע בסוף ההזמנה' : 'משלמים רק בסוף התיקון. בלי עלויות נוספות.';
 
   if (showAvailabilityCheck) {
     return <AvailabilityCheckScreen
       ready={!isLoading}
-      result={isLoading ? null : getNextAvailableSlot()}
       onDone={() => {
         try { sessionStorage.setItem('df_avail_checked', '1'); } catch { /* ignore */ }
         setShowAvailabilityCheck(false);
@@ -1549,7 +1776,7 @@ const NewRepairOrder = () => {
           <div className="flex items-center gap-3">
             <button onClick={() => {
             if (step === 'model') {
-              if (additionalRepairs.length > 0) goToStep('price');
+              if (cartLines.length > 0) continueFromCart();
               else navigate('/');
             } else if (step === 'repair') goToStep('model');else if (step === 'bundle') goToStep('repair');else if (step === 'price') {
               if (currentBundle) goToStep('bundle');else goToStep('repair');
@@ -1803,7 +2030,7 @@ const NewRepairOrder = () => {
             {/* Smart AI Search */}
             <SmartRepairInput models={models} repairTypes={repairTypes} priceMap={priceMap} onModelAndRepairFound={handleSmartModelAndRepair} onModelFound={handleSmartModelOnly} />
 
-            <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => setSelectedModel(model)} onConfirm={model => handleModelSelect(model)} />
+            <ModelPicker models={filteredModels} selectedModel={selectedModel} onSelect={model => { keepCurrentInCartFor(model); setSelectedModel(model); }} onConfirm={model => handleModelSelect(model)} />
 
             {/* Testimonials Slider */}
             <TestimonialsSlider />
@@ -3008,6 +3235,27 @@ const NewRepairOrder = () => {
           </div>}
       </main>
 
+      {showFloatingCart && <div className="h-28" aria-hidden="true" />}
+      {showFloatingCart && <RepairCart
+        variant="floating"
+        lines={cartLines}
+        adjustments={cartAdjustments}
+        subtotal={cartSubtotal}
+        total={cartTotal}
+        open={cartOpen}
+        onOpenChange={setCartOpen}
+        note={cartNote}
+        onContinue={finishOrderFromCart}
+        onAddRepair={handleAddAnotherRepair}
+        coupon={cartCoupon}
+      />}
+      {showAddRepairLoading && <AvailabilityCheckScreen
+        ready
+        title="מוסיפים תיקון"
+        messages={['שומרים את התיקון הקודם בסל...', 'מכינים לך 15% הנחה על התיקון הזול...']}
+        onDone={() => { setShowAddRepairLoading(false); goToStep('model'); }}
+      />}
+
       {/* Disclaimer */}
       {step === 'model' && <div className="text-center px-6 py-3">
           <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
@@ -3023,33 +3271,7 @@ const NewRepairOrder = () => {
               </Button>
               <Button 
                 variant="outline" 
-                onClick={() => {
-                  // Save current repair before going back to model selection
-                  if (selectedRepair && selectedModel) {
-                    setAdditionalRepairs(prev => [...prev, { 
-                      repair: selectedRepair, 
-                      price: getRepairPrice(selectedRepair),
-                      backColor: selectedBackColor || undefined,
-                      model: selectedModel
-                    }]);
-                  }
-                  if (selectedBundleAddon && currentBundle && selectedModel) {
-                    const batteryRepair = repairTypes.find(r => r.name.includes('סוללה'));
-                    if (batteryRepair) {
-                      setAdditionalRepairs(prev => [...prev, { 
-                        repair: batteryRepair, 
-                        price: getBundleAddonPrice(),
-                        model: selectedModel
-                      }]);
-                    }
-                    setSelectedBundleAddon(false);
-                    setCurrentBundle(null);
-                  }
-                  setSelectedRepair(null);
-                  setSelectedModel(null);
-                  setSelectedBackColor('');
-                  goToStep('model');
-                }}
+                onClick={handleAddAnotherRepair}
                 className="w-full h-12 text-sm rounded-2xl gap-2"
               >
                 <Wrench className="w-4 h-4" />
@@ -3057,6 +3279,23 @@ const NewRepairOrder = () => {
               </Button>
             </div>}
           
+          {(step === 'schedule' || step === 'details') && cartLines.length > 0 && <div className="mb-3">
+              <RepairCart
+                variant="inline"
+                lines={cartLines}
+                adjustments={cartAdjustments}
+                subtotal={cartSubtotal}
+                total={cartTotal}
+                open={cartOpen}
+                onOpenChange={setCartOpen}
+                note={cartNote}
+                onContinue={step === 'details' ? () => setCartOpen(false) : finishOrderFromCart}
+                continueLabel={step === 'details' ? 'חזרה למילוי פרטים' : 'סיום הזמנה'}
+                onAddRepair={handleAddAnotherRepair}
+                coupon={cartCoupon}
+              />
+            </div>}
+
           {step === 'schedule' && <Button onClick={handleScheduleConfirm} disabled={!selectedDate || !selectedTimeSlot} className="w-full h-14 text-base rounded-2xl font-bold shadow-lg hover:shadow-xl">
               המשך לפרטים
             </Button>}
