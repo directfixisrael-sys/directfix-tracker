@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check, MapPin, Wrench } from 'lucide-react';
 
 export type AvailabilityResult = { dayLabel: string; slot: string } | null;
@@ -24,6 +24,8 @@ const AvailabilityCheckScreen = ({ ready, result, onDone }: Props) => {
   const [msgIndex, setMsgIndex] = useState(0);
   const [started, setStarted] = useState(false);
   const found = minElapsed && ready;
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
 
   useEffect(() => {
     const t0 = setTimeout(() => setStarted(true), 30);
@@ -34,9 +36,9 @@ const AvailabilityCheckScreen = ({ ready, result, onDone }: Props) => {
 
   useEffect(() => {
     if (!found) return;
-    const t = setTimeout(onDone, FOUND_MS);
+    const t = setTimeout(() => onDoneRef.current(), FOUND_MS);
     return () => clearTimeout(t);
-  }, [found, onDone]);
+  }, [found]);
 
   return (
     <div
@@ -44,7 +46,7 @@ const AvailabilityCheckScreen = ({ ready, result, onDone }: Props) => {
       dir="rtl"
       role="status"
       aria-live="polite"
-      onClick={() => found && onDone()}
+      onClick={() => found && onDoneRef.current()}
     >
       <div className="w-full max-w-sm text-center">
         {/* Icon */}
