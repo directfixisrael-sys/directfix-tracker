@@ -7,7 +7,7 @@ interface RepairStore {
   orders: RepairOrder[];
   messages: ChatMessage[];
   currentOrder: RepairOrder | null;
-  activeTab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders' | 'leads' | 'voice_leads' | 'voice_agent' | 'loyalty' | 'ipad_prices' | 'wp_clicks';
+  activeTab: 'dashboard' | 'orders' | 'customers' | 'messages' | 'settings' | 'feedback' | 'analytics' | 'prices' | 'promotions' | 'coupons' | 'bundles' | 'live' | 'announcements' | 'reminders' | 'leads' | 'voice_leads' | 'voice_agent' | 'loyalty' | 'ipad_prices' | 'wp_clicks' | 'support';
   isLoading: boolean;
   
   // Tab actions

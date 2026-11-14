@@ -73,6 +73,8 @@ import { useTheme } from '@/components/ThemeProvider';
 import { Sun, Moon } from 'lucide-react';
 import SwipeableOrderCard from '@/components/SwipeableOrderCard';
 import AdminLiveChat from '@/components/AdminLiveChat';
+import SupportInbox from '@/components/admin/SupportInbox';
+import { Headset } from 'lucide-react';
 import PullToRefresh from '@/components/PullToRefresh';
 import PriceManagement from '@/components/admin/PriceManagement';
 import VacationManagement from '@/components/admin/VacationManagement';
@@ -1146,6 +1148,9 @@ const AdminPanel = () => {
       case 'coupons':
         return <CouponManagement />;
 
+      case 'support':
+        return <SupportInbox />;
+
       case 'reminders':
         return <RemindersManagement />;
 
@@ -2096,6 +2101,10 @@ const AdminPanel = () => {
                 <MousePointerClick className="w-4 h-4" />
                 <span>קליקים וורדפרס</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setActiveTab('support')} className={cn("gap-3 py-3", activeTab === 'support' && "text-primary font-medium")}>
+                <Headset className="w-4 h-4" />
+                <span>צ'אט תמיכה</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setActiveTab('messages')} className={cn("gap-3 py-3", activeTab === 'messages' && "text-primary font-medium")}>
                 <MessageSquare className="w-4 h-4" />
                 <span>הודעות</span>
@@ -2261,6 +2270,18 @@ const AdminPanel = () => {
           >
             <MousePointerClick className="w-5 h-5" />
             <span>קליקים וורדפרס</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('support')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+              activeTab === 'support' 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <Headset className="w-5 h-5" />
+            <span>צ'אט תמיכה</span>
           </button>
 
           {/* Divider */}
@@ -2481,6 +2502,7 @@ const AdminPanel = () => {
               {activeTab === 'wp_clicks' && 'קליקים וורדפרס'}
               {activeTab === 'promotions' && 'ניהול מבצעים'}
               {activeTab === 'coupons' && 'ניהול קופונים'}
+              {activeTab === 'support' && "צ'אט תמיכה"}
               {activeTab === 'bundles' && 'ניהול חבילות תיקון'}
               {activeTab === 'announcements' && 'הודעות והתראות'}
               {activeTab === 'reminders' && 'תזכורות ומשימות'}
