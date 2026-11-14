@@ -22,6 +22,13 @@
       "when": 1794691486650,
       "tag": "0002_create_support_chat",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794693451622,
+      "tag": "0003_create_support_faqs",
+      "breakpoints": true
     }
   ]
 }
