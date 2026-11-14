@@ -1,21 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ChatStatus } from 'ai';
-import { X, MessageCircle, UserRound, Package, Tag, Headset, RotateCcw } from 'lucide-react';
+import { X, UserRound, Package, Tag, Headset, RotateCcw } from 'lucide-react';
 import shiraAvatar from '@/assets/shira-avatar.png';
 import { Conversation, ConversationContent, ConversationEmptyState, ConversationScrollButton } from '@/components/ai-elements/conversation';
 import { Message, MessageContent, MessageResponse } from '@/components/ai-elements/message';
 import { PromptInput, PromptInputTextarea, PromptInputFooter, PromptInputSubmit, PromptInputTools, type PromptInputMessage } from '@/components/ai-elements/prompt-input';
 import { Shimmer } from '@/components/ai-elements/shimmer';
 import { Tool, ToolHeader, ToolContent, ToolOutput } from '@/components/ai-elements/tool';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
-  fetchHistory, getSession, requestHuman, sendMessage, clearSession, setChatContext,
+  fetchHistory, getSession, sendMessage, clearSession, setChatContext,
   type SupportMessage, type SupportStatus, type SupportTool,
 } from '@/lib/supportChat';
 
 // Questions customers ask after placing an order
-const SUGGESTIONS = ['מתי הטכנאי מגיע?', 'איך משלמים בסוף התיקון?', 'מה להכין לפני שהטכנאי מגיע?', 'אפשר לשנות את מועד ההגעה?', 'כמה זמן לוקח התיקון?', 'מה האחריות על התיקון?'];
+const SUGGESTIONS = ['איך אני יכול לעקוב אחרי ההזמנה?', 'איך משלמים בסוף התיקון?', 'הטכנאי יכול לתקן ברכב שלו?', 'מה להכין לפני שהטכנאי מגיע?', 'כמה זמן לוקח התיקון?'];
 const TOOL_TITLES: Record<string, string> = {
   lookup_order: 'בדיקת הזמנה',
   get_repair_prices: 'בדיקת מחירון',
@@ -88,6 +87,8 @@ const SupportChat = ({ orderNumber, name, phone }: SupportChatProps) => {
   const [input, setInput] = useState('');
   const [unread, setUnread] = useState(false);
   const busy = chatStatus === 'submitted' || chatStatus === 'streaming';
+  const asked = new Set(messages.filter((m) => m.role === 'customer').map((m) => m.content.trim()));
+  const remaining = SUGGESTIONS.filter((q) => !asked.has(q));
   const panelRef = useRef<HTMLDivElement>(null);
   const focusInput = () => panelRef.current?.querySelector('textarea')?.focus();
   const lastAdminCount = useRef(0);
@@ -190,16 +191,6 @@ const SupportChat = ({ orderNumber, name, phone }: SupportChatProps) => {
 
   const handleSubmit = (message: PromptInputMessage) => send(message.text || input);
 
-  const askForHuman = async () => {
-    try {
-      const r = await requestHuman();
-      setMessages((prev) => [...prev, ...r.messages]);
-      setConvStatus(r.status);
-      setWhatsappUrl(r.whatsappUrl);
-    } catch {
-      setMessages((prev) => [...prev, { id: `err-${Date.now()}`, role: 'system', content: 'לא הצלחנו להעביר לנציג. אפשר להתקשר 033106020.', tool_calls: null, created_at: new Date().toISOString() }]);
-    }
-  };
 
   const launcherBottom = 'bottom-[calc(env(safe-area-inset-bottom)+1.25rem)]';
 
@@ -224,7 +215,7 @@ const SupportChat = ({ orderNumber, name, phone }: SupportChatProps) => {
         <div
           ref={panelRef}
           role="dialog"
-          aria-label="צ'אט תמיכה Direct Fix"
+          aria-label="צ'אט תמיכה דיירקט פיקס"
           dir="rtl"
           className="fixed z-[60] inset-0 sm:inset-auto sm:left-4 sm:bottom-4 sm:w-[420px] sm:h-[640px] sm:max-h-[calc(100vh-2rem)] flex flex-col bg-background sm:rounded-3xl sm:border sm:border-border shadow-2xl overflow-hidden animate-scale-in"
         >
@@ -232,7 +223,7 @@ const SupportChat = ({ orderNumber, name, phone }: SupportChatProps) => {
           <div className="flex items-center gap-3 px-4 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] sm:pt-3 border-b border-border bg-card/80 backdrop-blur-xl">
             <img src={shiraAvatar} alt="" className="w-11 h-11 rounded-full object-cover border-2 border-primary/30" />
             <div className="flex-1 min-w-0">
-              <p className="font-extrabold text-base leading-tight">העוזרת של Direct Fix</p>
+              <p className="font-extrabold text-base leading-tight">העוזרת של דיירקט פיקס</p>
               <p className="text-xs text-muted-foreground flex items-center gap-1.5">
                 <span className={cn('w-2 h-2 rounded-full', convStatus === 'bot' ? 'bg-success' : 'bg-accent')} aria-hidden="true" />
                 {statusLine[convStatus]}
@@ -276,7 +267,7 @@ const SupportChat = ({ orderNumber, name, phone }: SupportChatProps) => {
                   <img src={shiraAvatar} alt="" className="w-20 h-20 rounded-full object-cover border-4 border-primary/20" />
                   <div className="space-y-1">
                     <h3 className="font-extrabold text-xl">{orderNumber ? `יש שאלה על הזמנה #${orderNumber}?` : 'יש שאלה על ההזמנה?'}</h3>
-                    <p className="text-muted-foreground text-sm">הגעת הטכנאי, תשלום, הכנה לתיקון ואחריות. אם לא אדע, אעביר לנציג.</p>
+                    <p className="text-muted-foreground text-sm">מעקב הזמנה, תשלום, הכנה לתיקון ותיקון ברכב הטכנאי.</p>
                   </div>
                   <div className="flex flex-wrap justify-center gap-2">
                     {SUGGESTIONS.map((s) => (
@@ -303,6 +294,18 @@ const SupportChat = ({ orderNumber, name, phone }: SupportChatProps) => {
                   );
                 })
               )}
+              {!busy && messages.length > 0 && messages[messages.length - 1].role !== 'customer' && remaining.length > 0 && (
+                <div className="flex flex-col gap-2" aria-label="שאלות נוספות">
+                  <p className="text-xs font-bold text-muted-foreground">שאלות נוספות</p>
+                  <div className="flex flex-wrap gap-2">
+                    {remaining.map((q) => (
+                      <button key={q} type="button" onClick={() => send(q)} className="rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10">
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {busy && (
                 <Message from="assistant">
                   {streamTools.map((t, i) => <ToolCard key={i} tool={t} />)}
@@ -326,14 +329,7 @@ const SupportChat = ({ orderNumber, name, phone }: SupportChatProps) => {
                 className="text-base"
               />
               <PromptInputFooter>
-                <PromptInputTools>
-                  {convStatus === 'bot' && (
-                    <Button type="button" variant="ghost" size="sm" onClick={askForHuman} className="gap-1.5 text-muted-foreground">
-                      <MessageCircle className="w-4 h-4" aria-hidden="true" />
-                      לדבר עם נציג
-                    </Button>
-                  )}
-                </PromptInputTools>
+                <PromptInputTools />
                 <PromptInputSubmit status={chatStatus} disabled={!input.trim() || busy} aria-label="שליחה" />
               </PromptInputFooter>
             </PromptInput>
