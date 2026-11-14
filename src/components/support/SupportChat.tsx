@@ -32,7 +32,7 @@ const statusLine: Record<SupportStatus, string> = {
 
 function TypingDots() {
   return (
-    <span className="inline-flex items-center gap-1.5 py-2" role="status" aria-label="העוזרת מקלידה">
+    <span className="inline-flex items-center gap-1.5 rounded-2xl bg-muted px-4 py-3" role="status" aria-label="העוזרת מקלידה">
       {[0, 1, 2].map((i) => (
         <span key={i} className="w-2.5 h-2.5 rounded-full bg-muted-foreground/70 animate-typing-dot" style={{ animationDelay: `${i * 0.18}s` }} aria-hidden="true" />
       ))}
