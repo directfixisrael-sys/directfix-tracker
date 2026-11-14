@@ -77,10 +77,10 @@ function ToolCard({ tool }: { tool: SupportTool }) {
   );
 }
 
-interface SupportChatProps { orderNumber?: number | null; name?: string; phone?: string }
+interface SupportChatProps { orderNumber?: number | null; name?: string; phone?: string; defaultOpen?: boolean }
 
-const SupportChat = ({ orderNumber, name, phone }: SupportChatProps) => {
-  const [open, setOpen] = useState(false);
+const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportChatProps) => {
+  const [open, setOpen] = useState(defaultOpen);
   const [messages, setMessages] = useState<SupportMessage[]>([]);
   const [convStatus, setConvStatus] = useState<SupportStatus>('bot');
   const [chatStatus, setChatStatus] = useState<ChatStatus>('ready');

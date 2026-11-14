@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import CustomerTracker from "./pages/CustomerTracker";
 import AdminPanel from "./pages/AdminPanel";
 import NewRepairOrder from "./pages/NewRepairOrder";
+import { lazy, Suspense } from "react";
+const ChatPreview = lazy(() => import("./pages/ChatPreview"));
 import DevicePurchase from "./pages/DevicePurchase";
 import ConsultationBooking from "./pages/ConsultationBooking";
 import DataTransfer from "./pages/DataTransfer";
@@ -70,6 +72,7 @@ const App = () => (
                   <Route path="/wp-order" element={<WpOrderRedirect />} />
                   <Route path="/track" element={<CustomerTracker />} />
                   <Route path="/order" element={<NewRepairOrder />} />
+                  <Route path="/chat-preview" element={<Suspense fallback={null}><ChatPreview /></Suspense>} />
                   <Route path="/devices" element={<DevicePurchase />} />
                   <Route path="/admin" element={<AdminPanel />} />
                   <Route path="/consultation" element={<ConsultationBooking />} />
