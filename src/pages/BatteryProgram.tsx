@@ -75,13 +75,13 @@ const BatteryProgram = () => {
       return;
     }
     setIsSubmitting(true);
-    await supabase.from('leads').insert({
-      customer_name: name.trim(),
-      customer_phone: phone.trim().replace(/\D/g, ''),
-      last_step: 'battery_landing',
-      device_type: selectedModel || 'iPhone',
-      repair_type: 'סוללה',
-      privacy_accepted: true,
+    await supabase.rpc('create_lead', {
+      _customer_name: name.trim(),
+      _customer_phone: phone.trim().replace(/\D/g, ''),
+      _last_step: 'battery_landing',
+      _device_type: selectedModel || 'iPhone',
+      _repair_type: 'סוללה',
+      _privacy_accepted: true,
     });
     setSubmitted(true);
     setIsSubmitting(false);

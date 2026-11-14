@@ -23,17 +23,8 @@ export const calculateDiscountFromPoints = (points: number): number => {
 
 export const getCustomerPoints = async (phone: string): Promise<number> => {
   const normalized = phone.replace(/\D/g, '');
-  const { data } = await supabase
-    .from('loyalty_points')
-    .select('points, type')
-    .eq('customer_phone', normalized);
-
-  if (!data) return 0;
-  return data.reduce((sum, p) => {
-    if (p.type === 'earned') return sum + p.points;
-    if (p.type === 'redeemed') return sum - p.points;
-    return sum + p.points; // adjustment (can be negative)
-  }, 0);
+  const { data } = await supabase.rpc('get_loyalty_balance', { _phone: normalized });
+  return Number(data) || 0;
 };
 
 const LoyaltyPointsDisplay = ({ customerPhone, mode, repairPrice = 0, showTerms = false }: LoyaltyPointsDisplayProps) => {
