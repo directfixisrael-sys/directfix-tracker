@@ -98,7 +98,7 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [unread, setUnread] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTIONS);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const busy = chatStatus === 'submitted' || chatStatus === 'streaming';
   const asked = new Set(messages.filter((m) => m.role === 'customer').map((m) => m.content.trim()));
   const remaining = suggestions.filter((q) => !asked.has(q));
@@ -121,7 +121,7 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
 
   useEffect(() => {
     let alive = true;
-    fetchFaqQuestions().then((q) => { if (alive && q) setSuggestions(q); });
+    fetchFaqQuestions().then((q) => { if (alive) setSuggestions(q ?? DEFAULT_SUGGESTIONS); });
     return () => { alive = false; };
   }, []);
 
