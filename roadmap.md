@@ -9,4 +9,5 @@
 - [x] Small "הוסף תיקון" button next to the add-repair hint, showing the short loading screen.
 - [x] Remove the "נמצא טכנאי פנוי מחר" part from the loading screen.
 - [x] Coupon box in the cart closed by default; opens on "יש לי קוד קופון".
-- [ ] Close (X) button for the opened coupon box in the cart.
+- [x] Close (X) button for the opened coupon box in the cart.
+- [ ] AI support chat: answers from help docs + order data, hands off to a person when unsure (waiting on answers).
