@@ -1171,7 +1171,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_lead: {
+        Args: {
+          _customer_email?: string
+          _customer_name: string
+          _customer_phone: string
+          _device_type?: string
+          _last_step?: string
+          _privacy_accepted?: boolean
+          _repair_type?: string
+        }
+        Returns: string
+      }
+      finalize_order_loyalty: {
+        Args: {
+          _join_club: boolean
+          _order_id: string
+          _redeem_points?: number
+        }
+        Returns: undefined
+      }
       get_home_stats: { Args: never; Returns: Json }
+      get_loyalty_balance: { Args: { _phone: string }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1180,6 +1201,21 @@ export type Database = {
         Returns: boolean
       }
       increment_coupon_usage: { Args: { coupon_code: string }; Returns: Json }
+      is_active_club_member: { Args: { _phone: string }; Returns: boolean }
+      join_club: { Args: { _name: string; _phone: string }; Returns: string }
+      update_lead: {
+        Args: {
+          _converted?: boolean
+          _customer_email?: string
+          _customer_name?: string
+          _customer_phone?: string
+          _device_type?: string
+          _last_step?: string
+          _lead_id: string
+          _repair_type?: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "staff"
