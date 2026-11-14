@@ -21,6 +21,9 @@ const TOOL_TITLES: Record<string, string> = {
   handoff_to_human: 'העברה לנציג',
 };
 
+// Our own links (like the order tracking page) open straight away, others ask first
+const linkSafety = { enabled: true, onLinkCheck: (url: string) => /^https:\/\/([a-z0-9-]+\.)?directfix\.co\.il(\/|$)/i.test(url) };
+
 const statusLine: Record<SupportStatus, string> = {
   bot: 'עונה מיד, 24/7',
   waiting_human: 'ממתינים לנציג',
@@ -288,7 +291,7 @@ const SupportChat = ({ orderNumber, name, phone }: SupportChatProps) => {
                       {m.role === 'admin' && <span className="text-xs font-bold text-accent flex items-center gap-1"><UserRound className="w-3.5 h-3.5" aria-hidden="true" />נציג Direct Fix</span>}
                       {m.tool_calls?.map((t, i) => <ToolCard key={i} tool={t} />)}
                       <MessageContent className={cn('text-base', isUser && 'group-[.is-user]:bg-primary group-[.is-user]:text-primary-foreground group-[.is-user]:rounded-2xl')}>
-                        {isUser ? <p className="whitespace-pre-wrap">{m.content}</p> : <MessageResponse>{m.content}</MessageResponse>}
+                        {isUser ? <p className="whitespace-pre-wrap">{m.content}</p> : <MessageResponse linkSafety={linkSafety}>{m.content}</MessageResponse>}
                       </MessageContent>
                     </Message>
                   );
@@ -310,7 +313,7 @@ const SupportChat = ({ orderNumber, name, phone }: SupportChatProps) => {
                 <Message from="assistant">
                   {streamTools.map((t, i) => <ToolCard key={i} tool={t} />)}
                   <MessageContent className="text-base">
-                    {streamText ? <MessageResponse>{streamText}</MessageResponse> : <Shimmer>חושבת...</Shimmer>}
+                    {streamText ? <MessageResponse linkSafety={linkSafety}>{streamText}</MessageResponse> : <Shimmer>חושבת...</Shimmer>}
                   </MessageContent>
                 </Message>
               )}
