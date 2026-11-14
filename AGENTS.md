@@ -1,4 +1,4 @@
 # Architecture rules
 - Repair checkout keeps optional club enrollment in the final details step, while legacy points recovery links resolve to price confirmation, so loyalty never interrupts checkout.- Customer-facing pages never read or write private tables (leads, club members, loyalty points) directly; they call narrow validated database functions, and public file uploads go through the public-upload server function, so visitors cannot see or change other customers' data.
 - The repair order cart (current repair + extra repairs, bundle, coupon) is saved to browser storage and restored on return, except for recovery deep links, so an accidental back or refresh never empties it.
-- The customer support chat talks only to the `support-chat` server function using a per-conversation secret token; support tables are admin-only, so customers can never read other chats.
+- The customer support chat talks only to the `support-chat` server function using a per-conversation secret token (its suggested questions and answers also come from that function, out of an admin-only table); support tables are admin-only, so customers can never read other chats.

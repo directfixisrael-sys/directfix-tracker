@@ -135,8 +135,13 @@ export default {
           "0%, 100%": { opacity: "1", transform: "scale(1)" },
           "50%": { opacity: "0.85", transform: "scale(1.03)" },
         },
+        "typing-dot": {
+          "0%, 60%, 100%": { transform: "translateY(0)", opacity: "0.45" },
+          "30%": { transform: "translateY(-5px)", opacity: "1" },
+        },
       },
       animation: {
+        "typing-dot": "typing-dot 1.1s ease-in-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "gradient-x": "gradient-x 3s ease infinite",

@@ -5,16 +5,15 @@ import shiraAvatar from '@/assets/shira-avatar.png';
 import { Conversation, ConversationContent, ConversationEmptyState, ConversationScrollButton } from '@/components/ai-elements/conversation';
 import { Message, MessageContent, MessageResponse } from '@/components/ai-elements/message';
 import { PromptInput, PromptInputTextarea, PromptInputFooter, PromptInputSubmit, PromptInputTools, type PromptInputMessage } from '@/components/ai-elements/prompt-input';
-import { Shimmer } from '@/components/ai-elements/shimmer';
 import { Tool, ToolHeader, ToolContent, ToolOutput } from '@/components/ai-elements/tool';
 import { cn } from '@/lib/utils';
 import {
-  fetchHistory, getSession, sendMessage, clearSession, setChatContext,
+  fetchHistory, fetchFaqQuestions, getSession, sendMessage, clearSession, setChatContext,
   type SupportMessage, type SupportStatus, type SupportTool,
 } from '@/lib/supportChat';
 
-// Questions customers ask after placing an order
-const SUGGESTIONS = ['איך אני יכול לעקוב אחרי ההזמנה?', 'איך משלמים בסוף התיקון?', 'הטכנאי יכול לתקן ברכב שלו?', 'מה להכין לפני שהטכנאי מגיע?', 'כמה זמן לוקח התיקון?'];
+// Fallback questions until the admin-managed list loads
+const DEFAULT_SUGGESTIONS = ['איך אני יכול לעקוב אחרי ההזמנה?', 'איך משלמים בסוף התיקון?', 'הטכנאי יכול לתקן ברכב שלו?', 'מה להכין לפני שהטכנאי מגיע?', 'כמה זמן לוקח התיקון?'];
 const TOOL_TITLES: Record<string, string> = {
   lookup_order: 'בדיקת הזמנה',
   get_repair_prices: 'בדיקת מחירון',
@@ -30,6 +29,16 @@ const statusLine: Record<SupportStatus, string> = {
   human: 'נציג בשיחה',
   closed: 'השיחה נסגרה',
 };
+
+function TypingDots() {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-2xl bg-muted px-4 py-3" role="status" aria-label="העוזרת מקלידה">
+      {[0, 1, 2].map((i) => (
+        <span key={i} className="w-2.5 h-2.5 rounded-full bg-muted-foreground/70 animate-typing-dot" style={{ animationDelay: `${i * 0.18}s` }} aria-hidden="true" />
+      ))}
+    </span>
+  );
+}
 
 function ToolResult({ tool }: { tool: SupportTool }) {
   const out = tool.output || {};
@@ -89,9 +98,10 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [unread, setUnread] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const busy = chatStatus === 'submitted' || chatStatus === 'streaming';
   const asked = new Set(messages.filter((m) => m.role === 'customer').map((m) => m.content.trim()));
-  const remaining = SUGGESTIONS.filter((q) => !asked.has(q));
+  const remaining = suggestions.filter((q) => !asked.has(q));
   const panelRef = useRef<HTMLDivElement>(null);
   const focusInput = () => panelRef.current?.querySelector('textarea')?.focus();
   const lastAdminCount = useRef(0);
@@ -108,6 +118,12 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
       lastAdminCount.current = adminCount;
     } catch { /* ignore */ }
   }, [open]);
+
+  useEffect(() => {
+    let alive = true;
+    fetchFaqQuestions().then((q) => { if (alive) setSuggestions(q ?? DEFAULT_SUGGESTIONS); });
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     setChatContext({ orderNumber, name, phone });
@@ -273,7 +289,7 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
                     <p className="text-muted-foreground text-sm">מעקב הזמנה, תשלום, הכנה לתיקון ותיקון ברכב הטכנאי.</p>
                   </div>
                   <div className="flex flex-wrap justify-center gap-2">
-                    {SUGGESTIONS.map((s) => (
+                    {suggestions.map((s) => (
                       <button key={s} type="button" onClick={() => send(s)} className="rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10">
                         {s}
                       </button>
@@ -313,7 +329,7 @@ const SupportChat = ({ orderNumber, name, phone, defaultOpen = false }: SupportC
                 <Message from="assistant">
                   {streamTools.map((t, i) => <ToolCard key={i} tool={t} />)}
                   <MessageContent className="text-base">
-                    {streamText ? <MessageResponse linkSafety={linkSafety}>{streamText}</MessageResponse> : <Shimmer>חושבת...</Shimmer>}
+                    {streamText ? <MessageResponse linkSafety={linkSafety}>{streamText}</MessageResponse> : <TypingDots />}
                   </MessageContent>
                 </Message>
               )}
