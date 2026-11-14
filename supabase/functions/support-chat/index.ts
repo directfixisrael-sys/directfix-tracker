@@ -32,7 +32,6 @@ const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("start"), name: z.string().trim().max(80).optional(), phone: z.string().trim().max(20).optional(), orderNumber: z.number().int().positive().max(10000000).optional() }),
   Auth.extend({ action: z.literal("history") }),
   Auth.extend({ action: z.literal("send"), message: z.string().trim().min(1).max(1000), page: z.string().max(200).optional() }),
-  Auth.extend({ action: z.literal("handoff") }),
 ]);
 
 async function sha256(text: string) {
@@ -53,6 +52,7 @@ async function loadConversation(conversationId: string, token: string) {
   return data;
 }
 
+const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 const whatsappUrl = (text: string) =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`שלום, אני פונה מהצ'אט באתר. ${text}`.slice(0, 600))}`;
 
@@ -175,7 +175,7 @@ function orderSummary(o: any) {
 async function runTool(conv: any, name: string, args: any, failedSoFar: { n: number }, state: { handoffReason: string | null }) {
   if (name === "lookup_order") {
     if (failedSoFar.n >= MAX_FAILED_LOOKUPS_PER_HOUR) {
-      return { found: false, error: "יותר מדי ניסיונות. יש להעביר לנציג." };
+      return { found: false, error: "יותר מדי ניסיונות. להפנות את הלקוח לווטסאפ." };
     }
     const phone = normalizePhone(String(args.phone || ""));
     const num = Number(args.order_number);
@@ -206,7 +206,7 @@ async function runTool(conv: any, name: string, args: any, failedSoFar: { n: num
           note: "מחירים לפני מבצעים. המחיר הסופי מוצג בעמוד ההזמנה.",
         };
       }
-      return { models: [], note: "הדגם לא נמצא במחירון. אפשר לבדוק בעמוד ההזמנה או להעביר לנציג." };
+      return { models: [], note: "הדגם לא נמצא במחירון. אפשר לבדוק בעמוד ההזמנה או לכתוב לנו בווטסאפ." };
     }
     const { data: prices } = await supabase
       .from("model_repair_prices")
@@ -257,11 +257,12 @@ async function buildInstructions(conv: any) {
 - מחיר לדגם: השתמשי ב-get_repair_prices.
 - שאלה על הזמנה קיימת: בקשי טלפון ומספר הזמנה, ואז lookup_order. אל תמסרי פרטי הזמנה בלי התאמה של שניהם. אל תמסרי כתובת.
 - הזמנה שעדיין אין לה טכנאי משויך או זמן הגעה: אל תכתבי "עדיין לא מופיע טכנאי" או "אין זמן הגעה", ואל תשלחי להתקשר כדי לברר מועד. כתבי בחום שקיבלנו את ההזמנה והיא כבר בטיפול שלנו, שאנחנו משבצים לה טכנאי, ושנעדכן את הלקוח כשהטכנאי בדרך. אפשר לצרף את קישור המעקב לסטטוס חי.
-- אין שיחה עם נציג בצ'אט. אם את לא בטוחה, אין מידע, או מדובר בתלונה/החזר/אחריות/ביטול/שינוי מועד - כתבי בנימוס שאפשר להתקשר אלינו 033106020.
+- אין שיחה עם נציג בצ'אט ואין העברה לאדם - את עונה לבד, תמיד. אל תבטיחי שמישהו יחזור בצ'אט.
+- שאלה מעבר למה שאת יודעת, תלונה, החזר, אחריות, ביטול, שינוי מועד או עדכון כתובת: הפני בנימוס לווטסאפ שלנו, תמיד כקישור markdown: [לכתוב לנו בווטסאפ](${WHATSAPP_LINK}). אל תפני לטלפון.
 - להזמנת תיקון הפני לעמוד ההזמנה /order. למעקב - /track.
 - אל תבטיחי הגעה תוך שעה.
 - כתבי את שם העסק בעברית: דיירקט פיקס.
-- הצ'אט נפתח ללקוח אחרי שביצע הזמנה. שאלות נפוצות: איך משלמים (בסוף התיקון, אחרי שהמכשיר עובד, כל אמצעי התשלום כולל העברה בנקאית ישירה), מה להכין (לגבות את המכשיר, לזכור את קוד הנעילה, להיות זמינים בטלפון), משך התיקון, האם הטכנאי יכול לתקן ברכב שלו (כן, ומומלץ - חוסך ללקוח זמן), ואיך עוקבים אחרי ההזמנה (תמיד לצרף את קישור המעקב כקישור markdown). שינוי מועד, ביטול או עדכון כתובת - להתקשר 033106020.
+- הצ'אט נפתח ללקוח אחרי שביצע הזמנה. שאלות נפוצות: איך משלמים (בסוף התיקון, אחרי שהמכשיר עובד, כל אמצעי התשלום כולל העברה בנקאית ישירה), מה להכין (לגבות את המכשיר, לזכור את קוד הנעילה, להיות זמינים בטלפון), משך התיקון, האם הטכנאי יכול לתקן ברכב שלו (כן, ומומלץ - חוסך ללקוח זמן), ואיך עוקבים אחרי ההזמנה (תמיד לצרף את קישור המעקב כקישור markdown). שינוי מועד, ביטול או עדכון כתובת - לווטסאפ.
 
 ${HELP_DOCS}${faqText}${verified}`;
 }
@@ -326,12 +327,6 @@ Deno.serve(async (req) => {
       return json({ status: conv.status, messages: data || [] });
     }
 
-    if (body.action === "handoff") {
-      const { data: last } = await supabase.from("support_messages").select("content").eq("conversation_id", conv.id).eq("role", "customer").order("created_at", { ascending: false }).limit(1).maybeSingle();
-      const sys = await startHandoff(conv, "הלקוח ביקש לדבר עם נציג", last?.content || "");
-      return json({ status: "waiting_human", messages: sys ? [sys] : [], whatsappUrl: whatsappUrl(last?.content || "") });
-    }
-
     // send
     const since = new Date(Date.now() - 10 * 60 * 1000).toISOString();
     const { count } = await supabase.from("support_messages").select("id", { count: "exact", head: true }).eq("conversation_id", conv.id).eq("role", "customer").gte("created_at", since);
@@ -339,9 +334,10 @@ Deno.serve(async (req) => {
 
     const customerMsg = await insertMessage(conv.id, "customer", body.message);
 
+    // The assistant always answers; there is no human mode
     if (conv.status !== "bot") {
-      await supabase.from("support_conversations").update({ admin_unread: true, status: conv.status === "closed" ? "waiting_human" : conv.status }).eq("id", conv.id);
-      return json({ status: conv.status === "closed" ? "waiting_human" : conv.status, messages: [customerMsg], whatsappUrl: whatsappUrl(body.message) });
+      await supabase.from("support_conversations").update({ status: "bot" }).eq("id", conv.id);
+      conv.status = "bot";
     }
 
     const { data: history } = await supabase
@@ -398,19 +394,13 @@ Deno.serve(async (req) => {
               input.push({ type: "function_call_output", call_id: c.call_id, output: JSON.stringify(result) });
             }
           }
-          if (!text.trim()) text = "לא הצלחתי לענות על זה. אפשר להתקשר אלינו 033106020.";
+          if (!text.trim()) text = `לא הצלחתי לענות על זה. אפשר [לכתוב לנו בווטסאפ](${WHATSAPP_LINK}).`;
           const botMsg = await insertMessage(conv.id, "bot", text, toolLog.length ? toolLog : null);
-          let status = "bot";
-          let sys = null;
-          if (state.handoffReason) {
-            sys = await startHandoff(conv, state.handoffReason, body.message);
-            status = "waiting_human";
-          }
-          send({ type: "done", message: botMsg, system: sys, status, whatsappUrl: status === "waiting_human" ? whatsappUrl(body.message) : null });
+          send({ type: "done", message: botMsg, system: null, status: "bot", whatsappUrl: null });
         } catch (e) {
           if (e instanceof GatewayError) console.error("gateway error", e.code, e.httpStatus, e.outcome, e.ids);
           else console.error("support chat error", e);
-          send({ type: "error", message: "משהו השתבש. אפשר לנסות שוב או לדבר עם נציג.", whatsappUrl: whatsappUrl(body.message) });
+          send({ type: "error", message: "משהו השתבש. אפשר לנסות שוב או לכתוב לנו בווטסאפ.", whatsappUrl: whatsappUrl(body.message) });
         } finally {
           controller.close();
         }
