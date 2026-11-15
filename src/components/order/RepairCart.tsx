@@ -4,6 +4,7 @@ import { ShoppingBag, X, Trash2, ChevronLeft, Plus, BadgePercent, Tag, Loader2 }
 import { Input } from '@/components/ui/input';
 import { Drawer, DrawerContent, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
+import CartTrustCarousel from './CartTrustCarousel';
 
 export interface RepairCartLine {
   key: string;
@@ -168,17 +169,7 @@ const RepairCart = ({
               ))}
             </ul>
 
-            {onAddRepair && (
-              <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-primary/5 border border-primary/15 px-4 py-2.5">
-                <p className="text-sm text-muted-foreground leading-snug">
-                  {count === 1 ? 'מוסיפים עוד תיקון? 15% הנחה על הזול מביניהם' : 'רוצים להוסיף עוד תיקון?'}
-                </p>
-                <Button size="sm" variant="outline" onClick={onAddRepair} className="h-9 rounded-full gap-1 px-3 flex-shrink-0 border-primary/30 text-primary">
-                  <Plus className="w-4 h-4" aria-hidden="true" />
-                  הוסף תיקון
-                </Button>
-              </div>
-            )}
+            <CartTrustCarousel count={count} onAddRepair={onAddRepair} />
 
             {coupon && (
               <div className="mt-3">
