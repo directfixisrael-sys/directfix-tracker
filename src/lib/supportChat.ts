@@ -3,7 +3,7 @@ const STORAGE_KEY = 'df_support_chat';
 const FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/support-chat`;
 const KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 /** Where customers go for questions beyond what the assistant answers. */
-export const SUPPORT_WHATSAPP_URL = 'https://wa.me/97233106020';
+export const SUPPORT_WHATSAPP_URL = `https://wa.me/972544597562?text=${encodeURIComponent("שלום, אני פונה מהצ'אט באתר דיירקט פיקס.")}`;
 
 export type SupportRole = 'customer' | 'bot' | 'admin' | 'system';
 export type SupportStatus = 'bot' | 'waiting_human' | 'human' | 'closed';

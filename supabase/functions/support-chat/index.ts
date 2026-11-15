@@ -5,7 +5,7 @@ import { z } from "npm:zod@3.23.8";
 import { HELP_DOCS } from "./knowledge.ts";
 
 const MODEL = "openai/gpt-6-astra";
-const WHATSAPP_NUMBER = "97233106020";
+const WHATSAPP_NUMBER = "972544597562";
 const MAX_CUSTOMER_MSGS_PER_10_MIN = 20;
 const MAX_FAILED_LOOKUPS_PER_HOUR = 5;
 
@@ -51,9 +51,9 @@ async function loadConversation(conversationId: string, token: string) {
   return data;
 }
 
-const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
+const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("שלום, אני פונה מהצ'אט באתר דיירקט פיקס.")}`;
 const whatsappUrl = (text: string) =>
-  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`שלום, אני פונה מהצ'אט באתר. ${text}`.slice(0, 600))}`;
+  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`שלום, אני פונה מהצ'אט באתר דיירקט פיקס. ${text}`.slice(0, 600))}`;
 
 async function insertMessage(conversationId: string, role: string, content: string, toolCalls: unknown = null) {
   const { data, error } = await supabase
