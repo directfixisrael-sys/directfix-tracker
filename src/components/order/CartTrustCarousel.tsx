@@ -24,35 +24,33 @@ export default function CartTrustCarousel({ count, onAddRepair }: Props) {
     { icon: Lock, title: 'פרטיות ושקט נפשי', text: 'התיקון מולכם, בלי מסירת סיסמה או איפוס', cta: false },
   ];
   const [i, setI] = useState(0);
-  const [paused, setPaused] = useState(false);
+  // Bumping `tick` restarts the timer after a manual dot click, so rotation never stops for good.
+  const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    if (paused) return;
     const t = setInterval(() => setI((p) => (p + 1) % slides.length), INTERVAL);
     return () => clearInterval(t);
-  }, [paused, slides.length]);
+  }, [slides.length, tick]);
 
   const idx = i % slides.length;
 
   return (
     <div
       className="mt-3 rounded-2xl bg-primary/5 border border-primary/15 px-4 pt-2.5 pb-2"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onTouchStart={() => setPaused(true)}
       role="region"
       aria-roledescription="קרוסלה"
       aria-label="למה דיירקט פיקס"
     >
-      <div className="relative h-14" aria-live="polite">
+      <div className="relative h-14 overflow-hidden" aria-live="polite">
         {slides.map((s, n) => {
           const Icon = s.icon;
           const active = n === idx;
+          const prev = n === (idx - 1 + slides.length) % slides.length;
           return (
             <div
               key={s.title}
               aria-hidden={!active}
-              className={`absolute inset-0 flex items-center justify-between gap-3 transition-all duration-500 ${active ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}
+              className={`absolute inset-0 flex items-center justify-between gap-3 transition-all duration-700 ease-out ${active ? 'opacity-100 translate-x-0' : prev ? 'opacity-0 translate-x-full pointer-events-none' : 'opacity-0 -translate-x-full pointer-events-none'}`}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <span className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
@@ -78,7 +76,7 @@ export default function CartTrustCarousel({ count, onAddRepair }: Props) {
           <button
             key={s.title}
             type="button"
-            onClick={() => { setI(n); setPaused(true); }}
+            onClick={() => { setI(n); setTick((x) => x + 1); }}
             aria-label={`מעבר אל: ${s.title}`}
             className={`h-1.5 rounded-full transition-all ${n === idx ? 'w-5 bg-primary' : 'w-1.5 bg-primary/25'}`}
           />
