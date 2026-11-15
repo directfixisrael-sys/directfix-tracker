@@ -71,7 +71,7 @@ const StoreLogin = ({ onLogin }: StoreLoginProps) => {
               <Logo size="lg" clickable={false} className="[&_span]:text-white [&_div]:border-white/20" />
             </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight" style={{ fontFamily: "'Ploni', sans-serif" }}>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight" style={{ fontFamily: "'Rubik', sans-serif" }}>
             חנות ההטבות
           </h1>
           <p className="text-white/70 text-lg max-w-md mx-auto">
