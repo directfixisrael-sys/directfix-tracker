@@ -1,3 +1,47 @@
+/* Ploni — self-hosted Hebrew typeface (files supplied by the site owner) */
+@font-face {
+  font-family: 'Ploni';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Ploni-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Ploni';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/Ploni-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Ploni';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/Ploni-DemiBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Ploni';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/Ploni-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Ploni';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/Ploni-UltraBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Ploni';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/fonts/Ploni-Black.woff2') format('woff2');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -210,13 +254,13 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Ploni', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   
   * {
-    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Ploni', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   /* High Contrast Mode */
