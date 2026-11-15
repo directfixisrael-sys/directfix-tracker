@@ -2163,7 +2163,7 @@ const AdminPanel = () => {
               <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-md">
                 <Wrench className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="font-extrabold text-sidebar-foreground text-lg tracking-tight" style={{ fontFamily: "'Ploni', sans-serif" }}>
+              <span className="font-extrabold text-sidebar-foreground text-lg tracking-tight" style={{ fontFamily: "'Rubik', sans-serif" }}>
                 direct<span className="text-sidebar-primary">fix</span>
               </span>
             </div>

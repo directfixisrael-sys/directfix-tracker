@@ -14,9 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        ploni: ["'Ploni'", "sans-serif"],
-        rubik: ["'Ploni'", "sans-serif"],
-        sans: ["'Ploni'", "sans-serif"],
+        rubik: ["'Rubik'", "sans-serif"],
+        sans: ["'Rubik'", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
