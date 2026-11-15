@@ -21,6 +21,7 @@ import Header from '@/components/Header';
 import SEO from "@/components/SEO";
 import { seo } from "@/lib/seoData";
 import { useHomeStats, HeroLiveProof } from '@/components/HomeSalesBoost';
+import SavedCartBar from '@/components/order/SavedCartBar';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -332,6 +333,9 @@ const Index = () => {
       <footer className="border-t-2 border-foreground/10 text-center py-5 text-sm text-muted-foreground bg-card" role="contentinfo">
         <p className="font-medium">{t('home.footer', { year: new Date().getFullYear() })}</p>
       </footer>
+
+      {/* Saved repair cart from the order page */}
+      <SavedCartBar />
     </div>);
 
 };
