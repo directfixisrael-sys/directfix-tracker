@@ -14,7 +14,9 @@ const json = (body: unknown, status = 200) =>
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 
-const nullableStr = (max = 500) => z.string().trim().max(max).optional().nullable();
+// Truncate over-long strings instead of rejecting: tracking must never fail an event.
+const nullableStr = (max = 500) =>
+  z.string().trim().transform((s) => s.slice(0, max)).optional().nullable();
 
 const trackSchema = z.object({
   action: z.literal("track"),
