@@ -51,7 +51,7 @@ const StorePage = () => {
               <Sparkles className="w-4 h-4 text-amber-400" />
               <span>הטבות בלעדיות לחברי מועדון</span>
             </div>
-            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-3" style={{ fontFamily: "'Rubik', sans-serif" }}>
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-3" style={{ fontFamily: "'Ploni', sans-serif" }}>
               חנות ההטבות של directfix
             </h1>
             <p className="text-white/70 max-w-lg text-lg">
