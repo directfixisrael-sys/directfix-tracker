@@ -1313,6 +1313,13 @@ const NewRepairOrder = () => {
         } : null,
         additional: additionalRepairs.map(a => ({ modelId: a.model.id, repairId: a.repair.id, price: a.price, backColor: a.backColor })),
         coupon: appliedCoupon,
+        // Display snapshot so the cart bar can render on other pages (e.g. home) without loading the catalog
+        display: {
+          lines: cartLines.map(({ onRemove, ...l }) => l),
+          adjustments: cartAdjustments,
+          subtotal: cartSubtotal,
+          total: cartTotal,
+        },
       }));
     } catch { /* ignore */ }
   }, [cartReady, step, mainInCart, selectedModel?.id, selectedRepair?.id, selectedBackColor, batteryPriceOverride, speakerPriceOverride, selectedBundleAddon, currentBundle?.id, additionalRepairs, appliedCoupon]);
