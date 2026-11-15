@@ -42,6 +42,33 @@ const getParam = (key: string): string | undefined => {
   return search.get(key) || hash.get(key) || undefined;
 };
 
+const cap = (v: string | null | undefined, max: number): string | null =>
+  v ? v.slice(0, max) : null;
+
+/** Bounds every attribution field (and the whole serialized object) to the server limits. */
+const sanitizeAttribution = (a: Attribution): Attribution => {
+  const clean: Attribution = {
+    utm_source: cap(a.utm_source, 200),
+    utm_medium: cap(a.utm_medium, 200),
+    utm_campaign: cap(a.utm_campaign, 200),
+    utm_content: cap(a.utm_content, 200),
+    utm_term: cap(a.utm_term, 200),
+    placement: cap(a.placement, 200),
+    fbclid: cap(a.fbclid, 400),
+    fbp: cap(a.fbp, 200),
+    fbc: cap(a.fbc, 400),
+    first_landing_url: cap(a.first_landing_url, 1000),
+    referrer: cap(a.referrer, 1000),
+  };
+  // The server also caps the serialized attribution object; drop the least
+  // important fields until it fits.
+  for (const key of ['referrer', 'first_landing_url', 'utm_content', 'utm_term'] as const) {
+    if (JSON.stringify(clean).length <= 950) break;
+    clean[key] = null;
+  }
+  return clean;
+};
+
 /** Capture UTM / fbclid / placement / landing url once per browser (persisted). */
 export const captureAttribution = (): Attribution => {
   if (typeof window === 'undefined') return {};
@@ -83,11 +110,12 @@ export const captureAttribution = (): Attribution => {
     merged.fbc = `fb.1.${Date.now()}.${merged.fbclid}`;
   }
 
+  const bounded = sanitizeAttribution(merged);
   try {
-    localStorage.setItem(ATTR_KEY, JSON.stringify(merged));
+    localStorage.setItem(ATTR_KEY, JSON.stringify(bounded));
   } catch { /* ignore */ }
 
-  return merged;
+  return bounded;
 };
 
 export const getAttribution = (): Attribution => {
@@ -240,7 +268,7 @@ export const trackMetaEvent = async (
     action: 'track',
     eventName,
     eventId,
-    eventSourceUrl: window.location.href,
+    eventSourceUrl: window.location.href.slice(0, 1000),
     visitorId: getVisitorId(),
     page: window.location.pathname,
     value: options.value ?? null,
@@ -252,11 +280,7 @@ export const trackMetaEvent = async (
       phone: options.phone || null,
       firstName: options.firstName || null,
     },
-    attribution: {
-      ...attribution,
-      fbp: attribution.fbp || null,
-      fbc: attribution.fbc || null,
-    },
+    attribution: sanitizeAttribution(attribution),
   };
 
   try {
